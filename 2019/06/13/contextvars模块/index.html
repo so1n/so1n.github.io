@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>contextvars模块 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记contextvars模块最主要的功能就是可以为a...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">contextvars模块</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">contextvars模块</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>June 13, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>16130</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="更新说明"><a href="#更新说明" class="headerlink" title="更新说明"></a>更新说明</h2><ul>
+<li>切换web框架sanic为starlette</li>
+<li>增加一个自己编写且可用于starlette,fastapi的context说明</li>
+</ul>
+<h2 id="1-有无上下文的区别"><a href="#1-有无上下文的区别" class="headerlink" title="1.有无上下文的区别"></a>1.有无上下文的区别</h2><p>首先,先回到两个Python的两个经典框架Django与Flask,他们有很多不同,比如在传request对象时,他们的方式就是不一样的.<br>先看看Django的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> django.http <span class="hljs-keyword">import</span> HttpResponse<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">root</span>(<span class="hljs-params">request</span>):</span><br>    so1n_name = request.GET.get(<span class="hljs-string">&#x27;so1n_name&#x27;</span>)<br>    <span class="hljs-keyword">return</span> HttpResponse(<span class="hljs-string">f&#x27;Name is <span class="hljs-subst">&#123;so1n_name&#125;</span>&#x27;</span>)<br></code></pre></td></tr></table></figure>
+<p>再看看Flask</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask, request<br><br><br>app = Flask(__name__)<br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">root</span>():</span><br>    so1n_name = request.GET.get(<span class="hljs-string">&#x27;so1n_name&#x27;</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&#x27;Name is <span class="hljs-subst">&#123;so1n_name&#125;</span>&#x27;</span><br></code></pre></td></tr></table></figure>
+<p>可以发现,在Django中,我们需要显示的传一个叫request变量,而Flask则是import一个叫request的全局变量,并在视图中直接使用,达到解耦的目的.</p>
+<p>可能会有人说, 也就是传个变量的区别,为了省传这个变量,而花许多功夫去维护一个全局变量,有点不值得,那可以看看下面的例子,如果层次多就会出现’一个参数传一天’的情况.分层做的好或者需求不坑爹一般不会出现像下面的情况,一个好的程序员能做好代码的分层,但还是要按照需求去更改代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 伪代码,举个例子一个request传了3个函数</span><br><span class="hljs-keyword">from</span> django.http <span class="hljs-keyword">import</span> HttpResponse<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">is_allow</span>(<span class="hljs-params">request, uid</span>):</span><br>	<span class="hljs-keyword">if</span> request.ip == <span class="hljs-string">&#x27;127.0.0.1&#x27;</span> <span class="hljs-keyword">and</span> check_permissions(uid):<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>	<span class="hljs-keyword">else</span>:<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">check_permissions</span>(<span class="hljs-params">request, uid</span>):</span><br>	<span class="hljs-keyword">pass</span><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">root</span>(<span class="hljs-params">request</span>):</span><br>	user_id = request.GET.get(<span class="hljs-string">&#x27;uid&#x27;</span>)<br>	<span class="hljs-keyword">if</span> is_allow(request, <span class="hljs-built_in">id</span>):<br>    	<span class="hljs-keyword">return</span> HttpResponse(<span class="hljs-string">&#x27;ok&#x27;</span>)<br>    <span class="hljs-keyword">else</span><br>	    <span class="hljs-keyword">return</span> HttpResponse(<span class="hljs-string">&#x27;error&#x27;</span>)<br></code></pre></td></tr></table></figure>
+<h2 id="2-在asyncio中使用contextvars"><a href="#2-在asyncio中使用contextvars" class="headerlink" title="2.在asyncio中使用contextvars"></a>2.在asyncio中使用contextvars</h2><p>threading.local 的隔离效果很好，但是他是针对线程的，只隔离线程之间的数据状态,所以werkzeug为了支持在gevent中运行,自己实现了一个Local变量,与contextvars相似,不过contextvars是对asyncio的上下文提供支持.</p>
+<p>下面以一个redis client为例子,展示如何在asyncio生态中使用contextvars(详细解释见代码).</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># demo/context.py</span><br><span class="hljs-comment"># 该文件存放contextvars相关</span><br><span class="hljs-keyword">import</span> contextvars<br><br><span class="hljs-keyword">if</span> TYPE_CHECKING:<br>    <span class="hljs-keyword">from</span> demo.redis_dal <span class="hljs-keyword">import</span> RDS  <span class="hljs-comment"># 这里是一个redis的封装实例</span><br><br><span class="hljs-comment"># 初始化一个redis相关的全局context</span><br>redis_pool_context = contextvars.ContextVar(<span class="hljs-string">&#x27;redis_pool&#x27;</span>)<br><br><span class="hljs-comment"># 通过函数调用可以获取到当前协程运行时的context上下文</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_redis</span>() -&gt; &#x27;RDS&#x27;:</span><br>    <span class="hljs-keyword">return</span> redis_pool_context.get()<br><br><span class="hljs-comment"># demo/web_tool.py</span><br><span class="hljs-comment"># 该文件存放starlette相关模块</span><br><span class="hljs-keyword">from</span> starlette.middleware.base <span class="hljs-keyword">import</span> BaseHTTPMiddleware<br><span class="hljs-keyword">from</span> starlette.requests <span class="hljs-keyword">import</span> Request<br><span class="hljs-keyword">from</span> starlette.middleware.base <span class="hljs-keyword">import</span> RequestResponseEndpoint<br><span class="hljs-keyword">from</span> starlette.responses <span class="hljs-keyword">import</span> Response<br><span class="hljs-keyword">from</span> demo.redis_dal <span class="hljs-keyword">import</span> RDS<br><br><br><span class="hljs-comment"># 初始化一个redis客户端变量,当前为空</span><br>REDIS_POOL = <span class="hljs-literal">None</span>  <span class="hljs-comment"># type: Optional[RDS]</span><br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RequestContextMiddleware</span>(<span class="hljs-params">BaseHTTPMiddleware</span>):</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dispatch</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">            self, request: Request, call_next: RequestResponseEndpoint</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; Response:</span><br>        <span class="hljs-comment"># 通过中间件,在进入路由之前,把redis客户端放入当前协程的上下文之中</span><br>        token = redis_pool_context.<span class="hljs-built_in">set</span>(REDIS_POOL)<br>        <span class="hljs-keyword">try</span>:<br>        	response = <span class="hljs-keyword">await</span> call_next(request)<br>            <span class="hljs-keyword">return</span> response<br>        <span class="hljs-keyword">finally</span>:<br>        	<span class="hljs-comment"># 调用完成,回收当前请求设置的redis客户端的上下文</span><br>	        redis_pool_context.reset(token)<br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">startup_event</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">global</span> REDIS_POOL<br><br>    REDIS_POOL = RDS() <span class="hljs-comment"># 初始化客户端,里面通过asyncio.ensure_future逻辑延后连接</span><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">shutdown_event</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">if</span> REDIS_POOL:<br>        <span class="hljs-keyword">await</span> REDIS_POOL.close() <span class="hljs-comment"># 关闭redis客户端</span><br><br><span class="hljs-comment"># demo/server.py</span><br><span class="hljs-comment"># 该文件存放starlette main逻辑</span><br><span class="hljs-keyword">from</span> starlette.applications <span class="hljs-keyword">import</span> Starlette<br><span class="hljs-keyword">from</span> starlette.responses <span class="hljs-keyword">import</span> JSONResponse<br><br><span class="hljs-keyword">from</span> demo.web_tool <span class="hljs-keyword">import</span> RequestContextMiddleware<br><span class="hljs-keyword">from</span> demo.context <span class="hljs-keyword">import</span> get_redis<br><br><br>APP = Starlette()<br>APP.add_middleware(RequestContextMiddleware)<br><br><br><span class="hljs-meta">@APP.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">homepage</span>(<span class="hljs-params">request</span>):</span><br>	<span class="hljs-comment"># 伪代码,这里是执行redis命令</span><br>	<span class="hljs-comment"># 只要验证 id(get_redis())等于demo.web_tool里REDID_POOL的id一致,那证明contextvars可以为asyncio维护一套上下文状态</span><br>	<span class="hljs-keyword">await</span> get_redis().execute()<br>    <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;hello&#x27;</span>: <span class="hljs-string">&#x27;world&#x27;</span>&#125;)<br></code></pre></td></tr></table></figure>
+<h2 id="3-在asyncio框架中使用contextvars中的好处"><a href="#3-在asyncio框架中使用contextvars中的好处" class="headerlink" title="3.在asyncio框架中使用contextvars中的好处"></a>3.在asyncio框架中使用contextvars中的好处</h2><p>首先看看未使用contextvars时,asyncio框架是如何传变量的,根据starlette的文档,在未使用contextvars时,传递redis客户端实例的办法是通过request.stat这个变量保存redis客户端的实例,改写代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># demo/web_tools.py</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RequestContextMiddleware</span>(<span class="hljs-params">BaseHTTPMiddleware</span>):</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dispatch</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">            self, request: Request, call_next: RequestResponseEndpoint</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; Response:</span><br>        request.stat.redis = REDIS_POOL<br>        response = <span class="hljs-keyword">await</span> call_next(request)<br>        <span class="hljs-keyword">return</span> response<br><span class="hljs-comment"># demo/server.py</span><br><span class="hljs-meta">@APP.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">homepage</span>(<span class="hljs-params">request</span>):</span><br>	<span class="hljs-comment"># 伪代码,这里是执行redis命令</span><br>	<span class="hljs-keyword">await</span> request.stat.redis.execute()<br>    <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;hello&#x27;</span>: <span class="hljs-string">&#x27;world&#x27;</span>&#125;)<br></code></pre></td></tr></table></figure>
+<p>可以发现,使用request.stat方法后代码量变少了,但是这是引用到了python动态特性的方法,所以除了在运行时,永远不知道这个方法调用到的变量的类型是什么,同时在编写代码时,IDE也无法智能的帮你检查(如输入request.stat.redis.时,IDE不会出现execute,或者出错时,IDE并不会提示).</p>
+<p>从<code>2.在asyncio中使用contextvars</code>中可以看到:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_redis</span>() -&gt; &#x27;RDS&#x27;:</span><br>    <span class="hljs-keyword">return</span> redis_pool_context.get()<br></code></pre></td></tr></table></figure>
+<p>使用contextvars可以与Type Hints结合,解决request.stat的缺点,虽然python是一种表达很强的动态语言,但是我觉得在web这种工程化比较严格的项目中,使用Type Hints来提升代码的可维护性和便利性是非常有必要的</p>
+<h2 id="4-如何优雅的使用contextvars"><a href="#4-如何优雅的使用contextvars" class="headerlink" title="4.如何优雅的使用contextvars"></a>4.如何优雅的使用contextvars</h2><p>从上面的示例代码来看,每多一个变量,就需要自己去写一个context,一个变量的初始化,一个变量的get函数,同时在引用时使用函数会比较别扭.</p>
+<p>自己在使用了<code>contextvars</code>一段时间后,觉得这样太麻烦了,每次都要做一堆重复的操作,且平时使用最多的就是把一个实例或者提炼出Headers的参数放入contextvars中,所以写了一个封装<a target="_blank" rel="noopener" href="https://github.com/so1n/fastapi-tools/blob/master/fastapi_tools/context/__init__.py">fastapi_tools.context</a>(虽然是用于<code>fastapi</code>的,但也是可以用于<code>starlette</code>),他能屏蔽所有与contextvars的相关逻辑,其中由ContextModel负责contextvars的set和get操作,ContextMiddleware管理contextvars的周期,HeaderQuery和CustomQuery分别托管Headers相关的参数和用户自己的实例.调用者只需要在ContextModel中写入自己需要的变量,引用时调用ContextModel的属性即可</p>
+<p>使用代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> uuid<br><span class="hljs-keyword">import</span> httpx<br><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> FastAPI<br><span class="hljs-keyword">from</span> fastapi_tools.context <span class="hljs-keyword">import</span> ContextMiddleware<br><span class="hljs-keyword">from</span> fastapi_tools.context <span class="hljs-keyword">import</span> ContextBaseModel<br><span class="hljs-keyword">from</span> fastapi_tools.context <span class="hljs-keyword">import</span> HeaderQuery  <span class="hljs-comment"># 用于把header的变量存放于contextvars中</span><br><span class="hljs-keyword">from</span> fastapi_tools.context <span class="hljs-keyword">import</span> CustomQuery  <span class="hljs-comment"># 用于把自己的实例(如上文所说的redis客户端)存放于contextvars中</span><br><br>app = FastAPI()<br>client = httpx.AsyncClient()<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ContextModel</span>(<span class="hljs-params">ContextBaseModel</span>):</span><br>	<span class="hljs-comment"># 通过该实例可以屏蔽大部分与contextvars相关的操作,如果要添加一个变量,则在该实例添加一个属性即可.</span><br>	<span class="hljs-comment"># 属性必须要使用Type Hints的写法,不然不会识别(强制使用Type Hints)</span><br>    request_id: <span class="hljs-built_in">str</span> = HeaderQuery(<br>        <span class="hljs-string">&#x27;X-Request-Id&#x27;</span>,<br>        default_func=<span class="hljs-keyword">lambda</span> request: <span class="hljs-built_in">str</span>(uuid.uuid4())<br>    ) <span class="hljs-comment"># 从headers中获取request id,如果没有这个值，则用uuid代替</span><br>    ip: <span class="hljs-built_in">str</span> = HeaderQuery(<br>        <span class="hljs-string">&#x27;X-Real-IP&#x27;</span>,<br>        default_func=<span class="hljs-keyword">lambda</span> request: request.client.host<br>    ) <span class="hljs-comment"># 从headers中获取ip,如果没有就从request.client.host中获取,default_func需要我们传入一个函数,且该函数必须接受一个starlette.request的变量</span><br>    user_agent: <span class="hljs-built_in">str</span> = HeaderQuery(<span class="hljs-string">&#x27;User-Agent&#x27;</span>)<br>    <br>    <span class="hljs-comment"># 自己传入自己实现的一个实例,交由CustomQuery托管</span><br>    http_client: httpx.AsyncClient = CustomQuery(client)<br><br><br><span class="hljs-comment"># 添加一个可以维护context的中间件,该中间件会自动维护该请求期间context_model的状态,与见&#x27;2.在asyncio中使用contextvars&#x27;中&#x27;demo/web_pool.py&#x27;的RequestContextMiddleware的原理差不多</span><br>app.add_middleware(ContextMiddleware, context_model=ContextModel())<br><br><br><span class="hljs-meta">@app.get(<span class="hljs-params"><span class="hljs-string">&quot;/&quot;</span></span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">root</span>():</span><br>	<span class="hljs-comment"># 通过访问ContextModel的属性即可获取到对应的上下文变量</span><br>	<span class="hljs-comment"># 检查contextvars的client实例是否与自己创建的一致</span><br>    <span class="hljs-keyword">assert</span> ContextModel.http_client == client<br>    <span class="hljs-comment"># 返回自己设置的headers参数</span><br>    <span class="hljs-keyword">return</span> &#123;<br>        <span class="hljs-string">&quot;message&quot;</span>: &#123;<br>            key: value<br>            <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> ContextModel.to_dict().items()<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> key.startswith(<span class="hljs-string">&#x27;custom&#x27;</span>) <span class="hljs-comment"># 去掉自己设置的实例,这里不应该被返回到用户展示</span><br>        &#125;<br>    &#125;<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    <span class="hljs-keyword">import</span> uvicorn<br>    uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+<h2 id="5-contextvars的原理"><a href="#5-contextvars的原理" class="headerlink" title="5.contextvars的原理"></a>5.contextvars的原理</h2><p>在第一次使用时,我就很好奇contextvars是如何去维护程序的上下文的,好在contextvars的作者出了一个向下兼容的<a target="_blank" rel="noopener" href="https://github.com/MagicStack/contextvars">contextvars</a>库,虽然他不支持asyncio,但我们还是可以通过代码了解到他的基本原理.</p>
+<h3 id="5-1-ContextMeta-ContextVarMeta和TokenMeta"><a href="#5-1-ContextMeta-ContextVarMeta和TokenMeta" class="headerlink" title="5.1 ContextMeta,ContextVarMeta和TokenMeta"></a>5.1 ContextMeta,ContextVarMeta和TokenMeta</h3><p><code>ContextMeta</code>,<code>ContextVarMeta</code>和<code>TokenMeta</code>的功能都是防止用户来继承<code>Context</code>,<code>ContextVar</code>和<code>Token</code>,原理都是通过元类来判断类名是否是自己编写类的名称,如果不是则抛错</p>
+<h3 id="5-2-Token"><a href="#5-2-Token" class="headerlink" title="5.2 Token"></a>5.2 Token</h3><p>用于保存调用set时的数据,包括context本身和上一次被set的旧数据,并在调用set后返回token.<br>返回的token可以被用户在调用context后,调用context.reset(token)来清空保存的上下文,方便context能及时的被回收</p>
+<h3 id="5-3-全局唯一context"><a href="#5-3-全局唯一context" class="headerlink" title="5.3 全局唯一context"></a>5.3 全局唯一context</h3><p>Python中由<code>threading.local()</code>负责每个线程的context, 协程属于线程的’子集’,所以contextvar直接基于<code>threading.local()</code>生成自己的全局context.</p>
+<p>contextvar通过<code>threading.local()</code>生成自己的全局context–_state.并通过_set_context把上下文对象设置到_state.context和_get_context从_state.context获取上下文(实际上也充当了set的功能)</p>
+<h4 id="5-3-1-threading-local"><a href="#5-3-1-threading-local" class="headerlink" title="5.3.1 threading.local()"></a>5.3.1 threading.local()</h4><p>关于<code>threading.local()</code>,虽然不是本文重点,但由于contextvars是基于<code>threading.local()</code>进行封装的,所以还是要明白<code>threading.local()</code>,这里做一个简单的示例解释.</p>
+<p>一个线程使用自己的局部变量比使用全局变量好，因为局部变量只有线程自己能看见，不会影响其他线程，而全局变量的修改必须加锁.但是局部变量也有问题，就是在函数调用的时候，传递起来很麻烦.<br>先看全局变量的例子:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs Python">pet_dict = &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_pet</span>(<span class="hljs-params">pet_name</span>):</span><br>	<span class="hljs-keyword">return</span> pet_dict[pet_name]<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set_pet</span>(<span class="hljs-params">pet_name</span>):</span><br>	<span class="hljs-keyword">return</span> pet_dict[pet_name]<br></code></pre></td></tr></table></figure>
+<p>如果是多线程调用的话,那就需要加锁啦,如果用局部变量,实际上就是每个线程有一个自己的<code>pet_dict</code>,假设每个线程调用<code>get_pet</code>,<code>set_pet</code>时,都会把自己的pid传入进来, 那么可以改为这样子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs Python">pet_dict = &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_pet</span>(<span class="hljs-params">pet_name, pid</span>):</span><br>	<span class="hljs-keyword">return</span> pet_dict[pid][pet_name]<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set_pet</span>(<span class="hljs-params">pet_name, pid</span>):</span><br>	<span class="hljs-keyword">return</span> pet_dict[pid][pet_name]<br></code></pre></td></tr></table></figure>
+<p>可以看到,没有对异常检查和初始化等处理,如果值比较复杂,靠我们手动维护太麻烦了.<br>这时候<code>threading.local()</code>就应运而生了,他负责帮我们处理这些维护的工作,我们只要对他进行一些调用即可,调用起来跟单线程调用一样简单方便.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs Python">thread_local=threading.local()<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_pet</span>(<span class="hljs-params">pet_name</span>):</span><br>	<span class="hljs-keyword">return</span> thread_local[pet_name]<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set_pet</span>(<span class="hljs-params">pet_name, pid</span>):</span><br>	<span class="hljs-keyword">return</span> thread_local[pet_name]<br></code></pre></td></tr></table></figure>
+<h3 id="5-4contextvar自己封装的Context"><a href="#5-4contextvar自己封装的Context" class="headerlink" title="5.4contextvar自己封装的Context"></a>5.4contextvar自己封装的Context</h3><p>contextvars自己封装的Context比较简单,主要是self._data,这里使用到了一个叫immutables.Map()的不可变对象,并对immutables.Map()进行一些封装,所以context可以看成一个不可变的dict.</p>
+<p>查看immutables.Map()的示例代码可以看到,每次对原对象的修改时,原对象并不会发生改变,并会返回一个已经发生改变的新对象.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python">map2 = <span class="hljs-built_in">map</span>.<span class="hljs-built_in">set</span>(<span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-number">10</span>)<br>print(<span class="hljs-built_in">map</span>, map2)<br><span class="hljs-comment"># will print:</span><br><span class="hljs-comment">#   &lt;immutables.Map(&#123;&#x27;a&#x27;: 1, &#x27;b&#x27;: 2&#125;)&gt;</span><br><span class="hljs-comment">#   &lt;immutables.Map(&#123;&#x27;a&#x27;: 10, &#x27;b&#x27;: 2&#125;)&gt;</span><br><br>map3 = map2.delete(<span class="hljs-string">&#x27;b&#x27;</span>)<br>print(<span class="hljs-built_in">map</span>, map2, map3)<br><span class="hljs-comment"># will print:</span><br><span class="hljs-comment">#   &lt;immutables.Map(&#123;&#x27;a&#x27;: 1, &#x27;b&#x27;: 2&#125;)&gt;</span><br><span class="hljs-comment">#   &lt;immutables.Map(&#123;&#x27;a&#x27;: 10, &#x27;b&#x27;: 2&#125;)&gt;</span><br><span class="hljs-comment">#   &lt;immutables.Map(&#123;&#x27;a&#x27;: 10&#125;)&gt;</span><br></code></pre></td></tr></table></figure>
+<p>此外,context还有一个叫<code>run</code>的方法,执行run的时候,会使用一个新的上下文来调用传入的函数.结果并不会影响当前上下文.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span>(<span class="hljs-params">self, <span class="hljs-built_in">callable</span>, *args, **kwargs</span>):</span><br>	<span class="hljs-comment"># 已经存在旧的context,抛出异常,防止多线程循环调用</span><br>    <span class="hljs-keyword">if</span> self._prev_context <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>        <span class="hljs-keyword">raise</span> RuntimeError(<br>            <span class="hljs-string">&#x27;cannot enter context: &#123;&#125; is already entered&#x27;</span>.<span class="hljs-built_in">format</span>(self))<br><br>    self._prev_context = _get_context()  <span class="hljs-comment"># 保存当前的context</span><br>    <span class="hljs-keyword">try</span>:<br>        _set_context(self) <span class="hljs-comment"># 设置新的context</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">callable</span>(*args, **kwargs)  <span class="hljs-comment"># 执行函数</span><br>    <span class="hljs-keyword">finally</span>:<br>        _set_context(self._prev_context)  <span class="hljs-comment"># 设置为旧的context</span><br>        self._prev_context = <span class="hljs-literal">None</span><br></code></pre></td></tr></table></figure>
+<h3 id="5-5-ContextVar"><a href="#5-5-ContextVar" class="headerlink" title="5.5 ContextVar"></a>5.5 ContextVar</h3><p>我们一般在使用contextvars模块时,经常使用的就是<code>ContextVar</code>这个类了,这个类很简单,主要提供了set–设置值,get–获取值,reset–重置值三个方法.</p>
+<ul>
+<li>set   <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, value</span>):</span><br>    ctx = _get_context()  <span class="hljs-comment"># 获取当前上下文对象`Context`</span><br>    data = ctx._data<br>    <span class="hljs-keyword">try</span>:<br>        old_value = data[self]  <span class="hljs-comment"># 获取Context旧对象</span><br>    <span class="hljs-keyword">except</span> KeyError:<br>        old_value = Token.MISSING  <span class="hljs-comment"># 获取不到则填充一个object(全局唯一)</span><br><br>    updated_data = data.<span class="hljs-built_in">set</span>(self, value) <span class="hljs-comment"># 设置新的值</span><br>    ctx._data = updated_data<br>    <span class="hljs-keyword">return</span> Token(ctx, self, old_value) <span class="hljs-comment"># 返回带有旧值的token</span><br></code></pre></td></tr></table></figure></li>
+<li>get  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, default=_NO_DEFAULT</span>):</span><br>    ctx = _get_context()  <span class="hljs-comment"># 获取当前上下文对象`Context`</span><br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-keyword">return</span> ctx[self]  <span class="hljs-comment"># 返回获取的值</span><br>    <span class="hljs-keyword">except</span> KeyError:<br>        <span class="hljs-keyword">pass</span><br><br>    <span class="hljs-keyword">if</span> default <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> _NO_DEFAULT:<br>        <span class="hljs-keyword">return</span> default    <span class="hljs-comment"># 返回调用get时设置的值</span><br><br>    <span class="hljs-keyword">if</span> self._default <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> _NO_DEFAULT:<br>        <span class="hljs-keyword">return</span> self._default  <span class="hljs-comment"># 返回初始化context时设置的默认值</span><br><br>    <span class="hljs-keyword">raise</span> LookupError  <span class="hljs-comment"># 都没有则会抛错</span><br></code></pre></td></tr></table></figure></li>
+<li>reset  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">reset</span>(<span class="hljs-params">self, token</span>):</span><br>       <span class="hljs-keyword">if</span> token._used:<br>       	<span class="hljs-comment"># 判断token是否已经被使用</span><br>           <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Token has already been used once&quot;</span>)<br><br>       <span class="hljs-keyword">if</span> token._var <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> self:<br>       	<span class="hljs-comment"># 判断token是否是当前contextvar返回的</span><br>           <span class="hljs-keyword">raise</span> ValueError(<br>               <span class="hljs-string">&quot;Token was created by a different ContextVar&quot;</span>)<br><br>       <span class="hljs-keyword">if</span> token._context <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> _get_context():<br>       	<span class="hljs-comment"># 判断token的上下文是否跟contextvar上下文一致</span><br>           <span class="hljs-keyword">raise</span> ValueError(<br>               <span class="hljs-string">&quot;Token was created in a different Context&quot;</span>)<br><br>       ctx = token._context<br>       <span class="hljs-keyword">if</span> token._old_value <span class="hljs-keyword">is</span> Token.MISSING:<br>       	<span class="hljs-comment"># 如果没有旧值则删除该值</span><br>           ctx._data = ctx._data.delete(token._var)<br>       <span class="hljs-keyword">else</span>:<br>       	<span class="hljs-comment"># 有旧值则当前contextvar变为旧值</span><br>           ctx._data = ctx._data.<span class="hljs-built_in">set</span>(token._var, token._old_value)<br><br>       token._used = <span class="hljs-literal">True</span>  <span class="hljs-comment"># 设置flag,标记token已经被使用了</span><br></code></pre></td></tr></table></figure>
+则此,contextvar的原理了解完了,接下来再看看他是如何在asyncio运行的.</li>
+</ul>
+<h2 id="6-contextvars-asyncio"><a href="#6-contextvars-asyncio" class="headerlink" title="6.contextvars asyncio"></a>6.contextvars asyncio</h2><p>这里使用<a target="_blank" rel="noopener" href="https://github.com/Skyscanner/aiotask-context">aiotask-context</a>进行源码分析,主要分析在如何在asyncio中如何获取和设置context</p>
+<h3 id="6-1在asyncio中获取context"><a href="#6-1在asyncio中获取context" class="headerlink" title="6.1在asyncio中获取context"></a>6.1在asyncio中获取context</h3><p>相比起contextvars复杂的概念,在asyncio中,我们可以很简单的获取到当前协程的task,并由task获取context,由于Pyhon3.7对asyncio的高级API 重新设计,所以可以看到需要对获取当前task进行封装</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python">PY37 = sys.version_info &gt;= (<span class="hljs-number">3</span>, <span class="hljs-number">7</span>)<br><br><span class="hljs-keyword">if</span> PY37:<br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">asyncio_current_task</span>(<span class="hljs-params">loop=<span class="hljs-literal">None</span></span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;Return the current task or None.&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-keyword">return</span> asyncio.current_task(loop)<br>        <span class="hljs-keyword">except</span> RuntimeError:<br>            <span class="hljs-comment"># simulate old behaviour</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br><span class="hljs-keyword">else</span>:<br>    asyncio_current_task = asyncio.Task.current_task<br></code></pre></td></tr></table></figure>
+<p>之后我们调用<code>asyncio_current_task().context</code>即可获取到当前的上下文了…</p>
+<h3 id="6-2-对上下文的操作"><a href="#6-2-对上下文的操作" class="headerlink" title="6.2 对上下文的操作"></a>6.2 对上下文的操作</h3><p>同样的,我们这里也需要set, get, clear的操作,不过十分简单,只要获取context后对他进行判空操作,再进行类似于dict的操作即可.</p>
+<ul>
+<li>set  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">key, value</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Sets the given value inside Task.context[key]. If the key does not exist it creates it.</span><br><span class="hljs-string">    :param key: identifier for accessing the context dict.</span><br><span class="hljs-string">    :param value: value to store inside context[key].</span><br><span class="hljs-string">    :raises</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    current_task = asyncio_current_task()<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> current_task:<br>        <span class="hljs-keyword">raise</span> ValueError(NO_LOOP_EXCEPTION_MSG.<span class="hljs-built_in">format</span>(key))<br><br>    current_task.context[key] = value<br></code></pre></td></tr></table></figure></li>
+<li>get  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">key, default=<span class="hljs-literal">None</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Retrieves the value stored in key from the Task.context dict. If key does not exist,</span><br><span class="hljs-string">    or there is no event loop running, default will be returned</span><br><span class="hljs-string">    :param key: identifier for accessing the context dict.</span><br><span class="hljs-string">    :param default: None by default, returned in case key is not found.</span><br><span class="hljs-string">    :return: Value stored inside the dict[key].</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    current_task = asyncio_current_task()<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> current_task:<br>        <span class="hljs-keyword">raise</span> ValueError(NO_LOOP_EXCEPTION_MSG.<span class="hljs-built_in">format</span>(key))<br><br>    <span class="hljs-keyword">return</span> current_task.context.get(key, default)<br></code></pre></td></tr></table></figure></li>
+<li>clear  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">clear</span>():</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Clear the Task.context.</span><br><span class="hljs-string">    :raises ValueError: if no current task.</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    current_task = asyncio_current_task()<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> current_task:<br>        <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&quot;No event loop found&quot;</span>)<br><br>    current_task.context.clear()<br></code></pre></td></tr></table></figure>
+<h3 id="6-2-copying-task-factory和chainmap-task-factory"><a href="#6-2-copying-task-factory和chainmap-task-factory" class="headerlink" title="6.2 copying_task_factory和chainmap_task_factory"></a>6.2 copying_task_factory和chainmap_task_factory</h3>在Python的更高级版本中,以及支持设置context了,所以这两个方法可以不再使用了.他们最后都用到了<code>task_factory</code>的方法,简单说就是创建一个新的task,再合成context,最后把context设置到task<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">task_factory</span>(<span class="hljs-params">loop, coro, copy_context=<span class="hljs-literal">False</span>, context_factory=<span class="hljs-literal">None</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    By default returns a task factory that uses a simple dict as the task context,</span><br><span class="hljs-string">    but allows context creation and inheritance to be customized via ``context_factory``.</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    <span class="hljs-comment"># 生成context工厂函数</span><br>    context_factory = context_factory <span class="hljs-keyword">or</span> partial(<br>        dict_context_factory, copy_context=copy_context)<br><br>	<span class="hljs-comment"># 创建task</span><br>    task = asyncio.tasks.Task(coro, loop=loop)<br>    <span class="hljs-keyword">if</span> task._source_traceback:<br>        <span class="hljs-keyword">del</span> task._source_traceback[-<span class="hljs-number">1</span>]<br><br>	<span class="hljs-comment"># 获取task的context</span><br>    <span class="hljs-keyword">try</span>:<br>        context = asyncio_current_task(loop=loop).context<br>    <span class="hljs-keyword">except</span> AttributeError:<br>        context = <span class="hljs-literal">None</span><br>	<br>	<span class="hljs-comment"># 从context工厂中处理context并赋值在task</span><br>    task.context = context_factory(context)<br><br>    <span class="hljs-keyword">return</span> task<br></code></pre></td></tr></table></figure>
+<code>aiotask-context</code>提供了两个对context处理的函数<code>dict_context_factory</code>和<code>chainmap_context_factory</code>.在<code>aiotask-context</code>中,context是一个dict对象,<code>dict_context_factory</code>可以选择赋值或者设置新的context<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dict_context_factory</span>(<span class="hljs-params">parent_context=<span class="hljs-literal">None</span>, copy_context=<span class="hljs-literal">False</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;A traditional ``dict`` context to keep things simple&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">if</span> parent_context <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>        <span class="hljs-comment"># initial context</span><br>        <span class="hljs-keyword">return</span> &#123;&#125;<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-comment"># inherit context</span><br>        new_context = parent_context<br>        <span class="hljs-keyword">if</span> copy_context:<br>            new_context = deepcopy(new_context)<br>        <span class="hljs-keyword">return</span> new_context<br></code></pre></td></tr></table></figure>
+<code>chainmap_context_factory</code>与<code>dict_context_factory</code>的区别就是在合并context而不是直接继承.同时借用<code>ChainMap</code>保证合并context后,还能同步context的改变<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">chainmap_context_factory</span>(<span class="hljs-params">parent_context=<span class="hljs-literal">None</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    A ``ChainMap`` context, to avoid copying any data</span><br><span class="hljs-string">    and yet preserve strict one-way inheritance</span><br><span class="hljs-string">    (just like with dict copying)</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    <span class="hljs-keyword">if</span> parent_context <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>        <span class="hljs-comment"># initial context</span><br>        <span class="hljs-keyword">return</span> ChainMap()<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-comment"># inherit context</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-built_in">isinstance</span>(parent_context, ChainMap):<br>            <span class="hljs-comment"># if a dict context was previously used, then convert</span><br>            <span class="hljs-comment"># (without modifying the original dict)</span><br>            parent_context = ChainMap(parent_context)<br>        <span class="hljs-keyword">return</span> parent_context.new_child()<br></code></pre></td></tr></table></figure>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7.总结"></a>7.总结</h2>contextvars本身其实很简单,但他可以让我们调用起来更加方便便捷,减少我们的传参次数,同时还可以结合TypeHint使项目更加工成化.除此之外,我们在编写web项目时,我们都会使用一个request_id来记录请求的链路日志,排查问题十分方便,借用contextvars也可以非常容易做到,可以查看<a target="_blank" rel="noopener" href="https://github.com/Skyscanner/aiotask-context/blob/master/examples/log_request_id.py">aiotask-context</a>的一个例子进行了解</li>
+</ul>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/06/13/contextvars%E6%A8%A1%E5%9D%97/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;06&#x2F;13&#x2F;contextvars%E6%A8%A1%E5%9D%97&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;06&#x2F;13&#x2F;contextvars%E6%A8%A1%E5%9D%97&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/asyncio/" rel="tag">asyncio</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2019/10/07/docker%E9%83%A8%E7%BD%B2python%E5%90%8E%E5%8F%B0%E5%BA%94%E7%94%A8/"><i class="iconfont iconleft"></i>让自己的Python应用容器化</a>
+    <a href="/2019/06/08/python%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9D%91/">python常见的坑<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E8%AF%B4%E6%98%8E"><span class="toc-text">更新说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%9C%89%E6%97%A0%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">1.有无上下文的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9C%A8asyncio%E4%B8%AD%E4%BD%BF%E7%94%A8contextvars"><span class="toc-text">2.在asyncio中使用contextvars</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9C%A8asyncio%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8contextvars%E4%B8%AD%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">3.在asyncio框架中使用contextvars中的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8contextvars"><span class="toc-text">4.如何优雅的使用contextvars</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-contextvars%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">5.contextvars的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-ContextMeta-ContextVarMeta%E5%92%8CTokenMeta"><span class="toc-text">5.1 ContextMeta,ContextVarMeta和TokenMeta</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-Token"><span class="toc-text">5.2 Token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%85%A8%E5%B1%80%E5%94%AF%E4%B8%80context"><span class="toc-text">5.3 全局唯一context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4contextvar%E8%87%AA%E5%B7%B1%E5%B0%81%E8%A3%85%E7%9A%84Context"><span class="toc-text">5.4contextvar自己封装的Context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-ContextVar"><span class="toc-text">5.5 ContextVar</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-contextvars-asyncio"><span class="toc-text">6.contextvars asyncio</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1%E5%9C%A8asyncio%E4%B8%AD%E8%8E%B7%E5%8F%96context"><span class="toc-text">6.1在asyncio中获取context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%AF%B9%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">6.2 对上下文的操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-copying-task-factory%E5%92%8Cchainmap-task-factory"><span class="toc-text">6.2 copying_task_factory和chainmap_task_factory</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%80%BB%E7%BB%93"><span class="toc-text">7.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

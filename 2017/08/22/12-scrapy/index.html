@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>scrapy学习笔记(有示例版） - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="Scrapy学习笔记，每个都带有示例
+
+
+scrapy...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">scrapy学习笔记(有示例版）</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">scrapy学习笔记(有示例版）</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 22, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>33428</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h1 id="scrapy学习笔记-有示例版）"><a href="#scrapy学习笔记-有示例版）" class="headerlink" title="scrapy学习笔记(有示例版）"></a>scrapy学习笔记(有示例版）</h1><h2 id="1-使用scrapy"><a href="#1-使用scrapy" class="headerlink" title="1.使用scrapy"></a>1.使用scrapy</h2><blockquote>
+<p>ps:linux环境</p>
+</blockquote>
+<p>安装：sudo install Scrapy</p>
+<h3 id="1-1创建工程"><a href="#1-1创建工程" class="headerlink" title="1.1创建工程"></a>1.1创建工程</h3><p>$ scrapy startproject Spider<br>就创建属于自己的项目<br>同时生成一个Spider目录：</p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs coq">Spider<br>    |<span class="hljs-type">- scrapy</span>.cfg                        项目部署文件<br>    |<span class="hljs-type">- Spider</span>                     该项目的python模块，可以在这里加入代码<br>        |<span class="hljs-type">- __init__</span>.py                 <br>        |<span class="hljs-type">- items</span>.py                       主要是将爬取的非结构性的数据源提取结构性数据<br>        |<span class="hljs-type">- middlewares</span>.py          <br>        |<span class="hljs-type">- pipelines</span>.py                  将爬取的数据进行持久化存储<br>        |<span class="hljs-type">-  __pycache__</span>  <br>        |<span class="hljs-type">-  settings</span>.py                  配置文件<br>        |<span class="hljs-type">-  spiders</span>                       放置spider代码的目录<br>            |<span class="hljs-type">-  __init__</span>.py <br>            |<span class="hljs-type">-  __pycache__</span><br></code></pre></td></tr></table></figure>
+<h3 id="1-2创建爬虫模块"><a href="#1-2创建爬虫模块" class="headerlink" title="1.2创建爬虫模块"></a>1.2创建爬虫模块</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> scrapy<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Spider</span>(<span class="hljs-params">scrapy.Spider</span>):</span>                       <span class="hljs-comment">#创建的Spider是继承scrapy.Spider类</span><br>    name = <span class="hljs-string">&quot;Spider&quot;</span>                                      <span class="hljs-comment">#爬虫的名称（必须是项目里面唯一的）</span><br>	allowed_domain = [<span class="hljs-string">&quot;xxx.com&quot;</span>]                <span class="hljs-comment">#允许的域名（就是这个爬虫爬取链接的范围）</span><br>	start_urls = [<span class="hljs-string">&quot;http://xxx.com/xxx/xxx&quot;</span>]     <span class="hljs-comment">#开始爬取的链接</span><br>    <br>	<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">self, response</span>):</span>                     <br>	    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>在spiders文件夹创建出这份代码，除了以上解释外，里面的parse()是一个Spider方法，被调用时，每个初始url响应后返回的Response对象，将会作为唯一的参数传递给该方法。该方法负责解析返回的数据，提取数据以及生成需要进一步处理的url的Responst对象</p>
+<h3 id="1-3网页解析"><a href="#1-3网页解析" class="headerlink" title="1.3网页解析"></a>1.3网页解析</h3><p> 创建完爬虫模块后就可以进行网页解析了，Scrapy有自己的一套数据提取机制，成为选择器（selector）,它们通过特定的XPath或者CSS表达式来选择HTML文件中的某个部分，Scrapy选择器构建与lxml库上，这意味着它们在速度和解析准确性上非常相似。当然，也可以使用自己的，比如BeautifulSoup进行解析</p>
+<p> Selector对象有四个基本的方法</p>
+<ul>
+<li><p>xpath(query)：传入XPath表达式query，返回该表达式所对应的所有节点的selector list列表</p>
+</li>
+<li><p>css(query)：传入CSS表达式query，返回该表达式所对应的所有节点的selector list列表</p>
+</li>
+<li><p>extract(): 序列化该节点为Unicode字符串并返回list列表。</p>
+</li>
+<li><p>re(regex)：根据传入的正则表达式对数据进行提取，返回Unicode字符串列表。regex可以是一个已编译的正则，也可以是一个将为re.compile(regex)编译为正则表达式的字符串。</p>
+<p>在spider类的parse()方法中，其中一个参数是response。所以使用选择器有两种方法</p>
+</li>
+<li><p>将response传入Selector：Selector(response).xpath()</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">Selector(response).xpath(<span class="hljs-string">&#x27;//span/text()&#x27;</span>).extract()<br></code></pre></td></tr></table></figure></li>
+<li><p>或者直接调用：response.xpath()</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">response.xpath(<span class="hljs-string">&#x27;//span/text()&#x27;</span>).extract()<br></code></pre></td></tr></table></figure>
+<p>Scrapy提供了一个简便的方式来查看表达式是否正确<br>打开命令行窗口后输入：<br>$ scrapy shell “<a target="_blank" rel="noopener" href="http://xxx.com&quot;/">http://xxx.com&quot;</a><br>或者响应后<br>&gt;&gt;&gt;response.xpath(‘//span/text()’).extract()<br>就可以抽取出响应的数据了，返回的是Unicode格式</p>
+</li>
+</ul>
+<p>示例代码中extract()是提取里面的文本，并返回一个 SelectorList实例<br>如果只想提取第一个匹配的元素，可以调用选择器 .extract_first()，如果获取不到则返回None<br>可以通过使用extract_first(default=’xxx’)来自定义返回数值</p>
+<p>了解了这些后可以写出一个parse()的代码<br>假设这个网页我们要提取的数据有标题，时间，评论，链接，且他们在网页的xxx里面</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">self, response</span>):</span><br>    papers = response.xpath(<span class="hljs-string">&quot;.//*[@class=&#x27;xxx&#x27;]&quot;</span>) <br>	<span class="hljs-keyword">for</span> paper <span class="hljs-keyword">in</span> papers:<br>	    url = paper.xpath(<span class="hljs-string">&quot;.//*[@class=&#x27;title&#x27;]/a/@href&quot;</span>).extract()[<span class="hljs-number">0</span>]<br>		title = paper.xpath(<span class="hljs-string">&quot;.//*[@class=&#x27;title&#x27;]/a/text()&quot;</span>).extract()[<span class="hljs-number">0</span>]<br>		time = paper.xpath(<span class="hljs-string">&quot;.//*[@class=&#x27;ttime&#x27;]/a/text())&quot;</span>.extract()[<span class="hljs-number">0</span>]<br>		content = paper.xpath(<span class="hljs-string">&quot;.//*[@class=&#x27;content&#x27;]/a/text()&quot;</span>).extract()[<span class="hljs-number">0</span>]<br>		item = SpiderItem(url=url, title=title, time=time,title=title, content=content)<br>		<span class="hljs-keyword">yield</span> item<br>		<span class="hljs-keyword">yield</span> scrapy.Request(url=url, callnack=self.parse)<br></code></pre></td></tr></table></figure>
+<p>yield item是把所有获得的数据封装起来,存放在Spideritem<br>yield scrapy.Request(url=url, callnack=self.parse)则是把获取到的url利用request对象构造为请求再利用callback回调到自己指定的Spideritem</p>
+<h3 id="1-4-item"><a href="#1-4-item" class="headerlink" title="1.4 item"></a>1.4 item</h3><p>Scrapy提供Item类。 Item对象是用于收集所抓取的数据的简单容器。它们提供了一个类似字典的 API，具有用于声明其可用字段的方便的语法<br>在items.py文件输入</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SpiderItem</span>(<span class="hljs-params">scrapt.Item</span>):</span><br>    url = scrapy.Field()<br>	time = scrapy.Field()<br>	title = scrapy.Field()<br>	content = scrapy.Field()<br></code></pre></td></tr></table></figure>
+<p>就创建好了，如果要拓展item就在原始item上来拓展item</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">newSpiderItem</span>(<span class="hljs-params">SpiderItem</span>):</span><br>    xxx = scrapy.Field()<br></code></pre></td></tr></table></figure>
+<h3 id="1-5Item-Pipeline"><a href="#1-5Item-Pipeline" class="headerlink" title="1.5Item Pipeline"></a>1.5Item Pipeline</h3><p>当item在Spider中被手机后，它将会传递到Item PipeLine，利用Item PipeLine来进行数据保存<br>先上一个示例代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> json<br><span class="hljs-keyword">from</span> scrapy.exceptions <span class="hljs-keyword">import</span> DropItem<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SpiderPipeline</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>	    self.file = <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;xxx.json&#x27;</span>,<span class="hljs-string">&#x27;w&#x27;</span>)<br>	<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_item</span>(<span class="hljs-params">self,item,spider</span>):</span><br>	    <span class="hljs-keyword">if</span> item[<span class="hljs-string">&#x27;title&#x27;</span>]:<br>		    line = json.dumps(<span class="hljs-built_in">dict</span>(item)) + <span class="hljs-string">&quot;\n&quot;</span><br>			self.file.write(line)<br>			<span class="hljs-keyword">return</span> item<br>		<span class="hljs-keyword">else</span>:<br>		    <span class="hljs-keyword">raise</span> DropItem(<span class="hljs-string">&quot;没有找到标题&quot;</span>+title)<br></code></pre></td></tr></table></figure>
+<p>之后在setting.py的ITEM_PIPELINES变了中进行激活</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">ITEM_PIPELINES</span> = &#123;<br>       <span class="hljs-string">&#x27;Spider.pipelines.spiderPipeline&#x27;</span>:300&#125;<br></code></pre></td></tr></table></figure>
+<p>process_item()方法可以用来判断是来自于哪个爬虫，item是被爬取对象，spider是爬取该item的Spider<br>Dropitem是一个错误捕获<br>300是判断运行顺序，范围为0~1000</p>
+<p>除此之外，Scrapy内置了一些简单的存储方式生成一个带有爬取数据的输出文件自带的类型有：</p>
+<ul>
+<li>JSON</li>
+<li>JSON lines</li>
+<li>CSV</li>
+<li>XMl</li>
+<li>Pickle</li>
+<li>Marshal<br>食用方法：将命令行切换到项目目录，比如想保存为csv格式，输入命令：<br>$ scrapy crawl Spider -o papers.csv<br>就可以让Spider采集到的数据保存为papers.csv文件了</li>
+</ul>
+<h3 id="1-6运行"><a href="#1-6运行" class="headerlink" title="1.6运行"></a>1.6运行</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-variable">$ </span>scrapy crawl Spider<br></code></pre></td></tr></table></figure>
+<p>就可以运行爬虫了，其中Spider就是我们定义的name<br>更过命令<a target="_blank" rel="noopener" href="http://blog.csdn.net/inke88/article/details/60323856">这里</a></p>
+<p>也可以在spider.py文件添加一下代码运行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> __name ==<span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    process = CrawlerProcess(get_project_settings())<br>	process.crawl(<span class="hljs-string">&#x27;spider&#x27;</span>)<br>	process.start()<br></code></pre></td></tr></table></figure>
+<h2 id="2-深入Scrapy"><a href="#2-深入Scrapy" class="headerlink" title="2.深入Scrapy"></a>2.深入Scrapy</h2><p>通过以上运行一个爬虫肯定会觉得还不如自己写代码来爬虫，但Scrapy框架还有很多厉害的地方</p>
+<h3 id="2-1Spider"><a href="#2-1Spider" class="headerlink" title="2.1Spider"></a>2.1Spider</h3><h4 id="2-1-1Spider"><a href="#2-1-1Spider" class="headerlink" title="2.1.1Spider"></a>2.1.1Spider</h4><p>继承于Spider是最简单的spider，常用属性为：</p>
+<ul>
+<li>name<br>定义此爬虫名称的字符串。爬虫名称是爬虫如何由Scrapy定位（和实例化），因此它必须是唯一的。但是，没有什么能阻止你实例化同一个爬虫的多个实例。这是最重要的爬虫属性，它是必需的。</li>
+<li>allowed_domains<br>允许此爬虫抓取的域的字符串的可选列表，指定一个列表可以抓取。</li>
+<li>start_urls<br>当没有指定特定网址时，爬虫将开始抓取的网址列表。</li>
+<li>custom_settings<br>运行此爬虫时将从项目宽配置覆盖的设置字典。<a target="_blank" rel="noopener" href="http://scrapy.readthedocs.io/en/latest/topics/settings.html#topics-settings-ref">详情在这里</a></li>
+<li>crawler<br>此属性from_crawler()在初始化类后由类方法设置，并链接Crawler到此爬虫实例绑定到的对象。<br>Crawlers在项目中封装了很多组件，用于单个条目访问（例如扩展，中间件，信号管理器等）</li>
+<li>settings<br>运行此爬虫的配置。</li>
+<li>logger<br>用Spider创建的Python记录器name。</li>
+<li>start_requests（）<br>此方法必须返回一个可迭代对象，该方法只被调用一次。<br>主要用于在启动阶段需要post登录某个网站时才使用<br>示例代码：  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> scrapy<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Spider</span>(<span class="hljs-params">scrapy.Spider</span>):</span>                       <span class="hljs-comment">#创建的Spider是继承scrapy.Spider类</span><br>   	name = <span class="hljs-string">&quot;Spider&quot;</span>                                      <span class="hljs-comment">#爬虫的名称（必须是项目里面唯一的）</span><br>	allowed_domain = [<span class="hljs-string">&quot;xxx.com&quot;</span>]                <span class="hljs-comment">#允许的域名（就是这个爬虫爬取链接的范围）</span><br>	<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">start_requests</span>(<span class="hljs-params">self</span>):</span><br>	    <span class="hljs-keyword">return</span> [scrapy.FromRequest(<span class="hljs-string">&quot;httP://www.xxx.com/login&quot;</span>,<br>	                                                         formdata=&#123;<span class="hljs-string">&#x27;user&#x27;</span>:<span class="hljs-string">&#x27;xxx&#x27;</span>,<span class="hljs-string">&#x27;pass&#x27;</span>:<span class="hljs-string">&#x27;xxx&#x27;</span>&#125;,<br>															 callback=self.login)]<br>	<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">login</span>(<span class="hljs-params">self, response</span>):</span><br>    	<span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<h4 id="2-1-2CrawlSpidel"><a href="#2-1-2CrawlSpidel" class="headerlink" title="2.1.2CrawlSpidel"></a>2.1.2CrawlSpidel</h4>CrawlCpider除了从Spider继承过来的属性外，还提供了一个新的属性rules，rules是一个包含一个或多个Rule对象的集合，每个Rule对爬取网站的动作定义了特定的规则。如果多个Rule匹配了相同的链接，则根据它们在rules属性中被定义的顺序，第一个会被使用。<br>Rule类的原型为：<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">scrapy.contrib,spiders.<span class="hljs-constructor">Rule(<span class="hljs-params">link_extractor</span>,<span class="hljs-params">callback</span>=None,<span class="hljs-params">cb_kwargs</span>=None,<span class="hljs-params">follow</span>=None,<span class="hljs-params">process_links</span>=None, <span class="hljs-params">process_request</span>=None)</span><br></code></pre></td></tr></table></figure>
+参数说明<blockquote>
+<p>link_extractor 是一个LinkExtractor对象，定义了如何从爬取到的页面提取链接。<br>callback回调函数接受一个response作为一个参数，应避免使用parse作为回调函数<br>cb_kwargs包含传递给回调函数的参数的字典<br>follow是一个布尔值，指定了根据规则从respose提取的链接是否需要跟进<br>process_links是一个可调用的或一个字符串（在这种情况下，将使用具有该名称的爬虫对象的方法），将使用指定从每个响应提取的每个链接列表调用该方法link_extractor。这主要用于过滤目的。<br>process_request 是一个可调用的或一个字符串（在这种情况下，将使用具有该名称的爬虫对象的方法），它将被此规则提取的每个请求调用，并且必须返回一个请求或无（过滤出请求）</p>
+</blockquote>
+</li>
+</ul>
+<p>link_extractor里面也大有乾坤，参数有：</p>
+<blockquote>
+<p>allow: 提取满足正则表达式的链接<br>deny: 排除正则表达式匹配的链接，优先级高于allow<br>allow_domains: 允许的域名，可以是str,list<br>deny_domains：排除的域名，同上<br>restrict_xpaths: 提取满足xpath选择条件的链接，可以是str,list<br>restrict_css: 提取满足css选择条件的链接，可以是str,list<br>tags: 提取指定标记下的链接，默认从a和area中提取，可以是str或list。<br>attrs: 提取满足拥有属性的链接，默认为href，类型为list<br>unique:链接是否去重，类型为boolean<br>process_value: 值处理函数（这个函数是对已经捕获的函数进行修补）<br>以上详细在<a target="_blank" rel="noopener" href="http://scrapy-chs.readthedocs.io/zh_CN/latest/topics/link-extractors.html">这里</a><br>关于process_value可以看这两个函数示例（来自于stackoverflow）：</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> scrapy<br><span class="hljs-keyword">from</span> scrapy.contrib.spiders <span class="hljs-keyword">import</span> CrawlSpider, Rule<br><span class="hljs-keyword">from</span> scrapy.contrib.linkextractors <span class="hljs-keyword">import</span> LinkExtractor<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">dmozItem</span>(<span class="hljs-params">scrapy.Item</span>):</span><br>    basic_url = scrapy.Field()<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">dmozSpider</span>(<span class="hljs-params">CrawlSpider</span>):</span><br>    name = <span class="hljs-string">&quot;dmoz&quot;</span><br>    allowed_domains = [<span class="hljs-string">&quot;scrapy.org&quot;</span>]<br>    start_urls = [<br>        <span class="hljs-string">&quot;http://scrapy.org/&quot;</span>,<br>    ]<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">clean_url</span>(<span class="hljs-params">value</span>):</span><br>        <span class="hljs-keyword">return</span> value.replace(<span class="hljs-string">&#x27;/../&#x27;</span>, <span class="hljs-string">&#x27;/&#x27;</span>)<br><br>    rules = (<br>        Rule(<br>            LinkExtractor(<br>                allow=(<span class="hljs-string">&#x27;\S+/&#x27;</span>),<br>                restrict_xpaths=([<span class="hljs-string">&#x27;.//ul[@class=&quot;navigation&quot;]/a[1]&#x27;</span>,<br>                                  <span class="hljs-string">&#x27;.//ul[@class=&quot;navigation&quot;]/a[2]&#x27;</span>,<br>                                  <span class="hljs-string">&#x27;.//ul[@class=&quot;navigation&quot;]/a[3]&#x27;</span>,<br>                                  <span class="hljs-string">&#x27;.//ul[@class=&quot;navigation&quot;]/a[4]&#x27;</span>,<br>                                  <span class="hljs-string">&#x27;.//ul[@class=&quot;navigation&quot;]/a[5]&#x27;</span>]),<br>                process_value=clean_url<br>            ),<br>            callback=<span class="hljs-string">&#x27;first_level&#x27;</span>),<br>    )<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">first_level</span>(<span class="hljs-params">self, response</span>):</span><br>        taco = dmozItem()<br>        taco[<span class="hljs-string">&#x27;basic_url&#x27;</span>] = response.url<br>        <span class="hljs-keyword">return</span> taco<br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_value</span>(<span class="hljs-params">value</span>):</span><br>    unique_id = re.search(<span class="hljs-string">r&quot;/item/(\d+)&quot;</span>, value).group(<span class="hljs-number">1</span>)<br>    <span class="hljs-keyword">if</span> unique_id <span class="hljs-keyword">in</span> already_crawled_site_ids:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>    <span class="hljs-keyword">return</span> value<br><br>rules = [Rule(SgmlLinkExtractor(allow=[<span class="hljs-string">&#x27;/item/\d+&#x27;</span>]), <span class="hljs-string">&#x27;parse_item&#x27;</span>, process_value=process_value)]<br></code></pre></td></tr></table></figure>
+<h4 id="2-1-3-XMLFeedSpider"><a href="#2-1-3-XMLFeedSpider" class="headerlink" title="2.1.3 XMLFeedSpider"></a>2.1.3 XMLFeedSpider</h4><p>XMLFeedSpider设计用于通过以特定节点名称迭代XML订阅源来解析XML订阅源。迭代器可以选自：iternodes，xml和html。iternodes为了性能原因，建议使用迭代器，因为xml和迭代器html一次生成整个DOM为了解析它。但是，html当使用坏标记解析XML时，使用作为迭代器可能很有用。</p>
+<p>要设置迭代器和标记名称，必须定义以下类属性：</p>
+<ul>
+<li><p>iterator<br>定义要使用的迭代器的字符串。它可以是：</p>
+<ul>
+<li>‘iternodes’ - 基于正则表达式的快速迭代器</li>
+<li>‘html’- 使用的迭代器Selector。请记住，这使用DOM解析，并且必须加载所有DOM在内存中，这可能是一个大饲料的问题</li>
+<li>‘xml’- 使用的迭代器Selector。请记住，这使用DOM解析，并且必须加载所有DOM在内存中，这可能是一个大饲料的问题<br>它默认为：’iternodes’。</li>
+</ul>
+</li>
+<li><p>itertag<br>一个具有要迭代的节点（或元素）的名称的字符串。示例：<br>itertag = ‘product’</p>
+</li>
+<li><p>namespaces<br>定义该文档中将使用此爬虫处理的命名空间的元组列表。在 与将用于自动注册使用的命名空间 的方法。(prefix, uri)prefixuriregister_namespace()<br>示例代码：</p>
+  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">YourSpider</span>(<span class="hljs-params">XMLFeedSpider</span>):</span><br><br>   	namespaces = [(<span class="hljs-string">&#x27;n&#x27;</span>, <span class="hljs-string">&#x27;http://www.sitemaps.org/schemas/sitemap/0.9&#x27;</span>)]<br>    itertag = <span class="hljs-string">&#x27;n:url&#x27;</span><br></code></pre></td></tr></table></figure></li>
+<li><p>adapt_response(response)<br>一种在爬虫开始解析响应之前，在响应从爬虫中间件到达时立即接收的方法。它可以用于在解析之前修改响应主体。此方法接收响应并返回响应（它可以是相同的或另一个）。</p>
+</li>
+<li><p>parse_node(response, selector)<br>对于与提供的标记名称（itertag）匹配的节点，将调用此方法。接收Selector每个节点的响应和 。覆盖此方法是必需的。否则，你的爬虫将不工作。此方法必须返回一个Item对象，一个 Request对象或包含任何对象的迭代器。</p>
+</li>
+<li><p>process_results(response, results)<br>对于由爬虫返回的每个结果（Items or Requests），将调用此方法，并且它将在将结果返回到框架核心之前执行所需的任何最后处理，例如设置项目ID。它接收结果列表和产生那些结果的响应。它必须返回结果列表</p>
+</li>
+</ul>
+<h3 id="2-2-Item-Loader"><a href="#2-2-Item-Loader" class="headerlink" title="2.2 Item Loader"></a>2.2 Item Loader</h3><p>Item Loader提供了一种便捷的方式填充抓取到的items。虽然items可以使用自带的类字典形式API填充，但是itemsLoader提供了更便捷的API可以分析原始数据并对item进行赋值。也就是Items提供保存捉取数据的容器，而Item Loader提供的是填充容器的机制，且可以方便的被拓展，重写不同字段的解析规则，这对大型的爬虫项目后期维护非常有利，拓展新的功能更加方便。<br>以下是Item和Item Loader的对比代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SpiderItem</span>(<span class="hljs-params">scrapt.Item</span>):</span><br>    url = scrapy.Field()<br>	time = scrapy.Field()<br>	title = scrapy.Field()<br>	content = scrapy.Field()<br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">self, response</span>):</span><br>    i = ItemLoader(item=Product(), response=response)<br>	l.add_xpath(<span class="hljs-string">&#x27;title&#x27;</span>, <span class="hljs-string">&#x27;//div[@class=&quot;title1&quot;]&#x27;</span>)<br>	l.add_xpath(<span class="hljs-string">&#x27;title&#x27;</span>, <span class="hljs-string">&#x27;//div[@class=&quot;title2&quot;]&#x27;</span>)<br>	l.add_xpath(<span class="hljs-string">&#x27;time&#x27;</span>, <span class="hljs-string">&#x27;//div[@class=&quot;time&quot;]&#x27;</span>)<br>    l.add_xpath(<span class="hljs-string">&#x27;content&#x27;</span>, <span class="hljs-string">&#x27;//div[@class=&quot;content&quot;]&#x27;</span>)<br>	<span class="hljs-keyword">return</span> l.load_item()<br></code></pre></td></tr></table></figure>
+<p>可以发现的是ItemsLoader里面的name字段可以从页面中两个不同的XPAth位置提取，之后分配给name字段。下面类似操作后把所有数据收集起来，再使用l.load_item将数据实际填充到Item中</p>
+<h4 id="2-2-1-输入与输出处理器"><a href="#2-2-1-输入与输出处理器" class="headerlink" title="2.2.1 输入与输出处理器"></a>2.2.1 输入与输出处理器</h4><p>Item Loder实现数据的收集处理和填充的功能都是通过输入与输出处理器来实现的，他们的功能是：</p>
+<ul>
+<li>Item Loder在每个字段中都包含了一个输入处理器和输出处理器</li>
+<li>输入处理器收到response后时立刻通过add_xpath(),add_css()或者add_value()等方法提取数据，经过输入处理器的结果被手机起来并且保存在Item Loder内，</li>
+<li>收集到所有的数据后，调用Item Loder.load_item()方法来填充并返回item对象。load_item()方法内部先调用输出处理器来处理收集到的数据，最后把结果存入Item中。</li>
+</ul>
+<p>下面是2个栗子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapy.loader <span class="hljs-keyword">import</span> ItemLoader<br><span class="hljs-keyword">from</span> scrapy.loader.processors <span class="hljs-keyword">import</span> TakeFirst, MapCompose, Join<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProductLoader</span>(<span class="hljs-params">ItemLoader</span>):</span><br><br>    default_output_processor = TakeFirst()<br><br>    name_in = MapCompose(unicode.title)<br>    name_out = Join()<br><br>    price_in = MapCompose(unicode.strip)<br><br>    <span class="hljs-comment"># ...</span><br></code></pre></td></tr></table></figure>
+<p>可以看到，输入处理器使用_in后缀声明，而输出处理器使用_out后缀声明。您还可以使用ItemLoader.default_input_processor和 ItemLoader.default_output_processor属性声明默认输入/输出 处理器。<br>输入和输出处理器可以在Item Loader定义中声明，这种方式声明输入处理器是很常见的。但是，还可以在item中声明：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> scrapy<br><span class="hljs-keyword">from</span> scrapy.loader.processors <span class="hljs-keyword">import</span> Join, MapCompose, TakeFirst<br><span class="hljs-keyword">from</span> w3lib.html <span class="hljs-keyword">import</span> remove_tags<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">filter_price</span>(<span class="hljs-params">value</span>):</span><br>    <span class="hljs-keyword">if</span> value.isdigit():<br>        <span class="hljs-keyword">return</span> value<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Product</span>(<span class="hljs-params">scrapy.Item</span>):</span><br>    name = scrapy.Field(<br>        input_processor=MapCompose(remove_tags),<br>        output_processor=Join(),<br>    )<br>    price = scrapy.Field(<br>        input_processor=MapCompose(remove_tags, filter_price),<br>        output_processor=TakeFirst(),<br>    )<br></code></pre></td></tr></table></figure>
+<p>以上说了三种处理器声明方式：</p>
+<ul>
+<li>ItemLoader类中声明类似field_in和field_out的属性</li>
+<li>itemd 的字段中声明</li>
+<li> ItemLoader默认处理器ItemLoader.default_input_processor和 ItemLoader.default_output_processor<br>这三种方式响应优先级是从上到下依次递减</li>
+</ul>
+<h4 id="2-2-2-Item-Loader-Context"><a href="#2-2-2-Item-Loader-Context" class="headerlink" title="2.2.2 Item Loader Context"></a>2.2.2 Item Loader Context</h4><p>所有输入和输出处理器之间共享的任意键/值的dict。它可以在声明，实例化或使用Item Loader时传递。它们用于修改输入/输出处理器的行为。</p>
+<p>例如，假设有一个parse_length接收文本值并从中提取长度的函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span>  <span class="hljs-title">parse_length</span> （<span class="hljs-title">text</span> ， <span class="hljs-title">loader_context</span> ）：</span><br>    unit  =  loader_context 。get （&#x27;unit&#x27; ， &#x27;m&#x27; ）<br>    ＃...长度解析代码在这里... <br>    <span class="hljs-keyword">return</span>  parsed_length<br></code></pre></td></tr></table></figure>
+<p>通过接受一个loader_context参数，该函数显式地告诉Item Loader它能够接收一个Item Loader上下文，因此Item Loader在调用它时传递当前活动的上下文，因此处理器功能（parse_length在这种情况下）可以使用它们。<br>有几种方法可以修改Item Loader上下文值：</p>
+<ul>
+<li>通过修改当前活动的Item Loader上下文（context属性）：  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">loader = ItemLoader(product)<br>loader.context[<span class="hljs-string">&#x27;unit&#x27;</span>] = <span class="hljs-string">&#x27;cm&#x27;</span><br></code></pre></td></tr></table></figure></li>
+<li>On Item Loader实例化（Item Loader构造函数的关键字参数存储在Item Loader上下文中）：  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">loader = ItemLoader(product, unit=<span class="hljs-string">&#x27;cm&#x27;</span>)<br></code></pre></td></tr></table></figure></li>
+<li>On Item Loader声明，对于那些支持使用Item Loader上下文实例化的输入/输出处理器。MapCompose是其中之一：  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProductLoader</span>(<span class="hljs-params">ItemLoader</span>):</span><br>   	length_out = MapCompose(parse_length, unit=<span class="hljs-string">&#x27;cm&#x27;</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="2-2-3-重用和拓展-Item-Loader"><a href="#2-2-3-重用和拓展-Item-Loader" class="headerlink" title="2.2.3 重用和拓展 Item Loader"></a>2.2.3 重用和拓展 Item Loader</h4>随着你的项目越来越大，越来越多的爬虫，维护成为一个根本的问题，特别是当你必须处理每个爬虫的许多不同的解析规则，有很多异常，但也想重用公共处理器。</li>
+</ul>
+<p>项目加载器旨在减轻解析规则的维护负担，同时不会失去灵活性，同时提供了扩展和覆盖它们的方便的机制。因此，项目加载器支持传统的python类继承，以处理特定爬虫（或爬虫组）的差异。</p>
+<p>例如，假设某个特定站点以三个短划线（例如）包含其产品名称，并且您不希望最终在最终产品名称中删除那些破折号。—Plasma TV—</p>
+<p>以下是如何通过重用和扩展默认产品项目Loader（ProductLoader）来删除这些破折号：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapy.loader.processors <span class="hljs-keyword">import</span> MapCompose<br><span class="hljs-keyword">from</span> myproject.ItemLoaders <span class="hljs-keyword">import</span> ProductLoader<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">strip_dashes</span>(<span class="hljs-params">x</span>):</span><br>    <span class="hljs-keyword">return</span> x.strip(<span class="hljs-string">&#x27;-&#x27;</span>)<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SiteSpecificLoader</span>(<span class="hljs-params">ProductLoader</span>):</span><br>    name_in = MapCompose(strip_dashes, ProductLoader.name_in)<br></code></pre></td></tr></table></figure>
+<p>另一种扩展项目加载器可能非常有用的情况是，当您有多种源格式，例如XML和HTML。在XML版本中，您可能想要删除CDATA事件。下面是一个如何做的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> scrapy.loader.processors <span class="hljs-keyword">import</span> MapCompose<br><span class="hljs-keyword">from</span> myproject.ItemLoaders <span class="hljs-keyword">import</span> ProductLoader<br><span class="hljs-keyword">from</span> myproject.utils.xml <span class="hljs-keyword">import</span> remove_cdata<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">XmlProductLoader</span>(<span class="hljs-params">ProductLoader</span>):</span><br>    name_in = MapCompose(remove_cdata, ProductLoader.name_in)<br></code></pre></td></tr></table></figure>
+<p>对于输出处理器，更常用的方式是在item字段元数据里声明，因为通常它们依赖于具体的字段而不是网站</p>
+<h4 id="2-2-4-内置的处理器"><a href="#2-2-4-内置的处理器" class="headerlink" title="2.2.4 内置的处理器"></a>2.2.4 内置的处理器</h4><p>除了可以使用可调用的函数作为输入输出处理器，Scrapy提供了一些常用的处理器，下面是一些内置的处理器</p>
+<ul>
+<li>Identity<br>类原型： class scrapy.loader.processors.Identity<br>最简单的处理器，不进行任何处理，直接返回原来的数据,无参数</li>
+<li>TakeFirst<br>类原型： class scrapy.loader.processors.TakeFirst<br>从接收到的值中返回第一个非空值/非空值，因此它通常用作单值字段的输出处理器。它不接收任何构造函数参数，也不接受Loader上下文  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">	&gt;&gt;&gt; <span class="hljs-keyword">from</span> scrapy.loader.processors <span class="hljs-keyword">import</span> TakeFirst<br>	&gt;&gt;&gt; proc = TakeFirst()<br>	&gt;&gt;&gt; proc([<span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;one&#x27;</span>, <span class="hljs-string">&#x27;two&#x27;</span>, <span class="hljs-string">&#x27;three&#x27;</span>])<br>	<span class="hljs-string">&#x27;one&#x27;</span><br>	````<br>- Join<br>类原型： <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">scrapy</span>.<span class="hljs-title">loader</span>.<span class="hljs-title">processors</span>.<span class="hljs-title">Join</span>(<span class="hljs-params">separator=<span class="hljs-string">u&#x27;&#x27;</span></span>)</span><br><span class="hljs-class">返回用分隔符<span class="hljs-title">separatoe</span>连续后的值，分隔符<span class="hljs-title">seeparator</span>默认为空格。不接受<span class="hljs-title">Loader</span> <span class="hljs-title">contexts</span>。当使用默认分隔符的时候，这个处理器等同于<span class="hljs-title">Python</span>字符串对象中<span class="hljs-title">join</span>方法：&#x27;&#x27;.<span class="hljs-title">join</span></span><br></code></pre></td></tr></table></figure>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>from scrapy.loader.processors import Join<br>proc = Join()<br>proc([‘one’, ‘two’, ‘three’])<br>  u’one two three’<br>proc = Join(‘<br>‘)<br>proc([‘one’, ‘two’, ‘three’])<br>  u’one<br>two<br>three’</p>
+  <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">- Compose<br>类原型： <span class="hljs-keyword">class</span> scrapy.loader.processors.<span class="hljs-constructor">Compose(<span class="hljs-operator">*</span><span class="hljs-params">functions</span>,<span class="hljs-operator">**</span><span class="hljs-params">default_loader_context</span>)</span><br>由给定函数的组合构成的处理器。这意味着该处理器的每个输入值都被传递给第一个函数，并且该函数的结果被传递给第二个函数，依此类推，直到最后一个函数返回该处理器的输出值。<br>默认情况下，停止进程None值。可以通过传递关键字参数来更改此行为stop_on_none=False<br>	```python<br>	&gt;&gt;&gt; from scrapy.loader.processors import Compose<br>	&gt;&gt;&gt; proc = <span class="hljs-constructor">Compose(<span class="hljs-params">lambda</span> <span class="hljs-params">v</span>: <span class="hljs-params">v</span>[0], <span class="hljs-params">str</span>.<span class="hljs-params">upper</span>)</span><br>	&gt;&gt;&gt; proc(<span class="hljs-literal">[&#x27;<span class="hljs-identifier">hello</span>&#x27;, &#x27;<span class="hljs-identifier">world</span>&#x27;]</span>)<br>	&#x27;HELLO&#x27;<br></code></pre></td></tr></table></figure></blockquote>
+</blockquote>
+</blockquote>
+</li>
+<li>MapCompose<br>类原型： class scrapy.loader.processors.MapCompose(*functions,**default_loader_context)<br>和Compose类似，也是用给定的多个方法的组合来构造处理器，不同的是内部结果在方法见传递的方式：<ul>
+<li>该处理器的输入值被迭代，并且第一函数被应用于每个元素。这些函数调用的结果（每个元素一个）被连接以构造新的迭代，然后用于应用第二个函数，等等，直到最后一个函数被应用于收集的值列表的每个值远。最后一个函数的输出值被连接在一起以产生该处理器的输出。</li>
+<li>每个特定函数可以返回值或值列表，这些值通过应用于其他输入值的相同函数返回的值列表展平。函数也可以返回None，在这种情况下，该函数的输出将被忽略，以便在链上进行进一步处理。</li>
+<li>此处理器提供了一种方便的方法来组合只使用单个值（而不是iterables）的函数。由于这个原因， MapCompose处理器通常用作输入处理器，因为数据通常使用选择器的 extract()方法提取，选择器返回unicode字符串的列表。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">filter_world</span>(<span class="hljs-params">x</span>):</span><br><span class="hljs-meta">... </span>    <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">if</span> x == <span class="hljs-string">&#x27;world&#x27;</span> <span class="hljs-keyword">else</span> x<br>...<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> scrapy.loader.processors <span class="hljs-keyword">import</span> MapCompose<br><span class="hljs-meta">&gt;&gt;&gt; </span>proc = MapCompose(filter_world, unicode.upper)<br><span class="hljs-meta">&gt;&gt;&gt; </span>proc([<span class="hljs-string">u&#x27;hello&#x27;</span>, <span class="hljs-string">u&#x27;world&#x27;</span>, <span class="hljs-string">u&#x27;this&#x27;</span>, <span class="hljs-string">u&#x27;is&#x27;</span>, <span class="hljs-string">u&#x27;scrapy&#x27;</span>])<br>[<span class="hljs-string">u&#x27;HELLO, u&#x27;</span>THIS<span class="hljs-string">&#x27;, u&#x27;</span>IS<span class="hljs-string">&#x27;, u&#x27;</span>SCRAPY<span class="hljs-string">&#x27;]</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>SelectJmes<br>类原型： class scrapy.loader.processors.SelectJmes(json_path)<br>使用提供给构造函数的json路径查询值，并返回输出。需要运行<a target="_blank" rel="noopener" href="https://github.com/jmespath/jmespath.py">jmespath</a>。该处理器一次只需要一个输入。  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> scrapy.loader.processors <span class="hljs-keyword">import</span> SelectJmes, Compose, MapCompose<br><span class="hljs-meta">&gt;&gt;&gt; </span>proc = SelectJmes(<span class="hljs-string">&quot;foo&quot;</span>) <span class="hljs-comment">#for direct use on lists and dictionaries</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>proc(&#123;<span class="hljs-string">&#x27;foo&#x27;</span>: <span class="hljs-string">&#x27;bar&#x27;</span>&#125;)<br><span class="hljs-string">&#x27;bar&#x27;</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>proc(&#123;<span class="hljs-string">&#x27;foo&#x27;</span>: &#123;<span class="hljs-string">&#x27;bar&#x27;</span>: <span class="hljs-string">&#x27;baz&#x27;</span>&#125;&#125;)<br>&#123;<span class="hljs-string">&#x27;bar&#x27;</span>: <span class="hljs-string">&#x27;baz&#x27;</span>&#125;<br></code></pre></td></tr></table></figure>
+  和json一起使用  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> json<br><span class="hljs-meta">&gt;&gt;&gt; </span>proc_single_json_str = Compose(json.loads, SelectJmes(<span class="hljs-string">&quot;foo&quot;</span>))<br><span class="hljs-meta">&gt;&gt;&gt; </span>proc_single_json_str(<span class="hljs-string">&#x27;&#123;&quot;foo&quot;: &quot;bar&quot;&#125;&#x27;</span>)<br><span class="hljs-string">u&#x27;bar&#x27;</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>proc_json_list = Compose(json.loads, MapCompose(SelectJmes(<span class="hljs-string">&#x27;foo&#x27;</span>)))<br><span class="hljs-meta">&gt;&gt;&gt; </span>proc_json_list(<span class="hljs-string">&#x27;[&#123;&quot;foo&quot;:&quot;bar&quot;&#125;, &#123;&quot;baz&quot;:&quot;tar&quot;&#125;]&#x27;</span>)<br>[<span class="hljs-string">u&#x27;bar&#x27;</span>]<br></code></pre></td></tr></table></figure>
+<h3 id="2-3-Item-Pipeline"><a href="#2-3-Item-Pipeline" class="headerlink" title="2.3 Item Pipeline"></a>2.3 Item Pipeline</h3>前面已经说了Item Pipeline的基本用法了，现在看的是如何利用item Pipeline来进行数据存储</li>
+</ul>
+<h4 id="2-3-1内置图片和文件下载"><a href="#2-3-1内置图片和文件下载" class="headerlink" title="2.3.1内置图片和文件下载"></a>2.3.1内置图片和文件下载</h4><p>item Pipeline提供了一些可以重用的Pipeline，其中有filesPipeline和imagesPipeline，他们都实现了以下特性：</p>
+<ul>
+<li>避免重新下载最近已经下载过的数据</li>
+<li>指定存储的位置和方式</li>
+</ul>
+<p>此外，imagesPipeline还提供了二位的特性：</p>
+<ul>
+<li>将所有下载的图片转换成通用的格式（jpg）和模式（rgb）</li>
+<li>粗略图生成</li>
+<li>检测图像的宽/高，确保他们满足最小限制</li>
+</ul>
+<p>使用FIlesPipeline方法如下：<br>1）在setting.py的ITEM_PIPELINES中添加一条’scrapy.pipelines.files.FilesPipeline’:1<br>2）在item中添加两个字段，比如：<br>file_urls = scrapy.Field()<br>files = scrapy.Field()<br>3）在setting.py文件中添加下载路径，文件url所在的item字段，和文件结果信息所在item字段，比如：<br>FILES_STORE = ‘/HOME/XXX/SPIDER’<br>FILES_URLS_FIELD =’file_urls’<br>FILES_RESULT_FIELD = ‘files’<br>使用files_expires设置文件过期时间，示例如下：<br>FILES_EXPIRES = 30   #30天过期</p>
+<p>使用ImagesPIpeline方法如下：<br>1）在setting.py的ITEM_PIPELINES中添加一条’scrapy.pipelines.images.ImagesPipeline’:1<br>2）在item中添加两个字段，比如：<br>image_urls = scrapy.Field()<br>images = scrapy.Field()<br>3 )在setting.py文件中添加下载路径，文件url所在的item字段，和文件结果信息所在item字段，比如：<br>IMAGES_STORE = ‘/HOME/XXX/SPIDER’<br>IMAGES_URLS_FIELD =’file_urls’<br>IMAGES_RESULT_FIELD = ‘files’<br>除此之外，使用IMAGES_THUMS制作缩略图，并这是缩略图尺寸大小，并使用IMAGES_EXPIRES设置文件过期时间，示例如下：<br>IMAGES_THUMBS = {<br>               ‘small’:(50, 50),<br>               ‘big’: (270,270),<br>}<br>IMAGES_EXPIRES = 30 #30天过期</p>
+<p>除此之外，Item Pipeline还有三个方法非常常用</p>
+<ul>
+<li>open_spider(self, spider)<br>当spider被开启时，这个方法被调用</li>
+<li>close_spider(self, spider)<br>当spider被关闭是，这个方法被调用</li>
+<li>from_crawler(cls, crawler)<br>这个类方法从Crawles属性中创建一个pipeline实例，Crawle对象能够接触所有Scrapy的核心组件，比如setting</li>
+</ul>
+<p>以下是一个存储到MongoDB的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> pymongo<br><br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ZhihuspiderPipeline</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, mongo_url, mongo_db</span>):</span><br>        self.mongo_url = mongo_url<br>        self.mongo_db = mongo_db<br><br><span class="hljs-meta">    @classmethod</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">from_crawler</span>(<span class="hljs-params">cls, crawler</span>):</span><br>        <span class="hljs-keyword">return</span> cls(<br>            mongo_url=crawler.settings.get(<span class="hljs-string">&#x27;MONGO_URL&#x27;</span>),<br>            mongo_db=crawler.settings.get(<span class="hljs-string">&#x27;MONGO_DATABASE&#x27;</span>, <span class="hljs-string">&#x27;items&#x27;</span>)<br>        )<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">open_spider</span>(<span class="hljs-params">self, spider</span>):</span><br>        self.client = pymongo.MongoClient(self.mongo_url)<br>        self.db = self.client[self.mongo_db]<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">close_spider</span>(<span class="hljs-params">self, spider</span>):</span><br>        self.client.close()<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_item</span>(<span class="hljs-params">self, item, spider</span>):</span><br>    	self.db.UserInfo.insert(<span class="hljs-built_in">dict</span>(item))<br>    	<span class="hljs-keyword">return</span> item<br></code></pre></td></tr></table></figure>
+<p>代码中首先通过from_crawler方法，获取setting中的MongoDB的URL和数据库名称，从而创建一个MongoPIpeline实例，在SPider开始运行是，在open_spider方法中建立数据库连接，当Spider关闭是，在close_spider方法中关闭数据库连接。<br>当是，这里配置的Pipeline会作用于所有的Spider，假如项目中有很多Spider在运行，处理起来就会很麻烦。所以通过process_item(self,item,spider)中的SPider参数判断是来自于哪个爬虫，不过还有更好的方法：<br>就是配置SPider类中的suctom_settings对象，为每一个Spider配置不同的pipeline</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MySpider</span>(<span class="hljs-params">CrawlSpider</span>):</span><br>    custom_settings = &#123;<br>	    <span class="hljs-string">&#x27;ITEM_PIPELINES&#x27;</span>:&#123;<br>		    <span class="hljs-string">&#x27;test.pipelines.TestPipeline.TestPipeline&#x27;</span>:<span class="hljs-number">1</span>,<br>		&#125;<br>    &#125;<br></code></pre></td></tr></table></figure>
+<h3 id="2-4-请求与响应"><a href="#2-4-请求与响应" class="headerlink" title="2.4 请求与响应"></a>2.4 请求与响应</h3><p>在编写Spider的模块中接触最紧密的是请求和响应。</p>
+<h4 id="2-4-1Request对象"><a href="#2-4-1Request对象" class="headerlink" title="2.4.1Request对象"></a>2.4.1Request对象</h4><p>一个Request对象代表着一个HTTP请求，通常在Spider类中产生，然后传递给下载器，最后返回一个响应<br>类原型：class scrapy.http.Request(url[, callback, method=’GET’, headers, body, cookies, meta, encoding=’utf-8’, priority=0, dont_filter=False, errback])<br>构造参数说明：</p>
+<ul>
+<li>url（string） - 此请求的网址</li>
+<li>callback（callable） - 将使用此请求的响应（一旦下载）作为其第一个参数调用的函数。如果请求没有指定回调，parse()将使用spider的 方法。请注意，如果在处理期间引发异常，则会调用errback。</li>
+<li>method（string） - 此请求的HTTP方法。默认为’GET’。</li>
+<li>meta（dict） - 属性的初始值Request.meta。如果给定，在此参数中传递的dict将被浅复制。</li>
+<li>body（str或unicode） - 请求体。如果unicode传递了a，那么它被编码为 str使用传递的编码（默认为utf-8）。- 如果 body没有给出，则存储一个空字符串。不管这个参数的类型，存储的最终值将是一个str（不会是unicode或None）。</li>
+<li>headers（dict） - 这个请求的头。dict值可以是字符串（对于单值标头）或列表（对于多值标头）。如果 None作为值传递，则不会发送HTTP头。</li>
+<li>cookie（dict或list） - 请求cookie。这些可以以两种形式发送。</li>
+<li>encoding（string） - 此请求的编码（默认为’utf-8’）。此编码将用于对URL进行百分比编码，并将正文转换为str（如果给定unicode）。</li>
+<li>priority（int） - 此请求的优先级（默认为0）。调度器使用优先级来定义用于处理请求的顺序。具有较高优先级值的请求将较早执行。允许负值以指示相对低优先级。</li>
+<li>dont_filter（boolean） - 表示此请求不应由调度程序过滤。当您想要多次执行相同的请求时忽略重复过滤器时使用。小心使用它，或者你会进入爬行循环。默认为False。</li>
+<li>errback（callable） - 如果在处理请求时引发任何异常，将调用的函数。这包括失败的404 HTTP错误等页面。</li>
+</ul>
+<blockquote>
+<p>cookies参数设置的两种方法<br>使用字典</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python">request_with_cookies = Request(url=<span class="hljs-string">&quot;http://www.example.com&quot;</span>,<br>                            cookies=&#123;<span class="hljs-string">&#x27;currency&#x27;</span>: <span class="hljs-string">&#x27;USD&#x27;</span>, <span class="hljs-string">&#x27;country&#x27;</span>: <span class="hljs-string">&#x27;UY&#x27;</span>&#125;)<br></code></pre></td></tr></table></figure>
+<p>使用字典列表发送</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python">&gt;request_with_cookies = Request(url=<span class="hljs-string">&quot;http://www.example.com&quot;</span>,<br>                              cookies=[&#123;<span class="hljs-string">&#x27;name&#x27;</span>: <span class="hljs-string">&#x27;currency&#x27;</span>,<br>                                       <span class="hljs-string">&#x27;value&#x27;</span>: <span class="hljs-string">&#x27;USD&#x27;</span>,<br>                                       <span class="hljs-string">&#x27;domain&#x27;</span>: <span class="hljs-string">&#x27;example.com&#x27;</span>,<br>                                       <span class="hljs-string">&#x27;path&#x27;</span>: <span class="hljs-string">&#x27;/currency&#x27;</span>&#125;]) <br></code></pre></td></tr></table></figure>
+<p>当某些网站返回Cookie（在响应中）时，这些Cookie会存储在该域的Cookie中，并在将来的请求中再次发送。这是任何常规网络浏览器的典型行为。但是，如果由于某种原因，想要避免与现有Cookie合并，可以设置Requ.meta中dont_merge_cookies字段的值。示例如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs Python">&gt;request_with_cookies = Request(url=<span class="hljs-string">&quot;http://www.example.com&quot;</span>,<br>                              cookies=&#123;<span class="hljs-string">&#x27;currency&#x27;</span>: <span class="hljs-string">&#x27;USD&#x27;</span>, <span class="hljs-string">&#x27;country&#x27;</span>: <span class="hljs-string">&#x27;UY&#x27;</span>&#125;,<br>                              meta=&#123;<span class="hljs-string">&#x27;dont_merge_cookies&#x27;</span>: <span class="hljs-literal">True</span>&#125;)<br></code></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>errback的使用方法示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs python">&gt;<span class="hljs-keyword">import</span> scrapy<br><br>&gt;<span class="hljs-keyword">from</span> scrapy.spidermiddlewares.httperror <span class="hljs-keyword">import</span> HttpError<br>&gt;<span class="hljs-keyword">from</span> twisted.internet.error <span class="hljs-keyword">import</span> DNSLookupError<br>&gt;<span class="hljs-keyword">from</span> twisted.internet.error <span class="hljs-keyword">import</span> TimeoutError, TCPTimedOutError<br><br>&gt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ErrbackSpider</span>(<span class="hljs-params">scrapy.Spider</span>):</span><br>   name = <span class="hljs-string">&quot;errback_example&quot;</span><br>   start_urls = [<br>       <span class="hljs-string">&quot;http://www.httpbin.org/&quot;</span>,              <span class="hljs-comment"># HTTP 200 expected</span><br>       <span class="hljs-string">&quot;http://www.httpbin.org/status/404&quot;</span>,    <span class="hljs-comment"># Not found error</span><br>       <span class="hljs-string">&quot;http://www.httpbin.org/status/500&quot;</span>,    <span class="hljs-comment"># server issue</span><br>       <span class="hljs-string">&quot;http://www.httpbin.org:12345/&quot;</span>,        <span class="hljs-comment"># non-responding host, timeout expected</span><br>       <span class="hljs-string">&quot;http://www.httphttpbinbin.org/&quot;</span>,       <span class="hljs-comment"># DNS error expected</span><br>   ]<br><br>   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">start_requests</span>(<span class="hljs-params">self</span>):</span><br>       <span class="hljs-keyword">for</span> u <span class="hljs-keyword">in</span> self.start_urls:<br>           <span class="hljs-keyword">yield</span> scrapy.Request(u, callback=self.parse_httpbin,<br>                                   errback=self.errback_httpbin,<br>                                   dont_filter=<span class="hljs-literal">True</span>)<br><br>   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse_httpbin</span>(<span class="hljs-params">self, response</span>):</span><br>       self.logger.info(<span class="hljs-string">&#x27;Got successful response from &#123;&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(response.url))<br>       <span class="hljs-comment"># do something useful here...</span><br><br>   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">errback_httpbin</span>(<span class="hljs-params">self, failure</span>):</span><br>       <span class="hljs-comment"># log all failures</span><br>       self.logger.error(<span class="hljs-built_in">repr</span>(failure))<br><br>       <span class="hljs-comment"># in case you want to do something special for some errors,</span><br>       <span class="hljs-comment"># you may need the failure&#x27;s type:</span><br><br>       <span class="hljs-keyword">if</span> failure.check(HttpError):<br>           <span class="hljs-comment"># these exceptions come from HttpError spider middleware</span><br>           <span class="hljs-comment"># you can get the non-200 response</span><br>           response = failure.value.response<br>           self.logger.error(<span class="hljs-string">&#x27;HttpError on %s&#x27;</span>, response.url)<br><br>       <span class="hljs-keyword">elif</span> failure.check(DNSLookupError):<br>           <span class="hljs-comment"># this is the original request</span><br>           request = failure.request<br>           self.logger.error(<span class="hljs-string">&#x27;DNSLookupError on %s&#x27;</span>, request.url)<br><br>       <span class="hljs-keyword">elif</span> failure.check(TimeoutError, TCPTimedOutError):<br>           request = failure.request<br>           self.logger.error(<span class="hljs-string">&#x27;TimeoutError on %s&#x27;</span>, request.url)<br></code></pre></td></tr></table></figure>
+<p>下面写的是Request的子类 FormRquest类，专门用来处理html表单，尤其对隐藏表单的处理非常方便，适合用来完成登录操作<br>类原型：class scrapy.http.FormRequest(url[, formdata, …])<br>其中构造参数formdata可以是字典，也可以是可迭代的（key,value）元祖，代表着需要提交的表单数据。<br>示例如下：</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">return</span> [FormRequest(url=<span class="hljs-string">&quot;http://www.example.com/post/action&quot;</span>,<br>                    formdata=&#123;<span class="hljs-string">&#x27;name&#x27;</span>: <span class="hljs-string">&#x27;John Doe&#x27;</span>, <span class="hljs-string">&#x27;age&#x27;</span>: <span class="hljs-string">&#x27;27&#x27;</span>&#125;,<br>                    callback=self.after_post)]<br></code></pre></td></tr></table></figure>
+<p>通常网站通过<input type="hidden">实现对某些表单字段的预填充，就像知乎的隐藏表单的_xfv数值，Scray在FromRequest类提供了一个类方法from_reponse来解决隐藏表单这个问题。方法原型如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">classmethod</span> from_response(response[, formname=<span class="hljs-literal">None</span>, formid=<span class="hljs-literal">None</span>, formnumber=<span class="hljs-number">0</span>, formdata=<span class="hljs-literal">None</span>, formxpath=<span class="hljs-literal">None</span>, formcss=<span class="hljs-literal">None</span>, clickdata=<span class="hljs-literal">None</span>, dont_click=<span class="hljs-literal">False</span>, ...])<br></code></pre></td></tr></table></figure>
+<p>参数说明：</p>
+<ul>
+<li>response（Responseobject） - 包含将用于预填充表单字段的HTML表单的响应</li>
+<li>formname（string） - 如果给定，将使用name属性设置为此值的形式。</li>
+<li>formid（string） - 如果给定，将使用id属性设置为此值的形式。</li>
+<li>formxpath（string） - 如果给定，将使用匹配xpath的第一个表单。</li>
+<li>formcss（string） - 如果给定，将使用匹配css选择器的第一个形式。</li>
+<li>formnumber（integer） - 当响应包含多个表单时要使用的表单的数量。第一个（也是默认）是0。</li>
+<li>formdata（dict） - 要在表单数据中覆盖的字段。如果响应元素中已存在字段，则其值将被在此参数中传递的值覆盖。</li>
+<li>clickdata（dict） - 查找控件被点击的属性。如果没有提供，表单数据将被提交，模拟第一个可点击元素的点击。除了html属性，控件可以通过其相对于表单中其他提交表输入的基于零的索引，通过nr属性来标识。</li>
+<li>dont_click（boolean） - 如果为True，表单数据将在不点击任何元素的情况下提交。</li>
+</ul>
+<p>下面是一个实现登录功能的示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> scrapy<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LoginSpider</span>(<span class="hljs-params">scrapy.Spider</span>):</span><br>    name = <span class="hljs-string">&#x27;example.com&#x27;</span><br>    start_urls = [<span class="hljs-string">&#x27;http://www.example.com/users/login.php&#x27;</span>]<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">self, response</span>):</span><br>        <span class="hljs-keyword">return</span> scrapy.FormRequest.from_response(<br>            response,<br>            formdata=&#123;<span class="hljs-string">&#x27;username&#x27;</span>: <span class="hljs-string">&#x27;john&#x27;</span>, <span class="hljs-string">&#x27;password&#x27;</span>: <span class="hljs-string">&#x27;secret&#x27;</span>&#125;,<br>            callback=self.after_login<br>        )<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">after_login</span>(<span class="hljs-params">self, response</span>):</span><br>        <span class="hljs-comment"># check login succeed before going on</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;authentication failed&quot;</span> <span class="hljs-keyword">in</span> response.body:<br>            self.logger.error(<span class="hljs-string">&quot;Login failed&quot;</span>)<br>            <span class="hljs-keyword">return</span><br></code></pre></td></tr></table></figure>
+<h4 id="2-4-2-Response对象"><a href="#2-4-2-Response对象" class="headerlink" title="2.4.2 Response对象"></a>2.4.2 Response对象</h4><p>Response对象代表着HTTP响应，Response通常是从下载器获取然后交给Spider处理：<br>类原型：class scrapy.http.Response(url[, status=200, headers=None, body=b’’, flags=None, request=None])<br>构造参数说明：</p>
+<ul>
+<li>url（string） - 此响应的URL</li>
+<li>status（integer） - 响应的HTTP状态。默认为200。</li>
+<li>headers（dict） - 这个响应的头。dict值可以是字符串（对于单值标头）或列表（对于多值标头）。</li>
+<li>body（str） - 响应体。它必须是str，而不是unicode，除非你使用一个编码感知响应子类，如 TextResponse。</li>
+<li>flags（list） - 是一个包含属性初始值的 Response.flags列表。如果给定，列表将被浅复制。</li>
+<li>request（Requestobject） - 属性的初始值Response.request。这代表Request生成此响应。</li>
+<li>meta(dict)：用来初始化Response.meta</li>
+</ul>
+<p>关于参数的其他补充：</p>
+<ul>
+<li>request<br>Request生成此响应的对象。在响应和请求通过所有下载中间件后，此属性在Scrapy引擎中分配。特别地，这意味着：<br>HTTP重定向将导致将原始请求（重定向之前的URL）分配给重定向响应（重定向后具有最终URL）。<br>Response.request.url并不总是等于Response.url<br>此属性仅在爬虫程序代码和 Spider Middleware中可用，但不能在Downloader Middleware中使用（尽管您有通过其他方式可用的请求）和处理程序response_downloaded。</li>
+<li>meta<br>的快捷方式Request.meta的属性 Response.request对象（即self.request.meta）。<br>与Response.request属性不同，Response.meta 属性沿重定向和重试传播，因此您将获得Request.meta从您的爬虫发送的原始属性。<br>也可以看看<br>Request.meta 属性</li>
+<li>flags<br>包含此响应的标志的列表。标志是用于标记响应的标签。例如：’cached’，’redirected ‘等等。它们显示在Response（_ str_ 方法）的字符串表示上，它被引擎用于日志记录。</li>
+<li>copy（）<br>返回一个新的响应，它是此响应的副本。</li>
+<li>replace（[ url，status，headers，body，request，flags，cls ] ）<br>返回具有相同成员的Response对象，但通过指定的任何关键字参数赋予新值的成员除外。该属性Response.meta是默认复制。</li>
+<li>urljoin（url ）<br>通过将响应url与可能的相对URL 组合构造绝对url。<br>这是一个包装在urlparse.urljoin，它只是一个别名，使这个调用：<br>urlparse.urljoin(response.url, url)</li>
+</ul>
+<p>同样的，Response有一个子类TextResponse,多了一个智能编码的功能。<br>类原型：class scrapy.http.TextResponse(url[, encoding[, …]])<br>构造参数encoding是一个包含编码的字符串，如果使用一个unicode编码的body构造出TextResponse实例，那body属性会使用encoding进行编码。<br>TextResponse类除了具有Response属性，还拥有自己的属性：</p>
+<ul>
+<li>encoding：包含编码的字符串。编码的优先级由高到低如下所示：<br>1）首先选用构造器中传入的encoding<br>2）选用http头中Content-Type字段的编码。如果编码无效，则被忽略，继续尝试下面的规则<br>3）选用响应body中的编码<br>4）最后猜测响应的编码，这种方式是比较脆弱</li>
+<li>selector:以当前响应为目标的选择器实例。<br>TextResponse类除了支持Response中的方法，还支持以下方法response</li>
+<li>body_as_unicode():返回unicode编码的响应body内容。等价于：<br>response.body.decode(response.encoding)</li>
+<li>xpath(query):等价于TextResponse.selector.xpath(query).示例如下：<br>response.xpath(‘//p’)</li>
+<li>css(query):等价于TextResponse.selector.css(query).示例如下：<br>response.css(‘//p’)</li>
+</ul>
+<h3 id="2-5下载器中间件"><a href="#2-5下载器中间件" class="headerlink" title="2.5下载器中间件"></a>2.5下载器中间件</h3><p>下载器中间件是介于Scrapy的request/response处理的钩子框架，是用于全局修改Scrapy的request和response，可以帮助我们定制自己的爬虫系统<br>激活哦下载器中间件的方法如下<br>在setting.py里面的DOWNLOADER_MIDDLEWARES修改，示例如下：<br>DOWNLOADER_MIDDLEWARES = {<br>            ‘myproject.middlewares.CustomDownloaderMiddleware’: 543,<br>            }<br>后面数值的设置要看自己的需求，越接近0越靠近引擎，越接近1000越靠近下载器，数字设置一般看自己需要先用到哪些中间件，就把数字设定得比哪个中间件大<br>中间件组建定义了以下python类，可以根据这些类来编写自己的中间件</p>
+<ul>
+<li>process_request(request,spider)</li>
+<li>process_response(request,response,spider)</li>
+<li>process_exception(request,exception,spider)</li>
+</ul>
+<h4 id="2-5-1process-request-request-spider"><a href="#2-5-1process-request-request-spider" class="headerlink" title="2.5.1process_request(request,spider)"></a>2.5.1process_request(request,spider)</h4><p>当每个request通过下载中间件时，该方法被调用，返回值必须为none，response对象，request对象中的一个或raise IgnoreRequest异常<br>参数说明：<br>Request：处理的request<br>Spider：该Request对应的Spider<br>返回值：如果返回None,Scrapy将继续处理该Request，执行其他中间件的相应方法，直到合适的下载器处理函数被调用，该Request被执行（其Response下载）<br>如果返回Response对象，SCrapy不会调用下面2个方法，或相应的下载方法，将返回该response。已安装的中间件的process_response()方法则会在每个respon返回时被调用<br>如果返回request对象，Scrapy则停止调用process_request方法并重新调度放回的Request。当新返回的Request被执行后，相应地中间件链将会根据下载的Response被调用<br>如果是Raise IgnoreRequest异常，则安装的下载中间件的process_exception()方法会被调用。如果没有任何一个方法处理该异常，则Request的errback方法会被调用。如果没有代码处理抛出的异常，则该异常被忽略且不记录</p>
+<h4 id="2-5-2process-request-request-response-spider"><a href="#2-5-2process-request-request-response-spider" class="headerlink" title="2.5.2process_request(request,response,spider)"></a>2.5.2process_request(request,response,spider)</h4><p>该方法主要用来处理产生的Response返回值必须为none，response对象，request对象中的一个或raise IgnoreRequest异常<br>参数说明：<br>Request：处理的request<br>response:处理的response<br>Spider：该Request对应的Spider<br>返回值：<br>如果返回Response对象，可以与传入的respon相同，也可以是新的对象，该Response会被链中的其他中间见的process_reponse()方法处理<br>如果返回request对象，Scrapy则停止调用process_request方法并重新调度放回的Request。当新返回的Request被执行后，相应地中间件链将会根据下载的Response被调用<br>如果是Raise IgnoreRequest异常，则安装的下载中间件的process_exception()方法会被调用。如果没有任何一个方法处理该异常，则Request的errback方法会被调用。如果没有代码处理抛出的异常，则该异常被忽略且不记录</p>
+<h4 id="2-5-3process-request-request-exceptionmspider"><a href="#2-5-3process-request-request-exceptionmspider" class="headerlink" title="2.5.3process_request(request,exceptionmspider)"></a>2.5.3process_request(request,exceptionmspider)</h4><p>当下载处理器或process_request()抛出异常，比如IgnoreRequest异常时，Scrapy调用process_exception().process_exception()应该返回none，response对象，request对象中的一个<br>参数说明：<br>Request：处理的request<br>exception:抛出的异常<br>Spider：该Request对应的Spider<br>返回值：<br>如果返回None,Scrapy将会继续处理该异常，接着调用已安装的其他中间件的process_exception()方法，知道所有中间件都被调用完毕，则调用默认的异常处理<br>如果返回response对象，则已安装的中间级链的process_response()方法被调用。Scrapy将不会调用任何其他中间件的process_exception()方法<br>如果返回Request对象，则返回的request将会被重新调用下载，这将停止中间级的process_exception()方法执行，类似于返回respon对象的处理</p>
+<p>下面是自定义下载器中间件的两个栗子：</p>
+<blockquote>
+<p>设置User-Agent字段，需要自己在setting,py中设置User-Agent列表</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RandomUserAgent</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self,agents</span>):</span><br>	    self.agents =agents<br>		<br><span class="hljs-meta">	@classmethod</span><br>	<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">from_crawler</span>(<span class="hljs-params">cls,crawler</span>):</span><br>	    <span class="hljs-keyword">return</span> cls(crawler.settings.getlist(<span class="hljs-string">&#x27;USER_AGENTS&#x27;</span>))<br>	<br>	<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_request</span>(<span class="hljs-params">self,request,spider</span>):</span><br>	    request.headers.setdefault(<span class="hljs-string">&#x27;User-Agent&#x27;</span>, random.choice(self.agents))<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>动态设置request代理ip,需要自己在setting,py中设置IPlist列表</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RandomProxy</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self,iplist</span>):</span><br>        self.iplist=iplist<br><br><span class="hljs-meta">    @classmethod</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">from_crawler</span>(<span class="hljs-params">cls,crawler</span>):</span><br>        <span class="hljs-keyword">return</span> cls(crawler.settings.getlist(<span class="hljs-string">&#x27;IPLIST&#x27;</span>))<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_request</span>(<span class="hljs-params">self, request, spider</span>):</span><br>        proxy = random.choice(self.iplist)<br>        request.meta[<span class="hljs-string">&#x27;proxy&#x27;</span>] =proxy<br></code></pre></td></tr></table></figure>
+<h3 id="2-6Spider中间件"><a href="#2-6Spider中间件" class="headerlink" title="2.6Spider中间件"></a>2.6Spider中间件</h3><p>这个看官方文档就好了 ——<a target="_blank" rel="noopener" href="http://scrapy-chs.readthedocs.io/zh_CN/0.24/topics/spider-middleware.html">这里</a></p>
+<h2 id="3-部署"><a href="#3-部署" class="headerlink" title="3.部署"></a>3.部署</h2><p>这里都是编写完爬虫代码后的其他一些应用，不完全属于部署</p>
+<h3 id="3-1分布式下载器-Crawlea"><a href="#3-1分布式下载器-Crawlea" class="headerlink" title="3.1分布式下载器:Crawlea"></a>3.1分布式下载器:Crawlea</h3><p>官方提供了一个分布式下载器，用来帮助我们躲避反爬虫的措施。首先在官网注册。之后拿到APIKEY用作验证<br>不过是需要钱的<br>官网：<a target="_blank" rel="noopener" href="https://app.scrapinghub.com/account/login/?next=/next=/account/login">https://app.scrapinghub.com/account/login/?next=/next=/account/login</a><br>安装：pip install scrapy-crawlera<br>之后修改setting.py<br>DOWNLOADER_MIDDLEWARES ={‘scrapy_crawlera.CrawleraMiddleware’:300}<br>CRAWLERA_ENABLED = True<br>CRAWLERA_APIKEY = ‘<API key>‘</p>
+<h3 id="3-2Scrapyd"><a href="#3-2Scrapyd" class="headerlink" title="3.2Scrapyd"></a>3.2Scrapyd</h3><p>是的。官方又提供了一个部署爬虫非常有用的工具，Scrapyd是运行Scrapy爬虫的服务程序，它吃屎以http命令方式通过json api进行发布、删除、启动、停止爬虫程序的操作，而且它可以同时管理多个爬虫，每个爬虫还可以有多个版本，也是部署分布式爬虫有效手段<br>安装：pipi install scrapyd<br>使用：输入scrapyd启动，在浏览器输入：<a target="_blank" rel="noopener" href="http://127.0.0.1:6800/%E5%B0%B1%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E7%95%8C%E9%9D%A2%E4%BA%86">http://127.0.0.1:6800/就可以看到界面了</a><br>API使用示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># -*- coding: utf-8 -*-</span><br><br><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">import</span> json <br><br>baseUrl =<span class="hljs-string">&#x27;http://127.0.0.1:6800/&#x27;</span><br>daemUrl =<span class="hljs-string">&#x27;http://127.0.0.1:6800/daemonstatus.json&#x27;</span><br>listproUrl =<span class="hljs-string">&#x27;http://127.0.0.1:6800/listprojects.json&#x27;</span><br>listspdUrl =<span class="hljs-string">&#x27;http://127.0.0.1:6800/listspiders.json?project=%s&#x27;</span><br>listspdvUrl= <span class="hljs-string">&#x27;http://127.0.0.1:6800/listversions.json?project=%s&#x27;</span><br>listjobUrl =<span class="hljs-string">&#x27;http://127.0.0.1:6800/listjobs.json?project=%s&#x27;</span><br>delspdvUrl= <span class="hljs-string">&#x27;http://127.0.0.1:6800/delversion.json&#x27;</span><br><br><span class="hljs-comment">#http://127.0.0.1:6800/daemonstatus.json</span><br><span class="hljs-comment">#查看scrapyd服务器运行状态</span><br>r= requests.get(daemUrl)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;1.stats :\n %s \n\n&#x27;</span>  %r.text  <br><br><span class="hljs-comment">#http://127.0.0.1:6800/listprojects.json</span><br><span class="hljs-comment">#获取scrapyd服务器上已经发布的工程列表</span><br>r= requests.get(listproUrl)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;1.1.listprojects : [%s]\n\n&#x27;</span>  %r.text<br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(json.loads(r.text)[<span class="hljs-string">&quot;projects&quot;</span>])&gt;<span class="hljs-number">0</span> :<br>    project = json.loads(r.text)[<span class="hljs-string">&quot;projects&quot;</span>][<span class="hljs-number">0</span>]<br><br><span class="hljs-comment">#http://127.0.0.1:6800/listspiders.json?project=myproject</span><br><span class="hljs-comment">#获取scrapyd服务器上名为myproject的工程下的爬虫清单</span><br>listspd=listspd % project<br>r= requests.get(listspdUrl)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;2.listspiders : [%s]\n\n&#x27;</span>  %r.text <br><span class="hljs-keyword">if</span> json.loads(r.text).has_key(<span class="hljs-string">&quot;spiders&quot;</span>)&gt;<span class="hljs-number">0</span> :<br>    spider =json.loads(r.text)[<span class="hljs-string">&quot;spiders&quot;</span>][<span class="hljs-number">0</span>]<br><br><br><span class="hljs-comment">#http://127.0.0.1:6800/listversions.json?project=myproject</span><br><span class="hljs-comment">##获取scrapyd服务器上名为myproject的工程下的各爬虫的版本</span><br>listspdvUrl=listspdvUrl % project<br>r = requests.get(listspdvUrl)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;3.listversions : [%s]\n\n&#x27;</span>  %rtext <br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(json.loads(r.text)[<span class="hljs-string">&quot;versions&quot;</span>])&gt;<span class="hljs-number">0</span> :<br>    version = json.loads(r.text)[<span class="hljs-string">&quot;versions&quot;</span>][<span class="hljs-number">0</span>]<br><br><span class="hljs-comment">#http://127.0.0.1:6800/listjobs.json?project=myproject</span><br><span class="hljs-comment">#获取scrapyd服务器上的所有任务清单，包括已结束，正在运行的，准备启动的。</span><br>listjobUrl=listjobUrl % proName<br>r=requests.get(listjobUrl)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;4.listjobs : [%s]\n\n&#x27;</span>  %r.text <br><br><br><span class="hljs-comment">#schedule.json</span><br><span class="hljs-comment">#http://127.0.0.1:6800/schedule.json -d project=myproject -d spider=myspider</span><br><span class="hljs-comment">#启动scrapyd服务器上myproject工程下的myspider爬虫，使myspider立刻开始运行，注意必须以post方式</span><br>schUrl = baseurl + <span class="hljs-string">&#x27;schedule.json&#x27;</span><br>dictdata =&#123; <span class="hljs-string">&quot;project&quot;</span>:project,<span class="hljs-string">&quot;spider&quot;</span>:spider&#125;<br>r= reqeusts.post(schUrl, json= dictdata)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;5.1.delversion : [%s]\n\n&#x27;</span>  %r.text <br><br><br><span class="hljs-comment">#http://127.0.0.1:6800/delversion.json -d project=myproject -d version=r99&#x27;</span><br><span class="hljs-comment">#删除scrapyd服务器上myproject的工程下的版本名为version的爬虫，注意必须以post方式</span><br>delverUrl = baseurl + <span class="hljs-string">&#x27;delversion.json&#x27;</span><br>dictdata=&#123;<span class="hljs-string">&quot;project&quot;</span>:project ,<span class="hljs-string">&quot;version&quot;</span>: version &#125;<br>r= reqeusts.post(delverUrl, json= dictdata)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;6.1.delversion : [%s]\n\n&#x27;</span>  %r.text <br><br><span class="hljs-comment">#http://127.0.0.1:6800/delproject.json -d project=myproject</span><br><span class="hljs-comment">#删除scrapyd服务器上myproject工程，注意该命令会自动删除该工程下所有的spider，注意必须以post方式</span><br>delProUrl = baseurl + <span class="hljs-string">&#x27;delproject.json&#x27;</span><br>dictdata=&#123;<span class="hljs-string">&quot;project&quot;</span>:project  &#125;<br>r= reqeusts.post(delverUrl, json= dictdata)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;6.2.delproject : [%s]\n\n&#x27;</span>  %r.text <br></code></pre></td></tr></table></figure>
+<h3 id="3-3Scrapyd-client"><a href="#3-3Scrapyd-client" class="headerlink" title="3.3Scrapyd-client"></a>3.3Scrapyd-client</h3><p>懒得截图访问<a target="_blank" rel="noopener" href="http://www.cnblogs.com/space007/p/5886177.html">这里</a>查看</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/08/22/12-scrapy/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;22&#x2F;12-scrapy&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;22&#x2F;12-scrapy&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scrapy/" rel="tag">scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/08/23/p1/"><i class="iconfont iconleft"></i>基于django的博客(1)</a>
+    <a href="/2017/08/17/11-vim/">vim命令<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#scrapy%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E6%9C%89%E7%A4%BA%E4%BE%8B%E7%89%88%EF%BC%89"><span class="toc-text">scrapy学习笔记(有示例版）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BD%BF%E7%94%A8scrapy"><span class="toc-text">1.使用scrapy</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E5%88%9B%E5%BB%BA%E5%B7%A5%E7%A8%8B"><span class="toc-text">1.1创建工程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E5%88%9B%E5%BB%BA%E7%88%AC%E8%99%AB%E6%A8%A1%E5%9D%97"><span class="toc-text">1.2创建爬虫模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3%E7%BD%91%E9%A1%B5%E8%A7%A3%E6%9E%90"><span class="toc-text">1.3网页解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-item"><span class="toc-text">1.4 item</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5Item-Pipeline"><span class="toc-text">1.5Item Pipeline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6%E8%BF%90%E8%A1%8C"><span class="toc-text">1.6运行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%B7%B1%E5%85%A5Scrapy"><span class="toc-text">2.深入Scrapy</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1Spider"><span class="toc-text">2.1Spider</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Item-Loader"><span class="toc-text">2.2 Item Loader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-Item-Pipeline"><span class="toc-text">2.3 Item Pipeline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%93%8D%E5%BA%94"><span class="toc-text">2.4 请求与响应</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5%E4%B8%8B%E8%BD%BD%E5%99%A8%E4%B8%AD%E9%97%B4%E4%BB%B6"><span class="toc-text">2.5下载器中间件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6Spider%E4%B8%AD%E9%97%B4%E4%BB%B6"><span class="toc-text">2.6Spider中间件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%83%A8%E7%BD%B2"><span class="toc-text">3.部署</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%8B%E8%BD%BD%E5%99%A8-Crawlea"><span class="toc-text">3.1分布式下载器:Crawlea</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2Scrapyd"><span class="toc-text">3.2Scrapyd</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3Scrapyd-client"><span class="toc-text">3.3Scrapyd-client</span></a></li></ol></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

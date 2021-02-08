@@ -1,0 +1,481 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>基于django的博客(1) - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记一开始为了熟悉django而按照教程或者文章写的基...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">基于django的博客(1)</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">基于django的博客(1)</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 23, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5797</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="github"><a href="#github" class="headerlink" title="github"></a>github</h2><p><a target="_blank" rel="noopener" href="https://github.com/so1n/Django_project/tree/master/project1">代码仓</a></p>
+<h2 id="基本功能"><a href="#基本功能" class="headerlink" title="基本功能"></a>基本功能</h2><p>代码量比较少只是简单的实现增删改</p>
+<ul>
+<li>管理员发表文章</li>
+<li>访问者查看文章<ul>
+<li> 归档</li>
+<li> 标签</li>
+<li> 分类</li>
+<li> 搜索</li>
+</ul>
+</li>
+</ul>
+<h2 id="new"><a href="#new" class="headerlink" title="new"></a>new</h2><h3 id="DetailView与ListView"><a href="#DetailView与ListView" class="headerlink" title="DetailView与ListView"></a>DetailView与ListView</h3><p>为了减少代码使用量等，在django中可以使用基于view来编写视图。常用的有DetailView与ListView，他们有些细微的却别:</p>
+<ul>
+<li>主要功能<ul>
+<li>ListView-从数据库中获取模型列表的数据</li>
+<li>DetailView从数据库获取模型的一条记录数据。比如查看某篇文章的详情，就是从数据库中获取这篇文章的记录然后渲染模板。</li>
+</ul>
+</li>
+</ul>
+<p>方法：</p>
+<ul>
+<li><p>DetailView 有以下方法：</p>
+<ul>
+<li>dispatch()</li>
+<li>http_method_not_allowed()</li>
+<li>get_template_names()</li>
+<li>get_slug_field()</li>
+<li>get_queryset()</li>
+<li>get_object()</li>
+<li>get_context_object_name()</li>
+<li>get_context_data()</li>
+<li>get()</li>
+<li>render_to_response()</li>
+</ul>
+</li>
+<li><p>ListView 有以下方法：</p>
+<ul>
+<li>dispatch()</li>
+<li>http_method_not_allowed()</li>
+<li>get_template_names()</li>
+<li>get_queryset()</li>
+<li>get_context_object_name()</li>
+<li>get_context_data()</li>
+<li>get()</li>
+<li>render_to_response()</li>
+</ul>
+</li>
+</ul>
+<p>内部结构：<br>ListView类图<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django%E5%8D%9A%E5%AE%A21-1.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">ListView类图</span><br>DetailView类图<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django1-2.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">DetailView类图</span><br>在这两个类图中，最关键的组件就是MultiObjectMixin和SingleObjectMixin这两个类了，他们实现的功能是从数据库中读取数据，并且构建要传入template的context。每个类都有一些属性和方法可以覆盖，实现自定制，比如可以覆盖context_object_name变量，用来指定传入template的context的对象的变量名；可以覆盖get_context_data()方法，用来将其他的变量放到context中；为queryset赋值，就可以自己指定这个View操作的对象(列表)；或者是直接重写get_queryset()/get_object()方法，简单暴力。</p>
+<p>注意，这两个类，也是继承自TemplateResponseMixin，也就是说它们也是直接返回的TemplateResponse对象。</p>
+<h3 id="django的处理流程"><a href="#django的处理流程" class="headerlink" title="django的处理流程"></a>django的处理流程</h3><p><a href="/2017/08/24/26/">浏览器访问流程</a></p>
+<h4 id="web-server"><a href="#web-server" class="headerlink" title="web server"></a>web server</h4><p>django拥有一个自己的web server-runserver，主要用于开发和调试中，部署到线上环境时用的都是别的web server 如：nginx+uwsgi</p>
+<p>runserver运行时主要是完成以下两件事：</p>
+<ol>
+<li>解析参数，并通过django.core.servers.basehttp.get_internal_wsgi_application方法获取wsgi handler;</li>
+<li>根据ip_address和port生成一个WSGIServer对象，接受用户请求<br>get_internal_wsgi_application的源码如下：</li>
+</ol>
+<p><img    class="lazyload" data-original="http://of66as8gb.bkt.clouddn.com/blog/20161017/174541324.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">image</span></p>
+<p>通过上面的代码可知道，Django会先根据settings中的WSGI_APPLICATION来获取handler；<br>在创建project的时候，Django会默认创建一个wsgi.py文件，而settings中的WSGI_APPLICATION配置也会默认指向这个文件。看一下这个wsgi.py文件，其实它也和上面的逻辑一样，最终调用get_wsgi_application实现。</p>
+<h4 id="django-http请求处理流程-来源于网上"><a href="#django-http请求处理流程-来源于网上" class="headerlink" title="django http请求处理流程(来源于网上)"></a>django http请求处理流程(来源于网上)</h4><p>Django的具体处理流程大致如下：</p>
+<ol>
+<li><p>加载settings.py</p>
+<blockquote>
+<p>在通过django-admin.py创建project的时候，Django会自动生成默认的settings文件和manager.py等文件，在创建WSGIServer之前会执行下面的引用:</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> django.conf <span class="hljs-keyword">import</span> settings<br></code></pre></td></tr></table></figure>
+<p>上面引用在执行时，会读取os.environ中的DJANGO_SETTINGS_MODULE配置，加载项目配置文件，生成settings对象。所以，在manager.py文件中你可以看到，在获取WSGIServer之前，会先将project的settings路径加到os路径中。</p>
+</li>
+<li><p>创建WSGIServer</p>
+</li>
+</ol>
+<p>不管是使用哪个web server运行Django项目，在启动时都会调用django.core.servers.basehttp中的run()方法<br>创建一个django.core.servers.basehttp.WSGIServer类的实例，之后调用其serve_forever()方法启动HTTP服务。<br>run方法的源码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span>(<span class="hljs-params">addr, port, wsgi_handler, ipv6=<span class="hljs-literal">False</span>, threading=<span class="hljs-literal">False</span></span>):</span><br>    server_address = (addr, port)<br>    <span class="hljs-keyword">if</span> threading:<br>        httpd_cls = <span class="hljs-built_in">type</span>(<span class="hljs-built_in">str</span>(<span class="hljs-string">&#x27;WSGIServer&#x27;</span>), (socketserver.ThreadingMixIn, WSGIServer), &#123;&#125;)<br>    <span class="hljs-keyword">else</span>:<br>        httpd_cls = WSGIServer<br>    httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)<br>    <span class="hljs-keyword">if</span> threading:<br>        <span class="hljs-comment"># ThreadingMixIn.daemon_threads indicates how threads will behave on an</span><br>        <span class="hljs-comment"># abrupt shutdown; like quitting the server by the user or restarting</span><br>        <span class="hljs-comment"># by the auto-reloader. True means the server will not wait for thread</span><br>        <span class="hljs-comment"># termination before it quits. This will make auto-reloader faster</span><br>        <span class="hljs-comment"># and will prevent the need to kill the server manually if a thread</span><br>        <span class="hljs-comment"># isn&#x27;t terminating correctly.</span><br>        httpd.daemon_threads = <span class="hljs-literal">True</span><br>    httpd.set_app(wsgi_handler)<br>    httpd.serve_forever()<br></code></pre></td></tr></table></figure>
+<blockquote>
+<blockquote>
+<p>如上，我们可以看到：在创建WSGIServer实例的时候会指定HTTP请求的Handler，<br>上述代码使用WSGIRequestHandler。当用户的HTTP请求到达服务器时，<br>WSGIServer会创建WSGIRequestHandler实例，使用其handler方法来处理HTTP请求(其实最终是调用wsgiref.handlers.BaseHandler中的run方法处理)。<br>WSGIServer通过set_app方法设置一个可调用(callable)的对象作为application，上面提到的handler方法最终会调用设置的application处理request，并返回response。<br>其中，WSGIServer继承自wsgiref.simple_server.WSGIServer，而WSGIRequestHandler继承自wsgiref.simple_server.WSGIRequestHandler，wsgiref是python标准库给出的WSGI的参考实现。其源码可自行到wsgiref参看，这里不再细说。</p>
+</blockquote>
+</blockquote>
+<ol start="3">
+<li>处理Request</li>
+</ol>
+<blockquote>
+<p>第二步中说到的application，在Django中一般是django.core.handlers.wsgi.WSGIHandler对象，WSGIHandler继承自django.core.handlers.base.BaseHandler，这个是Django处理request的核心逻辑，它会创建一个WSGIRequest实例，而WSGIRequest是从http.HttpRequest继承而来</p>
+</blockquote>
+<ol start="4">
+<li>返回Response</li>
+</ol>
+<blockquote>
+<p>上面提到的BaseHandler中有个get_response方法，该方法会先加载Django项目的ROOT_URLCONF，然后根据url规则找到对应的view方法(类)，view逻辑会根据request实例生成并返回具体的response。<br>在Django返回结果之后，第二步中提到wsgiref.handlers.BaseHandler.run方法会调用finish_response结束请求，并将内容返回给用户</p>
+</blockquote>
+<h4 id="Django处理Request的流程"><a href="#Django处理Request的流程" class="headerlink" title="Django处理Request的流程"></a>Django处理Request的流程</h4><p>1.用户通过浏览器输入url请求一个页面<br>2.请求到达Request Middlewares，中间件对request做一些预处理或者直接response请求(处理包括ip判断用户判断等)<br>3.URLConf通过urls.py文件和请求的URL的对比，找到相应的View<br>4.View Middlewares被访问，同样可以对request做一些处理或者直接返回response<br>5.调用View中的函数，进行逻辑判断<br>6.如果需要访问数据库获取或修改数据时，则通过Models访问底层的数据<br>7.view把对应的数据生成一个字典并返回给Template<br>8.Template接受数据并生成页面<br>    8.1Template使用Filters和Tags去渲染输出<br>    8.2HTTPResponse被发送到Response Middlewares<br>    8.3任何Response Middlewares都可以丰富response或者返回一个完全不同的response<br>    8.4Response返回到浏览器，呈现给用户</p>
+<h4 id="Middleware-中间件"><a href="#Middleware-中间件" class="headerlink" title="Middleware(中间件)"></a>Middleware(中间件)</h4><p>Middleware是在Django BaseHandler的load_middleware方法执行时加载的，加载之后会建立四个列表作为处理器的实例变量：</p>
+<blockquote>
+<p>_request_middleware：process_request方法的列表<br>_view_middleware：process_view方法的列表<br>_response_middleware：process_response方法的列表<br>_exception_middleware：process_exception方法的列表</p>
+</blockquote>
+<p>Django的中间件是在其配置文件(settings.py)的MIDDLEWARE_CLASSES元组中定义的。在MIDDLEWARE_CLASSES中，中间件组件用字符串表示：指向中间件类名的完整python路径。例如</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python">`MIDDLEWARE_CLASSES = [<br>    <span class="hljs-string">&#x27;django.middleware.security.SecurityMiddleware&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.sessions.middleware.SessionMiddleware&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.middleware.common.CommonMiddleware&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.middleware.csrf.CsrfViewMiddleware&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.auth.middleware.AuthenticationMiddleware&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.auth.middleware.SessionAuthenticationMiddleware&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.messages.middleware.MessageMiddleware&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.middleware.clickjacking.XFrameOptionsMiddleware&#x27;</span>,<br>]`<br></code></pre></td></tr></table></figure>
+<p>中间件出现的顺序非常重要：在request和view的处理阶段，Django按照MIDDLEWARE_CLASSES中出现的顺序来应用中间件，而在response和exception异常处理阶段，Django则按逆序来调用它们。也就是说，Django将MIDDLEWARE_CLASSES视为view函数外层的顺序包装子：在request阶段按顺序从上到下穿过，而在response则反过来。</p>
+<h4 id="URLConf"><a href="#URLConf" class="headerlink" title="URLConf"></a>URLConf</h4><p>URLConf相当于Django使用的地图告诉django要怎么去寻找url<br>第一个参数是url，可以通过正则去比对相应的url。<br>第二个参数是view，告诉Django如果这个url对应的view</p>
+<p>ps:第二个参数也可以是url把匹配到的url导向另一个app下面的url。使得url不会集成于一页,同时可以把二级url区分开</p>
+<p>第三个参数是命名空间，告诉那些需要调用url的（如模板），输入这个命名空间的名称就能获取到对应的url</p>
+<h4 id="Template"><a href="#Template" class="headerlink" title="Template"></a>Template</h4><p>django通过模板把动态数据导入html文件并返回给用户，需要注意的是，模板里不能编写python代码</p>
+<h3 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h3><p><a target="_blank" rel="noopener" href="https://code.ziqiangxuetang.com/django/django-nginx-deploy.html">部署教程</a></p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/08/23/p1/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;23&#x2F;p1&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;23&#x2F;p1&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/" rel="tag">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/08/23/13-scrapy-zhihu-easy/"><i class="iconfont iconleft"></i>Scrapy爬虫（1）-爬取知乎用户信息</a>
+    <a href="/2017/08/22/12-scrapy/">scrapy学习笔记(有示例版）<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#github"><span class="toc-text">github</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E5%8A%9F%E8%83%BD"><span class="toc-text">基本功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#new"><span class="toc-text">new</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DetailView%E4%B8%8EListView"><span class="toc-text">DetailView与ListView</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#django%E7%9A%84%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="toc-text">django的处理流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2"><span class="toc-text">部署</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

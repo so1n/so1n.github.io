@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>xadmin的使用 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记Django自身带的admin功能众多，但基于ad...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">xadmin的使用</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">xadmin的使用</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 21, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5214</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>在seeting.py的INSTALLED_APPS引入xadmin</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python">INSTALLED_APPS = [<br>    <span class="hljs-string">&#x27;django.contrib.admin&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.auth&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.contenttypes&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.sessions&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.messages&#x27;</span>,<br>    <span class="hljs-string">&#x27;django.contrib.staticfiles&#x27;</span>,<br>    <span class="hljs-string">&#x27;users&#x27;</span>,<br>    <span class="hljs-string">&#x27;xadmin&#x27;</span>,<br>]<br></code></pre></td></tr></table></figure>
+<p>配置url</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> xadmin<br><br>urlpatterns = [<br>    url(<span class="hljs-string">r&#x27;^admin/&#x27;</span>, xadmin.site.urls),<br>]<br></code></pre></td></tr></table></figure>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h3><p>新建一个.py文件，一般放在uesr app里面<br>配置页面</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> xadmin<br><br><span class="hljs-comment"># 主题设置</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BaseMyAdminView</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    enable_themes 启动更改主题</span><br><span class="hljs-string">    use_bootswatch 启用网上主题</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span><br>    enable_themes = <span class="hljs-literal">True</span><br>    use_bootswatch = <span class="hljs-literal">True</span><br><br><span class="hljs-comment"># 页面设置</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GlobalSettings</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    site_title 左上角名称</span><br><span class="hljs-string">    site_footer 底部名称</span><br><span class="hljs-string">    menu_style 更改左边样式</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span><br>    site_title = <span class="hljs-string">&quot;学习网后台管理系统&quot;</span><br>    site_footer = <span class="hljs-string">&quot;学习网&quot;</span><br>    menu_style = <span class="hljs-string">&quot;accordion&quot;</span><br><br><span class="hljs-comment"># 注册函数</span><br>xadmin.site.register(views.BaseAdminView, BaseMyAdminView)<br>xadmin.site.register(views.CommAdminView, GlobalSettings)<br></code></pre></td></tr></table></figure>
+<h3 id="2-定义自己的model在后台的显示"><a href="#2-定义自己的model在后台的显示" class="headerlink" title="2.定义自己的model在后台的显示"></a>2.定义自己的model在后台的显示</h3><p>使用xadmin可以非常方便的定义我们的后台管理，在同样的自己定义的app文件增加如下代码:<br>一个简单的栗子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 引入自己的model</span><br><span class="hljs-keyword">from</span> .models <span class="hljs-keyword">import</span> EmailVerifyRecord<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EmailVerifyRecordAdmin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    list_display = [<span class="hljs-string">&#x27;email&#x27;</span>, <span class="hljs-string">&#x27;code&#x27;</span>, <span class="hljs-string">&#x27;send_type&#x27;</span>, <span class="hljs-string">&#x27;send_time&#x27;</span>]    <span class="hljs-comment"># 选择需要显示的数据</span><br>    search_fields = [<span class="hljs-string">&#x27;email&#x27;</span>, <span class="hljs-string">&#x27;code&#x27;</span>, <span class="hljs-string">&#x27;send_type&#x27;</span>]                <span class="hljs-comment"># 选择可以搜索的数据</span><br>    list_filter = [<span class="hljs-string">&#x27;email&#x27;</span>, <span class="hljs-string">&#x27;code&#x27;</span>, <span class="hljs-string">&#x27;send_type&#x27;</span>, <span class="hljs-string">&#x27;send_time&#x27;</span>]     <span class="hljs-comment"># 选择可以过滤的数据</span><br>    model_icon = <span class="hljs-string">&#x27;fa fa-address-book-o&#x27;</span>   <span class="hljs-comment"># 选择该models在左边的图标显示，可以从该网页选择图标https://fontawesome.com/icons?d=gallery</span><br><br><br><br><br><span class="hljs-comment"># 同样进行注册</span><br>xadmin.site.register(EmailVerifyRecord, EmailVerifyRecordAdmin)<br></code></pre></td></tr></table></figure>
+<h4 id="1-过滤器"><a href="#1-过滤器" class="headerlink" title="1.过滤器"></a>1.过滤器</h4><p>过滤器除了如上的list_filter，还有其他属性<br>在 Model OptionClass 中设置以下属性:</p>
+<ul>
+<li>list_filter 属性:<br>  该属性指定可以过滤的列的名字, 系统会自动生成搜索器</li>
+<li>search_fields 属性:<br>  属性指定可以通过搜索框搜索的数据列的名字, 搜索框搜索使用的是模糊查找的方式, 一般用来搜素名字等字符串字段</li>
+<li>free_query_filter 属性:<br>  默认为 True , 指定是否可以自由搜索. 如果开启自有搜索, 用户可以通过 url 参数来进行特定的搜索, 例如:<br>  <a target="_blank" rel="noopener" href="http://xxx.com/xadmin/auth/user/?name__contains=tony">http://xxx.com/xadmin/auth/user/?name__contains=tony</a><h4 id="2-图表"><a href="#2-图表" class="headerlink" title="2.图表"></a>2.图表</h4>在 Model OptionClass 中设定 data_charts 属性, 该属性为 dict 类型, key 是图表的标示名称, value 是图表的具体设置属性. 使用示例:<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RecordAdmin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    data_charts = &#123;<br>        <span class="hljs-string">&quot;user_count&quot;</span>: &#123;<span class="hljs-string">&#x27;title&#x27;</span>: <span class="hljs-string">u&quot;User Report&quot;</span>, <span class="hljs-string">&quot;x-field&quot;</span>: <span class="hljs-string">&quot;date&quot;</span>, <span class="hljs-string">&quot;y-field&quot;</span>: (<span class="hljs-string">&quot;user_count&quot;</span>, <span class="hljs-string">&quot;view_count&quot;</span>), <span class="hljs-string">&quot;order&quot;</span>: (<span class="hljs-string">&#x27;date&#x27;</span>,)&#125;,<br>        <span class="hljs-string">&quot;avg_count&quot;</span>: &#123;<span class="hljs-string">&#x27;title&#x27;</span>: <span class="hljs-string">u&quot;Avg Report&quot;</span>, <span class="hljs-string">&quot;x-field&quot;</span>: <span class="hljs-string">&quot;date&quot;</span>, <span class="hljs-string">&quot;y-field&quot;</span>: (<span class="hljs-string">&#x27;avg_count&#x27;</span>,), <span class="hljs-string">&quot;order&quot;</span>: (<span class="hljs-string">&#x27;date&#x27;</span>,)&#125;<br>    &#125;<br></code></pre></td></tr></table></figure>
+图表的主要属性为:</li>
+<li>title : 图表的显示名称</li>
+<li>x-field : 图表的 X 轴数据列, 一般是日期, 时间等</li>
+<li>y-field : 图表的 Y 轴数据列, 该项是一个 list, 可以同时设定多个列, 这样多个列的数据会在同一个图表中显示</li>
+<li>order : 排序信息, 如果不写则使用数据列表的排序</li>
+</ul>
+<h4 id="3-书签"><a href="#3-书签" class="headerlink" title="3.书签"></a>3.书签</h4><p>书签：记录数据列表页面特定的数据过滤, 排序等结果. 添加的书签还可以在首页仪表盘中作为小组件添加</p>
+<p>在 Model OptionClass 中设定如下属性:</p>
+<ul>
+<li>show_bookmarks 属性:<br>  设置是否开启书签功能, 默认为 True</li>
+<li>list_bookmarks 属性:<br>  设置默认的书签. 用户可以在列表页面添加自己的书签, 你也可以实现设定好一些书签, 使用实例如下:  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserAdmin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    list_bookmarks = [&#123;<br>        <span class="hljs-string">&#x27;title&#x27;</span>: <span class="hljs-string">&quot;Female&quot;</span>,         <span class="hljs-comment"># 书签的名称, 显示在书签菜单中</span><br>        <span class="hljs-string">&#x27;query&#x27;</span>: &#123;<span class="hljs-string">&#x27;gender&#x27;</span>: <span class="hljs-literal">True</span>&#125;, <span class="hljs-comment"># 过滤参数, 是标准的 queryset 过滤</span><br>        <span class="hljs-string">&#x27;order&#x27;</span>: (<span class="hljs-string">&#x27;-age&#x27;</span>),         <span class="hljs-comment"># 排序参数</span><br>        <span class="hljs-string">&#x27;cols&#x27;</span>: (<span class="hljs-string">&#x27;first_name&#x27;</span>, <span class="hljs-string">&#x27;age&#x27;</span>, <span class="hljs-string">&#x27;phones&#x27;</span>),  <span class="hljs-comment"># 显示的列</span><br>        <span class="hljs-string">&#x27;search&#x27;</span>: <span class="hljs-string">&#x27;Tom&#x27;</span>    <span class="hljs-comment"># 搜索参数, 指定搜索的内容</span><br>        &#125;, &#123;...&#125;<br>    ]<br></code></pre></td></tr></table></figure>
+<h4 id="4-导出选项"><a href="#4-导出选项" class="headerlink" title="4.导出选项"></a>4.导出选项</h4>ps：如果想要导出 Excel 数据, 需要安装 xlwt.</li>
+</ul>
+<p>默认情况下, xadmin 会提供 Excel, CSV, XML, json 四种格式的数据导出. 可以通过设置 OptionClass 的 list_export 属性来指定使用哪些导出格式 (四种各使用分别用 xls, csv, xml, json 表示), 或是将 list_export 设置为 None 来禁用数据导出功能. 示例如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyModelAdmin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    list_export = (<span class="hljs-string">&#x27;xls&#x27;</span>, <span class="hljs-string">&#x27;xml&#x27;</span>, <span class="hljs-string">&#x27;json&#x27;</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="5-定时刷新"><a href="#5-定时刷新" class="headerlink" title="5.定时刷新"></a>5.定时刷新</h4><p>该插件在数据列表页面提供了定时刷新功能, 对于需要实时刷新列表页面查看即时数据的情况非常有用.</p>
+<p>设置 OptionClass 的 refresh_times 属性即可实现自动刷新. refresh_times 属性是存有刷新时间的数组. xadmin 默认不开启该插件.示例如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyModelAdmin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span> <br>    <span class="hljs-comment"># 这会显示一个下拉列表, 用户可以选择3秒或5秒刷新一次页面.</span><br>    refresh_times = (<span class="hljs-number">3</span>, <span class="hljs-number">5</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="6-数据详情"><a href="#6-数据详情" class="headerlink" title="6.数据详情"></a>6.数据详情</h4><p>该插件可以在列表页中显示相关字段的详细信息, 使用 Ajax 在列表页中显示.（右边有个感叹号）</p>
+<p>使用该插件主要设置 OptionClass 的 show_detail_fields, show_all_rel_details 两个属性. show_detail_fields 属性设置哪些字段要显示详细信息, show_all_rel_details 属性设置时候自动显示所有关联字段的详细信息, 该属性默认为 True. 示例如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyModelAdmin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <br>    show_detail_fields = [<span class="hljs-string">&#x27;group&#x27;</span>, <span class="hljs-string">&#x27;father&#x27;</span>, ...]<br></code></pre></td></tr></table></figure>
+<h4 id="7-数据即时编辑"><a href="#7-数据即时编辑" class="headerlink" title="7.数据即时编辑"></a>7.数据即时编辑</h4><p>该插件可以在列表页中即时编辑某字段的值, 使用 Ajax 技术, 无需提交或刷新页面即可完成数据的修改, 对于需要频繁修改的字段(如: 状态)相当有用.</p>
+<p>使用该插件主要设置 OptionClass 的 list_editable 属性. list_editable 属性设置哪些字段需要即时修改功能. 示例如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyModelAdmin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <br>    list_editable = [<span class="hljs-string">&#x27;price&#x27;</span>, <span class="hljs-string">&#x27;status&#x27;</span>, ...]<br></code></pre></td></tr></table></figure>
+<h4 id="8-设置只读字段"><a href="#8-设置只读字段" class="headerlink" title="8.设置只读字段"></a>8.设置只读字段</h4><p> 在使用xadmin的时候，ModelAdmin默认只有对于model的增删改查，但是总是有些字段是不希望用户来编辑的。而 readonly_fields 设置之后不管是admin还是其他用户都会变成只读，而我们通常只是想限制普通用户。 这时我们就可以通过重写 get_readonly_fields 方法来实现对特定用户的只读显示。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserInfoAdmin</span>():</span><br> <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_readonly_fields</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;  重新定义此函数，限制普通用户所能修改的字段  &quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.user.is_superuser:<br>            self.readonly_fields = []<br>        <span class="hljs-keyword">return</span> self.readonly_fields<br>     <br>    readonly_fields = (<span class="hljs-string">&#x27;user_email&#x27;</span>,)<br></code></pre></td></tr></table></figure>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/10/21/23_use_xadmin/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;10&#x2F;21&#x2F;23_use_xadmin&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;10&#x2F;21&#x2F;23_use_xadmin&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/" rel="tag">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xadmin/" rel="tag">xadmin</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/10/21/22_django_cache/"><i class="iconfont iconleft"></i>django与缓存</a>
+    <a href="/2017/10/21/21_Asynchronous%20sending%20of%20mail%20based%20on%20django%20and%20celery/">基于django和celery的邮件异步发送(记录)<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE"><span class="toc-text">基本配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%AE%9A%E4%B9%89%E8%87%AA%E5%B7%B1%E7%9A%84model%E5%9C%A8%E5%90%8E%E5%8F%B0%E7%9A%84%E6%98%BE%E7%A4%BA"><span class="toc-text">2.定义自己的model在后台的显示</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python数据结构以及排序 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记：Python自带了一些数据结构,不需要自己实现既...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">Python数据结构以及排序</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python数据结构以及排序</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 01, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7191</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h3 id="1-对数据的操作"><a href="#1-对数据的操作" class="headerlink" title="1.对数据的操作"></a>1.对数据的操作</h3><ul>
+<li>从序列提取变量<br>首先是两个简单的提取变量栗子<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">&gt;&gt;&gt;p = (<span class="hljs-number">4</span>,<span class="hljs-number">5</span>)<br>&gt;&gt;&gt;x, y = p<br>&gt;&gt;&gt;x<br><span class="hljs-number">4</span><br>&gt;&gt;&gt;y<br><span class="hljs-number">5</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python">&gt;&gt;&gt;data = [<span class="hljs-string">&#x27;ACME&#x27;</span>,  <span class="hljs-number">50</span>, <span class="hljs-number">91.1</span>, (<span class="hljs-number">2017</span>, <span class="hljs-number">8</span>, <span class="hljs-number">1</span>) ]<br>&gt;&gt;&gt;name, shares, price, (year, mon, day) = data<br>&gt;&gt;&gt;name<br><span class="hljs-string">&#x27;ACME&#x27;</span><br>&gt;&gt;&gt;shares<br><span class="hljs-number">50</span><br>&gt;&gt;&gt;price<br><span class="hljs-number">91.1</span><br>&gt;&gt;&gt;year<br><span class="hljs-number">2017</span><br>&gt;&gt;&gt;mon<br><span class="hljs-number">8</span><br>&gt;&gt;&gt;day<br><span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+python中的字符串可以分解（中文就不行。。。），在python中还可以通过函数来处理<br>如这个栗子，去掉序列的第一个和最后一个数字<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">drop_first_last</span>(<span class="hljs-params">grades</span>):</span><br>    first, *middle, last = grades<br>	<span class="hljs-keyword">return</span> avg(middle)<br></code></pre></td></tr></table></figure></li>
+<li>保留后面N个元素（使用到Python里面的collections模块）<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><span class="hljs-meta">&gt;&gt;&gt; </span>q = deque(maxlen = <span class="hljs-number">3</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">1</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">2</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">3</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q<br>deque([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], maxlen=<span class="hljs-number">3</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">4</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">4</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q<br>deque([<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>], maxlen=<span class="hljs-number">3</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">4</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">5</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">6</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q.append(<span class="hljs-number">7</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>q<br>deque([<span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>], maxlen=<span class="hljs-number">3</span>)<br><br></code></pre></td></tr></table></figure></li>
+<li>控制字典元素顺序<br>python中的字典元素是没有顺序的，OrderedDict()可以让字典拥有顺序<br>注：（1）如果要josn字段也拥有顺序，那么josn.dumps(d)就OK了<br>（2）OrderedDict()的大小是普通字典的两倍<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> OrderedDict<br><span class="hljs-meta">&gt;&gt;&gt; </span>d = OrderedDict()<br><span class="hljs-meta">&gt;&gt;&gt; </span>d[<span class="hljs-string">&#x27;foo&#x27;</span>] = <span class="hljs-number">1</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>d[<span class="hljs-string">&#x27;bar&#x27;</span>] = <span class="hljs-number">2</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>d[<span class="hljs-string">&#x27;spam&#x27;</span>] = <span class="hljs-number">3</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>d[<span class="hljs-string">&#x27;grok&#x27;</span>] = <span class="hljs-number">4</span><br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> d:<br><span class="hljs-meta">... </span>    print(key, d[key])<br><span class="hljs-meta">... </span><br>foo <span class="hljs-number">1</span><br>bar <span class="hljs-number">2</span><br>spam <span class="hljs-number">3</span><br>grok <span class="hljs-number">4</span><br></code></pre></td></tr></table></figure>
+ps：字典里面有个zip函数可以将字典的key值和value值进行反转<br>注意：zip()创建的是一个迭代器，内容只能被消费一次，例如只能print一次zipdict，第二次print时会报错<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">dict</span> = &#123;<span class="hljs-string">&#x27;a&#x27;</span>:<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;b&#x27;</span>:<span class="hljs-number">2</span>, <span class="hljs-string">&#x27;c&#x27;</span>:<span class="hljs-number">3</span>&#125;<br>zipdict = <span class="hljs-built_in">zip</span>(<span class="hljs-built_in">dict</span>.vakues(), <span class="hljs-built_in">dict</span>.keys())<br></code></pre></td></tr></table></figure></li>
+<li>找出列表中出现最频繁的单词<br>利用collections模块中的Counter类的most_commomn()方法可以直接显示结果<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br><span class="hljs-built_in">list</span> = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">1</span>,<span class="hljs-number">5</span>,<span class="hljs-number">1</span>,<span class="hljs-number">6</span>,<span class="hljs-number">2</span>,<span class="hljs-number">7</span>,<span class="hljs-number">2</span>,<span class="hljs-number">8</span>,<span class="hljs-number">1</span>,<span class="hljs-number">9</span>,<span class="hljs-number">3</span>]<br>list_counts = Counter(<span class="hljs-built_in">list</span>)<br>top_three = list_counts.most_common(<span class="hljs-number">3</span>)<br>print(top_three)<br></code></pre></td></tr></table></figure>
+显示结果：[(1, 4), (2, 3), (3, 2)]<br>当然，也可以用count计数，再用sorted进行排序<h3 id="2-语法糖"><a href="#2-语法糖" class="headerlink" title="2.语法糖"></a>2.语法糖</h3></li>
+<li>map()函数<br>map()接受一个Iterable和一个函数，map将传入的函数依次作用到序列的每个元素，并把结果作为新的Iterator返回</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">f</span>(<span class="hljs-params">x</span>):</span><br><span class="hljs-meta">... </span>    <span class="hljs-keyword">return</span> x * x<br>...<br><span class="hljs-meta">&gt;&gt;&gt; </span>r = <span class="hljs-built_in">map</span>(f, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>])<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">list</span>(r)<br>[<span class="hljs-number">1</span>, <span class="hljs-number">4</span>, <span class="hljs-number">9</span>, <span class="hljs-number">16</span>, <span class="hljs-number">25</span>, <span class="hljs-number">36</span>, <span class="hljs-number">49</span>, <span class="hljs-number">64</span>, <span class="hljs-number">81</span>]<br></code></pre></td></tr></table></figure>
+<ul>
+<li>reduce()函数<br>reduce把一个函数作用在一个序列[x1, x2, x3, …]上，这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> reduce<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">add</span>(<span class="hljs-params">x, y</span>):</span><br><span class="hljs-meta">... </span>    <span class="hljs-keyword">return</span> x + y<br>...<br><span class="hljs-meta">&gt;&gt;&gt; </span>reduce(add, [<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>, <span class="hljs-number">7</span>, <span class="hljs-number">9</span>])<br><span class="hljs-number">25</span><br></code></pre></td></tr></table></figure></li>
+<li>filter()函数<br>filter()把传入的函数依次作用于每个元素，然后根据返回值是True还是False决定保留还是丢弃该元素。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">is_odd</span>(<span class="hljs-params">n</span>):</span><br>    <span class="hljs-keyword">return</span> n % <span class="hljs-number">2</span> == <span class="hljs-number">1</span><br><br><span class="hljs-built_in">list</span>(<span class="hljs-built_in">filter</span>(is_odd, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>, <span class="hljs-number">15</span>]))<br><span class="hljs-comment"># 结果: [1, 5, 9, 15]</span><br></code></pre></td></tr></table></figure></li>
+<li>sorted()函数<br>sorted()函数也是一个高阶函数，它不仅可以排序，它还可以接收一个key函数来实现自定义的排序<br>默认排序<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">sorted</span>([<span class="hljs-number">36</span>, <span class="hljs-number">5</span>, -<span class="hljs-number">12</span>, <span class="hljs-number">9</span>, -<span class="hljs-number">21</span>])<br>[-<span class="hljs-number">21</span>, -<span class="hljs-number">12</span>, <span class="hljs-number">5</span>, <span class="hljs-number">9</span>, <span class="hljs-number">36</span>]<br></code></pre></td></tr></table></figure>
+用key值实现排序<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">sorted</span>([<span class="hljs-number">36</span>, <span class="hljs-number">5</span>, -<span class="hljs-number">12</span>, <span class="hljs-number">9</span>, -<span class="hljs-number">21</span>], key=<span class="hljs-built_in">abs</span>)<br>[<span class="hljs-number">5</span>, <span class="hljs-number">9</span>, -<span class="hljs-number">12</span>, -<span class="hljs-number">21</span>, <span class="hljs-number">36</span>]<br></code></pre></td></tr></table></figure></li>
+<li>匿名函数<br>在Python中，对匿名函数提供了有限支持。还是以map()函数为例，计算f(x)=x2时，除了定义一个f(x)的函数外，还可以直接传入匿名函数：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">list</span>(<span class="hljs-built_in">map</span>(<span class="hljs-keyword">lambda</span> x: x * x, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>]))<br>[<span class="hljs-number">1</span>, <span class="hljs-number">4</span>, <span class="hljs-number">9</span>, <span class="hljs-number">16</span>, <span class="hljs-number">25</span>, <span class="hljs-number">36</span>, <span class="hljs-number">49</span>, <span class="hljs-number">64</span>, <span class="hljs-number">81</span>]<br></code></pre></td></tr></table></figure>
+通过对比可以看出，匿名函数lambda x: x * x实际上就是：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">f</span>(<span class="hljs-params">x</span>):</span><br>    <span class="hljs-keyword">return</span> x * x<br></code></pre></td></tr></table></figure>
+匿名函数有个限制，就是只能有一个表达式，不用写return，返回值就是该表达式的结果<h3 id="3-算法排序"><a href="#3-算法排序" class="headerlink" title="3.算法排序"></a>3.算法排序</h3>虽然python本身有sorted，但还是了解一下比较好，毕竟你校招面试时别人问你用python写冒泡排序你直接写sorted()吧。。。（虽然我觉得这样的面试很奇怪，知道这部分思想就行了。。。）<br>排序按模型分类有：</li>
+</ul>
+<p>1.每次比较只有2个元素。包括插入排序，快速排序，堆排序，归并排序，冒泡排序。他们最好的效率只能到O(nlgn).可以通过画决策树证明。 一共有n!个节点。高度h的数最多有2^h个节点。所以有2^h≥n!。通过<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%96%AF%E7%89%B9%E6%9E%97%E5%85%AC%E5%BC%8F/9583086?fr=aladdin">斯特林公式</a>可以得证。<br>2.对数据做些操作。譬如计数排序。</p>
+<ul>
+<li>冒泡算法<br>之所以被叫为冒泡算法，是因为他就像泡泡一样，越大的元素会经由交换慢慢“浮”到数列的顶端<br>而冒泡算法需要：<br>（1）共循环 n-1 次<br>（2）每次循环中，如果 前面的数大于后面的数，就交换<br>（3）设置一个标签，如果上次没有交换，就说明这个是已经好了的（节省不必要的计算过程）。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">bubble_sort</span>(<span class="hljs-params">l</span>):</span><br>    flag = <span class="hljs-literal">True</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(l)-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>):<br>        <span class="hljs-keyword">if</span> flag: <br>            flag = <span class="hljs-literal">False</span><br>            <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(i):<br>                <span class="hljs-keyword">if</span> l[j] &gt; l[j + <span class="hljs-number">1</span>]:<br>                    l[j], l[j+<span class="hljs-number">1</span>] = l[j+<span class="hljs-number">1</span>], l[j]<br>                    flag = <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">break</span><br>num_list = [<span class="hljs-number">21</span>,<span class="hljs-number">44</span>,<span class="hljs-number">2</span>,<span class="hljs-number">45</span>,<span class="hljs-number">33</span>,<span class="hljs-number">4</span>,<span class="hljs-number">3</span>,<span class="hljs-number">67</span>]<br>bubble_sort(num_list)<br>print(num_list)  <span class="hljs-comment"># [2, 3, 4, 21, 33, 44, 45, 67]</span><br></code></pre></td></tr></table></figure></li>
+<li>选择排序<br>选择排序（Selection sort）是一种简单直观的排序算法。它的工作原理是每一次从待排序的数据元素中选出最小（或最大）的一个元素，存放在序列的起始位置，直到全部待排序的数据元素排完。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">insert_sort</span>(<span class="hljs-params">num_list</span>):</span><br>  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(num_list)-<span class="hljs-number">1</span>):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(i+<span class="hljs-number">1</span>, <span class="hljs-built_in">len</span>(num_list)):<br>      <span class="hljs-keyword">if</span> num_list[i]&gt;num_list[j]:<br>        num_list[i],num_list[j] = num_list[j],num_list[i]<br>  <span class="hljs-keyword">return</span> num_list<br><br>li = [<span class="hljs-number">21</span>,<span class="hljs-number">44</span>,<span class="hljs-number">2</span>,<span class="hljs-number">45</span>,<span class="hljs-number">33</span>,<span class="hljs-number">4</span>,<span class="hljs-number">3</span>,<span class="hljs-number">67</span>]<br>print(insert_sort(li))<br></code></pre></td></tr></table></figure></li>
+<li>插入排序<br>插入排序总结：</li>
+</ul>
+<p>1.当前需要排序的元素(array[i])，跟已经排序好的最后一个元素比较(array[i-1])，如果满足条件继续执行后面的程序，否则循环到下一个要排序的元素。<br>2.缓存当前要排序的元素的值，以便找到正确的位置进行插入。<br>3.排序的元素跟已经排序号的元素比较，比它大的向后移动(升序)。<br>4.要排序的元素，插入到正确的位置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">insert_sort</span>(<span class="hljs-params">array</span>):</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-built_in">len</span>(array)):<br>        <span class="hljs-keyword">if</span> array[i - <span class="hljs-number">1</span>] &gt; array[i]:<br>            temp = array[i]     <span class="hljs-comment"># 当前需要排序的元素</span><br>            index = i           <span class="hljs-comment"># 用来记录排序元素需要插入的位置</span><br>            <span class="hljs-keyword">while</span> index &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> array[index - <span class="hljs-number">1</span>] &gt; temp:<br>                array[index] = array[index - <span class="hljs-number">1</span>]     <span class="hljs-comment"># 把已经排序好的元素后移一位，留下需要插入的位置</span><br>                index -= <span class="hljs-number">1</span><br>                array[index] = temp <span class="hljs-comment"># 把需要排序的元素，插入到指定位置</span><br>    <span class="hljs-keyword">return</span> array<br>li = [<span class="hljs-number">21</span>,<span class="hljs-number">44</span>,<span class="hljs-number">2</span>,<span class="hljs-number">45</span>,<span class="hljs-number">33</span>,<span class="hljs-number">4</span>,<span class="hljs-number">3</span>,<span class="hljs-number">67</span>]<br>print(insert_sort(li))<br></code></pre></td></tr></table></figure>
+<p>这段程序主要就在while里面，每增加一个数，就要扔进while里面，再从里面列表的最后一个数开始比较，直到这个新增加的数比列表里面的数大才停止比较</p>
+<ul>
+<li>归并排序<br>归并排序描述起来好简单。就是把规模分成两组，一组都小于某个数n, 另一组都大于等于n。于是规模为n的问题，变成了2个n/2规模的问题。一次次这样划分下去，直到只剩下一个元素,一个元素当然是排好充的,然后再两两合并,直到得到原始问题的解。<br>其最坏情况是Θ(nlgn)<br>这个思想是分治法<br>可以看做是把他一直一半一半的切，切到为一个数据，再用类似选择排序那样慢慢比较大小，最后慢慢组合起来<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#升序</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">merge_sort</span>(<span class="hljs-params">literal</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">divide</span>(<span class="hljs-params">literal</span>):</span><br>        end = <span class="hljs-built_in">int</span>(<span class="hljs-built_in">len</span>(literal)/<span class="hljs-number">2</span>)<br>        <span class="hljs-keyword">return</span> (literal[:end], literal[end:])<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">conquer</span>(<span class="hljs-params">literal</span>):</span><br>        <span class="hljs-keyword">return</span> merge_sort(literal)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">merge</span>(<span class="hljs-params">literal1, literal2</span>):</span><br>        ret = []<br>        len1 = <span class="hljs-built_in">len</span>(literal1)<br>        len2 = <span class="hljs-built_in">len</span>(literal2)<br>        i1 = <span class="hljs-number">0</span><br>        i2 = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">while</span> len1 <span class="hljs-keyword">or</span> len2:<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> len1 <span class="hljs-keyword">and</span> len2:<br>                ret.extend(literal2[i2:])<br>                <span class="hljs-keyword">return</span> ret<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> len2 <span class="hljs-keyword">and</span> len1:<br>                ret.extend(literal1[i1:])<br>                <span class="hljs-keyword">return</span> ret<br><br>            v1 = literal1[i1]<br>            v2 = literal2[i2]<br>            <span class="hljs-keyword">if</span> v1 &lt;= v2:<br>                ret.append(v1)<br>                len1 -= <span class="hljs-number">1</span><br>                i1 += <span class="hljs-number">1</span><br>            <span class="hljs-keyword">else</span>:<br>                ret.append(v2)<br>                len2 -= <span class="hljs-number">1</span><br>                i2 += <span class="hljs-number">1</span><br>            print(ret,<span class="hljs-string">&#x27;c&#x27;</span>)<br>        <span class="hljs-keyword">return</span> ret<br> <br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> literal <span class="hljs-keyword">or</span> <span class="hljs-built_in">len</span>(literal) == <span class="hljs-number">1</span>:<br>        <span class="hljs-keyword">return</span> literal<br><br>    literal1, literal2 = divide(literal)<br>    print(literal1,literal2,<span class="hljs-string">&#x27;a&#x27;</span>)<br>    literal1 = conquer(literal1)<br>    literal2 = conquer(literal2)<br>    print(literal1,literal2,<span class="hljs-string">&#x27;b&#x27;</span>)<br>    <span class="hljs-keyword">return</span>  merge(literal1, literal2)<br>li = [<span class="hljs-number">21</span>,<span class="hljs-number">44</span>,<span class="hljs-number">2</span>,<span class="hljs-number">45</span>,<span class="hljs-number">33</span>,<span class="hljs-number">4</span>,<span class="hljs-number">3</span>,<span class="hljs-number">67</span>]<br>print(merge_sort(li))<br></code></pre></td></tr></table></figure></li>
+<li>快速排序<br>快速排序（Quicksort）是对冒泡排序的一种改进。由C. A. R. Hoare在1962年提出。它的基本思想是：通过一趟排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">quick_sort</span>(<span class="hljs-params">num_list</span>):</span><br><br>  <span class="hljs-keyword">if</span> num_list == []:<br>    <span class="hljs-keyword">return</span> num_list<br>  smallList = []<br>  bigList = []<br>  middleElement = num_list[<span class="hljs-number">0</span>]<br>  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> num_list[<span class="hljs-number">1</span>:]:<br>    <span class="hljs-keyword">if</span> i &lt;= middleElement:<br>      smallList.append(i)<br>    <span class="hljs-keyword">else</span>:<br>      bigList.append(i)<br>  <span class="hljs-keyword">return</span> quick_sort(smallList)+[middleElement]+quick_sort(bigList)<br>li = [<span class="hljs-number">21</span>,<span class="hljs-number">44</span>,<span class="hljs-number">2</span>,<span class="hljs-number">45</span>,<span class="hljs-number">33</span>,<span class="hljs-number">4</span>,<span class="hljs-number">3</span>,<span class="hljs-number">67</span>]<br>print(quick_sort(li))<br></code></pre></td></tr></table></figure></li>
+<li>算法排序小总结<br>当然还有堆排（暂时不知道怎么写- -），基数排序等/这些都是内部排序(内部排序是数据记录在内存中进行排序)，当n较大，则应采用时间复杂度为O(nlog2n)的排序方法：快速排序、堆排序或归并排序序<br>这些排序里面，快速排序是目前基于比较的内部排序中被认为是最好的方法，当待排序的关键字是随机分布时，快速排序的平均时间最短；插入排序是稳定的；<br>在写总结时，顺便百度了一下，结果发现有个dalao写了<a target="_blank" rel="noopener" href="http://blog.csdn.net/hguisu/article/details/7776068/">这个</a>看后受益匪浅啊～</li>
+</ul>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/08/01/6/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;01&#x2F;6&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;01&#x2F;6&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/" rel="tag">编程基础</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/08/08/7_how_to%20optimize_the_spider/"><i class="iconfont iconleft"></i>优化爬虫初级篇</a>
+    <a href="/2017/07/31/5_wxpy_2/">[Python玩微信（2）:wxpy的进阶]<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0%EF%BC%9A"><span class="toc-text">前记：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">1.对数据的操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="toc-text">2.语法糖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%AE%97%E6%B3%95%E6%8E%92%E5%BA%8F"><span class="toc-text">3.算法排序</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

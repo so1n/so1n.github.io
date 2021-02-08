@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>数据结构与算法-算法 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记这里是补充数据结构里面缺失的对应算法，略产促
+
+串...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">数据结构与算法-算法</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">数据结构与算法-算法</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 20, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>11660</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="串"><a href="#串" class="headerlink" title="串"></a>串</h2><h3 id="朴素的模式匹配算法"><a href="#朴素的模式匹配算法" class="headerlink" title="朴素的模式匹配算法"></a>朴素的模式匹配算法</h3><p>假设字母列表长度为m<br>想要寻找的长度为n，则<br>从头开始找，到第m-n+1位，寻找是否有相同的字母</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">naive_match</span>(<span class="hljs-params">s, p</span>):</span>  <br>    m = <span class="hljs-built_in">len</span>(s)<br>    n = <span class="hljs-built_in">len</span>(p)  <br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(m-n+<span class="hljs-number">1</span>):<span class="hljs-comment">#起始指针i  </span><br>        <span class="hljs-keyword">if</span> s[i:i+n] == p:  <br>            print(s[i:i+n])<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span>  <br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span>  <br><br>s = <span class="hljs-string">&quot;BBC ABCDAB ABCDABCDABDE&quot;</span><br>p = <span class="hljs-string">&quot;ABCDABD&quot;</span><br>naive_match(s,p)<br><br></code></pre></td></tr></table></figure>
+<h3 id="KMP模式匹配算法"><a href="#KMP模式匹配算法" class="headerlink" title="KMP模式匹配算法"></a>KMP模式匹配算法</h3><p>KMP算法减少了一些已经计算过的计算量，但是他需要我们自己创建一个匹配表<br>对KMP算法的讲解：<a target="_blank" rel="noopener" href="http://blog.csdn.net/chinwuforwork/article/details/51939826">http://blog.csdn.net/chinwuforwork/article/details/51939826</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">kmp_match</span>(<span class="hljs-params">s, p</span>):</span>  <br>    m = <span class="hljs-built_in">len</span>(s); n = <span class="hljs-built_in">len</span>(p)  <br>    cur = <span class="hljs-number">0</span><span class="hljs-comment">#起始指针cur  </span><br>    table = partial_table(p)  <br>    <span class="hljs-keyword">while</span> cur&lt;=m-n:  <br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>            <span class="hljs-keyword">if</span> s[i+cur]!=p[i]:  <br>                cur += <span class="hljs-built_in">max</span>(i - table[i-<span class="hljs-number">1</span>], <span class="hljs-number">1</span>)<span class="hljs-comment">#有了部分匹配表,我们不只是单纯的1位1位往右移,可以一次移动多位  </span><br>                <span class="hljs-keyword">break</span>  <br>        <span class="hljs-keyword">else</span>:  <br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span>  <br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span>  <br>  <br><span class="hljs-comment">#部分匹配表  </span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">partial_table</span>(<span class="hljs-params">p</span>):</span>  <br>    <span class="hljs-string">&#x27;&#x27;&#x27;&#x27;&#x27;partial_table(&quot;ABCDABD&quot;) -&gt; [0, 0, 0, 0, 1, 2, 0]</span><br><span class="hljs-string">    prefix&amp;postfix or &#123;&#x27;&#x27;&#125;求集合的交集，如果没有则为空</span><br><span class="hljs-string">    pop()可以取出里面的数值</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span>  <br>    prefix = <span class="hljs-built_in">set</span>()  <br>    postfix = <span class="hljs-built_in">set</span>()  <br>    ret = [<span class="hljs-number">0</span>]  <br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>,<span class="hljs-built_in">len</span>(p)):  <br>        prefix.add(p[:i])  <br>        postfix = &#123;p[j:i+<span class="hljs-number">1</span>] <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>,i+<span class="hljs-number">1</span>)&#125;  <br>        ret.append(<span class="hljs-built_in">len</span>((prefix&amp;postfix <span class="hljs-keyword">or</span> &#123;<span class="hljs-string">&#x27;&#x27;</span>&#125;).pop()))  <br>    <span class="hljs-keyword">return</span> ret  <br>  <br><br><span class="hljs-built_in">print</span> (partial_table(<span class="hljs-string">&quot;ABCDABD&quot;</span>)  )<br><span class="hljs-built_in">print</span> (kmp_match(<span class="hljs-string">&quot;BBC ABCDAB ABCDABCDABDE&quot;</span>, <span class="hljs-string">&quot;ABCDABD&quot;</span>)  )<br></code></pre></td></tr></table></figure>
+<h2 id="图的最小生成树"><a href="#图的最小生成树" class="headerlink" title="图的最小生成树"></a>图的最小生成树</h2><p>在一个有权的图中，既要做到遍历到所有点，同时要保证遍历顺序的权加起来是最小的</p>
+<h3 id="普里姆算法"><a href="#普里姆算法" class="headerlink" title="普里姆算法"></a>普里姆算法</h3><p>普里姆算法的基本思想：普里姆算法是另一种构造最小生成树的算法，它是按逐个将顶点连通的方式来构造最小生成树的</p>
+<p>从连通网络 N = { V, E }中的某一顶点 u0 出发，选择与它关联的具有最小权值的边(u0, v)，将其顶点加入到生成树的顶点集合U中。以后每一步从一个顶点在U中，而另一个顶点不在U中的各条边中选择权值最小的边(u, v),把该边加入到生成树的边集TE中，把它的顶点加入到集合U中。如此重复执行，直到网络中的所有顶点都加入到生成树顶点集合U中为止。</p>
+<p><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E6%99%AE%E5%88%A9%E6%AF%8D%E7%AE%97%E6%B3%95?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">普利母算法过程</span></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">prim</span>(<span class="hljs-params"> graph, vertex_num </span>):</span>  <br>      <br>    INF      = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">10</span>  <br>    visit    = [<span class="hljs-literal">False</span>] * vertex_num   <span class="hljs-comment">#检测是否遍历过</span><br>    dist     = [INF] * vertex_num     <span class="hljs-comment">#该集合是用于记录且判断权的最小值（需要与visit一起判断）</span><br>    <span class="hljs-comment">#利用dist可以做到，假如到了某个点，哪个点已经没有可以遍历的点了，就可以回到之前记录的点的没记录粿点的最小权</span><br>    my_list = []<br><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>( vertex_num ):  <br>          <br>        minDist = INF + <span class="hljs-number">1</span>  <br>        nextIndex = -<span class="hljs-number">1</span>  <br>          <br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>( vertex_num ):  <br>            <span class="hljs-comment">#查找第i个点与未遍历的点的最小权值的对应点</span><br>            <span class="hljs-keyword">if</span> dist[j] &lt; minDist <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> visit[j]:  <br>                    minDist = dist[j]  <br>                    nextIndex = j<br><br>        <span class="hljs-keyword">for</span> j,n <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(graph[nextIndex]):<br>            <span class="hljs-comment">#查找该点的前驱</span><br>            <span class="hljs-keyword">if</span> minDist == INF:<br>                a = <span class="hljs-number">0</span><br>            <span class="hljs-keyword">elif</span> n == minDist:<br>                a = j+<span class="hljs-number">1</span><br><br>        <span class="hljs-comment">#记录改点(poin_list的第一个为前驱，第二个为点)</span><br>        poin_list = [a,nextIndex+<span class="hljs-number">1</span>]<br>        my_list.append(poin_list)   <br>        visit[nextIndex] = <span class="hljs-literal">True</span>  <br>          <br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>( vertex_num ):<br>            <span class="hljs-comment">#为所查找的点附上与之对应点的权</span><br>            <span class="hljs-keyword">if</span> dist[j] &gt; graph[nextIndex][j] <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> visit[j]:  <br>                dist[j] = graph[nextIndex][j]<br><br>    <span class="hljs-keyword">return</span> my_list<br>  <br>_ = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">10</span>  <br><span class="hljs-comment">#&lt;&lt;的解释https://zhidao.baidu.com/question/583597339.html</span><br><span class="hljs-comment">#所以_是1024，代表无穷大</span><br><br>graph=[<br>    [<span class="hljs-number">0</span>,<span class="hljs-number">6</span>,<span class="hljs-number">1</span>,<span class="hljs-number">5</span>,_,_],<br>    [<span class="hljs-number">6</span>,<span class="hljs-number">0</span>,<span class="hljs-number">5</span>,_,<span class="hljs-number">3</span>,_],<br>    [<span class="hljs-number">1</span>,<span class="hljs-number">5</span>,<span class="hljs-number">0</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">4</span>],<br>    [<span class="hljs-number">5</span>,_,<span class="hljs-number">5</span>,<span class="hljs-number">0</span>,_,<span class="hljs-number">2</span>],<br>    [_,<span class="hljs-number">3</span>,<span class="hljs-number">6</span>,_,<span class="hljs-number">0</span>,<span class="hljs-number">6</span>],<br>    [_,_,<span class="hljs-number">4</span>,<span class="hljs-number">2</span>,<span class="hljs-number">6</span>,<span class="hljs-number">0</span>],<br>]  <br>  <br>print(prim( graph, <span class="hljs-number">6</span> ))  <br></code></pre></td></tr></table></figure>
+<h3 id="克鲁斯卡尔算法（优化版）"><a href="#克鲁斯卡尔算法（优化版）" class="headerlink" title="克鲁斯卡尔算法（优化版）"></a>克鲁斯卡尔算法（优化版）</h3><p>克鲁斯卡尔算法是一种用来寻找最小生成树的算法。在剩下的所有未选取的边中，找最小边，如果和已选取的边构成回路，则放弃，选取次小边<br>找最小边很容易，判断是不是回路就让我蒙了好久（现在还蒙- -），由于判断边的两个断点的最终根节点是否相同等于判断是不是构成回路，所以可以使用并查集来解决<br>构建最小生成树时，还要使等级低的指向等级高的，这样可以变成线性表，查找时速度就能得到提高</p>
+<p>关于并查集：<a target="_blank" rel="noopener" href="http://blog.csdn.net/qq_34594236/article/details/51834882">http://blog.csdn.net/qq_34594236/article/details/51834882</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#Kruskal’s Algorithm</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">find</span>(<span class="hljs-params">C, u</span>):</span><br>    <span class="hljs-comment">#输出该节点的根</span><br>    <span class="hljs-comment">#案例中，到了边14时，查找1获得3，再查找3获得6，最后才知道1的跟是6,4一步得出4的跟是6。在这个期间，就把1的跟转换为6</span><br>    <span class="hljs-comment">#案例中，到了边32时(25和13通过23连接了，但2指向5,1指向3指向6，并没有1指向3指向2，这个路径)</span><br>    <span class="hljs-comment">#       由于32边才通过逐级查找，判断出2跟5的跟是6</span><br>    <span class="hljs-keyword">if</span> C[u] != u:      <span class="hljs-comment">#判断这个点是不是根，如果不是向顶点查找(由于做了路径压缩处理，查找很快)</span><br>        C[u] = find(C, C[u])                    <br>    <span class="hljs-keyword">return</span> C[u]<br> <br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">union</span>(<span class="hljs-params">C, R, u, v</span>):</span><br>    <span class="hljs-comment">#将其视为平衡树，等级小的指向等级大的，如果两者等级一样，则前者指像后者。最后后者等级加1</span><br>    u, v = find(C, u), find(C, v)<br>    <span class="hljs-comment">#这句if,else是由等级来判断是否需要转换跟</span><br>    <span class="hljs-keyword">if</span> R[u] &gt; R[v]:                             <br>        C[v] = u<br>    <span class="hljs-keyword">else</span>:<br>        C[u] = v<br>    <span class="hljs-keyword">if</span> R[u] == R[v]:                            <span class="hljs-comment">#等级加1</span><br>        R[v] += <span class="hljs-number">1</span><br> <br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">kruskal</span>(<span class="hljs-params">G</span>):</span><br>    E = [(G[u][v],u,v) <span class="hljs-keyword">for</span> u <span class="hljs-keyword">in</span> G <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> G[u]] <span class="hljs-comment">#生成的E是(边的权，边的起点，边的终点)的列表</span><br>    T = <span class="hljs-built_in">set</span>()<br>    C, R = &#123;u:u <span class="hljs-keyword">for</span> u <span class="hljs-keyword">in</span> G&#125;, &#123;u:<span class="hljs-number">0</span> <span class="hljs-keyword">for</span> u <span class="hljs-keyword">in</span> G&#125;   <br>    <span class="hljs-comment"># 定义的c是通过路径压缩后，点的对应的最终顶节点，也就是树的根，</span><br>    <span class="hljs-comment">#R定义的是点的等级</span><br>    <span class="hljs-keyword">for</span> _, u, v <span class="hljs-keyword">in</span> <span class="hljs-built_in">sorted</span>(E): <span class="hljs-comment">#由于使用sorted所以排序先按权排序再按起点排序，所以这样生成的树中都是数字小的充当子节点，大的充当节点（但是在整颗树中并不是这样的）</span><br>        print(<span class="hljs-string">&quot;(&quot;</span>,u,v,<span class="hljs-string">&quot;)&quot;</span>)<br>        print(<span class="hljs-string">&quot;C&quot;</span>, C)<br>        print(<span class="hljs-string">&quot;R&quot;</span>, R)<br>        print(<span class="hljs-string">&quot;u,v&quot;</span>, u, v)<br>        print(<span class="hljs-string">&quot;C[u],u&quot;</span>,C[u],u)<br>        print(<span class="hljs-string">&quot;C[v],v&quot;</span>,C[v],v)<br>        <span class="hljs-keyword">if</span> find(C, u) != find(C, v):<br>            <span class="hljs-comment">#如果两个段点的根不同，就代表没有构成回路</span><br>            print(<span class="hljs-string">&quot;录入u,v&quot;</span>,u,v)<br>            T.add((u, v))<br>            union(C, R, u, v)<br>        print(<span class="hljs-string">&quot;------&quot;</span>)<br>    <span class="hljs-keyword">return</span> T<br><br><br><br>G = &#123;<br>    <span class="hljs-number">1</span>: &#123;<span class="hljs-number">2</span>:<span class="hljs-number">6</span>, <span class="hljs-number">3</span>:<span class="hljs-number">1</span>, <span class="hljs-number">4</span>:<span class="hljs-number">5</span>&#125;,<br>    <span class="hljs-number">2</span>: &#123;<span class="hljs-number">1</span>:<span class="hljs-number">6</span>, <span class="hljs-number">3</span>:<span class="hljs-number">5</span>, <span class="hljs-number">5</span>:<span class="hljs-number">3</span>&#125;,<br>    <span class="hljs-number">3</span>: &#123;<span class="hljs-number">1</span>:<span class="hljs-number">1</span>, <span class="hljs-number">2</span>:<span class="hljs-number">5</span>, <span class="hljs-number">4</span>:<span class="hljs-number">5</span>, <span class="hljs-number">5</span>:<span class="hljs-number">6</span>, <span class="hljs-number">6</span>:<span class="hljs-number">4</span>&#125;,<br>    <span class="hljs-number">4</span>: &#123;<span class="hljs-number">1</span>:<span class="hljs-number">5</span>, <span class="hljs-number">3</span>:<span class="hljs-number">5</span>, <span class="hljs-number">6</span>:<span class="hljs-number">2</span>&#125;,<br>    <span class="hljs-number">5</span>: &#123;<span class="hljs-number">2</span>:<span class="hljs-number">3</span>, <span class="hljs-number">3</span>:<span class="hljs-number">6</span>, <span class="hljs-number">6</span>:<span class="hljs-number">6</span>&#125;,<br>    <span class="hljs-number">6</span>: &#123;<span class="hljs-number">3</span>:<span class="hljs-number">4</span>, <span class="hljs-number">4</span>:<span class="hljs-number">2</span>, <span class="hljs-number">5</span>:<span class="hljs-number">6</span>&#125;,<br>    &#125;<br><br><br><span class="hljs-built_in">print</span> (<span class="hljs-built_in">list</span>(kruskal(G))) <br></code></pre></td></tr></table></figure>
+<h2 id="图的最小路径"><a href="#图的最小路径" class="headerlink" title="图的最小路径"></a>图的最小路径</h2><h3 id="迪杰斯特拉算法-Dijkstra"><a href="#迪杰斯特拉算法-Dijkstra" class="headerlink" title="迪杰斯特拉算法(Dijkstra)"></a>迪杰斯特拉算法(Dijkstra)</h3><p>该算法执行过程中，把途中的顶点分为两个集合，当时已知最短路径的顶点集合U，以及尚不知道最短路径的顶点集合V-U。算法执行过程中，逐步扩充已知最短路径的顶点集合，每步从顶点集合V-U中找出一个顶点（它是当时已经能确定最短路径的顶点）加入U。反复执行这样的操作，直到从找到顶点v0到其他所有顶点的最短路径。该算法能同时给出这些路径以及长度<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/Dijkstra%E5%9B%BE%E7%A4%BA%E5%9B%BE.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">图示图</span><br>图中(1)状态，只有a在集合u，这是有两条边界变分别到顶点c和d。选择距离a最近的d加入u并标记相应的变，标出新发现的到顶点e的边界点，得到图(2)。这是最近的非u顶点是c，将其加入u后发现了3条新的边界边，找到的顶点e的新路径比原来的已知路径更短，记录这是的边界边和顶点的已知距离得到图（3）。将这是最近的非u顶点e加入集合u，记录到e的最短路径。由于新发现了从e一步可以到达g，记录相应的边界边，得到图(4)。这是虽然边界边中最短的是到g的边，但顶点b距离a更近，因此应该把b加入u。将b加入u后发现了一条到f的新路径，但其长度并不断与此时已知到f的最短路径（事实上，两条路径一样长），因此不需要更新路径，得到图（5）.再经过两步，最后状态6给出了所有路径</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># dijkstra算法实现，有向图和路由的源点作为函数的输入，最短路径最为输出</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dijkstra</span>(<span class="hljs-params">graph,src</span>):</span><br>    <span class="hljs-comment"># 判断图是否为空，如果为空直接退出</span><br>    <span class="hljs-keyword">if</span> graph <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>    nodes = [i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(graph))]  <span class="hljs-comment"># 获取图中所有节点</span><br>    visited=[]  <span class="hljs-comment"># 表示已经路由到最短路径的节点集合</span><br>    <span class="hljs-keyword">if</span> src <span class="hljs-keyword">in</span> nodes:<br>        visited.append(src)<br>        nodes.remove(src)<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>    distance=&#123;src:<span class="hljs-number">0</span>&#125;  <span class="hljs-comment"># 记录源节点到各个节点的距离</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> nodes:<br>        distance[i]=graph[src][i]  <span class="hljs-comment"># 初始化</span><br>    <span class="hljs-comment"># print(distance)</span><br>    path=&#123;src:&#123;src:[]&#125;&#125;  <span class="hljs-comment"># 记录源节点到每个节点的路径</span><br>    k=pre=src<br>    <span class="hljs-keyword">while</span> nodes:<br>        mid_distance=<span class="hljs-built_in">float</span>(<span class="hljs-string">&#x27;inf&#x27;</span>)<br>        <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> visited:<br>            <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> nodes:<br>                new_distance = graph[src][v]+graph[v][d]<br>                <span class="hljs-keyword">if</span> new_distance &lt; mid_distance:<br>                    mid_distance=new_distance<br>                    graph[src][d]=new_distance  <span class="hljs-comment"># 进行距离更新</span><br>                    k=d<br>                    pre=v<br>        distance[k]=mid_distance  <span class="hljs-comment"># 最短路径</span><br>        path[src][k]=[i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> path[src][pre]]<br>        path[src][k].append(k)<br>        <span class="hljs-comment"># 更新两个节点集合</span><br>        visited.append(k)<br>        nodes.remove(k)<br>        print(visited,nodes)  <span class="hljs-comment"># 输出节点的添加过程</span><br>    <span class="hljs-keyword">return</span> distance,path<br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    graph_list = [ [<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>],<br>            [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>],<br>            [<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>],<br>            [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span>],<br>            [<span class="hljs-number">2</span>, <span class="hljs-number">4</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>],<br>            [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">7</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]]<br><br>    distance,path= dijkstra(graph_list, <span class="hljs-number">0</span>)  <span class="hljs-comment"># 查找从源点0开始带其他节点的最短路径</span><br>    print(distance,path)<br></code></pre></td></tr></table></figure>
+<h3 id="沸洛伊德算法"><a href="#沸洛伊德算法" class="headerlink" title="沸洛伊德算法"></a>沸洛伊德算法</h3><p>如果我要求顶点A到顶点B之间的距离的话，我可以先找一个顶点C，求解顶点A到顶点C加上顶点C到顶点B的距离和，如何这个距离和小于顶点A直接到顶点B的距离的话，那么这个时候就要更新一下距离矩阵中的值，将顶点A到顶点B的距离更新为：顶点A到顶点C加上顶点C到顶点B的距离和。这就是Folyd的核心思想了，那么如果要找到全局最优的解就要在选取中间顶点的过程中遍历所有的节点才行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">make_mat</span>(<span class="hljs-params">m, n, fill=<span class="hljs-literal">None</span></span>):</span><br>    mat = []<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(m):<br>        mat.append([fill] * n)<br>    <span class="hljs-keyword">return</span> mat<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_edges</span>(<span class="hljs-params">graph</span>):</span><br>    n = <span class="hljs-built_in">len</span>(graph)<br>    edges = []<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n):<br>            <span class="hljs-keyword">if</span> graph[i][j] != <span class="hljs-number">0</span>:<br>                edges.append((i, j, graph[i][j]))<br>    <span class="hljs-keyword">return</span> edges<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ford</span>(<span class="hljs-params">graph, v0</span>):</span><br>    n = <span class="hljs-built_in">len</span>(graph)<br>    edges = get_edges(graph)<br>    dis = [INF] * n<br>    dis[v0] = <span class="hljs-number">0</span><br>    path = [<span class="hljs-number">0</span>] * n<br><br>    <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n-<span class="hljs-number">1</span>):<br>        <span class="hljs-keyword">for</span> edge <span class="hljs-keyword">in</span> edges:<br>            <span class="hljs-comment"># relax</span><br>            <span class="hljs-keyword">if</span> dis[edge[<span class="hljs-number">0</span>]] + edge[<span class="hljs-number">2</span>] &lt; dis[edge[<span class="hljs-number">1</span>]]:<br>                dis[edge[<span class="hljs-number">1</span>]] = dis[edge[<span class="hljs-number">0</span>]] + edge[<span class="hljs-number">2</span>]<br>                path[edge[<span class="hljs-number">1</span>]] = edge[<span class="hljs-number">0</span>]<br><br>    <span class="hljs-comment"># check negative loop</span><br>    flag = <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">for</span> edge <span class="hljs-keyword">in</span> edges:<br>        <span class="hljs-comment"># try to relax</span><br>        <span class="hljs-keyword">if</span> dis[edge[<span class="hljs-number">0</span>]] + edge[<span class="hljs-number">2</span>] &lt; dis[edge[<span class="hljs-number">1</span>]]:<br>            flag = <span class="hljs-literal">True</span><br>            <span class="hljs-keyword">break</span><br>    <span class="hljs-keyword">if</span> flag:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">return</span> dis, path<br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    INF = <span class="hljs-number">1e6</span><br>    graph_list = [ [<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>],<br>            [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>],<br>            [<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>],<br>            [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span>],<br>            [<span class="hljs-number">2</span>, <span class="hljs-number">4</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>],<br>            [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">7</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]]<br><br>    distance,path= ford(graph_list, <span class="hljs-number">0</span>)  <span class="hljs-comment"># 查找从源点0开始带其他节点的最短路径</span><br>    print(distance,path)<br></code></pre></td></tr></table></figure>
+<h2 id="图的拓扑排序"><a href="#图的拓扑排序" class="headerlink" title="图的拓扑排序"></a>图的拓扑排序</h2><h3 id="拓扑排序算法"><a href="#拓扑排序算法" class="headerlink" title="拓扑排序算法"></a>拓扑排序算法</h3><p>拓扑顺序就是：每次找到一个只指向别人的点 (学术性说法：入度为0)，记录下来；然后忽略掉这个点和它所指出去的线，再找到下一个只指向别人的点，记录下来，直到剩最后一个点，所有记录的点的顺序就是拓扑顺序<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">拓扑排序</span><br>上图中，只有点1只指向别人，输出1；去掉点1和它伸出的两根线外只有点2只指向别人，输出2；…类推下去，得到拓扑排序结构: 1 2 4 3 5</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">indegree0</span>(<span class="hljs-params">v,e</span>):</span> <br>    <span class="hljs-keyword">if</span> v==[]:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>    tmp=v[:]<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> e:<br>        <span class="hljs-keyword">if</span> i[<span class="hljs-number">1</span>] <span class="hljs-keyword">in</span> tmp:<br>            tmp.remove(i[<span class="hljs-number">1</span>])<br>    <span class="hljs-keyword">if</span> tmp==[]:<br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> tmp:<br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(e)):<br>            <span class="hljs-keyword">if</span> t <span class="hljs-keyword">in</span> e[i]:<br>                e[i]=<span class="hljs-string">&#x27;toDel&#x27;</span> <span class="hljs-comment">#占位，之后删掉</span><br>    <span class="hljs-keyword">if</span> e:<br>        eset=<span class="hljs-built_in">set</span>(e)<br>        eset.remove(<span class="hljs-string">&#x27;toDel&#x27;</span>)<br>        e[:]=<span class="hljs-built_in">list</span>(eset)<br>    <span class="hljs-keyword">if</span> v:<br>        <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> tmp:<br>            v.remove(t)<br>    <span class="hljs-keyword">return</span> tmp<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">topoSort</span>(<span class="hljs-params">v,e</span>):</span><br>    result=[]<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        nodes=indegree0(v,e)<br>        <span class="hljs-keyword">if</span> nodes==<span class="hljs-literal">None</span>:<br>            <span class="hljs-keyword">break</span><br>        <span class="hljs-keyword">if</span> nodes==-<span class="hljs-number">1</span>:<br>            print(<span class="hljs-string">&#x27;there\&#x27;s a circle.&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>        result.extend(nodes)<br>    <span class="hljs-keyword">return</span> result<br><br>v=[<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-string">&#x27;b&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>,<span class="hljs-string">&#x27;d&#x27;</span>,<span class="hljs-string">&#x27;e&#x27;</span>]<br>e=[(<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-string">&#x27;b&#x27;</span>),(<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-string">&#x27;d&#x27;</span>),(<span class="hljs-string">&#x27;b&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>),(<span class="hljs-string">&#x27;d&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>),(<span class="hljs-string">&#x27;d&#x27;</span>,<span class="hljs-string">&#x27;e&#x27;</span>),(<span class="hljs-string">&#x27;e&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>)]<br>res=topoSort(v,e)<br>print(res)<br></code></pre></td></tr></table></figure>
+<h2 id="图的关键路径"><a href="#图的关键路径" class="headerlink" title="图的关键路径"></a>图的关键路径</h2><h3 id="关键路径算法"><a href="#关键路径算法" class="headerlink" title="关键路径算法"></a>关键路径算法</h3><p>关键路径：在AOE网中，从始点到终点具有最大路径长度（该路径上的各个活动所持续的时间之和）的路径称为关键路径。</p>
+<p>关键活动：关键路径上的活动称为关键活动。关键活动：e[i]=l[i]的活动</p>
+<p>　　由于AOE网中的某些活动能够同时进行，故完成整个工程所必须花费的时间应该为始点到终点的最大路径长度。关键路径长度是整个工程所需的最短工期。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Pro</span>:</span>  <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self,pro_id,require_time,previous,pro_list</span>):</span>  <br>        self.pro_id = pro_id  <br>        self.require_time = require_time  <br>        self.previous = previous  <br>        <span class="hljs-comment">#self.status = False  </span><br>        pro_list.append(self)  <br>  <br>    <span class="hljs-comment"># def Test(self):  </span><br>    <span class="hljs-comment">#   for item in self.previous:  </span><br>    <span class="hljs-comment">#       if pro_list[item].status == False:  </span><br>    <span class="hljs-comment">#           return False  </span><br>    <span class="hljs-comment">#   return True  </span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ShowSelf</span>(<span class="hljs-params">self</span>):</span>  <br>        <span class="hljs-built_in">print</span> (self.<span class="hljs-built_in">id</span>,self.require_time,self.previous)<span class="hljs-comment">#self.status,  </span><br>    <span class="hljs-comment"># def Pro_Finish(self):  </span><br>    <span class="hljs-comment">#   self.status = True  </span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span>(<span class="hljs-params">self</span>):</span>  <br>        total = <span class="hljs-number">0</span>  <br>        tmp = []  <br>        <span class="hljs-keyword">if</span> self.pro_id == <span class="hljs-number">0</span>:  <br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>  <br>        a = <span class="hljs-built_in">len</span>(self.previous)  <br>        <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(a):  <br>            tmp.append(pro_list[self.previous[x]].run() + self.require_time)  <br>        <span class="hljs-built_in">print</span> (tmp) <br>        total = <span class="hljs-built_in">max</span>(tmp)  <br>        <span class="hljs-built_in">print</span> (total)  <br>        <span class="hljs-keyword">return</span> total  <br>  <br>  <br>  <br>  <br>pro_list = []  <br>pro_0 = Pro(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, [<span class="hljs-number">0</span>], pro_list)  <br><span class="hljs-comment"># pro_0.status = True  </span><br>  <br><span class="hljs-comment">#init the pro_list  </span><br>pro_1 = Pro(<span class="hljs-number">1</span>, <span class="hljs-number">4</span>, [<span class="hljs-number">0</span>], pro_list)  <br>pro_2 = Pro(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>, [<span class="hljs-number">1</span>], pro_list)  <br>pro_3 = Pro(<span class="hljs-number">3</span>, <span class="hljs-number">2</span>, [<span class="hljs-number">1</span>], pro_list)  <br>pro_4 = Pro(<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, [<span class="hljs-number">2</span>], pro_list)  <br>pro_5 = Pro(<span class="hljs-number">5</span>, <span class="hljs-number">3</span>, [<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">8</span>], pro_list)  <br>pro_6 = Pro(<span class="hljs-number">6</span>, <span class="hljs-number">1</span>, [<span class="hljs-number">4</span>], pro_list)  <br>pro_7 = Pro(<span class="hljs-number">7</span>, <span class="hljs-number">3</span>, [<span class="hljs-number">5</span>,<span class="hljs-number">6</span>], pro_list)  <br>pro_8 = Pro(<span class="hljs-number">8</span>, <span class="hljs-number">5</span>, [<span class="hljs-number">1</span>], pro_list)  <br>pro_9 = Pro(<span class="hljs-number">9</span>, <span class="hljs-number">4</span>, [<span class="hljs-number">7</span>], pro_list)  <br>  <br>  <br>  <br>total_time = pro_9.run()    <span class="hljs-comment">#此处为总项目，也可以是单个项目  </span><br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;Total_time:&quot;</span>,total_time ) <br>  <br></code></pre></td></tr></table></figure>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/10/20/19/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;10&#x2F;20&#x2F;19&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;10&#x2F;20&#x2F;19&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/10/21/p2/"><i class="iconfont iconleft"></i>学习网开发</a>
+    <a href="/2017/10/20/16-data-structure/">数据结构<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%B2"><span class="toc-text">串</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%B4%E7%B4%A0%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="toc-text">朴素的模式匹配算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KMP%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="toc-text">KMP模式匹配算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91"><span class="toc-text">图的最小生成树</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%99%AE%E9%87%8C%E5%A7%86%E7%AE%97%E6%B3%95"><span class="toc-text">普里姆算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%8B%E9%B2%81%E6%96%AF%E5%8D%A1%E5%B0%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%BC%98%E5%8C%96%E7%89%88%EF%BC%89"><span class="toc-text">克鲁斯卡尔算法（优化版）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E8%B7%AF%E5%BE%84"><span class="toc-text">图的最小路径</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%AA%E6%9D%B0%E6%96%AF%E7%89%B9%E6%8B%89%E7%AE%97%E6%B3%95-Dijkstra"><span class="toc-text">迪杰斯特拉算法(Dijkstra)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B2%B8%E6%B4%9B%E4%BC%8A%E5%BE%B7%E7%AE%97%E6%B3%95"><span class="toc-text">沸洛伊德算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%9A%84%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F"><span class="toc-text">图的拓扑排序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95"><span class="toc-text">拓扑排序算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%9A%84%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84"><span class="toc-text">图的关键路径</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95"><span class="toc-text">关键路径算法</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

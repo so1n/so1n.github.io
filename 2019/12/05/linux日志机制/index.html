@@ -1,0 +1,936 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>linux日志规则 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记最近系统上出现部分日志丢失的情况,为了解决这个问题...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">linux日志规则</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">linux日志规则</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 05, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>28418</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="1-发送以及保存数据"><a href="#1-发送以及保存数据" class="headerlink" title="1.发送以及保存数据"></a>1.发送以及保存数据</h2><p>Linux中有一套稳定的日志管理系统,除了方便的过滤和分发外,为了多个服务器日志管理,还有一套稳定的日志发送结构,方便不漏日志的情况下,收集所有服务器的日志</p>
+<h3 id="1-1结构图-系统为debain7-以为本地发送-本地接受为例"><a href="#1-1结构图-系统为debain7-以为本地发送-本地接受为例" class="headerlink" title="1.1结构图(系统为debain7,以为本地发送,本地接受为例)"></a>1.1结构图(系统为debain7,以为本地发送,本地接受为例)</h3><p>一般程序通过调用Linux的日志接口把日志传给/dev/log,由journald发送到rsyslog service模块,再根据syslog协议把不同的日志转向不同的输出模块,输出不同的日志<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/Linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6%E7%BB%93%E6%9E%84.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">img</span></p>
+<h3 id="1-2如何发送日志"><a href="#1-2如何发送日志" class="headerlink" title="1.2如何发送日志"></a>1.2如何发送日志</h3><p>程序根据<a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc5424">syslog标准</a>,封装日志,并发送到指定socket(/dev/log)</p>
+<h3 id="1-3-dev-log"><a href="#1-3-dev-log" class="headerlink" title="1.3 /dev/log"></a>1.3 /dev/log</h3><p>一个UNIX域套接字，接受在本地机器上运行的进程所产生的消息,如果要想让系统记录日志,就可以按照syslog规范把日志发送到/dev/log/这个socket<br>除此之外还有/dev/klog – 一个从UNIX内核接受消息的设备.<br>如果看到syslog记录了kern的日志,却没记录普通日志,那就是/dev/log这个socket缓冲区满了,可以尝试通过kern.ipc.maxsockbuf改变缓冲区大小,但并不能完全解决问题.</p>
+<h3 id="1-4-journald"><a href="#1-4-journald" class="headerlink" title="1.4 journald"></a>1.4 journald</h3><p>systemd/journald 提供了 socket /run/systemd/journal/syslog，通过软连接,让发送到/dev/log/的数据实际上发送到/run/systemd/journal/syslog,通过读取标准socket来读取日志。不过systemd-journald 所记录的数据其实是在内存中，但是系统还是利用文件的型态将它记录到 /run/log/ 下面,重新开机后,在内存的数据就会被清除掉.<br>通过在 /etc/systemd/journald.conf 中设置 ForwardToSyslog=yes,journald就会把日志发送到rsyslog.<br>journald自己也提供了很多<a target="_blank" rel="noopener" href="https://wiki.archlinux.org/index.php/Systemd/Journal_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)">功能</a>,比如有:过滤输出,大小限制等等<br>PS: 在还没有systemd时代,必须要开机完成并且执行了 rsyslogd 这个 daemon 之后，登录文件才会开始记录。所以，需要自己产生一个 klogd 的服务， 才能将系统在开机过程、启动服务的过程中的信息记录下来，然后等 rsyslogd 启动后才传送给它来处理.现在有了systemd主动调用 systemd-journald 来协助记载登录文件,在开机过程中的所有信息，包括启动服务与服务若启动失败的情况等等，都可以直接被记录到 systemd-journald.</p>
+<h3 id="1-5-rsyslog"><a href="#1-5-rsyslog" class="headerlink" title="1.5 rsyslog"></a>1.5 rsyslog</h3><p>rsyslog服务启动后(以监控本地日志为例子,也就是加载module(load=”imuxsock”)) 从/run/systemd/journal/syslog 这个socket获取syslog类型日志,然后进入主队列根据对应规则写日志.<br>rsyslog采用C/S结构,可以日志信息追加到对应的日志文件中，一般在/var/log目录下。它还可以把日志信息通过网络协议发送到另一台Linux服务器上，或者将日志存储在MySQL或Oracle等数据库中。<br>除此之外,rsyslog能够快速的过滤,转发,发送日志,(还有官方说的每秒支持百万级日志),所以rsyslog的内容非常丰富.我们只要通过对配置文件进行简单的修改,就能实现传输,过滤等功能.<br>如上面的结构图,rsyslog中只有一个主消息队列，任何消息都要先进入这个队列，然后直到进入到动作队列之后消息才会从这个队列中删除。通常，我们都不会去动主队列的配置，因为默认的设置已经工作得很好；消息经过主消息队列之后，就被rule processor解析和处理，然后根据预先配置的规则压入各自的动作队列，动作队列之后消息最终被消费掉。</p>
+<h2 id="2-journald的配置"><a href="#2-journald的配置" class="headerlink" title="2.journald的配置"></a>2.journald的配置</h2><p>一般来说,只使用到journald的暂存日志并转发到rsyslog的功能,所以只需要看与暂存内存相关的配置即可</p>
+<ul>
+<li><p>Storage 指定如何存数据,默认none<br>“volatile” 表示仅保存在内存中， 也就是仅保存在 /run/log/journal 目录中(将会被自动按需创建)。 “persistent” 表示优先保存在磁盘上， 也就优先保存在 /var/log/journal 目录中(将会被自动按需创建)， 但若失败(例如在系统启动早期”/var”尚未挂载)， 则转而保存在 /run/log/journal 目录中(将会被自动按需创建)。 “auto” 与 “persistent” 类似， 但不自动创建 /var/log/journal 目录， 因此可以根据该目录的存在与否决定日志的保存位置。 “none” 表示不保存任何日志(直接丢弃所有收集到的日志)， 但日志转发不受影响。 默认值是 “auto”</p>
+</li>
+<li><p>Compress 默认值”yes”表示 压缩存储大于特定阈值(默认为512字节)的对象。 也可以直接设置一个 字节值(可以带有 K, M, G 后缀) 表示的阈值， 表示压缩存储 大于指定阈值的对象。</p>
+</li>
+<li><p>Seal 默认值”yes”表示： 如果存在一个”sealing key”(由 journalctl(1) 的 –setup-keys 命令创建)， 那么就为所有持久保存的日志文件启用 FSS(Seekable Sequential Key Generators)保护， 以避免日志文件 被恶意或无意的修改。</p>
+</li>
+<li><p>SplitMode 设置是否按照每个用户分割日志文件，以实现对日志的访问控制(日志守护进程会确保每个用户都能读取自己的日志文件). 默认值为uid<br>可以使用的分割策略如下： “uid” 表示每个用户都有自己专属的日志文件(无论该用户是否拥有登录会话)，但系统用户的日志依然记录到系统日志中。”none” 表示不对日志文件按不同用户进行分割，而是将所有日志都记录到系统日志中。这意味着非特权用户根本无法读取属于自己的日志信息。 注意， 仅分割持久保存的日志(/var/log/journal)， 永不分割内存中的日志(/run/log/journal)。</p>
+</li>
+<li><p>RateLimitIntervalSec 用于设置一个时间段长度,可以使用下面的时间单位： “ms”, “s”, “min”, “h”, “d”<br>限制日志的生成速率.表示在 RateLimitIntervalSec 时间段内， 每个服务最多允许产生 RateLimitBurst 数量(条数)的日志。 在同一个时间段内，超出数量限制的日志将被丢弃，直到下一个时间段才能再次开始记录。 对于所有被丢弃的日志消息，仅用一条类似”xxx条消息被丢弃”的消息来代替。 这个限制是针对每个服务的限制，一个服务超限并不会影响到另一个服务的日志记录。<br>如果一个服务已经通过 LogRateLimitIntervalSec= 和/或 LogRateLimitBurst= (参见 systemd.exec(5) 手册) 限制了自身的日志生成速率，那么将会覆盖此处的设置。</p>
+</li>
+<li><p>RateLimitBurst 用于设置一个正整数，表示消息条数，默认值是10000条.<br>说明见RateLimitIntervalSec </p>
+</li>
+<li><p>SystemMaxUse<br>限制磁盘使用量， 也就是 /var/log/journal 的使用量。限制全部日志文件加在一起最多可以占用多少空间。默认值是空间的10%与4G空间两者中的较小者；</p>
+</li>
+<li><p>SystemKeepFree<br>限制磁盘使用量， 也就是 /var/log/journal 的使用量。除日志文件之外，至少保留多少空间给其他用途。systemd-journald 会同时SystemKeepFree与SystemMaxUse ， 并且尽量限制日志文件的总大小，以同时满足这两个限制。默认值是空间的15%与4G空间两者中的较大者；</p>
+</li>
+<li><p>SystemMaxFileSize<br>限制磁盘使用量， 也就是 /var/log/journal 的使用量。限制单个日志文件的最大体积， 到达此限制后日志文件将会自动滚动。 默认值是对应的 SystemMaxUse值的1/8 ， 这也意味着日志滚动 默认保留7个历史文件。日志大小 可以使用以1024为基数的 K, M, G, T, P, E 后缀， 分别对应于 1024, 1024², … 字节。</p>
+</li>
+<li><p>SystemMaxFiles,<br>限制磁盘使用量， 也就是 /var/log/journal 的使用量。 限制最多允许同时存在多少个日志文件， 超出此限制后， 最老的日志文件将被删除， 而当前的活动日志文件 则不受影响。 默认值为100个。</p>
+</li>
+<li><p>RuntimeMaxUse<br>限制内存使用量， 也就是 /run/log/journal 的使用量。限制全部日志文件加在一起最多可以占用多少空间。默认值是空间的10%与4G空间两者中的较小者；</p>
+</li>
+<li><p>RuntimeKeepFree<br>限制内存使用量， 也就是 /run/log/journal 的使用量。除日志文件之外，至少保留多少空间给其他用途。systemd-journald 会同时RuntimeKeepFree与RuntimeMaxUse ， 并且尽量限制日志文件的总大小，以同时满足这两个限制。默认值是空间的15%与4G空间两者中的较大者；</p>
+</li>
+<li><p>RuntimeMaxFileSize<br>限制内存使用量， 也就是 /run/log/journal 的使用量。限制单个日志文件的最大体积， 到达此限制后日志文件将会自动滚动。 默认值是对应的 RuntimeMaxUse值的1/8 ， 这也意味着日志滚动 默认保留7个历史文件。日志大小 可以使用以1024为基数的 K, M, G, T, P, E 后缀， 分别对应于 1024, 1024², … 字节。</p>
+</li>
+<li><p>RuntimeMaxFiles<br>限制内存使用量， 也就是 /run/log/journal 的使用量。 限制最多允许同时存在多少个日志文件， 超出此限制后， 最老的日志文件将被删除， 而当前的活动日志文件 则不受影响。 默认值为100个。</p>
+</li>
+<li><p>MaxFileSec 日志滚动的时间间隔。 默认值是一个月， 设为零表示禁用基于时间的日志滚动策略。 可以使用 “year”, “month”, “week”, “day”, “h”, “m” 时间后缀， 若不使用后缀则表示以秒为单位。<br>通常 并不需要使用基于时间的日志滚动策略， 因为由 SystemMaxFileSize 与 RuntimeMaxFileSize 控制的基于文件大小的日志滚动策略 已经可以确保日志文件的大小不会超标。</p>
+</li>
+<li><p>MaxRetentionSec 日志文件的最大保留期限。 默认值零表示不使用基于时间的日志删除策略。可以使用 “year”, “month”, “week”, “day”, “h”, “m” 时间后缀， 若不使用后缀则表示以秒为单位。<br>当日志文件的最后修改时间(mtime)与当前时间之差， 大于此处设置的值时，日志文件将会被删除。  通常并不需要使用基于时间的日志删除策略，因为由 SystemMaxUse= 与 RuntimeMaxUse= 控制的基于文件大小的日志滚动策略 已经可以确保日志文件的大小不会超标。 </p>
+</li>
+<li><p>SyncIntervalSec 向磁盘刷写日志文件的时间间隔， 默认值是五分钟。<br>刷写之后，日志文件将会处于离线(OFFLINE)状态。 注意，当接收到 CRIT, ALERT, EMERG 级别的日志消息后， 将会无条件的立即刷写日志文件。 因此该设置仅对 ERR, WARNING, NOTICE, INFO, DEBUG 级别的日志消息有意义。</p>
+</li>
+<li><p>ForwardToSyslog 表示是否将接收到的日志消息转发给传统的 syslog 守护进程，默认值为”no”。 如果设为”yes”，但是没有任何进程监听对应的套接字，那么这种转发是无意义的。 此选项可以被内核引导选项 “systemd.journald.forward_to_syslog” 覆盖。</p>
+</li>
+<li><p>ForwardToKMsg 表示是否将接收到的日志消息转发给内核日志缓冲区(kmsg)，默认值为”no”。 此选项可以被内核引导选项 “systemd.journald.forward_to_kmsg” 覆盖。</p>
+</li>
+<li><p>ForwardToConsole 表示是否将接收到的日志消息转发给系统控制台，默认值为”no”。 如果设为”yes”，那么可以通过下面的 TTYPath= 指定转发目标。 此选项可以被内核引导选项 “systemd.journald.forward_to_console” 覆盖。 </p>
+</li>
+<li><p>ForwardToWall 表示是否将接收到的日志消息作为警告信息发送给所有已登录用户，默认值为”yes”。 此选项可以被内核引导选项 “systemd.journald.forward_to_wall” 覆盖。</p>
+</li>
+<li><p>MaxLevelStore 设置记录到日志文件中的最高日志等级，默认值为”debug”；可以被内核引导选项”systemd.journald.max_level_store”覆盖<br>可以设为日志等级的名称， 也可以设为日志等级对应的数字： “emerg”(0), “alert”(1), “crit”(2), “err”(3), “warning”(4), “notice”(5), “info”(6), “debug”(7) 。 所有高于设定等级的日志消息都将被直接丢弃， 仅保存/转发小于等于设定等级的日志消息。</p>
+</li>
+<li><p>MaxLevelSyslog 设置转发给传统的 syslog 守护进程的最高日志等级， 默认值为”debug”；可以被内核引导选项”systemd.journald.max_level_syslog”覆盖<br>选项说明同MaxLevelStore</p>
+</li>
+<li><p>MaxLevelKMsg 设置转发给内核日志缓冲区(kmsg)的最高日志等级，默认值为”notice”； 可以被内核引导选项”systemd.journald.max_level_kmsg”覆盖<br>选项说明同MaxLevelStore</p>
+</li>
+<li><p>MaxLevelConsole 设置转发给系统控制台的最高日志等级，默认值为”info”；可以被内核引导选项”systemd.journald.max_level_console”覆盖<br>选项说明同MaxLevelStore</p>
+</li>
+<li><p>MaxLevelWall 设置作为警告信息发送给所有已登录用户的最高日志等级，默认值为”emerg”；可以被内核引导选项”systemd.journald.max_level_wall”覆盖<br>选项说明同MaxLevelStore</p>
+</li>
+<li><p>ReadKMsg 是否收集内核日志。 默认值 yes 表示从 /dev/kmsg 中读取内核产生的日志消息。</p>
+</li>
+<li><p>TTYPath 指定 ForwardToConsole=yes 时所使用的控制台TTY， 默认值是 /dev/console</p>
+</li>
+<li><p>LineMax<br>在将日志流转化为日志记录时，每条日志记录最大允许的长度(字节)。 如果将单元的标准输出(STDOUT)/标准错误(STDERR)通过流套接字连接到日志中， 那么将会以换行符(“\n”, ASCII 10)与NUL字符(“\0”, ASCII 0)作为分割符， 把日志流切分成一条条独立的日志记录。 如果超过此处设置的长度之后仍然没有遇到分割符， 那么将会自动插入一个分割符，以强制将单行超长日志截断为多行。 此选项的值越大，每个日志流客户端日志守护进程占用的内存也越大(最大值等于此选项的值)。 另外，此选项的值太大也会造成与传统日志传输协议的不兼容(太长的日志无法封装在单个 AF_UNIX 或 AF_INET 报文内)。 此选项的值以字节为单位，同时也可以在数字的末尾加上 K, M, G, T 后缀(以1024为基准)。 默认值 48K 是一个足够大并且也能保持与传统日志传输协议兼容的值。 注意， 不能设为小于 79 的值(将被自动提升到79)。</p>
+<h2 id="3-rsyslog配置"><a href="#3-rsyslog配置" class="headerlink" title="3.rsyslog配置"></a>3.rsyslog配置</h2><p>rsyslog目前支持两种语法配置,个人觉得两种都有它的方便性,所以都是混用    </p>
+<h3 id="3-1过滤器"><a href="#3-1过滤器" class="headerlink" title="3.1过滤器"></a>3.1过滤器</h3><p>过滤器有时候被称为选择器（selector），rsyslog可以配置三种形式的过滤器：</p>
+</li>
+<li><p>Facility/Priority-based filter</p>
+</li>
+<li><p>Property-based filter</p>
+</li>
+<li><p>Expression-based filter</p>
+</li>
+</ul>
+<h4 id="3-1-1Facility-Priority-based-过滤器"><a href="#3-1-1Facility-Priority-based-过滤器" class="headerlink" title="3.1.1Facility/Priority-based 过滤器"></a>3.1.1Facility/Priority-based 过滤器</h4><h5 id="Facility"><a href="#Facility" class="headerlink" title="Facility"></a>Facility</h5><table>
+<thead>
+<tr>
+<th>代码</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>kern</td>
+<td>内核</td>
+</tr>
+<tr>
+<td>1</td>
+<td>user</td>
+<td>用户级</td>
+</tr>
+<tr>
+<td>2</td>
+<td>mail</td>
+<td>邮件</td>
+</tr>
+<tr>
+<td>3</td>
+<td>daemon</td>
+<td>系统</td>
+</tr>
+<tr>
+<td>4</td>
+<td>auth</td>
+<td>安全与授权</td>
+</tr>
+<tr>
+<td>5</td>
+<td>syslog</td>
+<td>守护进程</td>
+</tr>
+<tr>
+<td>6</td>
+<td>lpr</td>
+<td>打印相关</td>
+</tr>
+<tr>
+<td>7</td>
+<td>news</td>
+<td>网络消息</td>
+</tr>
+<tr>
+<td>8</td>
+<td>uucp</td>
+<td>uucp子系统</td>
+</tr>
+<tr>
+<td>9</td>
+<td></td>
+<td>时钟</td>
+</tr>
+<tr>
+<td>10</td>
+<td>authpriv</td>
+<td>安全与授权</td>
+</tr>
+<tr>
+<td>11</td>
+<td>ftp</td>
+<td>FTP</td>
+</tr>
+<tr>
+<td>12</td>
+<td>-</td>
+<td>NTP</td>
+</tr>
+<tr>
+<td>13</td>
+<td>-</td>
+<td>日志审计</td>
+</tr>
+<tr>
+<td>14</td>
+<td>-</td>
+<td>日志报警</td>
+</tr>
+<tr>
+<td>15</td>
+<td>cron</td>
+<td>定时器</td>
+</tr>
+<tr>
+<td>16</td>
+<td>local0</td>
+<td>用户自定义</td>
+</tr>
+<tr>
+<td>17</td>
+<td>local1</td>
+<td>用户自定义</td>
+</tr>
+<tr>
+<td>18</td>
+<td>local2</td>
+<td>用户自定义</td>
+</tr>
+<tr>
+<td>19</td>
+<td>local3</td>
+<td>用户自定义</td>
+</tr>
+<tr>
+<td>20</td>
+<td>local4</td>
+<td>用户自定义</td>
+</tr>
+<tr>
+<td>21</td>
+<td>local5</td>
+<td>用户自定义</td>
+</tr>
+<tr>
+<td>22</td>
+<td>local6</td>
+<td>用户自定义</td>
+</tr>
+<tr>
+<td>23</td>
+<td>local7</td>
+<td>用户自定义</td>
+</tr>
+</tbody></table>
+<h5 id="Priority"><a href="#Priority" class="headerlink" title="Priority"></a>Priority</h5><table>
+<thead>
+<tr>
+<th>0</th>
+<th>Emergency</th>
+<th>emerg</th>
+<th>紧急</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Alert</td>
+<td>alert</td>
+<td>报警</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Critical</td>
+<td>crit</td>
+<td>关键</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Error</td>
+<td>err</td>
+<td>错误</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Warning</td>
+<td>warn</td>
+<td>警告</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Notice</td>
+<td>notice</td>
+<td>通知</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Informational</td>
+<td>info</td>
+<td>消息</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Debug</td>
+<td>debug</td>
+<td>调试</td>
+</tr>
+</tbody></table>
+<p>通配符*的意思是任何类型。例如*.* ，即所有的Facility和Priority。<br>举个例子：cron.alert的意思是：cron定期任务所产生的警告日志，任何等于alert或者高于alert等级的日志（crit、err、warning等）都会被指定的动作处理。<br>如果希望只处理定义等级的日志，而不处理高于这个等级的日志，可以使用等号（=），例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">cron.=alert /var/<span class="hljs-built_in">log</span>/cron<br></code></pre></td></tr></table></figure>
+<p>有一些子系统产生的日志可能没有Priority，那么可以使用关键字none，例如</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">news.none /var/<span class="hljs-built_in">log</span>/messages<br></code></pre></td></tr></table></figure>
+<p>除了星号和等号，过滤器中还可以使用逗号（,）和感叹号（!），逗号用于分隔多个Priority，而感叹号的作用是取反，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">cron.!info,!debug /var/<span class="hljs-built_in">log</span>/cron<br></code></pre></td></tr></table></figure>
+<p>意思是除了info和debug等级的日志外，都写入到/var/log/cron中。</p>
+<h4 id="3-1-2Property-based-过滤器"><a href="#3-1-2Property-based-过滤器" class="headerlink" title="3.1.2Property-based 过滤器"></a>3.1.2Property-based 过滤器</h4><p>基于属性的过滤器，使我们可以根据不同的属性值进行日志处理。配置文件中常用的属性有：msg、hostname、fromhost、programname、timegenerated等<br><strong>基本语法：</strong></p>
+<blockquote>
+<p>:PROPERTY,[!]COMPARE_OPERATION,”VALUE”</p>
+</blockquote>
+<p>属性过滤器可用的操作符如下：</p>
+<ul>
+<li>contains 检查属性值是否包含指定的字符串（大小写敏感）</li>
+<li>contains_i 和上面一样，但忽略大小写</li>
+<li>isequal 属性值是否等于目标字符串</li>
+<li>startswith 属性值是否以某字符串开头（大小写敏感）</li>
+<li>startswith_i 如上，但忽略大小写</li>
+<li>regex 正则表达式匹配</li>
+<li>ereregex 使用扩展正则表达式匹配</li>
+<li>isempty 属性值是否为空</li>
+</ul>
+<p><strong>属性过滤器例子：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#日志信息中是否包含“error”字符串</span><br>:msg, contains, <span class="hljs-string">&quot;error&quot;</span> <br><span class="hljs-comment">#主机名称是否相等</span><br>:hostname, isequal, <span class="hljs-string">&quot;host1&quot;</span><br></code></pre></td></tr></table></figure>
+<h4 id="3-1-3Expression-based-过滤器"><a href="#3-1-3Expression-based-过滤器" class="headerlink" title="3.1.3Expression-based 过滤器"></a>3.1.3Expression-based 过滤器</h4><p>基于表达式的过滤器，这个表达式是一个条件表达式，即当满足特定条件的时候，执行指定的操作。<br>一般来说，表达式过滤器需要结合Rsyslogd中的属性来使用。<br>基本语法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-keyword">if</span> expression_true <span class="hljs-keyword">then</span> action <span class="hljs-keyword">else</span> action<br></code></pre></td></tr></table></figure>
+<p>else后续部分并不是必须的，它可以指定不满足条件的时候所执行的操作。<br>表达式中可用的操作符有：</p>
+<ul>
+<li>and、or、not</li>
+<li>==、!=、&lt;&gt;、&lt;、&gt;、&lt;=、&gt;= （!=和&lt;&gt;的作用基本相等）</li>
+<li>contains</li>
+<li>startswith、startswith_i（case-insensitive）</li>
+</ul>
+<p>一些例子：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#日志中包含error，保存到/var/log/errlog中</span><br><span class="hljs-keyword">if</span> <span class="hljs-variable">$msg</span> contains <span class="hljs-string">&#x27;error&#x27;</span> <span class="hljs-keyword">then</span> /var/<span class="hljs-built_in">log</span>/errlog<br><span class="hljs-comment">#如果要同时满足多个条件，使用and连接这些条件，整个表达式需要写在一行中</span><br><span class="hljs-keyword">if</span> <span class="hljs-variable">$syslogfacility</span>-text == <span class="hljs-string">&#x27;local0&#x27;</span> and <span class="hljs-variable">$msg</span> startswith <span class="hljs-string">&#x27;DEVNAME&#x27;</span> and (<span class="hljs-variable">$msg</span> contains <span class="hljs-string">&#x27;error1&#x27;</span> or <span class="hljs-variable">$msg</span> contains <span class="hljs-string">&#x27;error0&#x27;</span>) <span class="hljs-keyword">then</span> /var/<span class="hljs-built_in">log</span>/somelog<br><span class="hljs-keyword">if</span> <span class="hljs-variable">$syslogfacility</span>-text == <span class="hljs-string">&#x27;local0&#x27;</span> and <span class="hljs-variable">$msg</span> startswith <span class="hljs-string">&#x27;DEVNAME&#x27;</span> and not (<span class="hljs-variable">$msg</span> contains <span class="hljs-string">&#x27;error1&#x27;</span> or <span class="hljs-variable">$msg</span> contains <span class="hljs-string">&#x27;error0&#x27;</span>) <span class="hljs-keyword">then</span> /var/<span class="hljs-built_in">log</span>/somelog<br></code></pre></td></tr></table></figure>
+<h3 id="3-1-4动作"><a href="#3-1-4动作" class="headerlink" title="3.1.4动作"></a>3.1.4动作</h3><p>在rsyslog的配置中,过滤器与动作都是一起配置的.rsyslog把日志过滤后分发到各个指定的action.<br>常见的action有:</p>
+<ul>
+<li>写入文件</li>
+<li>转发到另一台服务器</li>
+<li>写入数据库</li>
+<li>丢弃</li>
+<li>发送给用户</li>
+</ul>
+<p>如rsyslog的默认配置:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">auth,authpriv.*	/var/<span class="hljs-built_in">log</span>/auth.log<br>*.*;auth,authpriv.none	-/var/<span class="hljs-built_in">log</span>/syslog<br>cron.*	/var/<span class="hljs-built_in">log</span>/cron.log<br>daemon.*	-/var/<span class="hljs-built_in">log</span>/daemon.log<br>kern.*	-/var/<span class="hljs-built_in">log</span>/kern.log<br>lpr.*	-/var/<span class="hljs-built_in">log</span>/lpr.log<br>mail.*	-/var/<span class="hljs-built_in">log</span>/mail.log<br>user.*	-/var/<span class="hljs-built_in">log</span>/user.log<br><br>*.emerg	:omusrmsg:*<br></code></pre></td></tr></table></figure>
+<p>rsyslog会根据规则写入到各个指定的文件夹,动作前面有一个（-）横杠，表示日志不会马上写入到文件中，而是缓存到内存中，这样可以提高日志系统的性能，但有可能会造成日志的丢失,使用波浪符号（~）处理需要丢弃的日志。<br>而omusrmsg则会把消息转发给指定的用户,用户登录时就可以收到该消息.默认为全部用户,如果需要指定用户则如下编写:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bahs">*.emerg	:omusrmsg:root,so1n<br></code></pre></td></tr></table></figure>
+<h3 id="3-1-5动作-传输日志"><a href="#3-1-5动作-传输日志" class="headerlink" title="3.1.5动作-传输日志"></a>3.1.5动作-传输日志</h3><p><strong>传输方式</strong><br>rsyslog提供三个远程日志传输方式：</p>
+<ul>
+<li>UDP: 数据包传输可信度不高</li>
+</ul>
+<p>基于传统UDP协议进行远程日志传输，也是传统syslog使用的传输协议；<br>可靠性比较低，但性能损耗最少， 在网络情况比较差，<br>或者接收服务器压力比较高情况下，可能存在丢日志情况。<br>在对日志完整性要求不是很高，在可靠的局域网环境下可以使用。</p>
+<ul>
+<li>TCP: 数据包传输可信度比较高 </li>
+</ul>
+<p>基于传统TCP协议明文传输，需要回传进行确认，可靠性比较高；<br>但在接收服务器宕机或者两者之间网络出问题的情况下，会出现丢日志情况。<br>这种协议相比于UDP在可靠性方面已经好很多，并且rsyslog原生支持，配置简单，<br>同时针对可能丢日志情况，可以进行额外配置提高可靠性，因此使用比较广。</p>
+<ul>
+<li>RELP: 数据包传输可信度最高，避免数据丢失，比较新的协议，目前应用较少</li>
+</ul>
+<p>RELP（Reliable Event Logging Protocol）是基于TCP封装的可靠日志消息传输协议；<br>是为了解决TCP 与 UDP 协议的缺点而在应用层实现的传输协议，也是三者之中最可靠的。<br>需要多安装一个包rsyslog-relp以支持该协议。</p>
+<p><strong>客户端配置</strong><br>根据需要打开对应的传输模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># provides UDP syslog reception</span><br>module(load=<span class="hljs-string">&quot;imudp&quot;</span>)<br>input(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;imudp&quot;</span> port=<span class="hljs-string">&quot;514&quot;</span>)<br><br><span class="hljs-comment"># provides TCP syslog reception</span><br>module(load=<span class="hljs-string">&quot;imtcp&quot;</span>)<br>input(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;imtcp&quot;</span> port=<span class="hljs-string">&quot;514&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>在动作那里配上如下格式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">@[(zNUMBER)]HOST:[PORT]<br></code></pre></td></tr></table></figure>
+<p>其中@代表udp,可选值zNUMBER设置了是否允许使用zlib对日志压缩（压缩级别1-9）<br>UDP 在主机名前加”@”<br>TCP 在主机名前加”@@”<br>RELP 在主机名前加”:omrelp:”<br><strong>服务端配置</strong><br>UDP:在服务端创建配置文件：/etc/rsyslog.d/udp.conf</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># server configure</span><br><span class="hljs-variable">$ModLoad</span> imudp <span class="hljs-comment"># 加载模块</span><br><span class="hljs-variable">$UDPServerRun</span> 10514 <span class="hljs-comment"># 指定监听端口</span><br><span class="hljs-variable">$AllowedSender</span> UDP, 10.0.0.0/16 <span class="hljs-comment"># 设置白名单</span><br><br><span class="hljs-comment"># 根据客户端IP存放到不同目录下，以日期命名文件</span><br><span class="hljs-variable">$template</span> location,/data/%fromhost-ip%/%<span class="hljs-variable">$YEAR</span>%-%<span class="hljs-variable">$MONTH</span>%-%<span class="hljs-variable">$DAY</span>%.<span class="hljs-built_in">log</span><br><span class="hljs-comment"># 自定义日志格式</span><br><span class="hljs-variable">$template</span> uformat,<span class="hljs-string">&quot;%fromhost-ip% %msg%\n&quot;</span><br><br><span class="hljs-comment"># 把非本地传输的日志按照指定的文件路径及格式保存</span><br>:fromhost-ip, !isequal, <span class="hljs-string">&quot;127.0.0.1&quot;</span> -?location;uformat<br><span class="hljs-comment"># &amp; 表示已经匹配处理的内容，~ 表示不再进行其他处理</span><br>&amp; ~<br></code></pre></td></tr></table></figure>
+<p>TCP: 服务端配置：/etc/rsyslog.d/tcp.conf</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># server configure</span><br><span class="hljs-variable">$ModLoad</span> imtcp <span class="hljs-comment"># 加载模块</span><br><span class="hljs-variable">$InputTCPServerRun</span> 20514 <span class="hljs-comment"># 指定监听端口</span><br><span class="hljs-variable">$AllowedSender</span> TCP, 10.0.0.0/16 <span class="hljs-comment"># 设置白名单</span><br><span class="hljs-comment"># 根据客户端IP存放到不同目录下，以日期命名文件</span><br><span class="hljs-variable">$template</span> location,<span class="hljs-string">&quot;/data/log/syslog/%fromhost-ip%.log&quot;</span><br><span class="hljs-comment"># 自定义日志格式</span><br><span class="hljs-variable">$template</span> uformat,<span class="hljs-string">&quot;%timestamp% %fromhost-ip% %rawmsg%\n&quot;</span><br><span class="hljs-comment"># 把非本地传输的日志按照指定的文件路径及格式保存</span><br>:fromhost-ip, !isequal, <span class="hljs-string">&quot;127.0.0.1&quot;</span> -?location;uformat<br><span class="hljs-comment"># &amp; 表示已经匹配处理的内容，stop 表示不再进行其他处理</span><br>&amp; stop<br></code></pre></td></tr></table></figure>
+<p>RELP<br>需要先在客户端和服务端安装RELP</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">apt-get update<br>apt-get -y install rsyslog-relp<br></code></pre></td></tr></table></figure>
+<p>客户端需要额外加载模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">module(load=<span class="hljs-string">&quot;omrelp&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>服务端配置（/etc/rsyslog.d/relp.conf）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># server configure</span><br><span class="hljs-variable">$ModLoad</span> imrelp    <span class="hljs-comment"># 加载模块</span><br><span class="hljs-variable">$InputRELPServerRun</span> 30514    <span class="hljs-comment"># 指定监听端口</span><br><span class="hljs-comment"># 根据客户端IP存放到不同目录下，以日期命名文件</span><br><span class="hljs-variable">$template</span> location,<span class="hljs-string">&quot;/data/log/syslog/%fromhost-ip%.log&quot;</span><br><span class="hljs-comment"># 自定义日志格式</span><br><span class="hljs-variable">$template</span> uformat,<span class="hljs-string">&quot;%timestamp% %fromhost-ip% %rawmsg%\n&quot;</span><br><span class="hljs-comment"># 把非本地传输的日志按照指定的文件路径及格式保存</span><br>:fromhost-ip, !isequal, <span class="hljs-string">&quot;127.0.0.1&quot;</span> -?location;uformat<br><span class="hljs-comment"># &amp; 表示已经匹配处理的内容，stop 表示不再进行其他处理</span><br>&amp; stop<br></code></pre></td></tr></table></figure>
+<h4 id="3-1-6模板"><a href="#3-1-6模板" class="headerlink" title="3.1.6模板"></a>3.1.6模板</h4><p>模板 $template， 最主要的一个指令，在 接收端 可用来定义消息格式、文件名。主要是在接收端使用。<br>语法:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$template</span> &lt;name&gt;,&lt;内容&gt;,&lt;可选项&gt;<br><span class="hljs-variable">$template</span> MyTemplateName,<span class="hljs-string">&quot;\7Text %property% some more text\n&quot;</span>,&lt;options&gt;<br></code></pre></td></tr></table></figure>
+<p>默认消息格式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">&lt;接收内容的时间&gt; &lt;发送者的hostname&gt; &lt;<span class="hljs-variable">$InputFileTag</span>&gt; &lt;原始消息%msg%&gt;<br>Dec 18 20:39:27 jumper-172-31-56-18 karltestdemoTag blala... dummy msg<br></code></pre></td></tr></table></figure>
+<p>如果只需要显示原始消息，可设置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$template</span> CleanMsgFormat,<span class="hljs-string">&quot;%msg%\n&quot;</span><br></code></pre></td></tr></table></figure>
+<p>模板支持一些变量,常见变量如下(<a target="_blank" rel="noopener" href="https://www.rsyslog.com/doc/v5-stable/configuration/properties.html">官网文档</a>):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">%msg%<br>%syslogfacility%<br>%HOSTNAME%<br>%syslogpriority%<br>%timereported:::date-mysql%<br>%timegenerated:::date-mysql%<br>%iut%<br><span class="hljs-string">&#x27;%syslogtag%&#x27;</span><br></code></pre></td></tr></table></figure>
+<p>如果要生成动态文件名,并把日志写入该文件,那可以这样配置:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$template</span> DynamicFile,<span class="hljs-string">&quot;/var/log/test_logs/%timegenerated%-test.log&quot;</span>    <span class="hljs-comment"># timegenerated属性从日志信息中提取出消息的时间戳，这样可以为每个日志生成唯一文件名称。</span><br>*.* ?DynamicFile<br></code></pre></td></tr></table></figure>
+<h4 id="3-1-7常用模块"><a href="#3-1-7常用模块" class="headerlink" title="3.1.7常用模块"></a>3.1.7常用模块</h4><p><strong>imfile模块</strong><br>imfile模块主要解决的问题是将非syslog日志转发到远程服务端<br>如日志:/var/log/helloworld.log</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 加载imfile这个模块</span><br>module(load=<span class="hljs-string">&quot;imfile&quot;</span> mode=<span class="hljs-string">&quot;inotify&quot;</span> PollingInterval=<span class="hljs-string">&quot;1&quot;</span>)<br><span class="hljs-comment"># 指定日志文件路径以及tag, severity, facility这些参数</span><br>input(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;imfile&quot;</span> File=<span class="hljs-string">&quot;/var/log/helloworld.log&quot;</span> Tag=<span class="hljs-string">&quot;helloworld&quot;</span> Severity=<span class="hljs-string">&quot;error&quot;</span> Facility=<span class="hljs-string">&quot;local0&quot;</span>)<br><span class="hljs-comment"># 由于local有限,一般可以专门预留一个local用来接受带有Tag的日志,解决local不足的问题</span><br><span class="hljs-comment"># 将helloworld的应用日志发送到远程服务器</span><br>:programname, contains, <span class="hljs-string">&quot;helloworld&quot;</span> @192.168.1.2<br></code></pre></td></tr></table></figure>
+<p>其他imfile配置如下,如果使用input,input的参数基本是以下配置的名称去掉input前缀:<br>更多配置见<a target="_blank" rel="noopener" href="https://www.rsyslog.com/doc/v8-stable/configuration/modules/imfile.html">官网</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$InputFileName</span> /path/to/file <span class="hljs-comment"># 待监控的文件路径</span><br><span class="hljs-variable">$InputFileTag</span> tag <span class="hljs-comment"># 文件唯一标识tag，最好保持唯一，用于接收端区分原始log文件，可以包含特殊字符，如&quot;:&quot;、&quot;,&quot;等 </span><br><span class="hljs-variable">$InputFileStateFile</span> /path/to/state/file<br><span class="hljs-comment"># 需要保证发送端唯一，记录读取到哪儿，状态文件保存在$WorkDirectory，默认为 /var/lib/rsyslog</span><br><span class="hljs-comment"># 如果某个要监控的文件名变化了，一定要重新设置该值</span><br><span class="hljs-variable">$InputFileFacility</span> facility <span class="hljs-comment"># log类型，默认local0， local开头的表示自定义类型</span><br><span class="hljs-variable">$InputFileSeverity</span> severity <span class="hljs-comment"># log级别：info，warning，默认notice</span><br><span class="hljs-variable">$InputRunFileMonitor</span> <span class="hljs-comment"># 启动监控当前的文件，如果忘记这行，则啥事也不会发生</span><br><span class="hljs-variable">$InputFilePollInterval</span> seconds <span class="hljs-comment"># 全局设置，默认轮询是10s</span><br><span class="hljs-variable">$InputFilePersistStateInterval</span> lines <span class="hljs-comment"># 每多少行更新state文件状态 </span><br><span class="hljs-variable">$InputFileMaxLinesAtOnce</span> number <span class="hljs-comment"># 默认10240，如果在发送端，需要同时监控多个文件，会处理完当前文件特定行后，切换到下一个文件，避免一个文件一直占用处理，导致收集别的文件不及时。</span><br><span class="hljs-variable">$InputFileBindRuleset</span> ruleset <span class="hljs-comment"># 绑定ruleset，可以把这个listener绑定到特点的规则(http://www.rsyslog.com/doc/v5-stable/concepts/multi_ruleset.html)</span><br></code></pre></td></tr></table></figure>
+<p>在input的语法中stateFile参数已经不建议使用。原因在于，为了防止出现重复的state files，rsyslog会基于下面的规则自动生成这些文件：</p>
+<ul>
+<li>在具体的被监控文件前添加”imfile-state:”字符串</li>
+<li>文件名前的反斜杠会被替换为短横杠。<br>尽量在文件刚生成时初始化日志,或者使用freshStartTail参数,然rsyslog并不建议使用该参数…</li>
+</ul>
+<p><strong>omprog模块</strong><br>omprog模块可以让日志通过管道的形式发送给程序(以每行日志分开发送),然后再由程序处理日志,以下是官网的一个例子:<br>日志被发送到Python程序的stdin,python程序将它们写入数据库.<br>执行配置的程序，并通过stdin将日志消息馈送到该二进制文件。二进制文件可以随意处理提供的数据。如果程序终止，则重新启动。如果rsyslog终止，则程序的stdin将看到EOF。然后该程序必须终止。<br>该模块会执行Python程序,并通过stdin的形式发送到Python,Python会一直运行,等待数据的到来,如果收到数据则处理数据(这个例子是写入数据库), 如果程序终止,则重新启动,如果rsyslo终止,则程序的stdin会捕获到EOF,此时程序会终止.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 配置</span><br>module(load=<span class="hljs-string">&quot;omprog&quot;</span>)<br><br>action(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;omprog&quot;</span><br>       name=<span class="hljs-string">&quot;db_forward&quot;</span><br>       binary=<span class="hljs-string">&quot;/usr/share/logging/db_forward.py&quot;</span><br>       confirmMessages=<span class="hljs-string">&quot;on&quot;</span>  <span class="hljs-comment"># 它告诉rsyslog等待程序确认其初始化以及收到的每条消息。该设置的目的是防止由于数据库连接失败而导致日志丢失。如果程序无法将日志写入数据库，它将通过stdout向rsyslog返回否定确认</span><br>       confirmTimeout=<span class="hljs-string">&quot;30000&quot;</span>  <span class="hljs-comment"># 指定超时时间内未收到程序的响应，则rsyslog将终止并重新启动它</span><br>       queue.type=<span class="hljs-string">&quot;LinkedList&quot;</span><br>       queue.saveOnShutdown=<span class="hljs-string">&quot;on&quot;</span><br>       queue.workerThreads=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-comment"># 使用具有（最多）5个工作线程的专用磁盘辅助队列，以避免在高负载时影响其他日志目标</span><br>       action.resumeInterval=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-comment"># Rsyslog将失败的日志保留在队列中，并在5秒后再次将其发送给程序。</span><br>       killUnresponsive=<span class="hljs-string">&quot;on&quot;</span><br>       output=<span class="hljs-string">&quot;/var/log/db_forward.log&quot;</span>  <span class="hljs-comment"># 程序将错误详细信息写入stderr,rsyslog捕获并写入/var/log/db_forward.log</span><br>)<br></code></pre></td></tr></table></figure>
+<p>除了使用模块接收日志,还可以用程序读取日志(建议用上inotify),或者开个端口接收日志</p>
+<h4 id="3-1-8RainerScript"><a href="#3-1-8RainerScript" class="headerlink" title="3.1.8RainerScript"></a>3.1.8RainerScript</h4><p>RainerScript是一个比较新的配置语言,RainerScript具有更紧凑的语法，使配置过程更加清晰，更不容易出错。</p>
+<ul>
+<li><p>加载模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 旧语法</span><br><span class="hljs-variable">$ModLoad</span> imtcp<br><span class="hljs-comment"># 新语法</span><br>module(load=<span class="hljs-string">&quot;imtcp&quot;</span>)<br></code></pre></td></tr></table></figure></li>
+<li><p>input<br>上面已经有使用imfile的例子了,这里就不多阐述</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 旧语法</span><br><span class="hljs-variable">$ModLoad</span> imfile <span class="hljs-comment">#导入模块</span><br><span class="hljs-variable">$InputFileName</span> /var/<span class="hljs-built_in">log</span>/nginx/access.log <span class="hljs-comment">#需要导入的文件</span><br><span class="hljs-variable">$InputFileTag</span> ng-acc <span class="hljs-comment">#添加标签名称</span><br><span class="hljs-variable">$InputFilePersistStateInterval</span> 10 <span class="hljs-comment">#多久处理一次追踪文件</span><br><span class="hljs-variable">$InputFileStateFile</span> state-ng-acc<br><span class="hljs-variable">$InputRunFileMonitor</span> <span class="hljs-comment">#开始监控文件</span><br><span class="hljs-comment"># 新语法</span><br>module(load=<span class="hljs-string">&quot;builtin:imfile&quot;</span>)<br>input(Type=<span class="hljs-string">&quot;imfile&quot;</span> File=<span class="hljs-string">&quot;/var/log/nginx/access.log&quot;</span> Tag=<span class="hljs-string">&quot;ng-acc&quot;</span>PersistStateInterval=10)<br></code></pre></td></tr></table></figure></li>
+<li><p>action<br>action是输出模块,包括了结构图里的action和队列</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 旧语法</span><br>*.* /var/<span class="hljs-built_in">log</span>/messages<br><span class="hljs-comment"># 新语法</span><br>*.* action(Type=<span class="hljs-string">&quot;omfile&quot;</span> File=<span class="hljs-string">&quot;/var/log/messages&quot;</span>)<br><span class="hljs-comment"># 包含队列的新语法</span><br>action(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;ommysql&quot;</span> server=<span class="hljs-string">&quot;localhost&quot;</span> db=<span class="hljs-string">&quot;Syslog&quot;</span> uid=<span class="hljs-string">&quot;root&quot;</span> <span class="hljs-built_in">pwd</span>=<span class="hljs-string">&quot;password&quot;</span>\<br>queue.type=<span class="hljs-string">&quot;LinkedList&quot;</span> queue.filename=<span class="hljs-string">&quot;name&quot;</span> queue.saveonshutdown=<span class="hljs-string">&quot;on&quot;</span>\<br>action.resumeRetryCount=<span class="hljs-string">&quot;-1&quot;</span><br></code></pre></td></tr></table></figure></li>
+<li><p>template<br>新的template对象提供了两种常用的模板定义方式，一种是string，另一种是list。string方式比较接近旧template的定义方式，而list方式可以更清晰的区分字符串和属性值。不过我比较喜欢的是string方式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 旧语法</span><br><span class="hljs-variable">$template</span> remote, <span class="hljs-string">&quot;message from %hostname%, received at %timegenerated%.&quot;</span><br><span class="hljs-comment"># 新语法string</span><br>template(namme=<span class="hljs-string">&quot;remote&quot;</span> <span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;string&quot;</span> string=<span class="hljs-string">&quot;message from %hostname%, received at %timegenerated%.&quot;</span>)<br><span class="hljs-comment"># 新语法list</span><br><span class="hljs-comment"># constant用于定义字面字符串值，而property用于定义实际的属性</span><br>template(name=<span class="hljs-string">&quot;dbFormat&quot;</span> <span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;list&quot;</span> option.sql=<span class="hljs-string">&quot;on&quot;</span>) &#123;<br>    constant(value=<span class="hljs-string">&quot;insert into SystemEvents (Message, FromHost,ReceivedAt)&quot;</span>)<br>    constant(value=<span class="hljs-string">&quot; values (&#x27;&quot;</span>)<br>    property(name=<span class="hljs-string">&quot;msg&quot;</span>)<br>    constant(value=<span class="hljs-string">&quot;, &#x27;&quot;</span>)<br>    property(name=<span class="hljs-string">&quot;hostname&quot;</span>)<br>    constant(value=<span class="hljs-string">&quot;&#x27;, &#x27;&quot;</span>)<br>    property(name=<span class="hljs-string">&quot;timegenerated&quot;</span> dateFormat=<span class="hljs-string">&quot;mysql&quot;</span>)<br>    constant(value=<span class="hljs-string">&quot;&#x27;)&quot;</span>)<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>ruleset<br>ruleset推荐用新的语法,比原来的清晰了很多</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 旧语法</span><br><span class="hljs-variable">$Ruleset</span> remote<br>mail.none /var/<span class="hljs-built_in">log</span>/mail.log<br>cron.none /var/<span class="hljs-built_in">log</span>/cron.log<br> <br><span class="hljs-variable">$ModLoad</span> imtcp<br><span class="hljs-variable">$InputTCPBindRuleset</span> remote<br><span class="hljs-variable">$InputTCPServerRun</span> 514<br><span class="hljs-comment"># 新语法</span><br>ruleset(name=<span class="hljs-string">&quot;remote-514&quot;</span>) &#123;<br>cron.none action(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;omfile&quot;</span> file=<span class="hljs-string">&quot;/var/log/remote-514-cron&quot;</span>)<br>mail.none action(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;omfile&quot;</span> file=<span class="hljs-string">&quot;/var/log/remote-514-mail&quot;</span>)<br>&#125;<br> <br>input(<span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;imtcp&quot;</span> port=<span class="hljs-string">&quot;514&quot;</span> ruleset=<span class="hljs-string">&quot;remote-514&quot;</span>);<br></code></pre></td></tr></table></figure>
+<h3 id="3-2-各个日志文件简介"><a href="#3-2-各个日志文件简介" class="headerlink" title="3.2 各个日志文件简介"></a>3.2 各个日志文件简介</h3></li>
+<li><p>/var/log/secure：记录用户登陆系统的信息，比如SSH，telnet，ftp等记录</p>
+</li>
+<li><p>/var/log/btmp：记录登陆失败的信息，被编码过，所以必须使用last解析</p>
+</li>
+<li><p>/var/log/messages：在开机运行中几乎所有的系统发生的错误都在此记录。</p>
+</li>
+<li><p>/var/log/boot.log：记录一些开机或者关机启动的一些服务信息</p>
+</li>
+<li><p>/var/log/cron：用来记录crontab这个服务执行任务计划产生的日志</p>
+</li>
+<li><p>/var/log/utmp：记录现在登陆的用户</p>
+</li>
+<li><p>/var/log/dmesg：内核日志</p>
+</li>
+<li><p>/var/log/kern：内核产生的信息</p>
+</li>
+<li><p>/var/log/daemon.log：系统监控程序产生的日志。</p>
+</li>
+</ul>
+<h3 id="3-3队列"><a href="#3-3队列" class="headerlink" title="3.3队列"></a>3.3队列</h3><p>rsyslog是我们在使用中最无感,通常也是最重要的,因为队列可以加速日志的传输,还会让传输更加可靠,内容大多数来源于<a target="_blank" rel="noopener" href="https://www.rsyslog.com/doc/master/concepts/queues.html">官方文档</a></p>
+<h4 id="3-3-1主队列"><a href="#3-3-1主队列" class="headerlink" title="3.3.1主队列"></a>3.3.1主队列</h4><p>一般日志进来到rsyslog时,都会先进入主队列,然后根据配置消费日志分发到各个队列以及执行动作,一般主队列的鲁棒性很强,我们一般都不会去修改他,而是去修改动作队列<br>使用下面命令可以告诉主消息队列在关闭时保存其内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$MainMsgQueueSaveOnShutdown</span> on<br></code></pre></td></tr></table></figure>
+<h4 id="3-3-2动作队列"><a href="#3-3-2动作队列" class="headerlink" title="3.3.2动作队列"></a>3.3.2动作队列</h4><p>动作队列用于接受主队列的消息,并根据规则执行动作,一般有以下4种:</p>
+<ul>
+<li><p>Direct queue<br>该队列是默认队列,如果对action没进行配置,则默认采用该队列,该队列既不排队也不缓冲任何队列消息,直接消息传给消费者.同时,该队列是唯一一个会把执行结果从消费者（action processor）返回给生产者的队列。action processor,通过这个返回值提醒action queue，让action queue取回这些处理失败的消息，如此循环，直到消息处理成功。</p>
+</li>
+<li><p>Disk queue<br>该队列使用硬盘进行缓冲,而不在内存中缓冲任何内容。因此该队列是超级可靠的，但到也是最慢的队列。正常情况下，不建议使用此队列模式。如果日志数据非常重要，为了确保在极端情况下也不能丢失，可以使用该队列。<br>写入该队列时，它是分块完成的。每个块接收其各自的文件。文件以前缀命名（通过$<object>QueueFilename设置），后跟7位数字（从1开始，每个文件递增）。默认情况下，块为10mb，可通过$<object>QueueMaxFileSize设置不同的大小。不过，大小限制不是一个很严格的限制,因为rsyslog总是写一个完整的队列条目，即使它会比大小限制还大。因此，块实际上比配置的大小大一点（通常小于1k）。所以，每个块的大小都会不一样。<br>每一个队列可以使用不同的位置保存数据，通过$WorkDirectory指令设置，这个指令要在队列创建之前配置。</p>
+</li>
+</ul>
+<ul>
+<li><p>memory queue （LinkedList/FixedArray）<br>这种类型的队列把所有的消息都保存在内存中，因此它的处理速度非常快，缺点是当电脑关闭或死机的时候，所有未被处理的消息都会丢失。如果希望电脑关机的时候保存这些消息，可以设置$<Object>QueueSaveOnShutdown<br>memory queue带有两种模式,如果不知道用哪个模式,建议使用LinkedList模式。因为它与FixedArray相比，处理开销较低，并且可以通过减少内存使用量来弥补。在大多数不使用的指针数组页面中分页可能比动态分配它们慢得多。<br>分别使用/$<object>QueueType LinkedList or  /$<object>QueueType FixedArray创建 LinkedLIst和FixesArray队列</p>
+<ul>
+<li>FixedArray queue 预先分配一定的内存来保存这些消息，它的缺点是，无论你的日志有多少，它都需要完全占用这些内存；好处是当数据量不大的时候，它的性能是最好的。</li>
+<li>LinkedList queue 内存是运行时分配的，会根据数据量的不同而作出调整，好处是内存利用率高，LinkedList队列适合使用在一些突发数据量大的场景。</li>
+</ul>
+</li>
+<li><p>Disk-Assisted In-memory queue<br>这种队列实际上是以内存队列为主，Disk Queue为辅的队列。在正常情况下，不会使用辅助的Disk queue，但当内存队列被填满，或者主机关闭的时候，Disk Queue就会被激活，数据被写入硬盘。结合两者使用，可以同时满足速度和数据的可靠性。<br>设置队列的语法如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$ActionQueueType</span> LinkedList<br><span class="hljs-variable">$ActionQueueFileName</span> fileName<br><br><span class="hljs-comment">#还有另外两个参数设置</span><br>$&lt;Object&gt;QueueHighWatermark  <span class="hljs-comment">#当队列中的数据超过这个设置的值的时候，要么把数据保存，要么把数据丢弃，如果是Disk-Assisted In-memory Queue，队列中的数据超过这个值，Disk Queue就会被激活。</span><br>$&lt;Object&gt;QueueLowWatermark  <span class="hljs-comment">#和上面的相反，这是一个低水位设置，当数据小于这个值的时候，就停止相关的操作，如果是Disk-Assisted In-memory Queue，数据低于这个值，Disk Queue就会被取消激活状态。</span><br></code></pre></td></tr></table></figure>
+<h4 id="3-3-3队列管理"><a href="#3-3-3队列管理" class="headerlink" title="3.3.3队列管理"></a>3.3.3队列管理</h4><p>队列的管理过程实际上是对队列的参数进行调优的过程。main message queue的参数和action queue的参数基本一样。这些参数必须在队列创建之后才能使用，每个不同的队列可以设置不同的数值，这些值在下一个队列创建之前被重置，前一个队列设置的值不会影响到下一个队列。</p>
+</li>
+<li><p>限制队列容量</p>
+<ul>
+<li>$<Object>QueueSize <number></li>
+<li>$<Object>QueueHighWaterMark <number><br>两者之间有细微的差别 $<Object>QueueSize用于设置队列的总容量，即队列可容纳的消息数量。<br>而$<Object>QueueHighWaterMark只用于disk-assisted类型的队列，当队列中的消息数量达到这个值之后，消息就会被写入到硬盘。但是这种行为是有依赖性的，仅当日志的输出目标无法到达的时候（数据库无法访问，远程服务器离线等），它才会发生。</li>
+</ul>
+</li>
+<li><p>丢弃消息</p>
+<ul>
+<li>$<Object>QueueDiscardMark     设置队列的最高值,当队列中的消息达到这个指定的值时，消息就会被丢弃</li>
+<li>$<Object>QueueDiscardSeverity  设定要丢弃哪些日志消息(见rsyslog的 Priority)</li>
+</ul>
+</li>
+<li><p>队列的终止<br>只有在系统被关闭的那一刻，队列才会被结束。当队列被终止的时候，队列中可能有数据尝试进入,rsyslog会试图处理这些数据,可以使用配置控制rsyslog的做法.</p>
+<ul>
+<li>$<Object>QueueTimeoutShutdown <milliseconds>  队列会仍然去处理这些数据,当队列关闭时间超过这个值，队列中的所有数据被丢弃</li>
+<li>$<Object>QueueTimeoutActionCompletion 只处理当前被处理的消息,其他的消息全部被抛弃</li>
+<li>$<Object>QueueSaveOnShutdown 不丢弃任何消息且队列是Disk-Queue或者Disk-assisted-Queue  <h3 id="3-4Ruleset"><a href="#3-4Ruleset" class="headerlink" title="3.4Ruleset"></a>3.4Ruleset</h3>Ruleset就是多个规则的集合，rsyslogd从ruleset的第一条规则开始处理，直到这个ruleset的最后一条规则。rsyslogd有一个默认的Ruleset，名为RSYSLOG_DefaultRuleset。<br>一个例子:<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$template</span> Centos7Server,<span class="hljs-string">&quot;/var/log/%hostname%/messages-%<span class="hljs-variable">$now</span>%.log&quot;</span><br><span class="hljs-variable">$RuleSet</span> remote<br>*.* ?Centos7Server<br> <br><span class="hljs-variable">$RuleSet</span> RSYSLOG_DefaultRuleset<br></code></pre></td></tr></table></figure>
+这个例子先创建了一个名叫remote的Ruleset，规则中使用了一个预先定义的模板。最后切换回默认的Ruleset，不切换回去的话,后面的配置就还是remote Ruleset<br>多个Ruleset的使用场景在于区分本地写日志和网络传日志.<br>本地通过$DefaultRuleset命令指定Ruleset,而网络日志绑定可以如下:<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$ModLoad</span> imtcp<br><span class="hljs-variable">$InputTCPServerBindRuleset</span> remote <span class="hljs-comment">#绑定自定以的Ruleset</span><br><span class="hljs-variable">$InputTCPServerRun</span> 514<br></code></pre></td></tr></table></figure>
+这时走TCP的日志就会使用remote Rules,如果是正常启用TCP传输日志,那么会走DefaultRuleset指定的ruleset,因为没有使用InputTCPServerBindRuleset去覆盖Ruleset.<br>如果有多个端口传输日志,每个端口的ruleset不同,那可以利用InputTCPServerBindRuleset 的覆盖性进行如下配置:<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$InputTCPServerBindRuleset</span> remote10001<br><span class="hljs-variable">$InputTCPServerRun</span> 10001<br> <br><span class="hljs-variable">$InputTCPServerBindRuleset</span> remote10002<br><span class="hljs-variable">$InputTCPServerRun</span> 10002<br> <br><span class="hljs-variable">$InputTCPServerBindRuleset</span> remote10003<br><span class="hljs-variable">$InputTCPServerRun</span> 10003<br></code></pre></td></tr></table></figure>
+<h2 id="4-日志轮转"><a href="#4-日志轮转" class="headerlink" title="4.日志轮转"></a>4.日志轮转</h2>在查看日志时我们很容易就发现出现syslog syslog.1 syslog.2.gz等类型的日志,这些日志都是考logrotate进行日志轮转的,方便我们对日志进行查找和管理<br>Logrotate是基于CRON来运行的，其脚本是/etc/cron.daily/logrotate，日志轮转是系统自动完成的。<br>使用logrotate不止是针对系统日志,还可以使一些应用本身不带日志轮转功能,或者本身日志轮换功能残缺的应用(对就是说Supervisor)拥有完善,高自定义的日志轮转功能.<br>实际运行时，Logrotate会调用配置文件/etc/logrotate.conf。<br>可以在/etc/logrotate.d目录里放置自定义好的配置文件，用来覆盖Logrotate的缺省值。<br>我们也可以手动执行日志轮转,不过要记得添加-f参数,表示强制轮转,手动运行最好添加-d参数 测试配置文件是否有错误,常用参数如下:<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">logrotate [OPTION...] &lt;configfile&gt;<br>-d, --debug ：debug模式，测试配置文件是否有错误。<br>-f, --force ：强制转储文件。<br>-m, --mail=<span class="hljs-built_in">command</span> ：压缩日志后，发送日志到指定邮箱。<br>-s, --state=statefile ：使用指定的状态文件。<br>-v, --verbose ：显示转储过程。<br></code></pre></td></tr></table></figure>
+logrotate的原理是检查日志是否需要轮转,在轮转后对进程进行重启(一般是发送信号量),确保进程能写入到新的文件,<br>一般来说,我们只要在/etc/logrotate.d/目录下配置针对某个日志的日志文件轮转配置就可以了,配置主要是声明要轮换的日志文件路径以及花括号内配置轮转属性,以nginx为例子:<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs bash">/usr/<span class="hljs-built_in">local</span>/nginx/logs/*<span class="hljs-built_in">log</span> &#123;<br>    daily<br>    <span class="hljs-comment"># 每天转储</span><br>    rotate 30<br>    <span class="hljs-comment"># 保存30个备份</span><br>    missingok<br>    <span class="hljs-comment"># 在日志转储期间,任何错误将被忽略</span><br>    notifempty<br>    <span class="hljs-comment"># 文件为空时不转储</span><br>    compress<br>    <span class="hljs-comment"># 通过 gzip 压缩</span><br>    dateext<br>    <span class="hljs-comment"># 日志文件以当前日期为格式结尾</span><br>    sharedscripts<br>    <span class="hljs-comment"># 所有日志文件转储完毕后执行一次脚本</span><br>    postrotate<br>    <span class="hljs-comment"># 转储之后执行命令，和endscript成对使用</span><br>        /bin/<span class="hljs-built_in">kill</span> -USR1 \$(cat /usr/<span class="hljs-built_in">local</span>/nginx/logs/nginx.pid 2&gt;/dev/null) 2&gt;/dev/null || :<br>    endscript<br>    <span class="hljs-comment"># 转储之后执行命令，和postrotate成对使用</span><br>&#125;<br></code></pre></td></tr></table></figure>
+rsyslog控制的日志比较多,可以像以下这样配置,多个日志文件多行显示,并同样的用花括号把配置包起来<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash">/var/<span class="hljs-built_in">log</span>/mail<br>/var/<span class="hljs-built_in">log</span>/messages<br>/var/<span class="hljs-built_in">log</span>/syslog<br>&#123;<br>        sharedscripts<br>        dateext<br>        rotate 25<br>        size 40M<br>        compress<br>        dateformat -%Y%m%d%s<br>        postrotate<br>                /bin/<span class="hljs-built_in">kill</span> -HUP `cat /var/run/syslogd.pid 2&gt; /dev/null` 2&gt; /dev/null || <span class="hljs-literal">true</span><br>        endscript<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="4-1logrotate参数"><a href="#4-1logrotate参数" class="headerlink" title="4.1logrotate参数"></a>4.1logrotate参数</h3>logrotate的主要使用也是以配置为主,没啥好说的,需要注意一些配置,多打日志,不然logrotate会以文件太小或者时间间隔比较低(如配置1天轮转一次,logrotate首次轮转可能要间隔两天)而不进行轮转<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dateext</td>
+<td>切换后的日志文件会附加上一个短横线和YYYYMMDD格式的日期，没有这个配置项会附加一个小数点加一个数字序号.</td>
+</tr>
+<tr>
+<td>dateformat</td>
+<td>配合dateext使用可以为切割后的日志加上YYYYMMDD格式的日期，如dateformat -%Y%m%d</td>
+</tr>
+<tr>
+<td>compress</td>
+<td>通过gzip 压缩转储以后的日志</td>
+</tr>
+<tr>
+<td>nocompress</td>
+<td>不需要压缩时，用这个参数</td>
+</tr>
+<tr>
+<td>copytruncate</td>
+<td>用于还在打开中的日志文件，把当前日志备份并截断</td>
+</tr>
+<tr>
+<td>nocopytruncate</td>
+<td>备份日志文件但是不截断</td>
+</tr>
+<tr>
+<td>create mode owner group</td>
+<td>转储文件，使用指定的文件模式创建新的日志文件</td>
+</tr>
+<tr>
+<td>nocreate</td>
+<td>不建立新的日志文件</td>
+</tr>
+<tr>
+<td>delaycompress</td>
+<td>一起使用时，转储的日志文件到下一次转储时才压缩</td>
+</tr>
+<tr>
+<td>nodelaycompress</td>
+<td>覆盖 delaycompress 选项，转储同时压缩。</td>
+</tr>
+<tr>
+<td>errors address</td>
+<td>专储时的错误信息发送到指定的Email 地址</td>
+</tr>
+<tr>
+<td>ifempty</td>
+<td>即使是空文件也转储，这个是 logrotate 的缺省选项。</td>
+</tr>
+<tr>
+<td>notifempty</td>
+<td>如果是空文件的话，不转储</td>
+</tr>
+<tr>
+<td>mail address</td>
+<td>把转储的日志文件发送到指定的E-mail 地址</td>
+</tr>
+<tr>
+<td>nomail</td>
+<td>转储时不发送日志文件</td>
+</tr>
+<tr>
+<td>olddir directory</td>
+<td>转储后的日志文件放入指定的目录，必须和当前日志文件在同一个文件系统</td>
+</tr>
+<tr>
+<td>noolddir</td>
+<td>转储后的日志文件和当前日志文件放在同一个目录下</td>
+</tr>
+<tr>
+<td>sharedscripts</td>
+<td>运行postrotate脚本，作用是在所有日志都轮转后统一执行一次脚本。如果没有配置这个，那么每个日志轮转后都会执行一次脚本</td>
+</tr>
+<tr>
+<td>prerotate/endscript</td>
+<td>在转储以前需要执行的命令可以放入这个对，这两个关键字必须单独成行</td>
+</tr>
+<tr>
+<td>postrotate/endscript</td>
+<td>在转储以后需要执行的命令可以放入这个对，这两个关键字必须单独成行</td>
+</tr>
+<tr>
+<td>daily</td>
+<td>指定转储周期为每天</td>
+</tr>
+<tr>
+<td>weekly</td>
+<td>指定转储周期为每周</td>
+</tr>
+<tr>
+<td>monthly</td>
+<td>指定转储周期为每月</td>
+</tr>
+<tr>
+<td>rotate count</td>
+<td>指定日志文件删除之前转储的次数，0 指没有备份，5 指保留5 个备份</td>
+</tr>
+<tr>
+<td>tabootext [+] list</td>
+<td>让logrotate 不转储指定扩展名的文件，缺省的扩展名是：.rpm-orig, .rpmsave, v, 和 ~</td>
+</tr>
+<tr>
+<td>size size</td>
+<td>当日志文件到达指定的大小时才转储，后缀MB.</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-一些常见坑"><a href="#5-一些常见坑" class="headerlink" title="5.一些常见坑"></a>5.一些常见坑</h2><ul>
+<li>log太长了,被截断<br>被$MaxMessageSize限制的,它的默认大小是2k，大概可以保存1000个中文字符,在加载imtcp/imudp之前设置， 此配置包括发送和接收，所以rsyslog客户端、服务端都要设置</li>
+<li>一行日志消息大小大于4K,只能用TCP。这是因为UDP栈大小限制的。</li>
+<li>某个系统日志文件过大<br>像用debian的话,可以看到/var/log/syslog会随着你的配置,里面的东西越来越多,主要要对该行默认配置进行修改,不然所有日志都会发送到这里了(以定义了local5,6为例子)<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">*.info;mail.none;authpriv.none;cron.none /var/<span class="hljs-built_in">log</span>/syslog<br>*.info;mail.none;authpriv.none;cron.none;local5.none;local6.none /var/<span class="hljs-built_in">log</span>/messages<br></code></pre></td></tr></table></figure></li>
+<li>接收端保存的文件路径不对<br>如果两个tag有共同的前缀，需要把长的放在前面，调整好顺序<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># For erp_wms</span><br><span class="hljs-variable">$template</span> erp_wms_FileFormat,<span class="hljs-string">&quot;/Data/logs/erp/wms/%fromhost-ip%/%syslogtag:F,44:2%-%<span class="hljs-variable">$YEAR</span>%%<span class="hljs-variable">$MONTH</span>%%<span class="hljs-variable">$DAY</span>%.log&quot;</span><br><span class="hljs-keyword">if</span> <span class="hljs-variable">$syslogtag</span> startswith <span class="hljs-string">&#x27;erp_wms&#x27;</span> <span class="hljs-keyword">then</span> ?erp_wms_FileFormat;CleanMsgFormat<br>&amp; ~<br> <br><span class="hljs-comment"># For erp_wms3</span><br><span class="hljs-variable">$template</span> erp_wms3_FileFormat,<span class="hljs-string">&quot;/Data/logs/erp/wms3/%fromhost-ip%/%syslogtag:F,44:2%-%<span class="hljs-variable">$YEAR</span>%%<span class="hljs-variable">$MONTH</span>%%<span class="hljs-variable">$DAY</span>%.log&quot;</span><br><span class="hljs-keyword">if</span> <span class="hljs-variable">$syslogtag</span> startswith <span class="hljs-string">&#x27;erp_wms3&#x27;</span> <span class="hljs-keyword">then</span> ?erp_wms3_FileFormat;CleanMsgFormat<br>&amp; ~<br></code></pre></td></tr></table></figure>
+修改后<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 这里注意下面的tag的顺序， 一定要让长的tag（erp_wms3）保持在上面，因为他们有共同的前缀(erp_wms)</span><br><span class="hljs-comment"># For erp_wms3</span><br><span class="hljs-variable">$template</span> erp_wms3_FileFormat,<span class="hljs-string">&quot;/Data/logs/erp/wms3/%fromhost-ip%/%syslogtag:F,44:2%-%<span class="hljs-variable">$YEAR</span>%%<span class="hljs-variable">$MONTH</span>%%<span class="hljs-variable">$DAY</span>%.log&quot;</span><br><span class="hljs-keyword">if</span> <span class="hljs-variable">$syslogtag</span> startswith <span class="hljs-string">&#x27;erp_wms3&#x27;</span> <span class="hljs-keyword">then</span> ?erp_wms3_FileFormat;CleanMsgFormat<br>&amp; ~<br> <br><span class="hljs-comment"># For erp_wms</span><br><span class="hljs-variable">$template</span> erp_wms_FileFormat,<span class="hljs-string">&quot;/Data/logs/erp/wms/%fromhost-ip%/%syslogtag:F,44:2%-%<span class="hljs-variable">$YEAR</span>%%<span class="hljs-variable">$MONTH</span>%%<span class="hljs-variable">$DAY</span>%.log&quot;</span><br><span class="hljs-keyword">if</span> <span class="hljs-variable">$syslogtag</span> startswith <span class="hljs-string">&#x27;erp_wms&#x27;</span> <span class="hljs-keyword">then</span> ?erp_wms_FileFormat;CleanMsgFormat<br>&amp; ~<br></code></pre></td></tr></table></figure></li>
+<li>接收端 rsyslog 文件名太长后被截断<br>由于发送端默认配置<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">template (name=<span class="hljs-string">&quot;ForwardFormat&quot;</span> <span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;string&quot;</span> string=<span class="hljs-string">&quot;&lt;%PRI%&gt;%TIMESTAMP:::date-rfc3339% %HOSTNAME%</span><br><span class="hljs-string">%syslogtag:1:32%%msg:::sp-if-no-1st-sp%%msg%&quot;</span>)<br></code></pre></td></tr></table></figure>
+中的   %syslogtag:1:32%限制了文件名长度,所以需要发送端重新绑定到一个新的模板<h2 id="6-常见rsyslog不记日志问题"><a href="#6-常见rsyslog不记日志问题" class="headerlink" title="6.常见rsyslog不记日志问题"></a>6.常见rsyslog不记日志问题</h2></li>
+<li>1.OOM kernel不能及时释放cache满足应用程序的突发内存需求的情况</li>
+<li>2.系统内存严重不够或者Rsyslog限制了它将在内存中保留的消息数量.如果该消息大于系统中的内存，则需要调整它。要么给机器更多内存，要么将rsyslog配置为更小的队列大小。</li>
+<li>3.回车控制符(来源于网络,没遇到过)<br>有可能是由于某用户的debug或者info log中，包含了回车控制符\n，而我们rsyslog client段的配置文件中EscapeControlCharactersOnReceive是off的，即不对控制符做转义，所以含有\n控制符的log被发送给了rsyslog center。而rsyslog center是根据回车控制符\n来判断是不是一条log的。如果用户的log中包含类似字段：GET /123/id=123&amp;\n90887294–sdf，那么rsyslog会把”GET /123/id=123&amp;“当作一条log，而把90887294作为下一条message的长度，并且会有刚才的Framing Error的报错。rsyslog会等待接收90887294byte的数据，然后判断大于了MaxMessageSize 4KB，然后rsyslog就只保存了从90887294开始之后的4KB日志，剩下的90887294 - 4*1024= 90883198byte的数据全被截断丢弃。这就有了received oversize message的报错。<br>解决办法：<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs vim">issues：http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/rsyslog/rsyslog/issues/<span class="hljs-number">111</span><br><span class="hljs-number">1</span>,开启rsyslog client的EscapeControlCharactersOnReceive为<span class="hljs-keyword">on</span>状态。对回车控制符进行转义，即可避免此问题<br>影响：把用户<span class="hljs-built_in">log</span>中的\n转换成了以#开头的三位八进制数#<span class="hljs-number">012</span>。（根基<span class="hljs-keyword">ascii</span>表转换）<br><span class="hljs-number">2</span>,关闭rsyslog <span class="hljs-keyword">center</span>的SupportOctetCountedFraming为off状态。即不支持Octet数据流。<br>影响：当用户<span class="hljs-built_in">log</span>中有\n的时候，<span class="hljs-built_in">log</span>会被截断。<br></code></pre></td></tr></table></figure></li>
+<li>4.rsyslog 性能跟不上导致丢日志，需要进行调优如对rsyslog的main queue和action queue进行调优<h2 id="7-附录A-用python发送日志到syslog"><a href="#7-附录A-用python发送日志到syslog" class="headerlink" title="7.附录A:用python发送日志到syslog"></a>7.附录A:用python发送日志到syslog</h2>python的logging模块也兼容Linux的日志机制只需要对logger更改就可以把日志发向/dev/log/从而被rsyslog捕获到日志<br>示例代码<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python">logger = logging.getLogger(<span class="hljs-string">&#x27;exp&#x27;</span>)<br>logger.setLevel(logging.INFO)<br>filehandler = logging.FileHandler(os.environ[<span class="hljs-string">&#x27;HOME&#x27;</span>] + <span class="hljs-string">&#x27;/exp.log&#x27;</span>, encoding=<span class="hljs-string">&#x27;utf8&#x27;</span>)<br>filehandler.setFormatter(logging.Formatter(<span class="hljs-string">&quot;%(asctime)s - %(levelname)s - %(message)s&quot;</span>))<br>logger.addHandler(filehandler)<br></code></pre></td></tr></table></figure>
+改为下面代码即可<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python">logger = logging.getLogger(<span class="hljs-string">&#x27;exp&#x27;</span>)<br>logger.setLevel(logging.INFO)<br>sys_handler = logging.handlers.SysLogHandler(<span class="hljs-string">&#x27;/dev/log&#x27;</span>, facility=logging.handlers.SysLogHandler.LOG_LOCAL0)<br>sys_handler.setFormatter(logging.Formatter(<span class="hljs-string">&#x27;exp_log&#x27;</span> + <span class="hljs-string">&quot;:%(asctime)s - %(name)s - %(levelname)s - %(message)s&quot;</span>))<br>logger.addHandler(sys_handler)<br></code></pre></td></tr></table></figure>
+另外,如果你想用python读日志的话也可以直接监听/dev/log/再打印日志<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> socket<br><span class="hljs-keyword">import</span> time<br>sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)<br>sock.bind(<span class="hljs-string">&#x27;/dev/log&#x27;</span>) <span class="hljs-comment">#需要先手动kill掉已经在运行的[r]syslogd进程，否则这里无法执行成功</span><br><span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    time.sleep(<span class="hljs-number">5</span>)<br>    data, addr = sock.recvfrom(<span class="hljs-number">1024</span>)<br>    print(data)<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/12/05/linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;12&#x2F;05&#x2F;linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;12&#x2F;05&#x2F;linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rsyslog/" rel="tag">Rsyslog</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/02/10/logstash%20Pipeline/"><i class="iconfont iconleft"></i>lgostash Pipeline</a>
+    <a href="/2019/11/03/logrotate/">Linux日志--logrotate<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8F%91%E9%80%81%E4%BB%A5%E5%8F%8A%E4%BF%9D%E5%AD%98%E6%95%B0%E6%8D%AE"><span class="toc-text">1.发送以及保存数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E7%BB%93%E6%9E%84%E5%9B%BE-%E7%B3%BB%E7%BB%9F%E4%B8%BAdebain7-%E4%BB%A5%E4%B8%BA%E6%9C%AC%E5%9C%B0%E5%8F%91%E9%80%81-%E6%9C%AC%E5%9C%B0%E6%8E%A5%E5%8F%97%E4%B8%BA%E4%BE%8B"><span class="toc-text">1.1结构图(系统为debain7,以为本地发送,本地接受为例)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E5%A6%82%E4%BD%95%E5%8F%91%E9%80%81%E6%97%A5%E5%BF%97"><span class="toc-text">1.2如何发送日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-dev-log"><span class="toc-text">1.3 &#x2F;dev&#x2F;log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-journald"><span class="toc-text">1.4 journald</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-rsyslog"><span class="toc-text">1.5 rsyslog</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-journald%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-text">2.journald的配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-rsyslog%E9%85%8D%E7%BD%AE"><span class="toc-text">3.rsyslog配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-text">3.1过滤器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-4%E5%8A%A8%E4%BD%9C"><span class="toc-text">3.1.4动作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-5%E5%8A%A8%E4%BD%9C-%E4%BC%A0%E8%BE%93%E6%97%A5%E5%BF%97"><span class="toc-text">3.1.5动作-传输日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%90%84%E4%B8%AA%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E7%AE%80%E4%BB%8B"><span class="toc-text">3.2 各个日志文件简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3%E9%98%9F%E5%88%97"><span class="toc-text">3.3队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4Ruleset"><span class="toc-text">3.4Ruleset</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%97%A5%E5%BF%97%E8%BD%AE%E8%BD%AC"><span class="toc-text">4.日志轮转</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1logrotate%E5%8F%82%E6%95%B0"><span class="toc-text">4.1logrotate参数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%B8%80%E4%BA%9B%E5%B8%B8%E8%A7%81%E5%9D%91"><span class="toc-text">5.一些常见坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%B8%B8%E8%A7%81rsyslog%E4%B8%8D%E8%AE%B0%E6%97%A5%E5%BF%97%E9%97%AE%E9%A2%98"><span class="toc-text">6.常见rsyslog不记日志问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E9%99%84%E5%BD%95A-%E7%94%A8python%E5%8F%91%E9%80%81%E6%97%A5%E5%BF%97%E5%88%B0syslog"><span class="toc-text">7.附录A:用python发送日志到syslog</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

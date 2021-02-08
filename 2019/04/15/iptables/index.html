@@ -1,0 +1,627 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>iptables - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="iptables 是一个配置 Linux 内核 防火墙...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">iptables</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">iptables</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 15, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7244</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="iptables知识点"><a href="#iptables知识点" class="headerlink" title="iptables知识点"></a>iptables知识点</h2><h3 id="查看iptables-规则"><a href="#查看iptables-规则" class="headerlink" title="查看iptables 规则"></a>查看iptables 规则</h3><h4 id="1、iptables-L"><a href="#1、iptables-L" class="headerlink" title="1、iptables -L"></a>1、iptables -L</h4><p>查看filter表的iptables规则，包括所有的链。filter表包含INPUT、OUTPUT、FORWARD三个规则链。</p>
+<p>说明：-L是–list的简写，作用是列出规则。</p>
+<h4 id="2、iptables-L-t-表名"><a href="#2、iptables-L-t-表名" class="headerlink" title="2、iptables -L [-t 表名]"></a>2、iptables -L [-t 表名]</h4><p>只查看某个表的中的规则。</p>
+<p>说明：表名一个有三个：filter,nat,mangle，如果没有指定表名，则默认查看filter表的规则列表（就相当于第一条命令）。</p>
+<p>举例：iptables -L -t filter</p>
+<h4 id="3、iptables-L-t-表名-链名"><a href="#3、iptables-L-t-表名-链名" class="headerlink" title="3、iptables -L (-t 表名)(链名)"></a>3、iptables -L (-t 表名)(链名)</h4><p>这里多了个链名，就是规则链的名称。</p>
+<p>说明：iptables一共有INPUT、OUTPUT、FORWARD、PREROUTING、POSTROUTING五个规则链。</p>
+<p>举例：iptables -L INPUT</p>
+<p>注意：链名必须大写。在Linux系统上，命令的大小写很敏感。</p>
+<h4 id="4、iptables-n-L"><a href="#4、iptables-n-L" class="headerlink" title="4、iptables -n -L"></a>4、iptables -n -L</h4><p>说明：以数字形式显示规则。如果没有-n，规则中可能会出现anywhere，有了-n，它会变成0.0.0.0/0</p>
+<h4 id="5、iptables-nv-L"><a href="#5、iptables-nv-L" class="headerlink" title="5、iptables -nv -L"></a>5、iptables -nv -L</h4><p>说明：这个列表看起来更详细.</p>
+<h4 id="6、删除规则-D"><a href="#6、删除规则-D" class="headerlink" title="6、删除规则(-D)"></a>6、删除规则(-D)</h4><p>如果想删除iptables规则我们可以如下操作</p>
+<p>如删除之前添加的规则（iptables -A INPUT -s 192.168.1.5 -j DROP）：</p>
+<p>[root@test ~]# iptables -D INPUT -s 192.168.1.5 -j DROP</p>
+<p>有时候要删除的规则太长，删除时要写一大串，既浪费时间又容易写错，这时我们可以先使用–line-number找出该条规则的行号，再通过行号删除规则。</p>
+<p>[root@test ~]# iptables -nv –line-number</p>
+<p>iptables v1.4.7: no command specified</p>
+<p>Try `iptables -h’ or ‘iptables –help’ for more information.</p>
+<p>[root@test ~]# iptables -nL –line-number</p>
+<p>Chain INPUT (policy ACCEPT)</p>
+<p>num target prot opt source destination</p>
+<p>1 DROP all – 192.168.1.1 0.0.0.0/0</p>
+<p>2 DROP all – 192.168.1.2 0.0.0.0/0</p>
+<p>3 DROP all – 192.168.1.3 0.0.0.0/0</p>
+<p>删除第二行规则</p>
+<p>[root@test ~]# iptables -D INPUT 2</p>
+<h3 id="添加iptables规则"><a href="#添加iptables规则" class="headerlink" title="添加iptables规则"></a>添加iptables规则</h3><p>首先,从网络上出现最多的例子开始说起.</p>
+<p> # iptables -A INPUT -p tcp –dport 80 -m connlimit –connlimit-above 50 -j DROP</p>
+<ul>
+<li><p>-A</p>
+<p>填写的参数是链,目前iptables中有preouting, input, output, forward,postrouting链.<a target="_blank" rel="noopener" href="http://www.zsythink.net/archives/1199">详细参考</a></p>
+</li>
+<li><p>-p</p>
+<p>填写的是Tcp/ip协议簇</p>
+</li>
+<li><p>-dport</p>
+<p>填写连接到本机的端口</p>
+</li>
+<li><p>-m</p>
+<p>使用iptables的模块,示例中使用了connlimit模块,并且使用了里面的connlimit-above 和connlimit- mask,其中connlimit-above是连接数统计,如果大于50就满足条件,而connlimit-mask是定义组机,此处的数值是网络为,即子网掩码,示例中的子网掩码为0则表示所有ip</p>
+</li>
+<li><p>-j</p>
+<p>表示满足条件后执行的动作,以下为所有动作列表.</p>
+<blockquote>
+<p>ACCEPT #允许数据包通过</p>
+</blockquote>
+<p>DROP #丢弃数据包，不对该数据包进一步处理</p>
+<p>REFECT #丢弃数据包，同时发送响应报文</p>
+<p>–reject-with tcp-reset 返回tcp重置</p>
+<p>–reject-with icmp-net-unreachable 返回网络不可达</p>
+<p>–reject-with icmp-host-unreachable 返回主机不可达</p>
+<p>RETURN #转到其它链处理</p>
+<p>LOG #将数据包信息记录到syslog</p>
+</li>
+</ul>
+<p>此外,还有:</p>
+<ul>
+<li><p>-s</p>
+<p>指定源地址</p>
+</li>
+<li><p>-d</p>
+<p>指定目标地址</p>
+</li>
+<li><p>-i</p>
+<p>指定数据报文流入接口</p>
+</li>
+<li><p>-o</p>
+<p>指定数据报文流出接口</p>
+</li>
+</ul>
+<h3 id="iptables的日志"><a href="#iptables的日志" class="headerlink" title="iptables的日志"></a>iptables的日志</h3><p>将上面的例子改为</p>
+<p># iptables -A INPUT -p tcp –dport 80 -m connlimit –connlimit-above 50 -j LOG –log-prefix ‘IptableslOG:’ –log-ip-options</p>
+<p>iptables会对满足条件的连接打印出log而不是drop掉,其中 –log-profix是可以让用户自定义的log前缀, 合理的log-profix能让自己更快速的找到日志(使用grep),</p>
+<p>–log-ip-options则是记录包中的ip header</p>
+<p>除此之外,log还支持其他参数.</p>
+<ul>
+<li><p>–log-tcp-sequence</p>
+<p>记录保中的TCP序列号</p>
+</li>
+<li><p>–log-tcp-options</p>
+<p>记录保重的TCP header</p>
+</li>
+<li><p>–log-uid</p>
+<p>记录生成数据包的进程的用户标识。</p>
+</li>
+<li><p>–log-level</p>
+<p>生成的日志等级, 等级对应说明如下:</p>
+</li>
+<li><p>0 (KERN_EMERG) 系统无法使用</p>
+<ul>
+<li><p>1 (KERN_ALERT) 必须立即处理</p>
+</li>
+<li><p>2 (KERN_CRIT) 关建事件</p>
+</li>
+<li><p>3 (KERN_ERR) 非关键事件错误</p>
+</li>
+<li><p>4 (KERN_WARNING) 应该注意的警告事件</p>
+</li>
+<li><p>5 (KERN_NOTICE) 正常但比较重要的事件</p>
+</li>
+<li><p>6 (KERN_INFO) info事件</p>
+</li>
+<li><p>7 (KERN_DEBUG) 内核调试消息</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>之后满足条件iptables就可能产生一段如下一段日志(来源于网上)</p>
+<p>Jun 19 17：20:04 webkernel： NEW DRAP IN=eth0 OUT=MAC=00:10:4b:cd:7b:b4:00:e0:le:b9:04：al:08:00SRC=192.168.150.1 DST=192.168.150.152 LEN=20 TOS=0X00 PREC=0x00 TTL=249ID=10492 DF PROTO=UDP SPT=53 DPT=32926 LEN=231</p>
+<p>| <strong>序号</strong> | <strong>字段名称</strong> | <strong>含义</strong> |</p>
+<p>| ——– | ———————————————————— | ———————————————————— |</p>
+<p>| 1 | Jun 19 17:20:24 | 日期时间，由syslog生成 |</p>
+<p>| 2 | Web | 主机名称 |</p>
+<p>| 3 | Kernel | 进程名由syslogd生成kernel为内核产生的日志说明netfilter在内核中运行 |</p>
+<p>| 4 | NEW_DRAP | 记录前缀，由用户指定—log-prefix”NEW_DRAP” |</p>
+<p>| 5 | IN=eth0 | 数据包进入的接口，若为空表示本机产生，接口还有eth0、br0等 |</p>
+<p>| 6 | OUT= | 数据包离开的接口，若为空表示本机接收 |</p>
+<p>| 7 | MAC=00:10:4b:cd:7b:b4:00:e0:le:b9:04:al | 00:10:4b:cd:7b:b4 为目标MAC地址00:e0:le:b9:04:al 为源MAC地址 |</p>
+<p>| 8 | 08:00 | 08:00 为上层协议代码，即表示IP协议 |</p>
+<p>| 9 | SRC=192.168.150.1 | 192.168.150.1为源IP地址 |</p>
+<p>| 10 | DST=192.168.150.152 | 192.168.150.152w为目标IP地址 |</p>
+<p>| 11 | LEN=20 | IP封包+承载数据的总长度(MTU) |</p>
+<p>| 12 | TOS=0x00 | IP包头内的服务类型字段，能反应服务质量包括延迟、可靠性和拥塞等 |</p>
+<p>| 13 | PREC=0x00 | 服务类型的优先级字段 |</p>
+<p>| 14 | TTL=249 | IP数据包的生存时间 |</p>
+<p>| 15 | ID=10492 | IP数据包标示 |</p>
+<p>| 16 | DF | DF表示不分段,此字段还可能为MF/FRAG |</p>
+<p>| 17 | PROTO=UDP | 传输层协议类型，它代表上层协议是什么可分为TCP、UDP、ICMP等 |</p>
+<p>| 18 | SPT=53 | 表示源端口号 |</p>
+<p>| 19 | DPT=32926 | 表示目的端口号 |</p>
+<p>| 20 | LEN=231 | 传输层协议头长度 |</p>
+<p>| 21 | SEQ= 内容略 | TCP序列号 |</p>
+<p>| 22 | ACK=内容略 | TCP应答号 |</p>
+<p>| 23 | WINDOWS=内容略 | IP包头内的窗口大小 |</p>
+<p>| 24 | RES | TCP-Flags中ECN bits的值 |</p>
+<p>| 25 | CWR/ECE/URG/ACK/PSH/RST/SYN/FIN | TCP标志位 |</p>
+<p>| 26 | URGP= | 紧急指针起点 |</p>
+<p>| 27 | OPT( 内容略 ) | IP或TCP选项，括号内为十六进制 |</p>
+<p>| 28 | INCOMPLETE[65535 bytes] | 不完整的数据包 |</p>
+<p>| 29 | TYPE=CODE=ID=SEQ=PARAMETER= | 当协议为ICMP时出现 |</p>
+<p>| 30 | SPI=0xF1234567 | 当前协议为AHESP时出现 |</p>
+<p>| 31 | SYN | TCP-Flags中的SYN标志,此外还有FIN/ACK/RST/URG/PSH几种 |</p>
+<p>| 32 | [ ] | 中括号出现在两个地方，在ICMP协议中作为协议头的递归使用；在数据包长度出现非法时用于指出数据实际长度 |</p>
+<h4 id="让日志变得清晰"><a href="#让日志变得清晰" class="headerlink" title="让日志变得清晰"></a>让日志变得清晰</h4><p>目前iptables产生的日志会到了系统的日志里面,利用rsyslog则可以把日志分发到其他地方.(需要系统是使用rsyslog)</p>
+<ol>
+<li><p>在rsyslog.conf 添加配置</p>
+<p>/etc/rsyslog.conf中添加不同的日志级别（默认warn(=4））</p>
+</li>
+</ol>
+<p>kern.warning /var/log/iptables.log</p>
+<p>kern.debug /var/log/iptables.log</p>
+<p>kern.info /var/log/iptables.log</p>
+<p>如果全部都加入系统日志的话使用(推荐)： kern.* /var/log/iptables.log</p>
+<p>重启日志配置： /etc/init.d/rsyslogd restart</p>
+<ol start="2">
+<li><p>让日志rotate(滚动)</p>
+<p>vim /etc/logrotate.d/syslog</p>
+<p>加入/var/log/iptables</p>
+</li>
+</ol>
+<p>这样配置完就有iptables对应的log文件啦</p>
+<h3 id="一些使用例子与说明"><a href="#一些使用例子与说明" class="headerlink" title="一些使用例子与说明"></a>一些使用例子与说明</h3><ul>
+<li>清空当前的所有规则和计数</li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><br><span class="hljs-attribute">iptables</span> -F <span class="hljs-comment"># 清空所有防火墙规则</span><br><br>iptables -X <span class="hljs-comment"># 删除用户自定义的空链</span><br><br>iptables -Z <span class="hljs-comment"># 清空计数</span><br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>允许ssh端口连接</li>
+</ul>
+<p>如下例子,22端口是ssh的端口, 192.168.1.0/24表示该网段的所有ip(使用了CIDR,也就是192.168.0.1~192.168.0.254)</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><br><span class="hljs-attribute">iptables</span> -A INPUT -s <span class="hljs-number">192.168.1.0</span>/<span class="hljs-number">24</span> -p tcp --dport -j ACCEPT<br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>允许本地回环地址可以正常使用</li>
+</ul>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs dns"><br>iptables -<span class="hljs-keyword">A</span> INPUT -i lo -j ACCEPT #本地圆环地址就是那个<span class="hljs-number">127.0.0.1</span>，是本机上使用的,它进与出都设置为允许<br><br>iptables -<span class="hljs-keyword">A</span> OUTPUT -o lo -j ACCEPT<br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>每秒中最多允许5个新连接</li>
+</ul>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs brainfuck"><br><span class="hljs-comment">iptables</span> <span class="hljs-literal">-</span><span class="hljs-comment">A</span> <span class="hljs-comment">FORWARD</span> <span class="hljs-literal">-</span><span class="hljs-comment">p</span> <span class="hljs-comment">tcp</span> --<span class="hljs-comment">syn</span> <span class="hljs-literal">-</span><span class="hljs-comment">m</span> <span class="hljs-comment">limit</span> --<span class="hljs-comment">limit</span> <span class="hljs-comment">1/s</span> --<span class="hljs-comment">limit</span><span class="hljs-literal">-</span><span class="hljs-comment">burst</span> <span class="hljs-comment">5</span> <span class="hljs-literal">-</span><span class="hljs-comment">j</span> <span class="hljs-comment">ACCEPT</span> <br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>防止各种端口扫描</li>
+</ul>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><br>iptables -A FORWARD -p tcp <span class="hljs-params">--tcp-flags</span> SYN,ACK,FIN,RST RST -m limit <span class="hljs-params">--limit</span> 1/s -j ACCEPT <br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>防止ping洪水攻击</li>
+</ul>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs llvm"><br>iptables -A FORWARD -p <span class="hljs-keyword">icmp</span> --<span class="hljs-keyword">icmp</span>-<span class="hljs-keyword">type</span> echo-request -m limit --limit <span class="hljs-number">1</span>/s -j ACCEPT <br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>关闭别人对服务器的ping</li>
+</ul>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><br>iptables -A <span class="hljs-keyword">INPUT</span> -p icmp -j <span class="hljs-keyword">DROP</span> <br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>防止同步包洪水（Sync Flood） </li>
+</ul>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><br>iptables -A FORWARD -p tcp <span class="hljs-params">--syn</span> -m limit <span class="hljs-params">--limit</span> 1/s -j ACCEPT <br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>利用recent模块 限制60秒内只有10个新链接</li>
+</ul>
+<p>例子中的–SYN TCP是由于syn的tcp中建立连接时的第一个包,通过–syn可以限定TCP 连接</p>
+<p>而使用了 state new则无需再使用 –SYN,因为state new包括TCP UDP IMCP<a target="_blank" rel="noopener" href="https://serverfault.com/questions/338553/iptables-new-connections-vs-syn">参考链接</a></p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><br>iptables -A INPUT -p tcp <span class="hljs-params">--dport</span> 80 <span class="hljs-params">--syn</span> -m recent <span class="hljs-params">--name</span> webpool <span class="hljs-params">--rcheck</span> <span class="hljs-params">--seconds</span> 60 <span class="hljs-params">--hitcount</span> 10 -j DROP<br><br></code></pre></td></tr></table></figure>
+
+
+<p>iptables可以通过模块来执行许多灵活的功能,如:</p>
+<ul>
+<li><p>-m state –state</p>
+<p>NEW,ESTABLISHED,RELATED 表示用state模块来匹配当前连接状态为这三种状态的连接</p>
+</li>
+<li><p>-m iprange</p>
+</li>
+<li><p>-src-range 用iprange模块匹配来源的ip地址范围</p>
+</li>
+<li><p>-dst-range 用iprange模块匹配目的的ip地址范围</p>
+</li>
+<li><p>-m multiport</p>
+</li>
+<li><p>-source-ports 用multiport模块来匹配来源的端口范围</p>
+</li>
+<li><p>-destination-ports 用multiport模块来匹配目的的端口范围</p>
+</li>
+</ul>
+<h3 id="在配置文件中配置"><a href="#在配置文件中配置" class="headerlink" title="在配置文件中配置"></a>在配置文件中配置</h3><p>使用命令配置时,配置的信息是存在于内存中的,重启iptables或重启计算机后就没有了,配置在配置文件能让iptables启动后能重新把配置加载到内存.</p>
+<p>使用vim /etc/sysconfig/iptables打开配置文件</p>
+<p>加上对应的命令即可(前面不需要iptables)了</p>
+<p>最后执行命令:# /etc/init.d/iptables restar重启iptables</p>
+<p>以下是来源于网络上的配置文件(越容易被执行的条件越应该房前面)</p>
+<blockquote>
+<p># Generated by iptables-save v1.4.7 on Wed Sep 28 18:06:07 2016</p>
+</blockquote>
+<p> *filter</p>
+<p> :INPUT DROP [8:632]  </p>
+<p> :FORWARD DROP [0:0]</p>
+<p> :OUTPUT ACCEPT [4:416]</p>
+<p> -A INPUT -s 192.168.1.0/24 -p tcp -m tcp –dport 22 -j ACCEPT </p>
+<p> -A INPUT -i lo -j ACCEPT </p>
+<p> -A INPUT -s 192.168.1.0/24 -j ACCEPT </p>
+<p> -A INPUT -s 192.168.140.0/24 -j ACCEPT </p>
+<p> -A INPUT -s 183.121.3.7/32 -p tcp -m tcp –dport 3380 -j ACCEPT </p>
+<p> -A INPUT -p tcp -m tcp –dport 80 -j ACCEPT </p>
+<p> -A INPUT -p icmp -m icmp –icmp-type 8 -j ACCEPT </p>
+<p> -A INPUT -m state –state RELATED,ESTABLISHED -j ACCEPT </p>
+<p> -A OUTPUT -o lo -j ACCEPT </p>
+<p> COMMIT</p>
+<p> # Completed on Wed Sep 28 18:06:07 2016</p>
+<p>前4行说明</p>
+<blockquote>
+<p>*filter #代表接下来的配置都是在filter表上的。我们默认的配置都在filter表上的，当然还有其它表，如raw,mangle,nat</p>
+</blockquote>
+<p>:INPUT DROP [8:632] #代表filter表上默认的input chain为drop ，对应上面的命令iptables -P INPUT DROP，中括号里面的两个数字代表的是这条链上已经接受到的包的数量及字节数量[包的数量:包的总字节数]</p>
+<p>:FORWARD DROP [0:0] #代表filter表上默认的forward chain为drop ，对应上面的命令iptables -P FORWARD DROP，中括号里面的两个数字代表的是这条链上已经接受到的包的数量及字节数量[包的数量:包的总字节数]</p>
+<p>:OUTPUT ACCEPT [4:416] #代表filter表上默认的forward chain为drop ，对应上面的命令iptables -P OUTPUT ACCEPT，中括号里面的两个数字代表的是这条链上已经接受到的包的数量及字节数量[包的数量:包的总字节数]</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/04/15/iptables/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;15&#x2F;iptables&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;15&#x2F;iptables&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Iptables/" rel="tag">Iptables</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2019/04/15/%E7%BB%99python%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A3%80/"><i class="iconfont iconleft"></i>给python接口加上一层类型检查</a>
+    <a href="/2019/04/06/%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86/">记一次TCP长连接过多的问题--实际上是被攻击了<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#iptables%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">iptables知识点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Biptables-%E8%A7%84%E5%88%99"><span class="toc-text">查看iptables 规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0iptables%E8%A7%84%E5%88%99"><span class="toc-text">添加iptables规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iptables%E7%9A%84%E6%97%A5%E5%BF%97"><span class="toc-text">iptables的日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8%E4%BE%8B%E5%AD%90%E4%B8%8E%E8%AF%B4%E6%98%8E"><span class="toc-text">一些使用例子与说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%B8%AD%E9%85%8D%E7%BD%AE"><span class="toc-text">在配置文件中配置</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

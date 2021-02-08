@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>基于django和celery的邮件异步发送(记录) - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记在验证用户邮箱时，需要发送一个链接给用户的邮箱，让...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">基于django和celery的邮件异步发送(记录)</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">基于django和celery的邮件异步发送(记录)</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 21, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3749</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="1-Celery介绍"><a href="#1-Celery介绍" class="headerlink" title="1.Celery介绍"></a>1.Celery介绍</h2><p>由于使用同步发送带来了许多麻烦，所以可以考虑用任务队列进行异步发送，在python中的Celery库发挥的就是这个作用，而且Celery接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库。<br><a target="_blank" rel="noopener" href="http://python.jobbole.com/87238/">更多介绍以及入门</a></p>
+<h2 id="2-与django结合异步发送邮件的服务"><a href="#2-与django结合异步发送邮件的服务" class="headerlink" title="2.与django结合异步发送邮件的服务"></a>2.与django结合异步发送邮件的服务</h2><p>假设之前已经完成了email发送逻辑（同步方式）</p>
+<h3 id="2-1setting-py设置"><a href="#2-1setting-py设置" class="headerlink" title="2.1setting.py设置"></a>2.1setting.py设置</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python">EMAIL_HOST = <span class="hljs-string">&#x27;smtp.163.com&#x27;</span>                <span class="hljs-comment"># 服务提供商</span><br>EMAIL_PORT = <span class="hljs-number">25</span>                            <span class="hljs-comment"># 端口</span><br>EMAIL_HOST_USER = <span class="hljs-string">&quot;***&quot;</span>                    <span class="hljs-comment"># 用户名</span><br>EMAIL_HOST_PASSWORD = <span class="hljs-string">&quot;***&quot;</span>                <span class="hljs-comment"># 密码</span><br>EMAIL_USE_TLS = <span class="hljs-literal">False</span>                      <span class="hljs-comment"># False就好了</span><br>EMAIL_FROM = <span class="hljs-string">&quot;***&quot;</span>                         <span class="hljs-comment"># 来源名字</span><br><br><br><span class="hljs-comment">###配置Broker</span><br>BROKER_URL = <span class="hljs-string">&#x27;redis://127.0.0.1:6379/0&#x27;</span>    <br>BROKER_TRANSPORT = <span class="hljs-string">&#x27;redis&#x27;</span><br></code></pre></td></tr></table></figure>
+<h3 id="2-2celery文件"><a href="#2-2celery文件" class="headerlink" title="2.2celery文件"></a>2.2celery文件</h3><p>在自己的project文件夹内（与setting.py同级）<br>创建celery.py文件，代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> django<br><br><span class="hljs-keyword">from</span> celery <span class="hljs-keyword">import</span> Celery<br><span class="hljs-keyword">from</span> django.conf <span class="hljs-keyword">import</span> settings<br><br>os.environ.setdefault(<span class="hljs-string">&#x27;DJANGO_SETTINGS_MODULE&#x27;</span>, <span class="hljs-string">&#x27;django_project.settings&#x27;</span>)   <span class="hljs-comment"># django_project 为自己的project名</span><br>django.setup()<br><br>app = Celery(<span class="hljs-string">&#x27;django_project&#x27;</span>)            <span class="hljs-comment"># 定义自己的app名字后面调用需要用到</span><br><br>app.config_from_object(<span class="hljs-string">&#x27;django.conf:settings&#x27;</span>)<br>app.autodiscover_tasks(<span class="hljs-keyword">lambda</span>: settings.INSTALLED_APPS)<br><br></code></pre></td></tr></table></figure>
+<h3 id="2-3发送邮件的py"><a href="#2-3发送邮件的py" class="headerlink" title="2.3发送邮件的py"></a>2.3发送邮件的py</h3><p>主要是从celery文件导入app并在自己发送的函数上面使用@app.task装饰器<br>其他的全是我自己的发送邮件规则</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> random <span class="hljs-keyword">import</span> Random<br><br><br><span class="hljs-keyword">from</span> django.core.mail <span class="hljs-keyword">import</span> send_mail<br><span class="hljs-keyword">from</span> django_project.settings <span class="hljs-keyword">import</span> EMAIL_FROM<br><br><span class="hljs-keyword">from</span> users.models <span class="hljs-keyword">import</span> EmailVerifyRecord<br><span class="hljs-keyword">from</span> django_project.celery <span class="hljs-keyword">import</span> app<br><br><br><span class="hljs-meta">@app.task</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">send_register_email</span>(<span class="hljs-params">email, send_type=<span class="hljs-string">&quot;register&quot;</span>, num=<span class="hljs-number">16</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    发送注册邮件时的链接</span><br><span class="hljs-string">    :param email: email</span><br><span class="hljs-string">    :param send_type: &#x27;register&#x27;or&#x27;forget&#x27;</span><br><span class="hljs-string">    :return: </span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    email_record = EmailVerifyRecord()<br>    code_str = random_str(num)<br>    email_record.code = code_str<br>    email_record.email = email<br>    email_record.send_type = send_type<br>    email_record.save()<br><br>    <span class="hljs-keyword">if</span> send_type == <span class="hljs-string">&#x27;register&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;注册激活链接&quot;</span><br>        email_body = <span class="hljs-string">&quot;请点击下面的链接激活你的账号：http://127.0.0.1:8000/active/&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">elif</span> send_type == <span class="hljs-string">&#x27;forget&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;重置密码链接&quot;</span><br>        email_body = <span class="hljs-string">&quot;请点击下面的链接重置你的密码：http://127.0.0.1:8000/reset/&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">elif</span> send_type == <span class="hljs-string">&#x27;update_email&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;邮箱修改验证码&quot;</span><br>        email_body = <span class="hljs-string">&quot;验证码为：&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">pass</span><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">random_str</span>(<span class="hljs-params">random_length=<span class="hljs-number">8</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    随机字符串生成</span><br><span class="hljs-string">    :param random_length: 生成字符串长度(init)</span><br><span class="hljs-string">    :return: 返回字符串(str)</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    code_str = <span class="hljs-string">&#x27;&#x27;</span><br>    generate_random_str = [<span class="hljs-built_in">chr</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">65</span>, <span class="hljs-number">91</span>)] + \<br>                          [<span class="hljs-built_in">chr</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">97</span>, <span class="hljs-number">123</span>)] + \<br>                          [<span class="hljs-built_in">str</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>)]<br>    chars = <span class="hljs-string">&#x27;&#x27;</span>.join(generate_random_str)<br>    length = <span class="hljs-built_in">len</span>(chars) - <span class="hljs-number">1</span><br>    random = Random()<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(random_length):<br>        code_str += chars[random.randint(<span class="hljs-number">0</span>, length)]<br>    <span class="hljs-keyword">return</span> code_str<br><br><br></code></pre></td></tr></table></figure>
+<h3 id="2-4view"><a href="#2-4view" class="headerlink" title="2.4view"></a>2.4view</h3><p>将原本发送邮件的函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">send_register_email(email, <span class="hljs-string">&quot;update_email&quot;</span>, num=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
+<p>改为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">send_register_email.delay(email, <span class="hljs-string">&quot;update_email&quot;</span>, num=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="2-5运行celery服务"><a href="#2-5运行celery服务" class="headerlink" title="2.5运行celery服务"></a>2.5运行celery服务</h3><p>Broker设置为redis所以必须先启动</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">service redis <span class="hljs-keyword">start</span><br></code></pre></td></tr></table></figure>
+<p>检查是否启动并监听端口</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">ps</span> aux|<span class="hljs-keyword">grep</span> redis<br></code></pre></td></tr></table></figure>
+<p>在celery所在目录输入命令启动celery</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">celery</span> -A (自己定义的名字) worker -l <span class="hljs-literal">debug</span><br></code></pre></td></tr></table></figure>
+<h3 id="2-6测试"><a href="#2-6测试" class="headerlink" title="2.6测试"></a>2.6测试</h3><p>发送时celery服务的提示，显示succeeded<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/celery%E5%8F%91%E9%82%AE%E4%BB%B611.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">image</span></p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/10/21/21_Asynchronous%20sending%20of%20mail%20based%20on%20django%20and%20celery/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;10&#x2F;21&#x2F;21_Asynchronous%20sending%20of%20mail%20based%20on%20django%20and%20celery&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;10&#x2F;21&#x2F;21_Asynchronous%20sending%20of%20mail%20based%20on%20django%20and%20celery&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/celery/" rel="tag">celery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/" rel="tag">django</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/10/21/23_use_xadmin/"><i class="iconfont iconleft"></i>xadmin的使用</a>
+    <a href="/2017/10/21/p2/">学习网开发<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Celery%E4%BB%8B%E7%BB%8D"><span class="toc-text">1.Celery介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%B8%8Edjango%E7%BB%93%E5%90%88%E5%BC%82%E6%AD%A5%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E7%9A%84%E6%9C%8D%E5%8A%A1"><span class="toc-text">2.与django结合异步发送邮件的服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1setting-py%E8%AE%BE%E7%BD%AE"><span class="toc-text">2.1setting.py设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2celery%E6%96%87%E4%BB%B6"><span class="toc-text">2.2celery文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E7%9A%84py"><span class="toc-text">2.3发送邮件的py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4view"><span class="toc-text">2.4view</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5%E8%BF%90%E8%A1%8Ccelery%E6%9C%8D%E5%8A%A1"><span class="toc-text">2.5运行celery服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6%E6%B5%8B%E8%AF%95"><span class="toc-text">2.6测试</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

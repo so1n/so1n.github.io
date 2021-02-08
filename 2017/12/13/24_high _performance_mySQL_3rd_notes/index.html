@@ -1,0 +1,904 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Mysql笔记(-第五章) - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记之前对数据库的使用都是写入，取出。最近想弄个数据库...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">Mysql笔记(-第五章)</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Mysql笔记(-第五章)</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 13, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>26409</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <h2 id="伪前记-mysql的命令"><a href="#伪前记-mysql的命令" class="headerlink" title="伪前记(mysql的命令)"></a>伪前记(mysql的命令)</h2><p><em>看书前温习了下命令，就顺便记下来了</em></p>
+<h3 id="mysql术语"><a href="#mysql术语" class="headerlink" title="mysql术语"></a>mysql术语</h3><ul>
+<li>关系型数据库<ul>
+<li>能够实现一种具有表、列与索引的数据库。</li>
+<li>保证不同表的行之间的引用完整性。</li>
+<li>能自动更新索引。</li>
+<li>能解释 SQL 查询，组合多张表的信息。</li>
+</ul>
+</li>
+<li>数据库（Database）：数据库是带有相关数据的表的集合。</li>
+<li>表（Table）：表是带有数据的矩阵。数据库中的表就像一种简单的电子表格。</li>
+<li>列（Column）：每一列（数据元素）都包含着同种类型的数据，比如邮编。</li>
+<li>行（Row）：行（又被称为元组、项或记录）是一组相关数据，比如有关订阅量的数据。</li>
+<li>冗余（Redundancy）：存储两次数据，以便使系统更快速。</li>
+<li>主键（Primary Key）：主键是唯一的。同一张表中不允许出现同样两个键值。一个键值只对应着一行。</li>
+<li>外键（Foreign Key）：用于连接两张表。</li>
+<li>复合键（Compound Key）：复合键（又称组合键）是一种由多列组成的键，因为一列并不足以确定唯一性。</li>
+<li>索引（Index）：它在数据库中的作用就像书后的索引一样。</li>
+<li>引用完整性（Referential Integrity）：用来确保外键一直指向已存在的一行。<h3 id="创建命令"><a href="#创建命令" class="headerlink" title="创建命令"></a>创建命令</h3>创建test数据库<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> DATABASE employee;<br></code></pre></td></tr></table></figure>
+链接employee数据库<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">use employee;<br></code></pre></td></tr></table></figure>
+创建表<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> 表的名字<br>(<br>列名a 数据类型(数据长度),<br>列名b 数据类型(数据长度)，<br>列名c 数据类型(数据长度)<br>);<br><br>#示例<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> employee (id <span class="hljs-type">int</span>(<span class="hljs-number">10</span>),name <span class="hljs-type">char</span>(<span class="hljs-number">20</span>),phone <span class="hljs-type">int</span>(<span class="hljs-number">12</span>));<br></code></pre></td></tr></table></figure>
+向表插入数据<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> 表的名字(列名a,列名b,列名c) <span class="hljs-keyword">VALUES</span>(值<span class="hljs-number">1</span>,值<span class="hljs-number">2</span>,值<span class="hljs-number">3</span>);<br>#示例<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> employee(id,name,phone) <span class="hljs-keyword">VALUES</span>(<span class="hljs-number">01</span>,<span class="hljs-string">&#x27;Tom&#x27;</span>,<span class="hljs-number">110110110</span>);<br><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> employee <span class="hljs-keyword">VALUES</span>(<span class="hljs-number">02</span>,<span class="hljs-string">&#x27;Jack&#x27;</span>,<span class="hljs-number">119119119</span>);<br><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> employee(id,name) <span class="hljs-keyword">VALUES</span>(<span class="hljs-number">03</span>,<span class="hljs-string">&#x27;Rose&#x27;</span>);<br></code></pre></td></tr></table></figure>
+<h3 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h3></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>约束类型</th>
+<th>主键</th>
+<th>默认值</th>
+<th>唯一</th>
+<th>外键</th>
+<th>非空</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>关键字</td>
+<td>PRIMARY KEY</td>
+<td>DEFAULT</td>
+<td>UNIQUE</td>
+<td>FOREIGN KEY</td>
+<td>NOT NULL</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> department<br>(<br>  dpt_name   <span class="hljs-type">CHAR</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,              <span class="hljs-operator">/</span><span class="hljs-operator">/</span>非空约束<br>  people_num <span class="hljs-type">INT</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-string">&#x27;10&#x27;</span>,           <span class="hljs-operator">/</span><span class="hljs-operator">/</span>默认值约束<br>  <span class="hljs-keyword">CONSTRAINT</span> dpt_pk <span class="hljs-keyword">PRIMARY</span> <span class="hljs-keyword">KEY</span> (dpt_name)   <span class="hljs-operator">/</span><span class="hljs-operator">/</span>主键约束<br><span class="hljs-operator">/</span><span class="hljs-operator">/</span><span class="hljs-keyword">CONSTRAINT</span> 可自定义主键名 dpt_pk <span class="hljs-operator">=</span><span class="hljs-operator">=</span> dpt_name 均作为该表主键<br>);<br><br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> employee<br>(<br>  id      <span class="hljs-type">INT</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">PRIMARY</span> <span class="hljs-keyword">KEY</span>,                     <span class="hljs-operator">/</span><span class="hljs-operator">/</span>主键约束 id 作为该表主键<br>  name    <span class="hljs-type">CHAR</span>(<span class="hljs-number">20</span>), <br>  age     <span class="hljs-type">INT</span>(<span class="hljs-number">10</span>),<br>  salary  <span class="hljs-type">INT</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,                        <span class="hljs-operator">/</span><span class="hljs-operator">/</span>非空约束<br>  phone   <span class="hljs-type">INT</span>(<span class="hljs-number">12</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,                        <span class="hljs-operator">/</span><span class="hljs-operator">/</span>非空约束<br>  in_dpt  <span class="hljs-type">CHAR</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,                      <span class="hljs-operator">/</span><span class="hljs-operator">/</span>非空约束<br>  <span class="hljs-keyword">UNIQUE</span>  (phone),                                <span class="hljs-operator">/</span><span class="hljs-operator">/</span>唯一值约束,phone值在该表中唯一<br>  <span class="hljs-keyword">CONSTRAINT</span> emp_fk <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (in_dpt) <span class="hljs-keyword">REFERENCES</span> department(dpt_name)<br><span class="hljs-operator">/</span><span class="hljs-operator">/</span>外键约束 in_dpt，并自定义外键名 emp_fk 参考department表 dpt_name 列 <br><span class="hljs-operator">/</span><span class="hljs-operator">/</span>使用<span class="hljs-keyword">INSERT</span>语句时，该表in_dpt列值必须在department表dpt_name中存在<br>);<br> <br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> project<br>(<br>  proj_num   <span class="hljs-type">INT</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>  proj_name  <span class="hljs-type">CHAR</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>  start_date <span class="hljs-type">DATE</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>  end_date   <span class="hljs-type">DATE</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-string">&#x27;2015-04-01&#x27;</span>, <span class="hljs-operator">/</span><span class="hljs-operator">/</span>默认约束<br>  of_dpt     <span class="hljs-type">CHAR</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">REFERENCES</span> department(dpt_name), <span class="hljs-operator">/</span><span class="hljs-operator">/</span>外键约束<br>  <span class="hljs-keyword">CONSTRAINT</span> proj_pk <span class="hljs-keyword">PRIMARY</span> <span class="hljs-keyword">KEY</span> (proj_num,proj_name)<br>   <span class="hljs-operator">/</span><span class="hljs-operator">/</span>复合主键约束(proj_num,proj_name)，并自定义主键名proj_pk<br> );<br></code></pre></td></tr></table></figure>
+<h3 id="查询命令"><a href="#查询命令" class="headerlink" title="查询命令"></a>查询命令</h3><p>基本SELECT：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> 要查询的列名 <span class="hljs-keyword">FROM</span> 表名字 <span class="hljs-keyword">WHERE</span> 限制条件;<br></code></pre></td></tr></table></figure>
+<p>数字符号条件限定，如(其中数字符号可以有:数学符号 (=,&lt;,&gt;,&gt;=,&lt;=)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> name,age <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> age<span class="hljs-operator">&gt;</span><span class="hljs-number">25</span>;<br></code></pre></td></tr></table></figure>
+<p>非数字条件限定</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs sql">#小于<span class="hljs-number">25</span>或大于<span class="hljs-number">30</span><br><span class="hljs-keyword">SELECT</span> name,age <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> age<span class="hljs-operator">&lt;</span><span class="hljs-number">25</span> <span class="hljs-keyword">OR</span> age<span class="hljs-operator">&gt;</span><span class="hljs-number">30</span>;<br>#大于<span class="hljs-number">25</span>且小于<span class="hljs-number">30</span><br><span class="hljs-keyword">SELECT</span> name,age <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> age<span class="hljs-operator">&gt;</span><span class="hljs-number">25</span> <span class="hljs-keyword">AND</span> age<span class="hljs-operator">&lt;</span><span class="hljs-number">30</span>;<br>#该列数据的所有dpt3和dpt4<br><span class="hljs-keyword">SELECT</span> name,age,phone,in_dpt <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> in_dpt <span class="hljs-keyword">IN</span> (<span class="hljs-string">&#x27;dpt3&#x27;</span>,<span class="hljs-string">&#x27;dpt4&#x27;</span>);<br>#该列数据的除了dpt1和dpt3<br><span class="hljs-keyword">SELECT</span> name,age,phone,in_dpt <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> in_dpt <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> (<span class="hljs-string">&#x27;dpt1&#x27;</span>,<span class="hljs-string">&#x27;dpt3&#x27;</span>);<br>#适配类似的数据_代表一个未知符，如果是两个就两个_<br><span class="hljs-keyword">SELECT</span> name,age,phone <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> phone <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;1101__&#x27;</span>;<br>#适配类似的数据<span class="hljs-operator">%</span>代表不定个未知符<br><span class="hljs-keyword">SELECT</span> name,age,phone <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> name <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;J%&#x27;</span>;<br></code></pre></td></tr></table></figure>
+<p>对结果排序</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> name,age,salary,phone <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">ASC</span><span class="hljs-operator">/</span><span class="hljs-keyword">DESC</span>;<br>#其中<span class="hljs-keyword">ASC</span>为升序，<span class="hljs-keyword">DESC</span>为将序<br></code></pre></td></tr></table></figure>
+<p>内置函数和计算</p>
+<table>
+<thead>
+<tr>
+<th>函数名</th>
+<th>COUNT</th>
+<th>SUM</th>
+<th>AVG</th>
+<th>MAX</th>
+<th>MIN</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>作用</td>
+<td>计数</td>
+<td>求和</td>
+<td>求平均值</td>
+<td>求最大</td>
+<td></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>其中 COUNT 函数可用于任何数据类型(因为它只是计数)，而 SUM 、AVG 函数都只能对数字类数据类型做计算，MAX 和 MIN 可用于数值、字符串或是日期时间数据类型。</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">MAX</span>(salary) <span class="hljs-keyword">AS</span> max_salary,<span class="hljs-built_in">MIN</span>(salary) <span class="hljs-keyword">FROM</span> employee;<br>#从employee取出最大和最小值，<span class="hljs-keyword">AS</span>是把最大值呈现在列名max_salary中(可以说<span class="hljs-keyword">AS</span>是改了列名)<br></code></pre></td></tr></table></figure>
+<p>关联表查询<br>显示of_dpt和count_project，而of_dpt存放在project的关联表employee里面</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> of_dpt,<span class="hljs-built_in">COUNT</span>(proj_name) <span class="hljs-keyword">AS</span> count_project <span class="hljs-keyword">FROM</span> project<br><span class="hljs-keyword">WHERE</span> of_dpt <span class="hljs-keyword">IN</span><br>(<span class="hljs-keyword">SELECT</span> in_dpt <span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">WHERE</span> name<span class="hljs-operator">=</span><span class="hljs-string">&#x27;Tom&#x27;</span>);<br></code></pre></td></tr></table></figure>
+<p>连接查询<br>各员工所在部门的人数，其中员工的 id 和 name 来自 employee 表，people_num 来自 department 表</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> id,name,people_num<br><span class="hljs-keyword">FROM</span> employee,department<br><span class="hljs-keyword">WHERE</span> employee.in_dpt = department.dpt_name<br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id;<br></code></pre></td></tr></table></figure>
+<p>也可以写为</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> id,name,people_num<br><span class="hljs-keyword">FROM</span> employee <span class="hljs-keyword">JOIN</span> department<br><span class="hljs-keyword">ON</span> employee.in_dpt <span class="hljs-operator">=</span> department.dpt_name<br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id;<br></code></pre></td></tr></table></figure>
+<h3 id="修改和删除"><a href="#修改和删除" class="headerlink" title="修改和删除"></a>修改和删除</h3><p>删除</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> DATABASE test_01; #库<br><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> test_01;  #表<br></code></pre></td></tr></table></figure>
+<p>修改</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs sql">#重命名表名字<br>RENAME <span class="hljs-keyword">TABLE</span> 原名 <span class="hljs-keyword">TO</span> 新名字;<br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> 原名 RENAME 新名;<br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> 原名 RENAME <span class="hljs-keyword">TO</span> 新名;<br>#增加一列<br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> 表名字 <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">COLUMN</span> 列名字 数据类型 约束;<br>或： <span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> 表名字 <span class="hljs-keyword">ADD</span> 列名字 数据类型 约束;<br>#增加的列在指定位置后面<br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> employee <span class="hljs-keyword">ADD</span> test <span class="hljs-type">INT</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">11</span> AFTER test;<br>#增加的列在第一个位置<br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> employee <span class="hljs-keyword">ADD</span> test <span class="hljs-type">INT</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">11</span> <span class="hljs-keyword">FIRST</span>;<br>#删除列<br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> 表名字 <span class="hljs-keyword">DROP</span> <span class="hljs-keyword">COLUMN</span> 列名字;<br>或： <span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> 表名字 <span class="hljs-keyword">DROP</span> 列名字;<br>#重改列<br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> 表名字 CHANGE 原列名 新列名 数据类型 约束;<br>#更新列的值<br><span class="hljs-keyword">UPDATE</span> 表名字 <span class="hljs-keyword">SET</span> 列<span class="hljs-number">1</span><span class="hljs-operator">=</span>值<span class="hljs-number">1</span>,列<span class="hljs-number">2</span><span class="hljs-operator">=</span>值<span class="hljs-number">2</span> <span class="hljs-keyword">WHERE</span> 条件;<br>#删除<br><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> 表名字 <span class="hljs-keyword">WHERE</span> 条件;<br></code></pre></td></tr></table></figure>
+<h2 id="12月21日更"><a href="#12月21日更" class="headerlink" title="12月21日更"></a>12月21日更</h2><h2 id="MySQL架构与基础"><a href="#MySQL架构与基础" class="headerlink" title="MySQL架构与基础"></a>MySQL架构与基础</h2><h3 id="MySQL架构"><a href="#MySQL架构" class="headerlink" title="MySQL架构"></a>MySQL架构</h3><p><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/MySQL%E6%9E%B6%E6%9E%84.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">MySQL架构</span><br>正方形内是MySQL的核心服务功能层，包括查询解析，分析，优化，缓存以及所有与的内置函数(日期，时间，数学和加密函数等)，所有跨存储功能都在这一层实现：存储过程，触发器，视图等。<br>存储引擎。负责MySQL中数据的存储和提取。每个存储引擎都有它的优势和劣势。服务器通过API与存储引擎进行通信。这些接口屏蔽了不同的存储引擎之间的差异，使得这些差异对上层的查询过程透明。存储引擎API包括几十个底层函数，用于执行诸如“开始一个事务，或者：“根据主键提取一行记录”等操作，但存储引擎不会取解析SQL（InnoDB除外，它会解析外键定义）。不同存储引擎之间也不会相互通信</p>
+<h3 id="MySQL锁策略"><a href="#MySQL锁策略" class="headerlink" title="MySQL锁策略"></a>MySQL锁策略</h3><p>为了并发读取数据时造出数据损坏，数据库也加了锁。理想是锁定方式是，只对会修改的数据片进行精确的锁定，任何时候，在给定的资源上，锁定的数据了越小，则系统的并发程度越高。<br><strong>读锁</strong> 由于可以多个用户读取一个文件，所以读锁是共享的，相互不阻塞。多个客户在同一时刻可以同时读取一个资源，而互不干扰。</p>
+<p><strong>写锁</strong> 写锁是排他的，只有一个用户能执行写入，并防止其他用户读取正在写入的同一资源</p>
+<p><strong>表锁</strong> 表锁是MySQL中最基本的锁策略，并且是开销最小的策略。它会锁定整张表，也就是一个用户在对表进行写操作前，需要先获得写锁，这时会阻塞其他用户对该表的所有读写操作。只有没有写锁时，其他读取的用户才能获得读锁，读锁之间是不互相阻塞的。<br>之中，写锁比读锁有更高优先级，因此一个写锁请求可能会被插入到读锁队列的前面（写锁可以插入到队列中读锁前面，反之毒素哦哦则不能）<br>尽管存储引擎可以管理自己的锁，MySQL本身还是会使用各种有效的表锁来实现不用的目的。例如，服务器会为诸如ALTER TABLE之类的语句使用表锁，而忽略存储引擎的锁机制。</p>
+<p><strong>行级锁</strong> 行级锁可以最大程度的支持并发处理（同时也带来最大的锁开销）。<br>行级锁只在存储引擎层实现。</p>
+<h3 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h3><p>事务就是一组原子性的SQL查询（原子性:不可切分的最小单位）或者说一个独立的工作单元。如果数据库引擎能够成功的对数据库应用该组查询的全部语句，就执行该组查询，如果其中有任何一条语句因为崩溃或其他原因无法执行，那么所有语句都不会执行。</p>
+<blockquote>
+<p>栗子：<br>假设银行的数据库有两张表：支票表和储蓄表。现在要从用户jane的支票账户转移200美元到她的账户</p>
+<ol>
+<li>检查支票账户的余额高于200美元。</li>
+<li>从支票账户余额中减去200美元</li>
+<li>在存蓄账户余额中增加200美元<br>这三个操作必须打包在一个事务中，任何一个步骤失败，则必须回滚所有的步骤。</li>
+</ol>
+</blockquote>
+<p>可以用START TRANSACTION语句开始一个事务，然后要么使用commit提交事务将修改的数据持久保留，要么使用ROLLBACK撤销所有的修改。事务的样本如下:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">START</span> TRANSACTION;<br><span class="hljs-keyword">SELECT</span> balance <span class="hljs-keyword">FROM</span> checking <span class="hljs-keyword">WHERE</span> customer_id <span class="hljs-operator">=</span> <span class="hljs-number">10233276</span>;<br><span class="hljs-keyword">UPDATE</span> checking <span class="hljs-keyword">SET</span> balance <span class="hljs-operator">=</span> balance <span class="hljs-operator">-</span> <span class="hljs-number">200.00</span> <span class="hljs-keyword">WHERE</span> customer_id <span class="hljs-operator">=</span> <span class="hljs-number">10233276</span>;<br><span class="hljs-keyword">UPDATE</span> savings <span class="hljs-keyword">SET</span> balance <span class="hljs-operator">=</span> balance <span class="hljs-operator">+</span> <span class="hljs-number">200.00</span> <span class="hljs-keyword">WHERE</span> customer_id <span class="hljs-operator">=</span> <span class="hljs-number">10233276</span>;<br><span class="hljs-keyword">COMMIT</span>；<br></code></pre></td></tr></table></figure>
+<p>为了事务能完好的执行，事务拥有ACID特性，ACID表示原子性，一致性，隔离性，持久性。</p>
+<ul>
+<li>原子性：一个人事务必须被视为一个不可分割的最小工作单元，整个十五中的所有操作要么成功要么失败回滚，对于一个事务来说，不可能只执行其中一个操作</li>
+<li>一致性：数据库总是从一个一致性的状态切换到另外一个一致性的状态。</li>
+<li>隔离性：通常来说(有隔离等级)一个事务所做的修改在最终提交以前，对其他事务是不可见的</li>
+<li>持久性：一旦事务提交，则其所做的修改就会永久保存到数据库中。此时即使系统崩溃，修改的数据也不会丢失。持久性是个有点模糊的概念，因为实际上持久性也分很多不同的级别。</li>
+</ul>
+<p>由于ACID特性也会增加系统开销，增加了安全性，需要数据库系统做更多的额外工作。所以要根据业务来选择是否使用带有事务处理的存储引擎，即使存储引擎不支持事务，也可以通过LOCK TABLES 语句为应用提供一定程度的保护。</p>
+<p><strong>隔离级别</strong></p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读可能性</th>
+<th>不可重复读可能性</th>
+<th>幻读可能性</th>
+<th>加锁读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>未提交读</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>提交读</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>可重复读</td>
+<td>no</td>
+<td>no</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>可串行化</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<p>ps脏读:事务中的修改，即使没有提交，对其他事务也都是可以见的，事务可以读取未提交的数据。</p>
+<h4 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h4><p>死锁是值两个或者多个事务在同一资源上相互占用，并请求锁定对方占用的资源，从而导致恶性循环的现象。当多个事务视图以不同的顺序锁定资源时，就可能产生死锁。<br>栗子：<br>下面两个事务同时处理StockPrice表：<br>事务1</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">START</span> TRANSACTION；<br><span class="hljs-keyword">UPDATE</span> StockPrice <span class="hljs-keyword">SET</span> <span class="hljs-keyword">close</span> <span class="hljs-operator">=</span> <span class="hljs-number">45.50</span> <span class="hljs-keyword">WHERE</span> stock_id <span class="hljs-operator">=</span><span class="hljs-number">4</span> <span class="hljs-keyword">and</span> <span class="hljs-type">date</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;2002-05-01&#x27;</span><br><span class="hljs-keyword">UPDATE</span> StockPrice <span class="hljs-keyword">SET</span> <span class="hljs-keyword">close</span> <span class="hljs-operator">=</span> <span class="hljs-number">19.80</span> <span class="hljs-keyword">WHERE</span> stock_id <span class="hljs-operator">=</span><span class="hljs-number">3</span> <span class="hljs-keyword">and</span> <span class="hljs-type">date</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;2002-05-02&#x27;</span><br></code></pre></td></tr></table></figure>
+<p>事务2</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">START</span> TRANSACTION；<br><span class="hljs-keyword">UPDATE</span> StockPrice <span class="hljs-keyword">SET</span> hight <span class="hljs-operator">=</span> <span class="hljs-number">20.12</span> <span class="hljs-keyword">WHERE</span> stock_id <span class="hljs-operator">=</span> <span class="hljs-number">3</span> <span class="hljs-keyword">and</span> <span class="hljs-type">date</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;2002-05-02&#x27;</span><br><span class="hljs-keyword">UPDATE</span> StockPrice <span class="hljs-keyword">SET</span> hight <span class="hljs-operator">=</span> <span class="hljs-number">47.20</span> <span class="hljs-keyword">WHERE</span> stock_id <span class="hljs-operator">=</span> <span class="hljs-number">4</span> <span class="hljs-keyword">and</span> <span class="hljs-type">date</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;2002-05-01&#x27;</span><br></code></pre></td></tr></table></figure>
+<p>如果凑齐，两个事务都执行了第一条update语句，更新一行数据，同时也锁定了该行数据，接着每个事务都尝试取执行第二条update语句，却发现该行已被对方锁定，然后两个事务都等待对方释放锁，同时又持有对方需要的锁，则陷入死循环。除非有外部因素介入才能解除死锁。<br>为了防止死锁，数据库系统实现了各种死锁检测和死锁超时机制。越复杂的系统，越能检测死锁的循环依赖，并立即返回一个错误，保证不会出现由于死锁出现了非常慢的查询。<br>还有一种解决方式，就是查询时间达到锁等待超时的设定后放弃锁请求。<br>InnoDB目前处理死锁的方法是，将持有最少行级排他锁的事务进行回滚。<br>锁的行为和顺序是存储引起相关的。以同样的顺序执行语句，有些存储引擎会产生死锁，有些则不会。死锁产生有双重原因：有些是因为真正的数据冲突，这种情况通常很难避免，但有些则完全是由于存储引擎的实现方式导致的。死多发生后，只有部分或者完全回滚其中一个事务，才能打破死锁，对于事务性的系统，这是无法避免的。</p>
+<h4 id="事务日志"><a href="#事务日志" class="headerlink" title="事务日志"></a>事务日志</h4><p>使用事务日志，存储引擎在修改表的数据时只需要修改其内存拷贝，再把该修改行为记录到持久在硬盘上的事务日志中，而不用每次都将修改的数据本身持久到磁盘。事务日志采用的是追加的方式，因此写日志的操作是磁盘上以小块区域内的顺序I/o需要在磁盘的多个地方移动磁头，所以采用事务日志的港式相对来说要快的多。事务日志持久以后，内存中被修改的数据在后台可以慢慢的刷回到磁盘。目前大所属存储引擎都是这样实现的，我们通常称为预写式日志，修改数据需要写两次磁盘。</p>
+<h4 id="MYSQL中的事务"><a href="#MYSQL中的事务" class="headerlink" title="MYSQL中的事务"></a>MYSQL中的事务</h4><p>MySQL提供了两种事务型的引擎:INnoDB\NDB Cluster。</p>
+<p>MySQL默认采用自动提交模式。也就是每个查询都被当做一个事务执行提交操作。可以通过设置变量来启用或禁用，1为启用，0为禁用。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SHOW</span> VARIABLES <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;AUTOCOMMIT&#x27;</span>； <br><span class="hljs-keyword">SET</span> AUTOCOMMIT <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
+<p>修改autocommit对非事务性的表，比如myisam或者内存吧，不会有任何影响。另外还有一些命令，在执行之前会强制执行commit提交当前的活动事务，典型的例子，在数据定义语言中，如果是会导致大量数据改变的操作，比如ALTER TABLE,就是如此，另外还有LOCK TABLES等其他语句也会导致同样的结果。</p>
+<h5 id="不要在事务中混合使用存储引擎"><a href="#不要在事务中混合使用存储引擎" class="headerlink" title="不要在事务中混合使用存储引擎"></a>不要在事务中混合使用存储引擎</h5><p>事务是由下层的存储引擎实现的。所以在同一个事务中，使用多种存储引擎是不可靠的。<br>如果在十五中混合使用了事务型和非事务型的表，在正常提交的情况下不会有什么问题。<br>但如果该事务需要回滚，非事务型的变更就无法撤销，这回导致数据库处于不一致的状态，这种情况很难修复，事务的最终结果将无法确定。所以，为每张表选择合适的存储引擎非常重要。</p>
+<h3 id="多版本并发控制-MVCC"><a href="#多版本并发控制-MVCC" class="headerlink" title="多版本并发控制(MVCC)"></a>多版本并发控制(MVCC)</h3><p>基于提升并发性能的考虑，数据库一般都实现了多版本并发控制，可以认为MVCC是行级锁的一个变种，但是它在很多情况下避免了加锁操作，因此开销更低。不同的存储引擎的MVCC实现是不同的，典型的有乐观和悲观并发控制。<br>MVCCD实现是通过保存数据在某个时间点的快照来实现的。也就是说，不管需要执行多长时间，每个事务看到的数据都是已知的。根据书屋开始的时间不同，每个事务对同一张表，同一时刻看到的数据可能是不一样的(<em>以空间换取时间？？？</em>)</p>
+<p>InnoDB的MVCC是通过每行记录后面保存两个隐藏的列来实现的，这两个列，一个保存了行的创建时间，一个保存行的过期时间或删除时间（这里应该说是系统版本号)。每开始一个新的事务，系统版本号会自动递增，事务开始时刻的系统版本号会作为事务的版本号，用来和查询到的每行记录的版本号进行比较</p>
+<ul>
+<li><p>SELECT<br>InnoDB会根据以下两个条件检查每行记录:</p>
+<ul>
+<li>InnoDB只查找版本早于当前事务版本的数据行，也就是，行的系统版本号小鱼或等于事务的系统版本号，这样可以确保事务读取的行，要么是在事务开始之前已经存在，要么是事务自身插入或者修改过的。</li>
+<li>行的删除版本要么未定义，要么大于当前事务版本号。这可以确保事务读取到的行，在事务开始之前未被删除。<br>只有符合上述两个条件的记录，才能返回作为查询结果</li>
+</ul>
+</li>
+<li><p>INSERT<br>InnoDB为新插入的每一行保存当前系统版本号作为行版本号</p>
+</li>
+<li><p>DELETE<br>InnoDB为删除的每一行保存当前系统版本号作为删除标识</p>
+</li>
+<li><p>UPDATE<br>InnoDB为插入每一行新记录，保存当前系统版本号作为行版本号，同时保存当前系统版本号到原来的行作为行删除标识。</p>
+<p>保存这两个额外系统版本号，使大多数读操作都可以不用加锁，这样设计使得读数据操作很简单，性能很好，并且也能保证只会读取到符合标准的行。不足之处是每行记录都需要额外的存储空间，需要做更多的行检查工作，以及一些额外的维护工作。但是mvcc只能在‘未提交读’，‘提交读’两个隔离级别下工作。</p>
+</li>
+</ul>
+<h2 id="MySQL基准测试"><a href="#MySQL基准测试" class="headerlink" title="MySQL基准测试"></a>MySQL基准测试</h2><h3 id="为什么需要基准测试"><a href="#为什么需要基准测试" class="headerlink" title="为什么需要基准测试"></a>为什么需要基准测试</h3><p>基准测试可以完成一下工作：</p>
+<ul>
+<li><p>验证基于系统的一些假设，确认这些假设是否符合实际情况。</p>
+</li>
+<li><p>重现系统中的某些异常行为，以解决这些异常。</p>
+</li>
+<li><p>测试系统当前的运行情况。如果不清楚系统当前的性能，就无法确认某些优化的效果如何。也可以利用历史的基准测试结果来分析诊断一些无法预测的问题。</p>
+</li>
+<li><p>模拟比当前系统更高的负载，以找出系统随着压力增加而可能遇到的扩展行瓶颈。</p>
+</li>
+<li><p>规划未来的业务增长。基准测试可以评估在项目未来的负载下，需要什么样的硬件，需要多大容量的网络，以及其他相关资源。这由于主降低系统升级和重大变更的风险。</p>
+</li>
+<li><p>测试应用适应可变环境的能力。</p>
+</li>
+<li><p>测试不同的硬件、软件和操作系统配置。看哪个更适合。</p>
+</li>
+<li><p>证明新采购的设备是否配置正确。</p>
+<h3 id="基准测试的策略"><a href="#基准测试的策略" class="headerlink" title="基准测试的策略"></a>基准测试的策略</h3><p>基准测试有两种主要的策略:一是针对整个系统的整体测试，另外是单独测试MySQL。分别被称为集成式以及单组件式基准测试。针对整个系统做集成式测试，而不是单独测试MySQL的原因主要有以下几点:</p>
+</li>
+<li><p>测试整个应用系统，包括web服务器、应用代码、网络和数据库是非常有用的，因为用户关注的并不止是MySQL本身的性能，而是应用整体的性能。</p>
+</li>
+<li><p>MySQL并非总是应用的瓶颈，通过整体的测试可以揭示这一点。</p>
+</li>
+<li><p>只有对应用做整体测试，才能发现各部分之间的缓存带来的影响。</p>
+</li>
+<li><p>整体应用的集成式测试更能揭示应用的真实表现而单独组件的测试很难做到这一点。</p>
+<p>有时候单独测试MySQL的原因：</p>
+</li>
+<li><p>需要比较不同的schema或查询的性能</p>
+</li>
+<li><p>针对应用中某个具体的问题的测试。</p>
+</li>
+<li><p>为了避免漫长的基准测试，可以通过一个短期的基准测试，做快速的”舟求循环“，来检测出某些调整的效果</p>
+</li>
+</ul>
+<h3 id="测试的指标"><a href="#测试的指标" class="headerlink" title="测试的指标"></a>测试的指标</h3><ul>
+<li>吞吐量<br>吞吐量指的是单位时间内的事务处理数。非常适用于多用户的交互式应用。常用的测试单位是每秒实物数(TPS),有些也采用每分钟事务数(TPM)</li>
+<li>响应时间或者延迟<br>这个指标用于测试任务所需的整体时间。根据具体的应用，测试的时间单位可能是微妙，毫秒，秒，分钟。根据不同的时间单位可以计算出平均响应时间、最小响应时间、最大响应时间和所占百分比，最大响应时间通常意义不大，因为测试时间越长，最大响应时间也可能越大。而且其结果通常不可重复，每次是都可能得到不同的最大响应时间。因此进行多次测试，再取测试后的响应时间的聚集范围。<br>例如：如果95%的响应时间都是5毫秒，则表示任务在95%的时间段内都可以在5毫秒之内完成。</li>
+<li>并发性<br>WEB服务器的并发性更准确的度量指标应该是在任意时间有多少同时发生的并发请求，但是web服务器的并发会导致数据库的高并发（需要用到数据库的话，且有很多个MySQL数据库服务器查询链接）。<br>换句话说，并发性基准测试需要关注的是正在工作中的并发操作，或者是同时工作中的线程数或者连接数。当并发性增加是，需要测量吞吐量是否下降，响应时间是否边长。<br>数据库的并发性测量，可以通过sysbench指定32、64或者128个线程测试，然后在测试期间记录MySQL数据库的threads_running状态值。</li>
+<li>可拓展性<br>可扩展性指的是，给系统增加一倍的工作，在理想情况下就能获得两倍的结果(即吞吐量增加一倍)或者说给系统增加一倍的资源，就可以获得两倍的吞吐量（理想情况下）。</li>
+</ul>
+<h3 id="基准测试方法"><a href="#基准测试方法" class="headerlink" title="基准测试方法"></a>基准测试方法</h3><p>在测试时，避免以下错误来避免错误导致测试结果无用或者不精确：</p>
+<ul>
+<li>使用真实数据的子集而不是全集。</li>
+<li>例如应用需要处理几百gb的数据，但测试只有1gb数据，或者只使用当前数据进行测试，却希望模拟未来业务大幅度增长后的情况。</li>
+<li>使用错误的数据分布，例如使用均匀分布的数据测试，而系统的真实数据有很多热点区域(随机生产的测试数据通常无法模拟真实的数据分布)</li>
+<li>使用不真实的分布参数，例如假定所有用户的个人信息都会被平均地读取</li>
+<li>在多用户场景中，只做单用户的测试</li>
+<li>在单服务器测试分布式应用</li>
+<li>与真实用户行为不匹配。</li>
+<li>例如真实用户在请求一个页面后会阅读一段时间，而不是不停顿地一个接一个点击相关链接</li>
+<li>反复执行同一个查询，真实的查询是不尽相同的，这可能会导致缓存命中率降低，而反复执行同一个查询在某种程度上，会全部或者部分缓存结果。</li>
+<li>没有检查错误。<br>果测试的结果无法得到合理的解释，比如一个本应该很慢的查询突然变快了，就应该检查是否有错误产生，否则可能只是测试了MySQL检测语法错误的产生。否则可能只是测试了MySQL检测语法错误的速度。所以基准测试完成后，一定要检查以下错误日志。</li>
+<li>忽略了系统预热的过程<br>例如系统重启后马上测试，有时候需要了解系统重启后需要多长时间才能达到正常的性能容量，要特别留意预热的时长。反过来说，如果要想分析正常的性能，需要注意，若基准测试在重启以后马上启动，则缓存是冷的、还没有数据，这时即使测试的压力相同，得到的结果也和缓存已经装满数据时的不同的</li>
+<li>使用默认的服务器配置</li>
+<li>测试时间太短。基准测试需要持续一定的时间。</li>
+</ul>
+<h3 id="测试工具（待补充）"><a href="#测试工具（待补充）" class="headerlink" title="测试工具（待补充）"></a>测试工具（待补充）</h3><p>略</p>
+<h2 id="服务器性能剖析"><a href="#服务器性能剖析" class="headerlink" title="服务器性能剖析"></a>服务器性能剖析</h2><h3 id="性能优化简介"><a href="#性能优化简介" class="headerlink" title="性能优化简介"></a>性能优化简介</h3><p><strong>性能</strong>的定义为完成某件任务所需的时间度量。<br>注:</p>
+<ul>
+<li>性能优化并不是指降低cpu利用率<br>虽然出bug会提高cpu利用率，但是同一时间内，能消耗更多的性能去加快查询速度，这是提升了性能。</li>
+</ul>
+<h3 id="通过性能剖析进行优化"><a href="#通过性能剖析进行优化" class="headerlink" title="通过性能剖析进行优化"></a>通过性能剖析进行优化</h3><p>步骤:测量任务所花费的时间，然后对结果进行统计和排序，将重要的任务排到前面<br>性能剖析有两种：</p>
+<ul>
+<li>基于执行时间的分析<br>研究的是什么任务的执行时间最长</li>
+<li>基于等待的分析<br>判断任务在什么地方被阻塞的时间最长</li>
+</ul>
+<h3 id="理解性能剖析"><a href="#理解性能剖析" class="headerlink" title="理解性能剖析"></a>理解性能剖析</h3><p>MySQL的性能剖析将最重要的任务展示在前面，但有时候没显示出来的信息也很重要。但是还是有很多需要的信息是缺失的。</p>
+<ul>
+<li>不值得优化的查询<br>一些只占总响应时间比重很小的查询是不值得优化的。<br>如果优化的成本大于收益，就应停止优化</li>
+<li>异常情况<br>有些任务即使没有出现在性能剖析输出的前面也需要优化。比如某些任务执行次数很少，但每次执行都非常慢，严重影响用户体验，因为其执行频率低，所以总的响应时间占比并不突出。</li>
+<li>未知的未知<br>一款好的性能剖析工具会显示可能的”丢失的时间“。丢失的时间指的是任务的总时间和实际测量到的时间之间的差。例如，如果处理器的cpu时间是10秒，而剖析到的任务总时间是9.7秒，那么就有300好秒的丢失时间。这可能是有些任务没有测量到，也可能是由于测量的误差和精度问题的缘故</li>
+<li>掩藏的细节<br>有些时候不能相信平均值，例如有两次查询响应的时间是1秒。另外的所有响应时间缺失几十微妙，这时候平均值是无法发现的，但是这两次响应值可能代表一些会发生的异常</li>
+</ul>
+<h3 id="剖析MySQL查询"><a href="#剖析MySQL查询" class="headerlink" title="剖析MySQL查询"></a>剖析MySQL查询</h3><h4 id="剖析服务器负载"><a href="#剖析服务器负载" class="headerlink" title="剖析服务器负载"></a>剖析服务器负载</h4><h5 id="捕获MySQL的查询到日志文件中"><a href="#捕获MySQL的查询到日志文件中" class="headerlink" title="捕获MySQL的查询到日志文件中"></a>捕获MySQL的查询到日志文件中</h5><p>MySQL的<strong>慢查询</strong>日志的功能（最初只是捕获比较”慢“的查询）。现在可以通过设置long_query_time为0来捕获所有的查询。<br>慢查询日志开销是最低的、精度最高的测量查询时间的工具（一般不会带来额外的i/o开销，cpu密集型场景i\o开销的影响会较大），但是慢查询可能消耗大量的磁盘空间<br>Percona Server的慢查询日志比官方的记录了更多细节且有价值的信息，如查询执行计划、锁、i/o活动等<br>有时因为权限不够的原因，无法在服务器上记录查询。可以使用两种替代的技术。</p>
+<ul>
+<li>通过– processlist选项不断查看SHOW FULL PROCESSLIST的输出，记录查询第一次出现的时间和消失的时间。但是一些执行较快的查询可能在两次执行的间隙就执行完成了，从而无法捕获到。</li>
+<li>通过tcp网络包，根据MySQL的客户端/服务端通信协议进行解析。可以先通过tcpdump将网络包数据保存到磁盘，然后使用pt-query-digest的–type=tcpdump选项来解析并分析查询，此方法的精度比较高，并且可以捕获所有查询，还可以解析更高级的协议特性，如二进制协议。</li>
+</ul>
+<h5 id="分析查询日志"><a href="#分析查询日志" class="headerlink" title="分析查询日志"></a>分析查询日志</h5><p>虽然生成了日志，但是打开整个慢查询日志进行分析很浪费时间。所以:<br>首先应该生成一个剖析报告，如果需要，则可以查看日志中需要特别关注的部分。生产剖析<br>报告的工具——pt-query-digest，可以将查询报告保存到数据库中，以及追踪工作负载时间的变化。<br><strong>详细介绍在书和<a target="_blank" rel="noopener" href="http://blog.csdn.net/seteor/article/details/24017913">链接</a></strong></p>
+<h4 id="剖析单挑语句"><a href="#剖析单挑语句" class="headerlink" title="剖析单挑语句"></a>剖析单挑语句</h4><p>定位到需要优化的单条查询后，就可以针对这个查询捉取更多的信息，确认为什么会花那么多时间取执行，以及如何取优化。以下是如何方便的测量查询执行的各部分花费了多少时间</p>
+<ul>
+<li><p>使用SHOW PROFILE<br>该命令默认是禁用的（我现在用的时候好像默认启用- -？），但可以通过服务器变量在会话（连接）级别动态地修改</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SET</span> profiling <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
+<p>  然后在服务器执行语句时，该工具都会测量其耗费的时间和其他一些查询执行状态变更相关的数据显示如：997rows in set (0.17sec)<br>输入命令：</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span><span class="hljs-keyword">SHOW</span> PROFILES;<br></code></pre></td></tr></table></figure>
+<p>  会返回一张表，记录了时间和所输入的命令</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SHOW</span> PROFILE <span class="hljs-keyword">FOR</span> QUERY <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
+<p>  命令可以剖析报告给出了查询执行的每个步骤及其花费的时间，但是输出是按照执行顺序排序的，而不是按花费了多少时间….也不嫩用ORDER BY之类的命令重新排序。<br>也可以按如下查询<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/MySQL%E4%BC%98%E5%8C%96%E7%A4%BA%E4%BE%8B.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">enter description here</span><br>这样就可以找到消耗时间的排行了，再去接着优化。</p>
+</li>
+<li><p>使用SHOW STATUS<br>该命令会返回一些计数器，既有服务器级别的全局计数器，也有基于某个链接的会话级别的计数器。<br>如果执行<strong>SHOW GLOBAL STATUS</strong>则可以查看服务器级别的从服务器启动时开始计算的查询次数统计。<br>由于返回的结果只是计数器，可以显示某些活动如读索引的频繁程度，无法给出消耗了多少时间。但可以根据计数器来猜测那些操作待机较高或者消耗时间较多</p>
+</li>
+<li><p>使用慢查询日志<br>查看慢查询日志是，其标题部分一般有如下输出:<br>Query 1: 0 QPS, 0x concurrency, ID oxEE758C5EoD7EADEE at byte 3214 ___<br>表明可以通过这里的字节偏移值(3214)直接跳转到日志的对应部分，如以下命令：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">tail <span class="hljs-operator">-</span>c <span class="hljs-operator">+</span><span class="hljs-number">3214</span> <span class="hljs-operator">/</span>path<span class="hljs-operator">/</span><span class="hljs-keyword">to</span><span class="hljs-operator">/</span>query.log <span class="hljs-operator">|</span> head <span class="hljs-operator">-</span>n100<br></code></pre></td></tr></table></figure></li>
+<li><p>使用Performance Schema<br>待查找5.6有无新特性</p>
+</li>
+</ul>
+<h3 id="诊断间歇性问题"><a href="#诊断间歇性问题" class="headerlink" title="诊断间歇性问题"></a>诊断间歇性问题</h3><p>列出的案例:</p>
+<ul>
+<li>应用通过curl从一个运行得很慢的外部服务来获取汇率报价的数据</li>
+<li>memcached缓存中的一些重要条目过去，导致大量请求落到mysql以重新生产缓存条目。</li>
+<li>DNS查询偶尔会有超时现象</li>
+<li>可能是由于互斥锁争用，或者内部删除查询缓存的算法效率太低的缘故，MySQL的查询缓存有时候会导致服务有短暂的停顿。</li>
+<li>当并发度超过某个阀值时，InnoDC的扩展性限制导致查询计划的优化需要很长的时间。</li>
+</ul>
+<h4 id="单条查询问题还是服务器问题"><a href="#单条查询问题还是服务器问题" class="headerlink" title="单条查询问题还是服务器问题"></a>单条查询问题还是服务器问题</h4><ul>
+<li>使用SHOW GLOBAL STATUS<br>这个方法实际上就是以较高的频率如一秒一次执行命令捕获数据，问题出现时，通过计数器（如:Threads_running,Threads_connected,Questions和Queries）的”尖刺“或”凹陷“来发现。这方法简单且对服务器影响小。<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/MYSQL%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AF%8A%E6%96%AD.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">enter description here</span><br>这个命令是每秒捕获一次SHOW GLOBAL STATUS的数据，且输出给awk计算并输出每秒的:Threads_running,Threads_connected,Questions和Queries这几个数据的趋势对于服务器级别偶尔停顿的敏感性高。</li>
+<li>使用SHOW PROCESSLIST<br>这个方法通过不停的捕获show processlist的输出，观察是否有大量线程处于不正常的状态或者有其他不正常的特征。可以使用以下命令查询(sort,uniq,sort计算某个列值出现的次数):<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql <span class="hljs-operator">-</span>e <span class="hljs-string">&#x27;SHOW PROCESSLIST\G&#x27;</span> <span class="hljs-operator">|</span>grep State: <span class="hljs-operator">|</span>sort <span class="hljs-operator">|</span>uniq <span class="hljs-operator">-</span>c <span class="hljs-operator">|</span>sort <span class="hljs-operator">-</span>rn<br></code></pre></td></tr></table></figure>
+<h2 id="Schema与数据类型优化"><a href="#Schema与数据类型优化" class="headerlink" title="Schema与数据类型优化"></a>Schema与数据类型优化</h2><h3 id="选择优化的数据类型"><a href="#选择优化的数据类型" class="headerlink" title="选择优化的数据类型"></a>选择优化的数据类型</h3>存储类型的选择</li>
+<li>更小的通常更好<br>一般情况下，应尽量吃用可以正确存储数据的最小数据类型。如果无法确定哪个数据类型是最好的，就选择认为不会超过方位的最小类型。</li>
+<li>简单就好<br>可以使用int就别用float，且使用MySQL内建的类型来存储日期和时间。（存储ip地址用int）</li>
+<li>尽量避免使用null<br>通常情况下，最好指定列为NOT NULL,除非真的需要存储Null值。不过在InnoDB时影响不大</li>
+</ul>
+<h4 id="整数类型"><a href="#整数类型" class="headerlink" title="整数类型"></a>整数类型</h4><p>如果存储整数，可以使用这几种整数类型:TINYINT,SMALLINT.MEDIUMINT,INT,BIGINT,分别使用8,16,24,32,64位存储空间。<br>整数类型有可选的的UNSIGNED属性，表示不允许负值。<br>在TINYINTZHONGZHONG，不使用UNSIGNED属性:存储范围-128<del>128<br>使用UNSIGNED属性:存储范围0</del>255<br>此外，MySQL可以为整数类型指定宽度，例如INT(11)，对大多数应用是没意义的:它不会限制值的合法范围，只是规定一些MySQL交互工具用来显示字符的个数。</p>
+<h4 id="实数类型"><a href="#实数类型" class="headerlink" title="实数类型"></a>实数类型</h4><p>有浮点和DECIMAL，浮点有FLOAT和DOUBLE，其中FLOAT占用4个字节存储，DOUBLE占用8个字节且相比FLOAT有更大的范围和更高的精度。<br>因为需要额外的空间和计算开销，所以尽量只在对小数进行精确计算时才使用DECIMAL。例如存储财务数据。但在数据了比较大的时候，可以考虑使用BIGINT代替DECIMAL，将需要存储的货币单位根据小数的位数乘以响应的倍数即可。这样可以避免浮点存储计算不精确和DECIMAL精确计算代价高的问题</p>
+<h4 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h4><ul>
+<li><p>VARCHAR(InnoDB/MYISAM引擎下的说明)<br>存储可变长字符串，比CHAR节省空间，但是，如果MySQL表使用ROW_FORMAT=FIXED创建的话，每一行都会使用定长存储。<br>VARCHAR需要使用额外字节记录字符长度，如果列的最大长度小于或等于255，则使用1个字节，否则使用2个字节。<br>适用VARCHAR的情况：</p>
+<ul>
+<li>字符串列的最大长度比平均长度大很多</li>
+<li>列的更新很少</li>
+<li>使用了像UTF-8这样复杂的字符串（每个字符串都使用不同的字节数进行存储）<br>在存储IP地址时，不应该使用VARCHAR(15)来存储，因为它本身是32位的二进制。MySQL提供了INET_ATON()和INET_NTOA()在这两种表示方法之间转换</li>
+</ul>
+</li>
+<li><p>CHAR(InnoDB/MYISAM引擎下的说明)<br>CHAR类型是定长的，MySQL总是根据定义的字符串长度分配足够的空间，当存储CHAR值是，MySQL会删除所有的末尾空格。<br>使用CHAR的情况</p>
+<ul>
+<li>适合存储所有制都接近同一个长度（如MD5）</li>
+<li>经常变更的数据（定长的CHAR不容易产生碎片）</li>
+<li>非常短的列如(Y/N)</li>
+</ul>
+</li>
+<li><p>BLOB和TEXT类型<br>BLOB和TEXT都是为了很大的数据而设计的字符串数据类型，分别采用存储二进制和字符串方式存储</p>
+</li>
+<li><p>使用枚举代替字符串类型</p>
+</li>
+<li><p>枚举列可以把一些不重复的字符串存储成一个预定义的集合。MySQL在存储枚举时非常紧凑，会根据列表值的数量压缩到一个或两个字节中。在内部会将每个值在列表中的未知保存为整数，并且在表的.frm文件中保存“数字-字符串”映射关系的”查找表”。<br>栗子：</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> enum_test(<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>    e ENUM(<span class="hljs-string">&#x27;fish&#x27;</span>,<span class="hljs-string">&#x27;apple&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>)<span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span><br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>);<br>mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> enum_test(e) <span class="hljs-keyword">VALUES</span>(<span class="hljs-string">&#x27;fish&#x27;</span>),(<span class="hljs-string">&#x27;dog&#x27;</span>),(<span class="hljs-string">&#x27;apple&#x27;</span>);<br></code></pre></td></tr></table></figure>
+<p>  其中存储顺序是按照</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> enum_test(e) <span class="hljs-keyword">VALUES</span>(<span class="hljs-string">&#x27;fish&#x27;</span>),(<span class="hljs-string">&#x27;dog&#x27;</span>),(<span class="hljs-string">&#x27;apple&#x27;</span>);<br></code></pre></td></tr></table></figure>
+<p>  进行排序的，而数字是按照</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">e ENUM(<span class="hljs-string">&#x27;fish&#x27;</span>,<span class="hljs-string">&#x27;apple&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>)<span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span><br></code></pre></td></tr></table></figure>
+<p>  绑定的<br>  可以输入</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span><span class="hljs-keyword">SELECT</span> e <span class="hljs-operator">+</span> <span class="hljs-number">0</span> <span class="hljs-keyword">FROM</span> enum_test;<br></code></pre></td></tr></table></figure>
+<p>  查看对应的数字，而</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> SELECE e <span class="hljs-keyword">FROM</span> enum_test <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> e;<br></code></pre></td></tr></table></figure>
+<p>  可以查看按照e排序的表。</p>
+<p>  枚举不好的地方是，字符串列表是固定的，天界或删除字符串必须使用ALTER TABLE。枚举把每个枚举值保存为整数，并且必须进行查找才能转换为字符串，所以枚举列有一些开销，所以枚举的列表要比较小。</p>
+</li>
+</ul>
+<h4 id="日期和时间类型"><a href="#日期和时间类型" class="headerlink" title="日期和时间类型"></a>日期和时间类型</h4><p>MySQL可以使用许多类型来保存日期和是兼职，如year和date.MySQL能存储的最小时间粒度为秒。但是可以使用微妙级别的粒度进行临时运算，且提供了DATETIME和TIMESTAMP两种日期类型</p>
+<ul>
+<li><p>DATETIME<br>保存的范围为：1001～9999年，精度为秒，格式为YYYYMMDDHHMMSS,与时区无关，使用8个字节的存储空间</p>
+</li>
+<li><p>TIMESTAMP<br>同unix时间戳保存了1979/1/1以来的秒数（如果还是32位的话，就到2038年）。只使用4个字节存储空间。<br>FROM_UNIXTIME()把unix时间戳转换为日期<br>UNIX_TIMSTAMP()把日期转换为unix时间戳<br>如果在插入时没有指定第一个TIMESTAMP列的值，MySQL则设置这个列的值为当前时间。在插入一行记录是，MySQL默认也会更新第一个TIMESTAMP列的值(除非在UPDATE语句中明确指定了值。)</p>
+<h4 id="位数据类型"><a href="#位数据类型" class="headerlink" title="位数据类型"></a>位数据类型</h4></li>
+<li><p>BIT<br>可以使用BIT列在一列中存储一个或多个true/false值，BIT列的最大长度是64个位。<br>MySQL把BIT当做字符串类型，而不是数字类型。当检索是，结果是一个包含二进制的字符串而不是ASCII码。</p>
+</li>
+<li><p>SET<br>如果需要保存很多true/false值，可以考虑合并这些列到一个SET数据类型，它在MySQL内部是以一系列打包的位的集合来表示的。有效利用了存储空间。不过，它的主要缺点是该表列的定义的代价比较高，需要ALTER TABLE。</p>
+</li>
+</ul>
+<h3 id="MySQL-schema设计中的陷阱"><a href="#MySQL-schema设计中的陷阱" class="headerlink" title="MySQL schema设计中的陷阱"></a>MySQL schema设计中的陷阱</h3><ul>
+<li>太多的列<br>MySQL的存储引擎API工作时需要在服务器层和存储引擎层之间通过行缓冲格式拷贝数据，然后在服务器层将缓冲内容解码成各个列。从行缓冲中将编码过的列转换成行数据结构的操作代价是非常高的，而且转换的代价依赖于列的数据。所以可以拆分为多个表，再关联起来。</li>
+<li>太多的关联<br>如果希望查询执行的快速且并发性好，单个查询最好在12个表以内做关联</li>
+<li>全能的枚举<br>在MySQL中，当需要在枚举中增加一个新的数据时。就需要做一次ALTER TABLE操作。</li>
+</ul>
+<h3 id="范式和反范式"><a href="#范式和反范式" class="headerlink" title="范式和反范式"></a>范式和反范式</h3><p>在范式化的数据库中，每个事实数据会出现并且只出现一次，相反，在反范式化的数据库中，信息是冗余的。栗子：</p>
+<table>
+<thead>
+<tr>
+<th>EMPLOYEE</th>
+<th>DEPARTMENT</th>
+<th>HEAD</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Jones</td>
+<td>Accounting</td>
+<td>Jones</td>
+</tr>
+<tr>
+<td>Smith</td>
+<td>Engineering</td>
+<td>Smith</td>
+</tr>
+<tr>
+<td>Browm</td>
+<td>Accounting</td>
+<td>Jones</td>
+</tr>
+<tr>
+<td>Green</td>
+<td>Engineering</td>
+<td>Smith</td>
+</tr>
+</tbody></table>
+<p>假如Say Browm接任Accounting部门的领导。需要修改多行数据来反映这个变化。<br>在没有雇员信息情况下就无法表示一个部门。如果我们删除了所有Accounting部门的雇员，我们就失去了关于这个部门本身的所有记录。所以我们需要对这个表进行范式化，拆分雇员和部门项。<br>拆分后的表如下:<br>雇员表:<br>| EMPLOYEE | DEPARTMENT  |<br>| ——– | ———– |<br>| Jones    | Accounting  |<br>| Smith    | Engineering |<br>| Browm    |   Accounting  |<br>| Green    | Engineering  |<br>部门表:<br>| DEPARTMENT  | HEAD  |<br>| ———– | —– |<br>| Accounting  | Jones |<br>| Engineering | Smith |</p>
+<h4 id="范式的优点和缺点"><a href="#范式的优点和缺点" class="headerlink" title="范式的优点和缺点"></a>范式的优点和缺点</h4><p>优点:</p>
+<ul>
+<li>范式化的更新操作通常比反范式化要快</li>
+<li>当数据较好地范式化时，就只有很少或者有没重复数据，所以只需要修改更少的数据。</li>
+<li>范式化的表通常更小，可以更好地放在内存里，所以操作会更快。</li>
+<li>很少有多余的数据意味这检错列表数据时更少需要DISTINCT或者GROUP BY才能获得一份唯一的部门表。<br>缺点:通常需要关联，稍微复杂一些的查询语句在符合范式的schema上都可能需要至少一次关联，也许更多。</li>
+</ul>
+<h3 id="缓存表和汇总表"><a href="#缓存表和汇总表" class="headerlink" title="缓存表和汇总表"></a>缓存表和汇总表</h3><p>提升性能最好的方法除了在同一张表中保存衍生的冗余数据外，也可以通过创建一张完全独立的汇总表或缓存表。<br>缓存表:表示存储那些可以比较简单地从schema其他表获取(但每次获取的速度比较慢)的数据表（如逻辑冗余的数据）。<br>汇总表:保存的是使用GROUP BY 语句聚合数据的表。</p>
+<p>汇总表栗子：如果一个网站需要计算之前24小时内发送的消息数，可以这样设计:<br>以每小时汇总表为基础，把前23个完整的小时的统计表中的计数全部加起来，最后再加上开始阶段和结束阶段不完整的小时内的计数。</p>
+<p>而缓存表则不一样，对优化搜索和检索查询语句很有效。这些查询语句经常需要特殊的表和索引结构。栗子:如果需要很多不同的索引组合来加速各种类型的查询时，可以创建一张只包含主表中部分列的缓存表。这时可以使用不同的存储引擎，例如主表使用InnoDB ，缓存表用MyISAM将会得到更小的索引空间。</p>
+<p>在重建表时，可以考虑通过使用”影子表”来实现，也就是创建一个新表，填充数据后与真实表做切换。栗子，原始表为my_summary<br>命令:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> my_summary_new,my_summary_old;<br>mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> my_summary_new <span class="hljs-keyword">LIKE</span> my_summary;<br><span class="hljs-comment">-- populate my_summary_new as desired</span><br>mysql<span class="hljs-operator">&gt;</span> RENAME <span class="hljs-keyword">TABLE</span> my_summary <span class="hljs-keyword">TO</span> my_summary_old, my_summary_new <span class="hljs-keyword">TO</span>  my_summary;<br></code></pre></td></tr></table></figure>
+<h4 id="计数器表"><a href="#计数器表" class="headerlink" title="计数器表"></a>计数器表</h4><p>一般设计的计数器表只有一行数据，对于事务来说，这条记录上都有一个全局的互斥锁，会使得事务只能串行执行，如果要获得更高的并发更新性能，也可以将计数器保存在多行中，每次随机选择一行更新，要获得结果时，则使用聚合查询。<br>创建命令：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> CREAT <span class="hljs-keyword">TABLE</span> hit_counter(<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>    slot tinyint unsigned <span class="hljs-keyword">not</span> <span class="hljs-keyword">null</span> <span class="hljs-keyword">primary</span> <span class="hljs-keyword">key</span>,<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>    cnt <span class="hljs-type">int</span> unsigned <span class="hljs-keyword">not</span> <span class="hljs-keyword">null</span><br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>)   ENGINE<span class="hljs-operator">=</span>InnoDB;<br></code></pre></td></tr></table></figure>
+<p>更新命令(创建100行):</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span><span class="hljs-keyword">UPDATE</span> hit_counter <span class="hljs-keyword">SET</span> cnt <span class="hljs-operator">=</span> cnt <span class="hljs-operator">+</span> <span class="hljs-number">1</span> <span class="hljs-keyword">WHERE</span> slot <span class="hljs-operator">=</span> RAND()<span class="hljs-operator">*</span><span class="hljs-number">100</span>;<br></code></pre></td></tr></table></figure>
+<p>获得结果:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>(cnt) <span class="hljs-keyword">FROM</span> hit_counter;<br></code></pre></td></tr></table></figure>
+<p>如果希望减少表的行数，可以写一个周期执行的任务，合并所有结果到0号槽并删除其他槽:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">UPDATE</span> daily_hit_counter <span class="hljs-keyword">as</span> c<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>    <span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span>(<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>        <span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">day</span>,<span class="hljs-built_in">SUM</span>(cnt) <span class="hljs-keyword">AS</span> cnt,<span class="hljs-built_in">MIN</span>(slot) <span class="hljs-keyword">AS</span> mslot<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>        <span class="hljs-keyword">FROM</span> daily_hit_counter<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>        <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> <span class="hljs-keyword">day</span><br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>    ) <span class="hljs-keyword">AS</span> xUSING(<span class="hljs-keyword">day</span>)<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SET</span> c.cnt <span class="hljs-operator">=</span> IF(c.slot <span class="hljs-operator">=</span> x.mslot, x.cnt,<span class="hljs-number">0</span>), <br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span>     c.slot <span class="hljs-operator">=</span> IF(c.slot <span class="hljs-operator">=</span> x.mslot,<span class="hljs-number">0</span>,c<span class="hljs-operator">/</span>slot);<br>mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> daily_hit_counter <span class="hljs-keyword">WHERE</span> slot <span class="hljs-operator">&lt;&gt;</span> <span class="hljs-number">0</span><span class="hljs-keyword">AND</span> cnt <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br></code></pre></td></tr></table></figure>
+<h3 id="加快ALTER-TABLE-操作的速度"><a href="#加快ALTER-TABLE-操作的速度" class="headerlink" title="加快ALTER TABLE 操作的速度"></a>加快ALTER TABLE 操作的速度</h3><p>一般来说ALTER TABLE都是重建表，操作的性能都比较差，特别是大表<br>但有也有例外，例如，有两种方法可以改变或删除一个列的默认值(一种方法很快，一种很慢)。假如要修改电影的默认租赁限期，从三天改到五天，很慢的方式:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> sakila.film<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> MODIFT <span class="hljs-keyword">COLUMN</span> rental_duration TINYINT(<span class="hljs-number">3</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">5</span>;<br></code></pre></td></tr></table></figure>
+<p>该方式拷贝了整张表到一张新表，甚至列的类型、大小和可否为NULL属性都没改变。</p>
+<p>快的方式:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> sakila.film<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">COLUMN</span> rental_duration <span class="hljs-keyword">SET</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">5</span>;<br></code></pre></td></tr></table></figure>
+<p>该方式会直接修改.frm文件而不涉及表数据。所以这个操作会很快。</p>
+<h4 id="只修改-frm文件"><a href="#只修改-frm文件" class="headerlink" title="只修改.frm文件"></a>只修改.frm文件</h4><p>如果是这些操作则可能不需要重建:</p>
+<ul>
+<li>移除(不是增加)一个列的AUTO_INCREMENT属性</li>
+<li>增加、移除、或更改ENUM和SET常量。如果移除的是已经有行数据用到其值的常量，查询将会返回一个空字符串值</li>
+</ul>
+<p>修改方法(为表结构创建一个新的.frm文件，然后用它替换掉已经存在的那张表.frm文件):</p>
+<ol>
+<li>创建一张有相同结构的空表，并进行所需的修改(如增加enum常量)</li>
+<li>执行FLUSH TABLES WITH READ LOCK。这将会关闭所有正在使用的表，并且禁止任何表被打开。</li>
+<li>交换.frm文件</li>
+<li>执行UNLOCK TABLES 来释放第二步的读锁</li>
+</ol>
+<h4 id="快速创建MyISAM索引"><a href="#快速创建MyISAM索引" class="headerlink" title="快速创建MyISAM索引"></a>快速创建MyISAM索引</h4><p>为了高效地载入数据到MyISAM表中，有一个常用的技巧是先禁用索引，载入数据，然后再启用索引。这样之所以能加快的原因是构建索引的工作被延迟到数据完全载入后，这个时候已经可以通过排序来构建索引了。<br>操作步骤:</p>
+<ol>
+<li>用需要的表结构创建一张表，但是不包括索引</li>
+<li>载入数据到表中以构建.MYD文件</li>
+<li>按照需要的结构创建另外一张空表，这次要包含索引，这回创建需要的.frm和.MYI文件</li>
+<li>获取读锁并刷新</li>
+<li>重命名第二张表的.frm和.MYI文件，让MySQL认为是一张表的文件</li>
+<li>释放读锁</li>
+<li>使用REPAIR TABLE来重建表的索引。该操作会通过排序来构建所有索引，包括唯一索引</li>
+</ol>
+<h2 id="创建高性能的索引"><a href="#创建高性能的索引" class="headerlink" title="创建高性能的索引"></a>创建高性能的索引</h2><h3 id="索引基础"><a href="#索引基础" class="headerlink" title="索引基础"></a>索引基础</h3><p>索引原理栗子:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> first_name <span class="hljs-keyword">FROM</span> sakila.actor <span class="hljs-keyword">WHERE</span> actor_id <span class="hljs-operator">=</span> <span class="hljs-number">5</span>;<br></code></pre></td></tr></table></figure>
+<p>如果在actor_id列上建有索引，则MySQL将使用该索引找到actor_id为5的行，也就是，MySQL先在索引上按值进行查找，然后返回所有包含该值的数据行。</p>
+<p>索引可以包含一个或多个列的值。如果索引包含多个列，那么列的顺序也十分重要，因为MySQL只能高效地使用索引的最左前缀列，创建一个包含两个列的索引，和创建两个只包含一列的索引是大不相同的</p>
+<h4 id="索引类型"><a href="#索引类型" class="headerlink" title="索引类型"></a>索引类型</h4><p>在MySQL中，索引是在存储引擎层而不是服务器层实现的，所以，并没有同一的索引标准，不同存储引擎的索引的工作方式并不一样，也不是所有的存储引擎都支持所有类型的索引。</p>
+<ul>
+<li><p>B-Tree索引<br>所有值都是按顺序存储的，并且每一个叶子页到根的距离相同。<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/sql-b-tree.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">innoDB的B-tree结构</span><br>存储引擎根据索引的根节点开始进行搜索。<br>B-Tree索引的查询类型适用于全键值、键值范围或键前缀查找。其中键前缀查找只使用于根据最左前缀的查找。前面所述的索引对如下类型的查询有效:</p>
+<ul>
+<li><p>全值匹配<br>全值匹配指的是和索引中的所有列进行匹配，例如可用于查找姓名为CUba Allen、出生与1960-01-01的人</p>
+</li>
+<li><p>匹配最左前缀<br>可用于查找所有姓为Allen的人，即只使用索引的第一列</p>
+</li>
+<li><p>匹配列前缀<br>匹配某一列的值的开头部分，如查找所有以J开头的姓的人</p>
+</li>
+<li><p>匹配范围值<br>例如查找姓位于Allen和Barrymore之间的人</p>
+</li>
+<li><p>精确匹配某一列并范围匹配另外一列<br>如查找所有姓为Allen且名字是字母K开头的人</p>
+</li>
+<li><p>只访问索引的查询<br>查询只需要访问索引而无需访问数据行</p>
+<p>B-Tree索引的限制</p>
+</li>
+<li><p>如果不是按照索引的最左列开始查找，则无法使用索引。</p>
+</li>
+<li><p>不能跳过索引中的列</p>
+</li>
+<li><p>如果查询中有某个列的范围查询，则其右边所有列都无法使用索引优化查找。<br>如“WHERE last_name=’Smith’ AND first_name LIKe ‘J%’ AND dob = ‘1976-12-23’”这个查询只能使用索引的前两列，由于like是范围条件。</p>
+</li>
+</ul>
+</li>
+<li><p>哈希索引<br>哈希索引基于哈希表实现，只有精确到匹配索引所有列的查询才有效。对于每一行数据，存储引擎会对所有的索引列计算一个哈希码，哈希码是一个较小的值，并且不同键值的行计算出来的哈希码也不一样，哈希索引将所有的哈希码存储在索引中，同时在哈希表中保存指向每个数据行的指针。<br>在MySQL中只有Memory引擎显示支持哈希索引(注:经查阅，NDB也支持，而InnoDB支持的方式略不同，不能人为干与，只能自动创建)<br>由于索引本身只需存储对应的哈希值所以索引的结构十分紧凑，这也让哈希索引查找的速度非常快，不过哈希索引也有它的限制:</p>
+<ul>
+<li>哈希索引只包含哈希值和行指针，而不存储字段值，所以不能使用索引中的值来避免读取行。不过，访问内存中的行的速度很快，所以大部分情况下这一点对性能的影响并不明显。</li>
+<li>哈希索引数据并不是按照索引值顺序存储的，所以就无法用于排序</li>
+<li>哈希索引也不支持部分索引列匹配查找，因为哈希索引始终是使用索引列的全部内容来计算哈希值的。</li>
+<li>哈希索引只支持等值比较查询，=、IN()、&lt;=&gt;</li>
+<li>访问哈希索引的数据非常快，除非有很多哈希冲突。当出现冲突时，存储引擎必须遍历链表中所有的行指针，逐步进行比较，直到找到所有符合条件的行</li>
+</ul>
+</li>
+</ul>
+<p>关于innoDB的哈希索引:当innoDB注意到某些索引值被使用得非常频繁时，它会在内存中基于B-tree索引之上再创建一个哈希索引，这样就让B-Tree索引也具有哈希索引的一些优点，但这是一个完全自动的、内部的行为，用户无法控制或配置，但可以完全关闭该功能</p>
+<pre><code>- 创建自定义哈希索引
+如果引擎不支持哈希索引，则可以模拟像InnoDB一样创建哈希索引。
+思路就是在用B-Tree查找时，它使用哈希值而不是键本身进行索引查找，需要做的就是在查询的WHERE子句中手动指定使用哈希函数。栗子（使用B-Tree存储URL）：
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> id <span class="hljs-keyword">FROM</span> url <span class="hljs-keyword">WHERE</span> url<span class="hljs-operator">=</span>&quot;http://www.mysql.com&quot;;<br></code></pre></td></tr></table></figure>
+改用为：
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> id <span class="hljs-keyword">FROM</span> url <span class="hljs-keyword">WHERE</span> url<span class="hljs-operator">=</span>&quot;http://www.mysql.com&quot;<br>    <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">AND</span> url_crc<span class="hljs-operator">=</span>CRC32(&quot;http://www.mysql.com&quot;);<br></code></pre></td></tr></table></figure>
+这样的查询速度很快，不过需要自己来维护哈希值。可以使用触发器实现，下面的案例演示了触发器如何在插入和更新时维护url_crc列。首先创建下表:
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> pseudohash(<br>    id <span class="hljs-type">int</span> unsigned <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> auto_increment,<br>    url <span class="hljs-type">varchar</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>    url_crc <span class="hljs-type">int</span> unsigned <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">0</span>,<br>    <span class="hljs-keyword">PRIMARY</span> <span class="hljs-keyword">KEY</span>(id)<br>);<br></code></pre></td></tr></table></figure>
+然后创建触发器。先临时修改以下语句分隔符，这样就可以在触发器定义中使用分好:
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">DELIMITER</span>//<br><br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> pseudohash_crc_ins <span class="hljs-keyword">BEFORE</span> <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> pseudohash <span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-keyword">ROW</span> <span class="hljs-keyword">BEGIN</span><br><span class="hljs-keyword">SET</span> <span class="hljs-built_in">NEW</span>.url_crc=crc32(<span class="hljs-built_in">NEW</span>.url);<br><span class="hljs-keyword">END</span>;<br>//<br><br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> pseudohash_crc_UPD <span class="hljs-keyword">BEFORE</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">ON</span> pseudohash <span class="hljs-keyword">FOR</span>  <span class="hljs-keyword">EACH</span> <span class="hljs-keyword">ROW</span> <span class="hljs-keyword">BEGIN</span> <span class="hljs-keyword">SET</span> <span class="hljs-built_in">NEW</span>.uel_crc=crc32(<span class="hljs-built_in">NEW</span>.url);<br><span class="hljs-keyword">END</span>;<br>//<br></code></pre></td></tr></table></figure>
+如果出现哈希冲突。查询时应该使用类似于:
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> word,crc <span class="hljs-keyword">FROM</span> words <span class="hljs-keyword">WHERE</span> crc <span class="hljs-operator">=</span> CRC(<span class="hljs-string">&#x27;gnu&#x27;</span>)<span class="hljs-keyword">AND</span> word <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;gnu&#x27;</span>;<br></code></pre></td></tr></table></figure>
+而不是单单：
+    <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> word,crc <span class="hljs-keyword">FROM</span> words <span class="hljs-keyword">WHERE</span> crc <span class="hljs-operator">=</span> CRC(<span class="hljs-string">&#x27;gnu&#x27;</span>);<br></code></pre></td></tr></table></figure>
+</code></pre>
+<ul>
+<li>空间数据索引<br>MyISAM表支持空间索引，可以用作地理数据存储，这种索引无需前缀查询，空间索引会从所有维度来索引数据，必须使用MySQL的GIS相关函数如MBRCONTAINS()等来维护数据，但MySQL支持并不完善</li>
+<li>全文索引<br>是一种特殊类型的索引，查找的是文本中的关键词，而不是直接比较索引中的值，比较类似于搜索引擎坐的事情而不是简单的WHERE条件匹配。<br>在相同的列上同时创建全文索引和基于值的B-Tree索引不会有冲突，全文索引适用于MATCHI AGAINST操作，而不是普通的WHERE条件操作。</li>
+</ul>
+<h3 id="索引的优点"><a href="#索引的优点" class="headerlink" title="索引的优点"></a>索引的优点</h3><p>索引有三个优点:<br>1.索引大大减少了服务器需要扫描的数据量<br>2.索引可以帮助服务器避免排序和临时表<br>3.索引可以将随机I/O变为顺序I/O</p>
+<h3 id="高性能的索引策略"><a href="#高性能的索引策略" class="headerlink" title="高性能的索引策略"></a>高性能的索引策略</h3><h4 id="不要索引独立的列"><a href="#不要索引独立的列" class="headerlink" title="不要索引独立的列"></a>不要索引独立的列</h4><p>独立的列，MySQL是不会使用索引的<br>独立的列是指索引列不能是表达式的一部分，也不能是函数的参数，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> actor_id <span class="hljs-keyword">FROM</span> sakila.actor <span class="hljs-keyword">WHERE</span> actor_id <span class="hljs-operator">+</span><span class="hljs-number">1</span> <span class="hljs-operator">=</span><span class="hljs-number">5</span>;<br></code></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> ... <span class="hljs-keyword">WHERE</span> TO_DAYS(<span class="hljs-built_in">CURRENT_DATE</span>) <span class="hljs-operator">-</span> TO_DAYS(date_col) <span class="hljs-operator">&lt;=</span><span class="hljs-number">10</span>;<br></code></pre></td></tr></table></figure>
+<h4 id="前缀索引和索引选择性"><a href="#前缀索引和索引选择性" class="headerlink" title="前缀索引和索引选择性"></a>前缀索引和索引选择性</h4><p>索引的选择性：不重复的索引值和数据表记录总数(#T)的比值，范围从1/#T到1之间。索引的选择性越高则查询效率越高，因为选择性高的索引可以让MySQL子啊查找时过滤掉更多的行。唯一索引的选择性是1，这是最好的索引选择性，性能也是最好的。</p>
+<p>诀窍在于选择足够长的前缀以保证较高的选择性，同时又不能太长(以便节约空间)。换句话说，前缀的“基数”应该接近于完整列的“基数”,一般计算合适的前缀长度就是计算完整列的选择性:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-keyword">DISTINCT</span> ???)<span class="hljs-operator">/</span><span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">FROM</span> ???<br></code></pre></td></tr></table></figure>
+<p>得出的数与</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-keyword">DISTINCT</span> <span class="hljs-keyword">LEFT</span>(???, <span class="hljs-number">3</span>))<span class="hljs-operator">/</span><span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">As</span> sel3 <span class="hljs-keyword">FROM</span> ???<br></code></pre></td></tr></table></figure>
+<p>相近即可，其中3最前缀的数字的多少。</p>
+<h4 id="选择合适的索引列顺序"><a href="#选择合适的索引列顺序" class="headerlink" title="选择合适的索引列顺序"></a>选择合适的索引列顺序</h4><p>在一个多列B-Tree索引中，索引列的顺序意味着索引首先按照最左列进行排序，其次是第二列，等等，索引可以按照升序或者降序进行扫描，以满足精确符合列顺序的ORDER BY、GROUP和DISTINCT等子句的查询需求<br>以下面的查询为例:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> payment <span class="hljs-keyword">WHERE</span> staff_id <span class="hljs-operator">=</span> <span class="hljs-number">2</span> <span class="hljs-keyword">AND</span> customer_id <span class="hljs-operator">=</span> <span class="hljs-number">584</span><br></code></pre></td></tr></table></figure>
+<p>要使用什么索引可以用下面的查询预测以下，看看各个WHERE条件的分支对应的数据基数有多大:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&lt;</span><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>(staff_id<span class="hljs-operator">=</span><span class="hljs-number">2</span>),<span class="hljs-built_in">SUM</span>(customer_id <span class="hljs-operator">=</span> <span class="hljs-number">584</span>) <span class="hljs-keyword">FROM</span> payment\G<br><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-number">1.</span><span class="hljs-type">row</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><br><span class="hljs-built_in">SUM</span>(staff_id<span class="hljs-operator">=</span><span class="hljs-number">2</span>):<span class="hljs-number">7992</span><br><span class="hljs-built_in">SUM</span>(customer_id <span class="hljs-operator">=</span> <span class="hljs-number">584</span>):<span class="hljs-number">30</span><br></code></pre></td></tr></table></figure>
+<p>这样可以发现选用customer_id在前面比较好，但是不能依赖与具体值，所以可以这样:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(DISTINC staff_id)<span class="hljs-operator">/</span><span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">AS</span> staff_id_selectivity,<br>    <span class="hljs-operator">&gt;</span><span class="hljs-built_in">COUNT</span>(DISTINC customer_id)<span class="hljs-operator">/</span><span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">AS</span> customer_id_selectivity,<br>    <span class="hljs-operator">&gt;</span><span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>)<br>    <span class="hljs-operator">&gt;</span><span class="hljs-keyword">FROM</span> payment\G<br><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-number">1.</span><span class="hljs-type">row</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span><br>staff_id_selectivity：<span class="hljs-number">0.0001</span><br>customer_id_selectivity:<span class="hljs-number">0.0373</span><br><span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>):<span class="hljs-number">16049</span><br></code></pre></td></tr></table></figure>
+<p>可以看出customer_id的选择性更高，所以答案是将其作为索引列的第一列。</p>
+<h4 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h4><p>聚簇索引并不是一种单独的索引类型，而是一种数据存储方式，具体细节依赖于其实现方式，但InnoDB的聚簇索引实际上在同一个结构中保存了B-Tree索引和数据行。当表有聚簇索引时，它的数据行实际上存放在索引的叶子页中。聚簇表示数据行和相邻的键值紧凑地存储在一起，因为无法同时把数据行存放在两个不同的地方，所以一个表只能有一个聚簇索引。<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">enter description here</span><br>图展示了聚簇索中的记录是如何存放的。注意到，叶子页包含了行的全部数据，但是节点页只包含了索引列。InnoDB将通过主键聚集数据，这就是说图中“被索引的列”就是主键列。如果没有定义主键，InnoDB会选择一个唯一的非空索引代替。如果没有这样的索引，InnoDB会隐式定义一个主键来作为聚簇索引。InnoDB只聚集在同一个页面中的记录。包含相邻键值的页面可能会相聚甚远。</p>
+<p>聚集的数据有一些重要的优点:</p>
+<ul>
+<li>可以把相关数据保存在一起。例如实现电子邮箱时，可以根据用户ID来聚集数据，这样只需要从磁盘读取少数的数据页就能获取某个用户的全部邮件。如果没有使用聚簇索引，则每封邮件都可能导致一次磁盘I/O</li>
+<li>数据访问更快。因为聚簇索引将索引和数据保存在同一个B-Tree</li>
+<li>使用覆盖索引扫描的查询可以直接使用页节点中的主键值。<br>也有一些缺点:</li>
+<li>聚簇数据最大限度地提高了I/O密集型应用的性能，但如果数据全部都放在内存中，则访问的顺序就没那么重要了，也没有优势</li>
+<li>插入速度严重依赖于插入顺序。按照主键的顺序插入是加载数据到InnoDB表中速度最快的方式。但如果不是按照主键顺序加载数据，那么在加载完成后最好使用OPTIMIZE TABLE 命令重新组织一下表。</li>
+<li>更新更新聚簇索引的表在插入新行，或者主键被更新导致需要移动行的时候，可能面临“页分裂”的问题。当行的主键值要求必须将这一行插入到某个已满的页中时，存储引擎会将该页分裂成两个页面来容纳该行，这就是一次页分裂操作，页分裂会导致表占用更多的磁盘空间。</li>
+<li>聚簇索引可能导致权标扫面变慢，尤其是行比较稀疏，或者由于页分裂导致数据存储不连续的时候。</li>
+<li>二级索引可能不想象的要更大，因为在二级索引的叶子节点包含了引用行的主键列。</li>
+<li>二级索引访问需要两次索引查找，而不是一次（因为二级索引叶子节点保存的不是指向行的物理位置的指针，而是行的主键值，然后根据这个值取聚簇索引中查找对应的行）。</li>
+</ul>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>如果一个索引包含所有需要查询的字段的值，我们就称为覆盖索引</p>
+<p>覆盖索引是非常有用的能够极大地提高性能，如果查询只需要扫描索引而无须回表，会带来很多好处:</p>
+<ul>
+<li>索引条目通常远小于数据行大小，所以如果只需要读取索引，那么MySQL就会极大地减少数据访问量。</li>
+<li>由于索引是按照列值顺序存储的所以对于I/O密集型的范围查询会比随机从磁盘读取每一行数据的I/o要少得多。</li>
+<li>由于InnoDB的聚簇索引，覆盖索引对InnoDB表特别有用，InnoDB的二级索引在叶子节点中保存了行的主键值，所以如果二级主键能够覆盖查询，则可以避免对主键索引的二次查询。</li>
+</ul>
+<p>由于B-Tree索引能够存储索引列的值，所以只有它才能称为覆盖索引。当发起一个被索引覆盖的查询时，在EXPLAIN的Extra列可以看到“Using index”的信息。假如表有一个多列索引(store_id,film_id)。MySQL如果只需要访问这两列，就可以使用这个索引做覆盖索引。</p>
+<h4 id="使用索引扫描来做排序"><a href="#使用索引扫描来做排序" class="headerlink" title="使用索引扫描来做排序"></a>使用索引扫描来做排序</h4><p>MySQL有两种方式可以生产有序的结果:通过排序操作和按索引顺序扫描，如果EXPLAIN出来的tyre列的值为index，则说明使用了索引扫描来做排序。</p>
+<p>扫描索引本事很快的，但如果索引不能覆盖查询所需的全部列，那就不得不每扫描一条索引记录就都回表查询一次对应的行，这基本上都是随机I/O，因此按索引顺序读取数据的速度通常要比顺序地全表扫描慢，尤其是在I、O密集型的工作负载时。所以要设计MySQL可以使用同一个索引既能满足排序又能用于查找行。<br>Ps:只有当索引的列顺序和ORDER BY子句的顺序完全已知，并且所有列的排序方向都一样时，MySQL才能都使用索引来对结果做排序。如果查询需要关联多张表，则只有当ORDER BY子句引用的字段全部为第一个表时，才能使用索引做排序。ORDER BY子句和查找型查询的限制是一样的:需要满足索引的最左前缀的要求；否则MySQL都需要执行排序操作，而无法利用索引排序。</p>
+<h3 id="索引案例学习"><a href="#索引案例学习" class="headerlink" title="索引案例学习"></a>索引案例学习</h3><p>案例直接看书</p>
+<h4 id="支持多种过滤条件"><a href="#支持多种过滤条件" class="headerlink" title="支持多种过滤条件"></a>支持多种过滤条件</h4><p>in()与where的诀窍使用，见书。</p>
+<h4 id="避免多个范围条件"><a href="#避免多个范围条件" class="headerlink" title="避免多个范围条件"></a>避免多个范围条件</h4><h4 id="优化排序"><a href="#优化排序" class="headerlink" title="优化排序"></a>优化排序</h4><h3 id="维护索引和表"><a href="#维护索引和表" class="headerlink" title="维护索引和表"></a>维护索引和表</h3><p>当需要找到并修复损坏的表，维护准确的缩影统计信息，减少碎片时，看书。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/12/13/24_high%20_performance_mySQL_3rd_notes/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;12&#x2F;13&#x2F;24_high%20_performance_mySQL_3rd_notes&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;12&#x2F;13&#x2F;24_high%20_performance_mySQL_3rd_notes&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://pic.izhaoo.com/alipay.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag">读书笔记</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/12/13/20_web/"><i class="iconfont iconleft"></i>WEB</a>
+    <a href="/2017/11/10/18_python_design_patterns/">python设计模式<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%AA%E5%89%8D%E8%AE%B0-mysql%E7%9A%84%E5%91%BD%E4%BB%A4"><span class="toc-text">伪前记(mysql的命令)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mysql%E6%9C%AF%E8%AF%AD"><span class="toc-text">mysql术语</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%91%BD%E4%BB%A4"><span class="toc-text">创建命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%A6%E6%9D%9F"><span class="toc-text">约束</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E5%91%BD%E4%BB%A4"><span class="toc-text">查询命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-text">修改和删除</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12%E6%9C%8821%E6%97%A5%E6%9B%B4"><span class="toc-text">12月21日更</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%9F%BA%E7%A1%80"><span class="toc-text">MySQL架构与基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL%E6%9E%B6%E6%9E%84"><span class="toc-text">MySQL架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL%E9%94%81%E7%AD%96%E7%95%A5"><span class="toc-text">MySQL锁策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1"><span class="toc-text">事务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6-MVCC"><span class="toc-text">多版本并发控制(MVCC)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-text">MySQL基准测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-text">为什么需要基准测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E7%9A%84%E7%AD%96%E7%95%A5"><span class="toc-text">基准测试的策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E7%9A%84%E6%8C%87%E6%A0%87"><span class="toc-text">测试的指标</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95"><span class="toc-text">基准测试方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7%EF%BC%88%E5%BE%85%E8%A1%A5%E5%85%85%EF%BC%89"><span class="toc-text">测试工具（待补充）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%80%A7%E8%83%BD%E5%89%96%E6%9E%90"><span class="toc-text">服务器性能剖析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%AE%80%E4%BB%8B"><span class="toc-text">性能优化简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E6%80%A7%E8%83%BD%E5%89%96%E6%9E%90%E8%BF%9B%E8%A1%8C%E4%BC%98%E5%8C%96"><span class="toc-text">通过性能剖析进行优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%90%86%E8%A7%A3%E6%80%A7%E8%83%BD%E5%89%96%E6%9E%90"><span class="toc-text">理解性能剖析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%96%E6%9E%90MySQL%E6%9F%A5%E8%AF%A2"><span class="toc-text">剖析MySQL查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%8A%E6%96%AD%E9%97%B4%E6%AD%87%E6%80%A7%E9%97%AE%E9%A2%98"><span class="toc-text">诊断间歇性问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Schema%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%BC%98%E5%8C%96"><span class="toc-text">Schema与数据类型优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%89%E6%8B%A9%E4%BC%98%E5%8C%96%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">选择优化的数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL-schema%E8%AE%BE%E8%AE%A1%E4%B8%AD%E7%9A%84%E9%99%B7%E9%98%B1"><span class="toc-text">MySQL schema设计中的陷阱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8C%83%E5%BC%8F%E5%92%8C%E5%8F%8D%E8%8C%83%E5%BC%8F"><span class="toc-text">范式和反范式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E8%A1%A8%E5%92%8C%E6%B1%87%E6%80%BB%E8%A1%A8"><span class="toc-text">缓存表和汇总表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E5%BF%ABALTER-TABLE-%E6%93%8D%E4%BD%9C%E7%9A%84%E9%80%9F%E5%BA%A6"><span class="toc-text">加快ALTER TABLE 操作的速度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95"><span class="toc-text">创建高性能的索引</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E5%9F%BA%E7%A1%80"><span class="toc-text">索引基础</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-text">索引的优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95%E7%AD%96%E7%95%A5"><span class="toc-text">高性能的索引策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E6%A1%88%E4%BE%8B%E5%AD%A6%E4%B9%A0"><span class="toc-text">索引案例学习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%B4%E6%8A%A4%E7%B4%A2%E5%BC%95%E5%92%8C%E8%A1%A8"><span class="toc-text">维护索引和表</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
