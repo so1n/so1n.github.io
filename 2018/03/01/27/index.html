@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="google" content="notranslate" />
   
-  <meta name="description" content="前记由于Http的无状态，所以需要进行用户验证，让后端...">
+  <meta name="description" content="前记HTTP协议是非常简单流行的, 然而HTTP协议也...">
   <meta name="author" content="So1n">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
@@ -185,25 +185,31 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 01, 2018</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3977</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>4409</span>
     </div>
   </div>
 </section>
 
     <section class="main">
       <section class="content">
-        <p>HTTP 是一个无状态的连接过程，每一次访问对于 Server 来说都是新用户，那么需要一些技术来让 Server 知道这次连接过来的是谁。从而产生了 Session 和 Cookies 。其中 Cookies 是 HTTP 协议中规定的，而 Session 是基于 Cookies 衍生出来的。</p>
-<p>可是在前后端分离的开发中，前端是使用 socket (通常是axios)来创建一次 HTTP 连接的，不是浏览器创建的，所以 Cookies 没法有效储存，导致了 Cookies 和 Session 无法使用。所以我们会采用手动的形式来模拟浏览器处理 Cookies 的流程来创造一套属于自己的 HTTP 用户认证方式：TOKEN、 JWT。</p>
-<h2 id="COOKIES"><a href="#COOKIES" class="headerlink" title="COOKIES"></a>COOKIES</h2><p>Cookies 是 HTTP 协议中自带的内容，所以浏览器对其的支持都是很好的，说白了就是一个简单的KV（key-value）的数组。同时 Cookies 是对用户透明的，所以后端都会对Cookies进行一定的编码，使cookies详细的数据不可见(但仍可以使用整段cookie来达到欺骗的效果)，用户不用做任何操作，浏览器会根据 HTTP 报文来做处理。</p>
-<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><p>Client 访问 Server 时会自动带上 Cookies，具体实现是在 HTTP 头部的 Cookies 中传递过去。<br>Server 可以在 Client 中写入 Cookies，具体是在 HTTP 响应报文头部中Set-Cookie 来告诉浏览器需要在 Client 中记录这些信息，以后访问的时候顺便带过来。<br>以访问google为栗子(提取于Django-book)：<br>第一次访问时：</p>
+        <p><code>HTTP</code>是一个无状态的连接过程，每一次访问对于<code>Server</code>来说都是新用户，那么需要一些技术来让 <code>Server</code>知道这次连接过来的是谁。从而产生了<code>Session</code>和<code>Cookies</code>。其中<code>Cookies</code>是<code>HTTP</code> 协议中规定的，而<code>Session</code>是基于<code>Cookies</code>衍生出来的。</p>
+<p>可是在App端中，不像浏览器一样, <code>Cookies</code>是没法有效储存，导致了<code>Cookies</code>和<code>Session</code>无法使用。所以我们会采用手动的形式来模拟浏览器处理<code>Cookies</code>的流程来创造一套属于自己的<code>HTTP</code>用户认证方式：<code>TOKEN</code>、<code>JWT</code>。</p>
+<h2 id="1-HTTP-Auth-Authentication"><a href="#1-HTTP-Auth-Authentication" class="headerlink" title="1.HTTP Auth Authentication"></a>1.HTTP Auth Authentication</h2><p><code>HTTP</code>提供了一个用于权限控制和认证的方案, 目前最简单的就是<code>HTTP Basic Authentication</code>. 该方案非常简单, 在<code>Authorization</code>字段中存放一个<code>用户名:密码</code>的base64的字符串, 双方通过解析该字符串从而知道了用户是谁, 不过该方案太简单, 所以也很容易被破解.</p>
+<h2 id="2-COOKIES"><a href="#2-COOKIES" class="headerlink" title="2.COOKIES"></a>2.COOKIES</h2><p>如果双方一直都用<code>HTTP Basic Authentication</code>验证用户, 那也太麻烦了,  而且容易泄露用户密码. 如果用户只登录一次,  后面只用一个标记身份的字符串代替, 那就非常方便了, <code>Cookies</code>就是这样的.<br><code>Cookies</code>是<code>HTTP</code>协议中自带的内容，所以浏览器对其的支持都是很好的，说白了就是一个简单的KV（key-value）的数组。同时 Cookies 是对用户透明的，所以后端都会对Cookies进行一定的编码，使cookies详细的数据不可见(但仍可以使用整段cookie来达到欺骗的效果)，用户不用做任何操作，浏览器会根据 HTTP 报文来做处理。</p>
+<h3 id="2-1流程"><a href="#2-1流程" class="headerlink" title="2.1流程"></a>2.1流程</h3><p>Client 访问 Server 时会自动带上<code>Cookies</code>，具体实现是在<code>HTTP</code>头部的<code>Cookies</code>中传递过去。<br>Server 可以在 Client 中写入<code>Cookies</code>，具体是在<code>HTTP</code>响应报文头部中Set-Cookie 来告诉浏览器需要在 Client 中记录这些信息，以后访问的时候顺便带过来。<br>以访问google为栗子(提取于Django-book)：<br>第一次访问时：</p>
 <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs vim">GET / HTTP/<span class="hljs-number">1.1</span><br>Hos<span class="hljs-variable">t:</span> google.<span class="hljs-keyword">com</span><br>...<br></code></pre></td></tr></table></figure>
 <p>响应：</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs routeros">HTTP/1.1 200 OK<br>Content-Type: text/html<br>Set-Cookie: <span class="hljs-attribute">PREF</span>=ID=5b14f22bdaf1e81c:TM=1167000671:LM=1167000671;<br>            <span class="hljs-attribute">expires</span>=Sun, 17-Jan-2038 19:14:07 GMT;<br>            <span class="hljs-attribute">path</span>=/; <span class="hljs-attribute">domain</span>=.google.com<br>Server: GWS/2.1<br><span class="hljs-built_in">..</span>.<br></code></pre></td></tr></table></figure>
-<p>之后访问时：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs routeros">HTTP/1.1 200 OK<br>Content-Type: text/html<br>Set-Cookie: <span class="hljs-attribute">PREF</span>=ID=5b14f22bdaf1e81c:TM=1167000671:LM=1167000671;<br>            <span class="hljs-attribute">expires</span>=Sun, 17-Jan-2038 19:14:07 GMT;<br>            <span class="hljs-attribute">path</span>=/; <span class="hljs-attribute">domain</span>=.google.com<br>Server: GWS/2.1<br><span class="hljs-built_in">..</span>.<br>可以看到里面是以`;`区分的key-value数据, 第一个为`Cookie`, 第二个是过期时间, 告诉浏览器服务端会在多久之后刷新Cookie. 后面还有当前的path以及domain信息<br></code></pre></td></tr></table></figure>
+<p>之后客户端访问服务端时, 都会在<code>Cookie</code>字段填写Cookie：</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-builtin-name">GET</span> / HTTP/1.1<br>Host: google.com<br>Cookie: <span class="hljs-attribute">PREF</span>=ID=5b14f22bdaf1e81c:TM=1167000671:LM=1167000671<br><span class="hljs-built_in">..</span>.<br></code></pre></td></tr></table></figure>
-<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><p>setDomain：设置cookie范围<br>isHttpOnly：是否只是http协议使用。只能在后端通过getCookies()获取，js不能获取；<br>每一个cookie文件大小：4kb ， 如果超过4kb浏览器不识别；<br>cookie不安全，可能泄露用户信息，浏览器支持禁用cookie操作；</p>
-<h2 id="SESSION"><a href="#SESSION" class="headerlink" title="SESSION"></a>SESSION</h2><p>Session 是在 Cookies 发展中为了解决 Cookies 某些弊端而产生的技术，为了绕开 cookie 的各种限制，通常借助 cookie 本身和后端存储实现的，一种更高级的会话状态实现，session是存在服务器的，用于区分会话和不同用户的访问。<br>Session主要是为了跟踪会话，比如某些网站中网页有不同的访问权限，有只能登录的用户访问的网页或者用户级别不同不能访问的，但是http请求是无状态的，每次访问服务端是不知道是否是登录用户，很自然的想到在http请求报文中加入登录标识就可以了，这个登录标识就可以是cookie，这样的cookie服务端要保存有所有登录用户的cookie，这样请求报文来了之后拿到登录标识cookie，在服务端进行比较久可以了。再比如购物网站，多次点击添加商品到购物车客户端很容易知道哪些物品在购物车中，但是服务端怎么知道每次添加的物品放到哪个登录用户的购物车中呢？也需要请求报文中带着cookie才行，这些cookie都是为了跟踪会话用的，所以客户端有，服务端也有，并且服务端有全部的会话cookie。</p>
-<h2 id="TOKEN"><a href="#TOKEN" class="headerlink" title="TOKEN"></a>TOKEN</h2><p>Token它可以是 Session-id，也可以是一串随机的字符。但是它的作用跟Session-id 一样都是为了识别不同的访问者，同时验证它的有效性。</p>
+<h3 id="2-2特性"><a href="#2-2特性" class="headerlink" title="2.2特性"></a>2.2特性</h3><p>除了过期时间外, 服务端还可以通过以下字段设置而<code>Cookie</code>的一些限制:</p>
+<ul>
+<li>setDomain：设置cookie范围</li>
+<li>isHttpOnly：是否只是http协议使用。只能在后端通过getCookies()获取，js不能获取；</li>
+</ul>
+<p>而且需要注意的是每一个cookie文件大小：4kb ， 如果超过4kb浏览器不识别；cookie不安全，可能泄露用户信息，浏览器支持禁用cookie操作；</p>
+<h2 id="3-SESSION"><a href="#3-SESSION" class="headerlink" title="3.SESSION"></a>3.SESSION</h2><p><code>Session</code>是在<code>Cookies</code>发展中为了解决<code>Cookies</code>某些弊端而产生的技术，为了绕开<code>Cookies</code>的各种限制，通常借助<code>Cookies</code>本身和后端存储实现的，一种更高级的会话状态实现，<code>Session</code>是存在服务器的，用于区分会话和不同用户的访问。<br>Session主要是为了跟踪会话，比如某些网站中网页有不同的访问权限，有只能登录的用户访问的网页或者用户级别不同不能访问的，但是http请求是无状态的，每次访问服务端是不知道是否是登录用户，很自然的想到在http请求报文中加入登录标识就可以了，这个登录标识就可以是cookie，这样的cookie服务端要保存有所有登录用户的cookie，这样请求报文来了之后拿到登录标识cookie，在服务端进行比较久可以了。再比如购物网站，多次点击添加商品到购物车客户端很容易知道哪些物品在购物车中，但是服务端怎么知道每次添加的物品放到哪个登录用户的购物车中呢？也需要请求报文中带着cookie才行，这些cookie都是为了跟踪会话用的，所以客户端有，服务端也有，并且服务端有全部的会话cookie。</p>
+<h2 id="4-TOKEN"><a href="#4-TOKEN" class="headerlink" title="4.TOKEN"></a>4.TOKEN</h2><p>Token它可以是 Session-id，也可以是一串随机的字符。但是它的作用跟Session-id 一样都是为了识别不同的访问者，同时验证它的有效性。</p>
 <p>Token 是一个很广泛的说法，是因为它只提供了一个验证的准则，而不是一个具体的做法，所以 JWT、OAUTH 都可以算是 Token 的一种实现。</p>
 <blockquote>
 <p>在我看来，Token的过程就是这么一回事：<br>Client —&gt; Server: 嘿，我是那个谁啊<br>Server —&gt; Client: 知道了，你记着你的票号 123456，半个小时内有有效<br>// 几分钟后<br>Client —&gt; Server: 嘿，我的票号是 123456，帮我买瓶水，钱从账户扣<br>Server —&gt; Client: （嗯，123456 在有效期内）好嘞<br>Client —&gt; Server: （我试下用别人的账号买东西）嘿，我的票号是 666666，帮我买瓶水，钱从账户扣<br>Server —&gt; Client: （嗯？我们根本就没有 666666 这个票号的记录啊）兄弟，你是来搞事的吧<br>// 半个小时后<br>Client —&gt; Server: 嘿，我的票号是 123456，帮我买瓶水，钱从账户扣<br>Server —&gt; Client: （em，好像过时了）诶诶诶，你的票号过期了，不办理了</p>
@@ -211,7 +217,7 @@
 <p>在token中，Token能明确这里明确告诉了用户他的识别id和有效期也就是说 Server 必须通过某种方式通知 Client，而不是像 Cookies 和 Session 那样使用 Set-Cookie就可以完成的。</p>
 <p>服务器告知客户端的具体实现方法如下:<br>通过 HTTP RESPONSE 报文中 Headers 返回 Token:123456<br>通过 HTTP RESPONSE 报文中Content 返回{‘status’:’OK’, ‘data’:{‘token’:’123456’}}<br>ps:使用 Header 携带消息的方法使用较少，普遍都是使用 Content 来携带消息，因为通常情况下，需要返回的信息不只是 Token 本身，还有相关的附加信息：Expire-time 等等</p>
 <p>客户端告知服务器的具体实现方法如下:<br>通过 HTTP REQUEST 报文中 Header 携带 Token:123456<br>通过 HTTP URL 携带：<a target="_blank" rel="noopener" href="http://foo.com/buy?good=water&amp;number=1&amp;token=123456">http://foo.com/buy?good=water&amp;number=1&amp;token=123456</a><br>通过 HTTP FORM 携带：这个方法只能出现在非 GET 请求下。<br>上述讲的三种方法，最常见的是前两种，第三种少使用的原因是需要为 GET 设计另外一种 Token 携带方案，而前两种适合于所有 HTTP 访问</p>
-<h3 id="JWT"><a href="#JWT" class="headerlink" title="JWT"></a>JWT</h3><p>JWT 是 Token 的具体且应用实现。<br>它具备两个特点：</p>
+<h3 id="5-JWT"><a href="#5-JWT" class="headerlink" title="5.JWT"></a>5.JWT</h3><p>JWT 是 Token 的具体且应用实现。<br>它具备两个特点：</p>
 <ul>
 <li><p>简洁(Compact)<br>可以通过URL, POST 参数或者在 HTTP header 发送，因为数据量小，传输速度快</p>
 </li>
@@ -296,7 +302,7 @@
           
   <aside class="toc-wrap">
     <h3 class="toc-title">文章目录：</h3>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#COOKIES"><span class="toc-text">COOKIES</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B"><span class="toc-text">流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E6%80%A7"><span class="toc-text">特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SESSION"><span class="toc-text">SESSION</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TOKEN"><span class="toc-text">TOKEN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JWT"><span class="toc-text">JWT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95"><span class="toc-text">单点登录</span></a></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-HTTP-Auth-Authentication"><span class="toc-text">1.HTTP Auth Authentication</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-COOKIES"><span class="toc-text">2.COOKIES</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E6%B5%81%E7%A8%8B"><span class="toc-text">2.1流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E7%89%B9%E6%80%A7"><span class="toc-text">2.2特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-SESSION"><span class="toc-text">3.SESSION</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-TOKEN"><span class="toc-text">4.TOKEN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-JWT"><span class="toc-text">5.JWT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95"><span class="toc-text">单点登录</span></a></li></ol></li></ol>
   </aside>
 
         
