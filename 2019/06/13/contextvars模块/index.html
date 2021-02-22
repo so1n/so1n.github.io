@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,10 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>contextvars模块最主要的功能就是可以为asyncio生态添加上下文功能,即使程序在多个协程并发运行的情况下,也能调用到程序的上下文变量.</p>
+<p>上下文,可以理解为我们说话的语境,有些话脱离了特定的语境,他的意思就变了,程序的运行也是如此.在线程中也是有他的上下文,只不过称为堆栈,如在python中就是保存在thread.local变量中,而协程也有他自己的上下文,但是没有暴露出来,不过我们可以通过contextvars模块去保存与读取.</p>
+<p>使用contextvars的好处不仅可以防止’一个变量传遍天’的事情发生外,还能很好的结合TypeHint,,让自己的代码更加适应工程化,同时可以让自己的代码可以被mypy以及IDE检查.</p>
         <h2 id="更新说明"><a href="#更新说明" class="headerlink" title="更新说明"></a>更新说明</h2><ul>
 <li>切换web框架sanic为starlette</li>
 <li>增加一个自己编写且可用于starlette,fastapi的context说明</li>
@@ -322,8 +326,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E8%AF%B4%E6%98%8E"><span class="toc-text">更新说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%9C%89%E6%97%A0%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">1.有无上下文的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9C%A8asyncio%E4%B8%AD%E4%BD%BF%E7%94%A8contextvars"><span class="toc-text">2.在asyncio中使用contextvars</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9C%A8asyncio%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8contextvars%E4%B8%AD%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">3.在asyncio框架中使用contextvars中的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8contextvars"><span class="toc-text">4.如何优雅的使用contextvars</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-contextvars%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">5.contextvars的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-ContextMeta-ContextVarMeta%E5%92%8CTokenMeta"><span class="toc-text">5.1 ContextMeta,ContextVarMeta和TokenMeta</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-Token"><span class="toc-text">5.2 Token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%85%A8%E5%B1%80%E5%94%AF%E4%B8%80context"><span class="toc-text">5.3 全局唯一context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4contextvar%E8%87%AA%E5%B7%B1%E5%B0%81%E8%A3%85%E7%9A%84Context"><span class="toc-text">5.4contextvar自己封装的Context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-ContextVar"><span class="toc-text">5.5 ContextVar</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-contextvars-asyncio"><span class="toc-text">6.contextvars asyncio</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1%E5%9C%A8asyncio%E4%B8%AD%E8%8E%B7%E5%8F%96context"><span class="toc-text">6.1在asyncio中获取context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%AF%B9%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">6.2 对上下文的操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-copying-task-factory%E5%92%8Cchainmap-task-factory"><span class="toc-text">6.2 copying_task_factory和chainmap_task_factory</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%80%BB%E7%BB%93"><span class="toc-text">7.总结</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -336,6 +347,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

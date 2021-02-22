@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>前几天,突然发现线上Es有大量的错误日志,核心日志是Limit of total fields [1000] in index.经过查明发现是同事存api server日志时他是数据带有有很多field,导致报错,解决这个问题很简单,又却很复杂,最好的解决方案是分开存储,让Es只做好Es的职责,但是对于架构又复杂了.</p>
         <h2 id="1-发生问题"><a href="#1-发生问题" class="headerlink" title="1.发生问题"></a>1.发生问题</h2><p>前几天在准备增加Logstash的机器部署时发现旧Logstash机器上面有一些错误日志,核心的信息是<code>Limit of total fields [1000] in index</code>.很容易理解,就是本次发送的数据字段数量大于1000了.</p>
 <blockquote>
 <p>题外话,之所以会有这样大的数据量是因为同事那边发送的日志数据里有一个动态的json对象,而对于es来说{‘a’: {‘b’: 1, ‘c’: 2}}会认为有a.b,和a.c两个字段.在发现问题后,把含有该动态json对象的字段解析为文本就好了(不过没事还是不要存那么多数据).</p>
@@ -287,8 +289,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8F%91%E7%94%9F%E9%97%AE%E9%A2%98"><span class="toc-text">1.发生问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98"><span class="toc-text">2.解决问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9D%91"><span class="toc-text">3.坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%81%BF%E5%9D%91"><span class="toc-text">4.避坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">5.解决方案</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -301,6 +310,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

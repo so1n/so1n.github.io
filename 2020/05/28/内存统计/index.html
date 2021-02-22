@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近在做监控系统,发现Linux的内存监控比较困难,主要是指标太多,不知道那些指标才是真正需要的,比如一开始我们就监控free命令输出的free,然而由于页缓存的原因,有些数据是不对的.恰好今天刚刚遇到系统的一个内存看似不准的问题,在调查问题时同时了解了Linux的内存设计</p>
         <h2 id="1-一次”内存报警异常”"><a href="#1-一次”内存报警异常”" class="headerlink" title="1.一次”内存报警异常”"></a>1.一次”内存报警异常”</h2><h3 id="1-1-问题"><a href="#1-1-问题" class="headerlink" title="1.1.问题"></a>1.1.问题</h3><p>最近监控一直在报某些机器内存异常,内存超过了90%的使用,登上去机器用<code>free -h</code>命令查看发现user部分确实很多,但通过<code>ps -aux | sort -l 4</code>发现所有进程加起来的内存占用都没有user的10分之一,究竟是谁在吃内存不得而知.</p>
 <h3 id="1-2-排查问题机器"><a href="#1-2-排查问题机器" class="headerlink" title="1.2.排查问题机器"></a>1.2.排查问题机器</h3><h4 id="1-2-1-top"><a href="#1-2-1-top" class="headerlink" title="1.2.1.top"></a>1.2.1.top</h4><p>从top命令可以看出,目前最占用内存的进程只有supervisord,只占用了0.9%的内存,即使所有进程占用内存加起来,也占用到10-20%左右</p>
 <figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs tap">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                                                          <br><span class="hljs-number"> 1230 </span>root     <span class="hljs-number"> 20 </span> <span class="hljs-number"> 0 </span> <span class="hljs-number"> 30040 </span><span class="hljs-number"> 18192 </span> <span class="hljs-number"> 1764 </span>S   0.0   0.9  73:32.80 supervisord                                                                                                      <br>27835 nobody   <span class="hljs-number"> 20 </span> <span class="hljs-number"> 0 </span> <span class="hljs-number"> 21248 </span><span class="hljs-number"> 11552 </span> <span class="hljs-number"> 1900 </span>S   3.3   0.6  18:15.34 so1n-server                                                                                                        <br>16045 nobody   <span class="hljs-number"> 20 </span> <span class="hljs-number"> 0 </span> <span class="hljs-number"> 18456 </span> <span class="hljs-number"> 8240 </span> <span class="hljs-number"> 1380 </span>S   1.0   0.4   3:45.40 so1n-server                                                                                                        <br>22880 root     <span class="hljs-number"> 20 </span> <span class="hljs-number"> 0 </span> <span class="hljs-number"> 16720 </span> <span class="hljs-number"> 8108 </span> <span class="hljs-number"> 6836 </span>S   0.0   0.4   0:01.83 sshd                                                                                                             <br> <span class="hljs-number"> 209 </span>root     <span class="hljs-number"> 20 </span> <span class="hljs-number"> 0 </span> <span class="hljs-number"> 44292 </span> <span class="hljs-number"> 8056 </span> <span class="hljs-number"> 4212 </span>S   0.0   0.4   5:36.02 systemd-journal  <br>.....<br></code></pre></td></tr></table></figure>
@@ -285,8 +287,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E6%AC%A1%E2%80%9D%E5%86%85%E5%AD%98%E6%8A%A5%E8%AD%A6%E5%BC%82%E5%B8%B8%E2%80%9D"><span class="toc-text">1.一次”内存报警异常”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E9%97%AE%E9%A2%98"><span class="toc-text">1.1.问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E6%8E%92%E6%9F%A5%E9%97%AE%E9%A2%98%E6%9C%BA%E5%99%A8"><span class="toc-text">1.2.排查问题机器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%A6%81%E7%9B%91%E6%8E%A7%E5%93%AA%E4%BA%9B%E5%86%85%E5%AD%98"><span class="toc-text">2.要监控哪些内存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%99%84%E5%BD%95"><span class="toc-text">3. 附录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%AD%A3%E5%B8%B8%E6%9C%BA%E5%99%A8%E6%95%B0%E6%8D%AE"><span class="toc-text">3.1. 正常机器数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-free"><span class="toc-text">3.2. free</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-cat-proc-meminfo"><span class="toc-text">3.3. cat &#x2F;proc&#x2F;meminfo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-slabtop"><span class="toc-text">3.4. slabtop</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -299,6 +308,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

@@ -46,12 +46,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -197,6 +197,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <p>用python写出一个12306查询余票的爬虫</p>
         <h3 id="制作一个火车票查询余票的爬虫"><a href="#制作一个火车票查询余票的爬虫" class="headerlink" title="制作一个火车票查询余票的爬虫"></a>制作一个火车票查询余票的爬虫</h3><p>PS：因为我要接入网页里面的，所以只做了个大概功能，其余后期做个接口接入到网页<br>这是代码</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> re<br><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">from</span> bs4 <span class="hljs-keyword">import</span> BeautifulSoup<br><span class="hljs-keyword">from</span> pprint <span class="hljs-keyword">import</span> pprint<br><span class="hljs-keyword">import</span> json<br><br>url = <span class="hljs-string">&#x27;https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2017-09-02&amp;leftTicketDTO.from_station=CBQ&amp;leftTicketDTO.to_station=IZQ&amp;purpose_codes=ADULT&#x27;</span><br>response = requests.get(url, verify=<span class="hljs-literal">False</span>)<br>rowlists = json.loads(response.text)[<span class="hljs-string">&#x27;data&#x27;</span>][<span class="hljs-string">&#x27;result&#x27;</span>]<br>ticket_info_list = []<br><span class="hljs-keyword">for</span> rowlist <span class="hljs-keyword">in</span> rowlists:<br>	row9 = rowlist.split(<span class="hljs-string">&#x27;|&#x27;</span>)<br>	train_num = row[<span class="hljs-number">3</span>]<br>	from_station = row[<span class="hljs-number">4</span>]<br>	to_station = row[<span class="hljs-number">7</span>]<br>	from_time = row[<span class="hljs-number">8</span>]<br>	to_time = row[<span class="hljs-number">9</span>]<br>	all_time = row[<span class="hljs-number">10</span>]<br>	swz_num = row[<span class="hljs-number">32</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	ydz_num = row[<span class="hljs-number">31</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	edz_num = row[<span class="hljs-number">30</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	gjrw_num = row[<span class="hljs-number">21</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	rw_num = row[<span class="hljs-number">23</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	dw_num = row[<span class="hljs-number">27</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	yw_num = row[<span class="hljs-number">28</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	rz_num = row[<span class="hljs-number">24</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	yz_num = row[<span class="hljs-number">29</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	wz_num = row[<span class="hljs-number">26</span>] <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;--&#x27;</span><br>	ticket_info = [train_num, from_station, to_station, from_time, to_time, all_time , swz_num, ydz_num, edz_num, gjrw_num, rw_num, dw_num, yw_num, rz_num, yz_num, wz_num]<br>	ticket_info_list.append(ticket_info)<br>print(ticket_info_list)<br></code></pre></td></tr></table></figure>
 <p>这是结果：</p>
@@ -273,8 +275,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%B6%E4%BD%9C%E4%B8%80%E4%B8%AA%E7%81%AB%E8%BD%A6%E7%A5%A8%E6%9F%A5%E8%AF%A2%E4%BD%99%E7%A5%A8%E7%9A%84%E7%88%AC%E8%99%AB"><span class="toc-text">制作一个火车票查询余票的爬虫</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%B6%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="toc-text">制作过程</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -287,6 +296,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

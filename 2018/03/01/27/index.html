@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>HTTP</code>协议是非常简单流行的, 然而<code>HTTP</code>协议也是无状态的, 且没有用户标识. 目前业界已经有几套成熟的用户标识以及用户验证的方案, 让后端知道访问的用户是谁.常见的用户验证有：<br><code>Session</code>，<code>Cookies</code>，<code>Token</code>，<code>Jwt</code>等等</p>
         <p><code>HTTP</code>是一个无状态的连接过程，每一次访问对于<code>Server</code>来说都是新用户，那么需要一些技术来让 <code>Server</code>知道这次连接过来的是谁。从而产生了<code>Session</code>和<code>Cookies</code>。其中<code>Cookies</code>是<code>HTTP</code> 协议中规定的，而<code>Session</code>是基于<code>Cookies</code>衍生出来的。</p>
 <p>可是在App端中，不像浏览器一样, <code>Cookies</code>是没法有效储存，导致了<code>Cookies</code>和<code>Session</code>无法使用。所以我们会采用手动的形式来模拟浏览器处理<code>Cookies</code>的流程来创造一套属于自己的<code>HTTP</code>用户认证方式：<code>TOKEN</code>、<code>JWT</code>。</p>
 <h2 id="1-HTTP-Auth-Authentication"><a href="#1-HTTP-Auth-Authentication" class="headerlink" title="1.HTTP Auth Authentication"></a>1.HTTP Auth Authentication</h2><p><code>HTTP</code>提供了一个用于权限控制和认证的方案, 目前最简单的就是<code>HTTP Basic Authentication</code>. 该方案非常简单, 在<code>Authorization</code>字段中存放一个<code>用户名:密码</code>的base64的字符串, 双方通过解析该字符串从而知道了用户是谁, 不过该方案太简单, 所以也很容易被破解.</p>
@@ -298,8 +300,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-HTTP-Auth-Authentication"><span class="toc-text">1.HTTP Auth Authentication</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-COOKIES"><span class="toc-text">2.COOKIES</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E6%B5%81%E7%A8%8B"><span class="toc-text">2.1流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E7%89%B9%E6%80%A7"><span class="toc-text">2.2特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-SESSION"><span class="toc-text">3.SESSION</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-TOKEN"><span class="toc-text">4.TOKEN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-JWT"><span class="toc-text">5.JWT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95"><span class="toc-text">单点登录</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -312,6 +321,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

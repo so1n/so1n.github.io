@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,13 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近使用Redis越来越多了,使用Redis可以提升接口性能,同时也可以基于Redis实现分布式锁以及使用Redis限流等等.不过在使用Redis与Mysql结合时会遇到一些常见的单机缓存相关问题(基本是标配了)缓存穿透、击穿、雪崩.</p>
+<p>缓存穿透,击穿,雪崩很像,如果不是为了面试准备,我也可能随时就忘了(逃)</p>
+<ul>
+<li>击穿  缓存和数据库都没有数据的时候</li>
+<li>穿透  同一个key,缓存没数据,数据库有数据的时候</li>
+<li>雪崩  很多个key在同一时刻,缓存没数据,数据库有数据的时候
         这类问题十分常见,所以我又是多水了一文啦,不过要确保在引入解决方案时,能尽可能的适应自己的业务,而不是为了引进解决方案而引进解决方案.</li>
 </ul>
 <p><strong>注:示例代码做了更新,使用的redis为aioredis,使用的mysql为aiomysql,同时已经把代码更新到Python3.6+可用</strong></p>
@@ -294,8 +301,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%9A%E5%8A%A1%E6%8E%A5%E5%8F%A3%E5%BC%80%E5%8F%91%E4%B8%AD%E7%9A%84%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text">1.业务接口开发中的缓存实现方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%BC%93%E5%AD%98%E9%97%AE%E9%A2%98"><span class="toc-text">2.缓存问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F"><span class="toc-text">2.1缓存穿透</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF"><span class="toc-text">2.2缓存击穿</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9"><span class="toc-text">2.3缓存雪崩</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -308,6 +322,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

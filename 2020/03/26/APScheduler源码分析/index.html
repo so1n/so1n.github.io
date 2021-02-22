@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近由于账单提交和脚本过多不好控制的原因,一直在寻找解决方案,发现APScheduler比较轻量级以及适合我的账单提交,和脚本运行控制(如果脚本运行需要依赖的话就可以上AirFlow).为了弄清楚原理,以及更好的使用APScheduler,所以阅读了APScheduler代码.其实是APScheduler代码量比较少的分析起来才容易(逃)</p>
         <p><strong>注:</strong> 为了节省篇幅,下面分析代码时大多数是只贴github的源码链接,并加以说明</p>
 <h2 id="1-主体逻辑"><a href="#1-主体逻辑" class="headerlink" title="1.主体逻辑"></a>1.主体逻辑</h2><h3 id="1-1代码结构"><a href="#1-1代码结构" class="headerlink" title="1.1代码结构"></a>1.1代码结构</h3><p>首先看看APScheduler的代码结构,除了job,event,util这几个简单的封装外,APScheduler中的组件都各自一个文件夹</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">├── executors      执行器,用于执行任务<br>├── jobstores      储存器,用于存放任务<br>├── schedulers     调度器,用于调度任务实例,由执行器,存储器,触发器三个组件构成<br>├── triggers       触发器,用于设定触发任务的条件<br>├── __init__.py<br>├── events.py      事件,调度器触发时的事件封装<br>├── job.py         job,对添加的任务进行封装,方便调度器调用<br>└── util.py        工具包,apscheduler一些常用函数封装<br></code></pre></td></tr></table></figure>
@@ -378,8 +380,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BB%E4%BD%93%E9%80%BB%E8%BE%91"><span class="toc-text">1.主体逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%84"><span class="toc-text">1.1代码结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.2简单的例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E5%88%9D%E5%A7%8B%E5%8C%96scheduler"><span class="toc-text">1.3 初始化scheduler</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4%E6%B7%BB%E5%8A%A0job"><span class="toc-text">1.4添加job</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5%E5%BC%80%E5%A7%8B%E8%BF%90%E8%A1%8Cscheduler"><span class="toc-text">1.5开始运行scheduler</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">2.源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-executors"><span class="toc-text">2.1 executors</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-JobStore"><span class="toc-text">2.2 JobStore</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-schedulers"><span class="toc-text">2.3 schedulers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-triggers"><span class="toc-text">2.4 triggers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-job-py"><span class="toc-text">2.5 job.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -392,6 +401,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

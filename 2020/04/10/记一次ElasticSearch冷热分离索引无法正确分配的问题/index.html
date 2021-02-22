@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><h2 id="1-问题"><a href="#1-问题" class="headerlink" title="1.问题"></a>1.问题</h2><p>当给ElasticSearch配置了ILM后,ElasticSearch自动执行,按照配置把索引进行处理迁移,但是运行一段时间后发现,之前用logstash传过来的且没有使用mapping的数据都无法正常执行ILM,而其他数据却能正常处理.<br>由于发现这个问题时,对于Es不是十分了解,只能copy错误去搜索,搜索后发现几乎没有一个答案是满意的,最多说的是升级ElasticSearch版本解决,所以就又水了一文</p>
         <h2 id="2-查看索引ilm运行情况"><a href="#2-查看索引ilm运行情况" class="headerlink" title="2.查看索引ilm运行情况"></a>2.查看索引ilm运行情况</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">GET so1n_index/_ilm/explain<br></code></pre></td></tr></table></figure>
 <p>首先使用ilm/explain查看索引的ilm运行情况,这里使用so1n_index代替索引名(下同).</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;indices&quot;</span> : &#123;<br>    <span class="hljs-attr">&quot;so1n_index&quot;</span> : &#123;<br>      <span class="hljs-attr">&quot;index&quot;</span> : <span class="hljs-string">&quot;so1n_index&quot;</span>,<br>      <span class="hljs-attr">&quot;managed&quot;</span> : <span class="hljs-literal">true</span>,<br>      <span class="hljs-attr">&quot;policy&quot;</span> : <span class="hljs-string">&quot;so1n_index_policy&quot;</span>,<br>      <span class="hljs-attr">&quot;lifecycle_date_millis&quot;</span> : <span class="hljs-number">1585008002962</span>,<br>      <span class="hljs-attr">&quot;age&quot;</span> : <span class="hljs-string">&quot;35.41d&quot;</span>,<br>      <span class="hljs-attr">&quot;phase&quot;</span> : <span class="hljs-string">&quot;cold&quot;</span>,<br>      <span class="hljs-attr">&quot;phase_time_millis&quot;</span> : <span class="hljs-number">1587686411329</span>,<br>      <span class="hljs-attr">&quot;action&quot;</span> : <span class="hljs-string">&quot;allocate&quot;</span>,<br>      <span class="hljs-attr">&quot;action_time_millis&quot;</span> : <span class="hljs-number">1587686419823</span>,<br>      <span class="hljs-attr">&quot;step&quot;</span> : <span class="hljs-string">&quot;check-allocation&quot;</span>,<br>      <span class="hljs-attr">&quot;step_time_millis&quot;</span> : <span class="hljs-number">1587686428607</span>,<br>      <span class="hljs-attr">&quot;step_info&quot;</span> : &#123;<br>        <span class="hljs-attr">&quot;message&quot;</span> : <span class="hljs-string">&quot;Waiting for [2] shards to be allocated to nodes matching the given filters&quot;</span>,<br>        <span class="hljs-attr">&quot;shards_left_to_allocate&quot;</span> : <span class="hljs-number">2</span>,<br>        <span class="hljs-attr">&quot;all_shards_active&quot;</span> : <span class="hljs-literal">true</span>,<br>        <span class="hljs-attr">&quot;actual_replicas&quot;</span> : <span class="hljs-number">1</span><br>      &#125;,<br>      <span class="hljs-attr">&quot;phase_execution&quot;</span> : &#123;<br>        <span class="hljs-attr">&quot;policy&quot;</span> : <span class="hljs-string">&quot;so1n_index_policy&quot;</span>,<br>        <span class="hljs-attr">&quot;phase_definition&quot;</span> : &#123;<br>          <span class="hljs-attr">&quot;min_age&quot;</span> : <span class="hljs-string">&quot;31d&quot;</span>,<br>          <span class="hljs-attr">&quot;actions&quot;</span> : &#123;<br>            <span class="hljs-attr">&quot;freeze&quot;</span> : &#123; &#125;,<br>            <span class="hljs-attr">&quot;allocate&quot;</span> : &#123;<br>              <span class="hljs-attr">&quot;include&quot;</span> : &#123; &#125;,<br>              <span class="hljs-attr">&quot;exclude&quot;</span> : &#123; &#125;,<br>              <span class="hljs-attr">&quot;require&quot;</span> : &#123;<br>                <span class="hljs-attr">&quot;box_type&quot;</span> : <span class="hljs-string">&quot;cold&quot;</span><br>              &#125;<br>            &#125;,<br>            <span class="hljs-attr">&quot;set_priority&quot;</span> : &#123;<br>              <span class="hljs-attr">&quot;priority&quot;</span> : <span class="hljs-number">10</span><br>            &#125;<br>          &#125;<br>        &#125;,<br>        <span class="hljs-attr">&quot;version&quot;</span> : <span class="hljs-number">3</span>,<br>        <span class="hljs-attr">&quot;modified_date_in_millis&quot;</span> : <span class="hljs-number">1587663954354</span><br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
@@ -279,8 +281,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%97%AE%E9%A2%98"><span class="toc-text">1.问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95ilm%E8%BF%90%E8%A1%8C%E6%83%85%E5%86%B5"><span class="toc-text">2.查看索引ilm运行情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95allocation%E6%83%85%E5%86%B5"><span class="toc-text">3.查看索引allocation情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%A7%A3%E5%86%B3"><span class="toc-text">4.解决</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -293,6 +302,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

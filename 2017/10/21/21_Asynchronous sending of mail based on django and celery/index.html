@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在验证用户邮箱时，需要发送一个链接给用户的邮箱，让用户点击以确保用户输入的邮箱是他本人所有。<br>但是email是由提供商进行发送的，我们需要先把请求发给提供商再由提供商发送，如果不使用异步发送，在用户点击按钮后，必须等到后台收到提供商的返回结果，我们才能把数据返回给用户。</p>
         <h2 id="1-Celery介绍"><a href="#1-Celery介绍" class="headerlink" title="1.Celery介绍"></a>1.Celery介绍</h2><p>由于使用同步发送带来了许多麻烦，所以可以考虑用任务队列进行异步发送，在python中的Celery库发挥的就是这个作用，而且Celery接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库。<br><a target="_blank" rel="noopener" href="http://python.jobbole.com/87238/">更多介绍以及入门</a></p>
 <h2 id="2-与django结合异步发送邮件的服务"><a href="#2-与django结合异步发送邮件的服务" class="headerlink" title="2.与django结合异步发送邮件的服务"></a>2.与django结合异步发送邮件的服务</h2><p>假设之前已经完成了email发送逻辑（同步方式）</p>
 <h3 id="2-1setting-py设置"><a href="#2-1setting-py设置" class="headerlink" title="2.1setting.py设置"></a>2.1setting.py设置</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python">EMAIL_HOST = <span class="hljs-string">&#x27;smtp.163.com&#x27;</span>                <span class="hljs-comment"># 服务提供商</span><br>EMAIL_PORT = <span class="hljs-number">25</span>                            <span class="hljs-comment"># 端口</span><br>EMAIL_HOST_USER = <span class="hljs-string">&quot;***&quot;</span>                    <span class="hljs-comment"># 用户名</span><br>EMAIL_HOST_PASSWORD = <span class="hljs-string">&quot;***&quot;</span>                <span class="hljs-comment"># 密码</span><br>EMAIL_USE_TLS = <span class="hljs-literal">False</span>                      <span class="hljs-comment"># False就好了</span><br>EMAIL_FROM = <span class="hljs-string">&quot;***&quot;</span>                         <span class="hljs-comment"># 来源名字</span><br><br><br><span class="hljs-comment">###配置Broker</span><br>BROKER_URL = <span class="hljs-string">&#x27;redis://127.0.0.1:6379/0&#x27;</span>    <br>BROKER_TRANSPORT = <span class="hljs-string">&#x27;redis&#x27;</span><br></code></pre></td></tr></table></figure>
@@ -278,8 +280,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Celery%E4%BB%8B%E7%BB%8D"><span class="toc-text">1.Celery介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%B8%8Edjango%E7%BB%93%E5%90%88%E5%BC%82%E6%AD%A5%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E7%9A%84%E6%9C%8D%E5%8A%A1"><span class="toc-text">2.与django结合异步发送邮件的服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1setting-py%E8%AE%BE%E7%BD%AE"><span class="toc-text">2.1setting.py设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2celery%E6%96%87%E4%BB%B6"><span class="toc-text">2.2celery文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E7%9A%84py"><span class="toc-text">2.3发送邮件的py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4view"><span class="toc-text">2.4view</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5%E8%BF%90%E8%A1%8Ccelery%E6%9C%8D%E5%8A%A1"><span class="toc-text">2.5运行celery服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6%E6%B5%8B%E8%AF%95"><span class="toc-text">2.6测试</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -292,6 +301,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

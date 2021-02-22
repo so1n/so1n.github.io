@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,9 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>初次认识Graphite时,Graphite已经发展了十年了,那时在负责kamailio相关工作内容,为了监控和查看kamailio数据,查找到的文章<a target="_blank" rel="noopener" href="https://acalustra.com/kamailio-statsd-better-statistics-in-your-voip-platform.html">Kamailio statsd, better statistics in your voip platform.</a>,虽然不太认同作者把statsd客户端的嵌入kamailio的理念,但发现Graphite这东西还是很不错的(虽然后面接触了Prometheus emmmm…….不过Graphite可以保存长期的历史数据,并根据时间自动做聚合这个优点是Prometheus无法代替的).</p>
+<p>Graphite是一个包含了用于接收和整合数据的<code>carbon</code>,存储数据的时序数据库<code>Whisper</code>还有一个提供API的server.<br>它的理念十分简单,存的数据只有timestamp-value,该数据存在key的文件里面,用户可以用过以<code>*.*.*</code>的方式来设置数据维度或者标签.而写数据就更简单了只要发送TCP/UDP文本<code>&#123;key&#125; &#123;value&#125; &#123;timestamp&#125;</code>到carbon即可.同时他还提供按数据落盘时长来聚合数据的归档功能,觉得这个功能是非常帮的,因为我们不会专门去查看一年前的具体数据,只会去查看他的大概数据.</p>
         <h2 id="1-Graphite的好处"><a href="#1-Graphite的好处" class="headerlink" title="1.Graphite的好处"></a>1.Graphite的好处</h2><ul>
 <li>类似于RRD的时序数据库<code>Whisper</code>,支持Metrics的精度递减,如一天内10s一条,七天内合并为1m一条,一年内1h一条(<strong>这点最棒!</strong>)</li>
 <li>带有丰富的查询函数,  sum/min/max/avg/alias等等</li>
@@ -406,8 +409,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Graphite%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">1.Graphite的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Graphite%E7%BB%84%E4%BB%B6"><span class="toc-text">2.Graphite组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.1组件介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E7%BB%93%E6%9E%84%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.2结构介绍</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%8EGraphite%E7%9B%B8%E5%85%B3%E7%BB%84%E4%BB%B6"><span class="toc-text">3.与Graphite相关组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96"><span class="toc-text">4.优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%85%B6%E4%BB%96"><span class="toc-text">5.其他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E9%9B%86%E7%BE%A4"><span class="toc-text">6.集群</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1%E9%9B%86%E7%BE%A4%E7%BB%93%E6%9E%84"><span class="toc-text">6.1集群结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2%E5%A6%82%E4%BD%95%E9%85%8D%E7%BD%AE"><span class="toc-text">6.2如何配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -420,6 +430,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

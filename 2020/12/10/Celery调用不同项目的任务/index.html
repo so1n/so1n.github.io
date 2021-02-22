@@ -44,12 +44,12 @@ Celery的示例或者常用使用...">
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -195,6 +195,9 @@ Celery的示例或者常用使用...">
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>PS: 水文笔记…</p>
+<p><code>Celery</code>的示例或者常用使用方式中, <code>Celery</code>的Woker以及任务调用经常都是在同一个项目里面.<br>但是随着项目的拓展,很多时候<code>Celery</code>任务调用端与Woker的代码并不是在同一个项目里(但是共享同一个Mq, Redis等配置和中间件),而且<code>Celery</code>是基于<code>RabbitMQ</code>进行任务信息传输的,非常适合不同的项目调用解耦.<br>而<code>Celery</code>有一个非常好的概念–Signature,我们只要在远程端封装一个伪任务的Signature,就可以通过调用该Signature去让另一个项目的Celery执行对应的任务.</p>
         <h2 id="1-send-task"><a href="#1-send-task" class="headerlink" title="1.send_task"></a>1.send_task</h2><p>在<code>Celery</code>的文档中,有提到如果是调用不同项目的Woker可以使用send_task方法,先看看Woker端的代码:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> celery <span class="hljs-keyword">import</span> Celery<br><br>celery: Celery = Celery()    <span class="hljs-comment"># 省略配置</span><br><br><span class="hljs-comment"># 一个模拟任务,会跑60秒</span><br><span class="hljs-meta">@celery.task(<span class="hljs-params">name=<span class="hljs-string">&quot;test.block&quot;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test</span>(<span class="hljs-params">sleep_seconds=<span class="hljs-number">60</span></span>):</span><br>    time.sleep(sleep_seconds)<br></code></pre></td></tr></table></figure>
 <p>作为调用端,如果需要调用的话需要如下代码去调用:</p>
@@ -271,8 +274,15 @@ Celery的示例或者常用使用...">
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-send-task"><span class="toc-text">1.send_task</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Signature"><span class="toc-text">2.Signature</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%99%84%E5%BD%95"><span class="toc-text">3.附录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E6%A3%80%E6%9F%A5%E4%BB%BB%E5%8A%A1%E6%98%AF%E5%90%A6%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9D%9F"><span class="toc-text">3.1检查任务是否运行结束</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -285,6 +295,7 @@ Celery的示例或者常用使用...">
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

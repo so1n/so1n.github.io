@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h3 id="前记：之所以说是初级篇，是我现在用的爬虫最多也就是十万级数据，数据量还是不大，所以以下内容还是我实际遇到需要优化的内容或者网上看到的一些文章，该文章很多内容来自于网上，主要是做记录和写下个人理解。因为主要是记录，所以大多是只是阐述下有这个方法，具体还需要百度等去了解"><a href="#前记：之所以说是初级篇，是我现在用的爬虫最多也就是十万级数据，数据量还是不大，所以以下内容还是我实际遇到需要优化的内容或者网上看到的一些文章，该文章很多内容来自于网上，主要是做记录和写下个人理解。因为主要是记录，所以大多是只是阐述下有这个方法，具体还需要百度等去了解" class="headerlink" title="前记：之所以说是初级篇，是我现在用的爬虫最多也就是十万级数据，数据量还是不大，所以以下内容还是我实际遇到需要优化的内容或者网上看到的一些文章，该文章很多内容来自于网上，主要是做记录和写下个人理解。因为主要是记录，所以大多是只是阐述下有这个方法，具体还需要百度等去了解"></a>前记：之所以说是初级篇，是我现在用的爬虫最多也就是十万级数据，数据量还是不大，所以以下内容还是我实际遇到需要优化的内容或者网上看到的一些文章，该文章很多内容来自于网上，主要是做记录和写下个人理解。因为主要是记录，所以大多是只是阐述下有这个方法，具体还需要百度等去了解</h3>
         <h3 id="1-增加爬行速度"><a href="#1-增加爬行速度" class="headerlink" title="1.增加爬行速度"></a>1.增加爬行速度</h3><p>爬虫是需要访问网络的，所以速度会比写入数据还慢，数据量少的话爬虫速度还看不出有多慢，当数据量多起来的时候，少则要几天，多则要几周的时间。</p>
 <h4 id="1-1-分布式爬虫"><a href="#1-1-分布式爬虫" class="headerlink" title="1.1 分布式爬虫"></a>1.1 分布式爬虫</h4><p>分布式爬虫，简单来说就是本来由一台电脑运行的爬虫任务分给其他电脑一起运作，从而达到提升爬虫速度。<br>分布式爬虫主要有主从模式和对等模式，两种模式都有对应的缺点。例如主从模式的爬虫速度会因为控制节点的瓶颈限制到速度（因为控制节点上面有URL管理器、数据存储器和控制调度器，而其他爬虫节点只是从调度器那里领取任务再执行任务（<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1hrWEOYg#list/path=/%E3%80%8APython%E7%88%AC%E8%99%AB%E5%BC%80%E5%8F%91%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98%E3%80%8B%E8%AF%95%E8%AF%BB%E7%AB%A0%E8%8A%82">这里有一个简单的分布式爬虫主从模式的栗子</a>，书里第7章的内容）），而对等模式会因为当有一台服务器死机或者添加新的服务器，那么所有URL的哈希求余的结果就都要变化。也就是说，这种方式的扩展性不佳，不过对等模式也有进行改进。这两种方案的对比和结果图示可以参考<a target="_blank" rel="noopener" href="http://f.dataguru.cn/thread-529666-1-1.html">这里</a><br>虽然我现在没有那么多电脑/服务器来跑分布式爬虫，但是可以通过一些资料了解到分布式爬虫的存在和大概结构，运行原理。目前网上的资料大多都是采用主从模式的。所以对等式我也只是了解一下，并没有找到案例（网上基本都是Scrapy+Redis的主从分布式爬虫，我试着跑一下，发现数据量还不会造成瓶颈- -估计要上千万的数据量才会有瓶颈吧）</p>
 <h4 id="1-2-榨干性能去爬虫"><a href="#1-2-榨干性能去爬虫" class="headerlink" title="1.2 榨干性能去爬虫"></a>1.2 榨干性能去爬虫</h4><p>首先先了解几个概念</p>
@@ -303,8 +305,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0%EF%BC%9A%E4%B9%8B%E6%89%80%E4%BB%A5%E8%AF%B4%E6%98%AF%E5%88%9D%E7%BA%A7%E7%AF%87%EF%BC%8C%E6%98%AF%E6%88%91%E7%8E%B0%E5%9C%A8%E7%94%A8%E7%9A%84%E7%88%AC%E8%99%AB%E6%9C%80%E5%A4%9A%E4%B9%9F%E5%B0%B1%E6%98%AF%E5%8D%81%E4%B8%87%E7%BA%A7%E6%95%B0%E6%8D%AE%EF%BC%8C%E6%95%B0%E6%8D%AE%E9%87%8F%E8%BF%98%E6%98%AF%E4%B8%8D%E5%A4%A7%EF%BC%8C%E6%89%80%E4%BB%A5%E4%BB%A5%E4%B8%8B%E5%86%85%E5%AE%B9%E8%BF%98%E6%98%AF%E6%88%91%E5%AE%9E%E9%99%85%E9%81%87%E5%88%B0%E9%9C%80%E8%A6%81%E4%BC%98%E5%8C%96%E7%9A%84%E5%86%85%E5%AE%B9%E6%88%96%E8%80%85%E7%BD%91%E4%B8%8A%E7%9C%8B%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E6%96%87%E7%AB%A0%EF%BC%8C%E8%AF%A5%E6%96%87%E7%AB%A0%E5%BE%88%E5%A4%9A%E5%86%85%E5%AE%B9%E6%9D%A5%E8%87%AA%E4%BA%8E%E7%BD%91%E4%B8%8A%EF%BC%8C%E4%B8%BB%E8%A6%81%E6%98%AF%E5%81%9A%E8%AE%B0%E5%BD%95%E5%92%8C%E5%86%99%E4%B8%8B%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3%E3%80%82%E5%9B%A0%E4%B8%BA%E4%B8%BB%E8%A6%81%E6%98%AF%E8%AE%B0%E5%BD%95%EF%BC%8C%E6%89%80%E4%BB%A5%E5%A4%A7%E5%A4%9A%E6%98%AF%E5%8F%AA%E6%98%AF%E9%98%90%E8%BF%B0%E4%B8%8B%E6%9C%89%E8%BF%99%E4%B8%AA%E6%96%B9%E6%B3%95%EF%BC%8C%E5%85%B7%E4%BD%93%E8%BF%98%E9%9C%80%E8%A6%81%E7%99%BE%E5%BA%A6%E7%AD%89%E5%8E%BB%E4%BA%86%E8%A7%A3"><span class="toc-text">前记：之所以说是初级篇，是我现在用的爬虫最多也就是十万级数据，数据量还是不大，所以以下内容还是我实际遇到需要优化的内容或者网上看到的一些文章，该文章很多内容来自于网上，主要是做记录和写下个人理解。因为主要是记录，所以大多是只是阐述下有这个方法，具体还需要百度等去了解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%A2%9E%E5%8A%A0%E7%88%AC%E8%A1%8C%E9%80%9F%E5%BA%A6"><span class="toc-text">1.增加爬行速度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%A7%A3%E5%86%B3%E5%8F%8D%E7%88%AC"><span class="toc-text">2.解决反爬</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -317,6 +326,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

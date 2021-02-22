@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近系统上出现部分日志丢失的情况,为了解决这个问题,开始了解Linux的日志结构和机制.<br>注:由于这些应用都是需要用配置去改良或者指导他们如何去做,所以除了简述Linux的结构和功能外,更多的是如何去配置他们,如果不想看配置说明,可以忽略2,3,4点,不过最重要的是了解整个日志记录的机制,以及通过配置去了解这套机制会如何去限制日志的记录以及优化传输,这样我们才能去灵活使用他们</p>
         <h2 id="1-发送以及保存数据"><a href="#1-发送以及保存数据" class="headerlink" title="1.发送以及保存数据"></a>1.发送以及保存数据</h2><p>Linux中有一套稳定的日志管理系统,除了方便的过滤和分发外,为了多个服务器日志管理,还有一套稳定的日志发送结构,方便不漏日志的情况下,收集所有服务器的日志</p>
 <h3 id="1-1结构图-系统为debain7-以为本地发送-本地接受为例"><a href="#1-1结构图-系统为debain7-以为本地发送-本地接受为例" class="headerlink" title="1.1结构图(系统为debain7,以为本地发送,本地接受为例)"></a>1.1结构图(系统为debain7,以为本地发送,本地接受为例)</h3><p>一般程序通过调用Linux的日志接口把日志传给/dev/log,由journald发送到rsyslog service模块,再根据syslog协议把不同的日志转向不同的输出模块,输出不同的日志<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/Linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6%E7%BB%93%E6%9E%84.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">img</span></p>
 <h3 id="1-2如何发送日志"><a href="#1-2如何发送日志" class="headerlink" title="1.2如何发送日志"></a>1.2如何发送日志</h3><p>程序根据<a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc5424">syslog标准</a>,封装日志,并发送到指定socket(/dev/log)</p>
@@ -819,8 +821,15 @@ rsyslog控制的日志比较多,可以像以下这样配置,多个日志文件�
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8F%91%E9%80%81%E4%BB%A5%E5%8F%8A%E4%BF%9D%E5%AD%98%E6%95%B0%E6%8D%AE"><span class="toc-text">1.发送以及保存数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E7%BB%93%E6%9E%84%E5%9B%BE-%E7%B3%BB%E7%BB%9F%E4%B8%BAdebain7-%E4%BB%A5%E4%B8%BA%E6%9C%AC%E5%9C%B0%E5%8F%91%E9%80%81-%E6%9C%AC%E5%9C%B0%E6%8E%A5%E5%8F%97%E4%B8%BA%E4%BE%8B"><span class="toc-text">1.1结构图(系统为debain7,以为本地发送,本地接受为例)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E5%A6%82%E4%BD%95%E5%8F%91%E9%80%81%E6%97%A5%E5%BF%97"><span class="toc-text">1.2如何发送日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-dev-log"><span class="toc-text">1.3 &#x2F;dev&#x2F;log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-journald"><span class="toc-text">1.4 journald</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-rsyslog"><span class="toc-text">1.5 rsyslog</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-journald%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-text">2.journald的配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-rsyslog%E9%85%8D%E7%BD%AE"><span class="toc-text">3.rsyslog配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-text">3.1过滤器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-4%E5%8A%A8%E4%BD%9C"><span class="toc-text">3.1.4动作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-5%E5%8A%A8%E4%BD%9C-%E4%BC%A0%E8%BE%93%E6%97%A5%E5%BF%97"><span class="toc-text">3.1.5动作-传输日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%90%84%E4%B8%AA%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E7%AE%80%E4%BB%8B"><span class="toc-text">3.2 各个日志文件简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3%E9%98%9F%E5%88%97"><span class="toc-text">3.3队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4Ruleset"><span class="toc-text">3.4Ruleset</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%97%A5%E5%BF%97%E8%BD%AE%E8%BD%AC"><span class="toc-text">4.日志轮转</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1logrotate%E5%8F%82%E6%95%B0"><span class="toc-text">4.1logrotate参数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%B8%80%E4%BA%9B%E5%B8%B8%E8%A7%81%E5%9D%91"><span class="toc-text">5.一些常见坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%B8%B8%E8%A7%81rsyslog%E4%B8%8D%E8%AE%B0%E6%97%A5%E5%BF%97%E9%97%AE%E9%A2%98"><span class="toc-text">6.常见rsyslog不记日志问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E9%99%84%E5%BD%95A-%E7%94%A8python%E5%8F%91%E9%80%81%E6%97%A5%E5%BF%97%E5%88%B0syslog"><span class="toc-text">7.附录A:用python发送日志到syslog</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -833,6 +842,7 @@ rsyslog控制的日志比较多,可以像以下这样配置,多个日志文件�
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

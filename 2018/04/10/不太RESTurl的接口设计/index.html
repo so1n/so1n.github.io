@@ -44,12 +44,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -195,6 +195,11 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>又是一篇水文- -. </p>
+<p>在还没开始实习的时候,除了在弄一些练习项目或者刷面试题时,经常碰到RESTurl,知道这是一个非常重要的前后端交互的接口设计模式,也是很少人/公司能把RESTurl完全的应用到自己的业务逻辑里面.</p>
+<p>实习时,一开始就用RESTurl方式去写API,写了一段时间的API后发现,其实没必要完全去追求RESTurl,虽然RESTurl的设计是很好的,但是从理论到落地总是会有一些偏差.</p>
+<p>要永远记得,一切要以实际业务为准.</p>
         <p>** 注:文章已经更新,目前已经使用starlette代替sanic作为web框架**</p>
 <h2 id="1-HTTP-Method方法缺少云服务商的支持"><a href="#1-HTTP-Method方法缺少云服务商的支持" class="headerlink" title="1.HTTP Method方法缺少云服务商的支持"></a>1.HTTP Method方法缺少云服务商的支持</h2><p>在RESTurl中,最明显的就是对于同一个url,把url当做资源,再用http method方法去进行操作,比如用get去获取数据,post添加数据,put更新数据,delete删除数据,从设计上面来看这个设计的没问题的,但是在现实中却会带来一些bug.之前在API运用RESTurl的设计后运行了一段时间,结果在某一天套上了阿里云的CDN后发现接口不可用了,经过一段时间的排查后发现是阿里云的CDN只支持GET/POST方法…<br>在这次事故之后,所有API的HTTP Method改为GET/POST, get一般用于获取数据且数据一定能被CDN缓存的,其他都使用POST方法.在做了此次更改后,无论接了什么CDN,都再也没有出现云服务商无法支持的问题了.</p>
 <h2 id="2-接口设计与抛错设计的"><a href="#2-接口设计与抛错设计的" class="headerlink" title="2.接口设计与抛错设计的"></a>2.接口设计与抛错设计的</h2><p>经常能发现很多人在一些编程论坛上吵着,全RESTurl,或者只要接口没问题,那就返回HTTP STATUS CODE 200,并自己在json里面写上业务的code,交由客户端判断.在经历过几次项目的设计后,我还是偏爱于后者的.先看看设计</p>
@@ -297,8 +302,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-HTTP-Method%E6%96%B9%E6%B3%95%E7%BC%BA%E5%B0%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%95%86%E7%9A%84%E6%94%AF%E6%8C%81"><span class="toc-text">1.HTTP Method方法缺少云服务商的支持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%8A%9B%E9%94%99%E8%AE%BE%E8%AE%A1%E7%9A%84"><span class="toc-text">2.接口设计与抛错设计的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E6%8E%A5%E5%8F%A3%E8%BF%94%E5%9B%9E%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.1接口返回设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%A6%82%E4%BD%95%E7%BC%96%E5%86%99%E6%8A%9B%E9%94%99%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="toc-text">2.2 如何编写抛错设计的代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -311,6 +323,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

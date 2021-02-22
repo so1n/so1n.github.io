@@ -46,12 +46,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -197,6 +197,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <p>阅读scrapy后做了一个简单的scrapy爬虫</p>
         <h2 id="Scrapy爬虫（1）-知乎"><a href="#Scrapy爬虫（1）-知乎" class="headerlink" title="Scrapy爬虫（1）-知乎"></a>Scrapy爬虫（1）-知乎</h2><p>第一次用Scrap创建的爬虫，详细记录下<br>完整代码请访问<a target="_blank" rel="noopener" href="https://github.com/so1n/learn-python/tree/master/6-zhihuSpider">这里</a>,不过代码可能有所不同</p>
 <h3 id="1-前记"><a href="#1-前记" class="headerlink" title="-1.前记"></a>-1.前记</h3><p>本来是昨天弄好代码，今天写文章的。然后今天早上在逛台风吧看台风天鸽状况，天鸽近岸爆发加上机构被妮妲狼来了戏耍后都保持谨慎态度，珠海到早上上班时间后才挂红色预警，澳门则到了快登录才挂10号风球，珠三角没有做好防范，还有近岸爆发和赶上天文大潮导致受灾加重，希望那里灾情不重。付上两张图，一张是澳门海水倒灌一张是天鸽高层图，很像鸽子头<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/scrapy%E5%8F%B0%E9%A3%8E1.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">enter description here</span><br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/Scrapy%E5%8F%B0%E9%A3%8E2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">enter description here</span></p>
 <h3 id="0-思路验证"><a href="#0-思路验证" class="headerlink" title="0.思路验证"></a>0.思路验证</h3><p>在创建这个工程前，我先用段代码来检验基本功能可否运行<br>知乎可以不用登录获取用户信息，对我来说，方便太多了，而且知乎的查看关注页面那里同时显示有个人用户信息所以直接访问：<a target="_blank" rel="noopener" href="https://www.zhihu.com/people/%EF%BC%88token%EF%BC%89/following">https://www.zhihu.com/people/（token）/following</a><br>就可以找到我要的信息了（虽然关注列表只有20个，不过无所谓）<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E7%9F%A5%E4%B9%8E-%E6%9F%A5%E7%9C%8B%E7%9F%A5%E4%B9%8E%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">enter description here</span><br>提取信息如图，直接copy这段数据去相应网站分析后，可以得出我要的数据在两个部分，<br>一个是在[‘people’][‘followingByUser’][urltoken][‘ids’]<br>另一个是在[‘entities’][‘users’][urltoken]<br>找到后就可以写代码开始爬下来了。<br>不过知乎的json会有空，比如这个用户没有学校的值时，json就没有相应的节点，如果直接爬就会报错，然后我也没有找到比较简便的处理方法，就写了try…except（如果用了对象，一个方法来复用，最后代码量也差不多，我就放弃了）<br>代码如下：</p>
@@ -308,8 +310,15 @@ ip代理列表<br>这个ip我是从免费代理IP拿的，测试一下ip代理�
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Scrapy%E7%88%AC%E8%99%AB%EF%BC%881%EF%BC%89-%E7%9F%A5%E4%B9%8E"><span class="toc-text">Scrapy爬虫（1）-知乎</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%89%8D%E8%AE%B0"><span class="toc-text">-1.前记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0-%E6%80%9D%E8%B7%AF%E9%AA%8C%E8%AF%81"><span class="toc-text">0.思路验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E5%B7%A5%E7%A8%8B"><span class="toc-text">1.创建工程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%88%9B%E5%BB%BA%E7%88%AC%E8%99%AB%E6%A8%A1%E5%9D%97"><span class="toc-text">2.创建爬虫模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%A7%A3%E6%9E%90%E7%BD%91%E9%A1%B5"><span class="toc-text">3.解析网页</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%AE%9A%E4%B9%89item"><span class="toc-text">4.定义item</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-Pipeline"><span class="toc-text">5.Pipeline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%85%B6%E4%BB%96%E8%A1%A5%E5%85%85"><span class="toc-text">6.其他补充</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E7%BB%93%E6%9E%9C"><span class="toc-text">7.结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E4%BC%98%E5%8C%96%E4%B8%8E%E8%A1%A5%E5%85%85"><span class="toc-text">7.优化与补充</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -322,6 +331,7 @@ ip代理列表<br>这个ip我是从免费代理IP拿的，测试一下ip代理�
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 

@@ -43,12 +43,12 @@
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="light">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
 
       
         
         
-<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark.min.css" name="highlight-style" mode="dark">
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
 
       
   
@@ -194,6 +194,8 @@
 
     <section class="main">
       <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>升级版的增删改查项目，并使用xadmin来替代django自带的admin为后台</p>
         <h2 id="github"><a href="#github" class="headerlink" title="github"></a>github</h2><p><a target="_blank" rel="noopener" href="https://github.com/so1n/Django_project/tree/master/project2">代码仓</a></p>
 <h2 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h2><p>学生可以通过机构，老师或课程进入学习课程。</p>
 <ul>
@@ -306,8 +308,15 @@
       
     </section>
   </div>
-</article></div>
+</article>
+</div>
       <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#github"><span class="toc-text">github</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="toc-text">主要功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#new"><span class="toc-text">new</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1"><span class="toc-text">缓存设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E6%AD%A5%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6"><span class="toc-text">异步发送邮件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xadmin"><span class="toc-text">xadmin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E4%BD%BF%E7%94%A8"><span class="toc-text">模板使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#django-pure-pagination%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">django pure pagination的使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9D%91"><span class="toc-text">坑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BD%BF%E7%94%A8"><span class="toc-text">数据库使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E8%87%AA%E5%B7%B1%E7%9A%84user%E8%A1%A8"><span class="toc-text">定义自己的user表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xadmin%E7%9A%84%E7%89%88%E6%9C%AC%E9%97%AE%E9%A2%98"><span class="toc-text">xadmin的版本问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MEDIA-URL%E7%A9%BA%E5%80%BC"><span class="toc-text">MEDIA_URL空值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%90%E5%88%B6%E7%BD%91%E9%A1%B5%E9%9C%80%E8%A6%81%E7%99%BB%E5%BD%95%E7%9A%84%E7%94%A8%E6%88%B7%E8%AE%BF%E9%97%AE"><span class="toc-text">限制网页需要登录的用户访问</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#models-form%E9%AA%8C%E8%AF%81%E6%95%B0%E6%8D%AE"><span class="toc-text">models.form验证数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8D%E4%BD%BF%E7%94%A8-Login-required%E7%9A%84%E7%99%BB%E5%BD%95%E8%B7%B3%E8%BD%AC"><span class="toc-text">不使用@Login_required的登录跳转</span></a></li></ol></li></ol>
+  </aside>
+
         
           
   <aside class="toc-wrap">
@@ -320,6 +329,7 @@
     </div>
   </div>
 </main>
+
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
 
