@@ -1,0 +1,455 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>API分页设计(基于MySql) - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="分页设计是一个常见的需求, 通常是跟数据库强绑定的需求...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">API分页设计(基于MySql)</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">API分页设计(基于MySql)</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>September 05, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3741</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <p>分页设计是一个常见的需求, 通常是跟数据库强绑定的需求, 对于一个API来说,经常会返回成千上百条记录, 一下子返回所有结果对服务器, 客户端来说是一个挑战, 于是就有了分页的功能, 所以分页设计很常见, 但是分页的功能并不是数据库的本职工作,  数据库只能尽量的提供分页功能. 所以分页的功能但又是很难的一个点, 并没有一个万金油选项, 只能根据业务定义自己的分页功能.</p>
+        <h2 id="1-一个API例子"><a href="#1-一个API例子" class="headerlink" title="1.一个API例子"></a>1.一个API例子</h2><p>首先先看看一个API例子, 对于客户端来说,需要一个如下的Url让客户端知道能请求第几页,每页有多少条数据:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">GET /api/book?page=10&amp;size=10<br></code></pre></td></tr></table></figure>
+<p>服务端在收到请求时,会转化为offset为100(10* 10), 并在数据库调用<code>select * from xxx limit 100, 10</code>的语法来查出数据, 同时在返回数据时,需要告诉客户端当前是第几页,总共有多少条数据:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;page_info&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;page&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;page_size&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;total&quot;</span>: <span class="hljs-number">10000</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;data&quot;</span>: [<br>        ...<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这样的设计看起来非常不错, 前后端都看得懂, 后端写起来也不费劲,但是对于服务端与MySql的交互还是需要优化的</p>
+<h2 id="2-优化点一-offset语法"><a href="#2-优化点一-offset语法" class="headerlink" title="2.优化点一: offset语法"></a>2.优化点一: offset语法</h2><p>该语法使用非常简单,但非常抵效率, 在前面几页, MySql的性能消耗都不高, 但当翻的页数再高时, 就开始有性能瓶颈了.还是以<code>select * from xxx limit 100, 10</code>为例子,offset为100时,数据库还是会查看前100条,只不过是跳过不返回数据而已(大多数提供分页功能的数据库都是这样), 数据库实际上是查了前110条,然后返回最后10条, 当offset非常大时, 数据库需要查的数据量就会更大.</p>
+<p>那这个方法不行, 该怎么优化呢, 如果数据表有良好的设计, 表里应该有个primary key索引的id字段, 他的数值还是自增的(论良好设计的重要性). 因为这个值是带有索引的, 并且保持有序的自增, 只要让MySql查询大于某个id的值(刚好是第一百条)再Limit10, 这时候MySQL只会扫描我们需要的10条,减少了其他的消耗, 那么我们可以把API的例子改为:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"># page_start的值为id值<br>GET /api/book?page_start=100&amp;size=10<br><br>&#123;<br>    <span class="hljs-attr">&quot;page_info&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;page_start&quot;</span>: <span class="hljs-number">100</span>,<br>        <span class="hljs-attr">&quot;page_size&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;total&quot;</span>: <span class="hljs-number">10000</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;data&quot;</span>: [<br>        ...<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如果觉得id会暴露自己的数据(比如当前的业务量),也可以用其他字段代替, 只要该字段满足有索引,且保持有序自增的条件. 如业务需求会按时间的相关性来查询, 这时就可以用时间这个字段来代替id了</p>
+<p>改用了这种方法除了可以减少MySql查询时扫描的行数,提升性能外, 还可以规避另外一个问题, 如已经查询到了100-110条数据时, 0-100中突然插入新的10条数据, 下一页的数据还是下一页的数据, 而不是原来的下一页的数据还是原来的数据, 不用担心新的记录来扰乱.</p>
+<p>然而上面说了那么多好的,特别是对性能的提升非常明显,但他也有局限性, 最大的局限性就是在当前的相关性查询中必须有带索引且保持自增的字段, 此外还有一个局限性.如果用了很多数据库, 就会发现上面说的方法很像, ElasticSearch和Redis的游标, 实际上上面用到的方法正就是MySql的游标, 如果在代码里有保存对应的游标对象的话, 是能一直调用<code>cursor.fetchone</code>获取之后的数据的,只不过用一个索引数据来代替这个游标对象.由于我们使用了游标的功能,那么就会带来了一个显而易见的问题,没法回滚上一页, 需要用原本的offset…limit…的方法实现(或者通过缓存缓存之前加载的数据, 如果上一页刚好是缓存过的数据, 就可以直接返回了).</p>
+<h2 id="3-优化点二-总的数量"><a href="#3-优化点二-总的数量" class="headerlink" title="3.优化点二: 总的数量"></a>3.优化点二: 总的数量</h2><p>在返回响应中, 我们需要返回一个总的数量, 那么就需要执行两条语句:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> xxx limit <span class="hljs-number">100</span>, <span class="hljs-number">10</span><br><span class="hljs-keyword">select</span> <span class="hljs-built_in">count</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">from</span> xxx<br></code></pre></td></tr></table></figure>
+<p>这样不止在写代码的时候十分麻烦, 同时要查两次也很浪费性能, 这时可以通过使用<code>FOUND_ROWS</code>函数来帮忙, 把语句改为如下:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> sql_cale_found_rows, <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> xxx limit <span class="hljs-number">100</span>, <span class="hljs-number">10</span><br><span class="hljs-keyword">select</span> found_rows() count;<br></code></pre></td></tr></table></figure>
+<p>这样查询的查询量只有一次, 第二条语句会返回第一条语句不带limit查询的总值, 大大的增加了性能.<br>需要主要的是, 第一条语句一定要带有<code>sql_cale_found_rows</code>和<code>limit</code>, 不然第二条语句返回的结果会不对, 同时第二条语句会过滤一些为空的数据.</p>
+<p>虽然很好的解决需求, 以及增加了性能, 但是也需要MySql去计算总量, 还是有性能消耗的, 在性能要求高的情况下还是不能去查总的条数, 一般会通过缓存来减少计算次数, 但这样会出现总数不准的问题. 由于我们返回的总数主要还是告诉客户端是否还要继续翻页,  那就可以通过另外一个做法来解决, 假设我们每次获取10条, 如果在获取一次数据时得到的总数不足以10条时, 则应该返回应该标记, 告诉客户端当前已经没有数据可以获取了. </p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"># is_null代表是否有数据可以获取 <br>GET /api/book?page_start=100&amp;size=10<br><br>&#123;<br>    <span class="hljs-attr">&quot;page_info&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;page_start&quot;</span>: <span class="hljs-number">100</span>,<br>        <span class="hljs-attr">&quot;page_size&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;is_null&quot;</span>: <span class="hljs-literal">false</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;data&quot;</span>: [<br>        ...<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="4-优化点三-数据重复问题"><a href="#4-优化点三-数据重复问题" class="headerlink" title="4.优化点三: 数据重复问题"></a>4.优化点三: 数据重复问题</h2><p>在执行<code>select * from xxx limit 100, 10</code>时, 顺序都是一致的, 假设里面有个价格的参数,这个字段我们一般不会加索引的, 但是我们要按照他的大小来排序, 这时sql会写为<code>select * from xxx order by price desc limit 100, 10</code>. 经过这个改动后, 就会触发一个问题–不同的页面可能会出现相同的数据, 但是使用了<code>select * from xxx order by price desc, id desc limit 100, 10</code>就可以解决问题了(id为唯一索引).</p>
+<p>首先先看看MySql针对一个查询语句的执行顺序:</p>
+<ul>
+<li><ol>
+<li>SELECT</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>DISTINCT <select_list></li>
+</ol>
+</li>
+<li><ol start="3">
+<li>FROM <left_table></li>
+</ol>
+</li>
+<li><ol start="4">
+<li><join_type> JOIN <right_table></li>
+</ol>
+</li>
+<li><ol start="5">
+<li>ON <join_condition></li>
+</ol>
+</li>
+<li><ol start="6">
+<li>WHERE <where_condition></li>
+</ol>
+</li>
+<li><ol start="7">
+<li>GROUP BY <group_by_list></li>
+</ol>
+</li>
+<li><ol start="8">
+<li>HAVING <having_condition></li>
+</ol>
+</li>
+<li><ol start="9">
+<li>ORDER BY <order_by_condition></li>
+</ol>
+</li>
+<li><ol start="10">
+<li>LIMIT <limit_number></li>
+</ol>
+</li>
+</ul>
+<p>可以看出, MySql在执行完排序后再执行limit语句的, 而出现上面这种情况, 是跟MySql5.6之后的更新有关的, 在MySql5.6之后优化器在遇到order by limit语句时, 会使用priority queue的一个优化, 使用 priority queue 的目的，就是在不能使用索引有序性的时候，如果要排序，并且使用了limit n，那么只需要在排序的过程中，保留n条记录即可.但是prioruty queue使用了堆排序的排序方法, 这种方法不是稳定排序的, 也就是值相同时, 顺序并不是一定的. 假设我们要排序的值都是一样的, 且有20个, 假设有两次查询, 一次查询的量是10个, 那会发现两次查询的值是有重复的.</p>
+<p>了解了问题的原因后就可以知道<code>select * from xxx order by price desc limit 100, 10</code>出现重复数据的原因是price有相同的值, 导致了数据的重复, 而在加了一个id后, 就没有一个值会重复了, 所以问题也就解决了.<br>但是需要注意的是, 还有一些极端的情况下会出现数据重复的情况, 因为我们的分页是在数据库提供的排序功能的基础上，衍生出来的应用需求，数据库并不保证分页的重复问题。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/09/05/%E5%9F%BA%E4%BA%8EMySql%E7%9A%84API%E5%88%86%E9%A1%B5%E8%AE%BE%E8%AE%A1/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;09&#x2F;05&#x2F;%E5%9F%BA%E4%BA%8EMySql%E7%9A%84API%E5%88%86%E9%A1%B5%E8%AE%BE%E8%AE%A1&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;09&#x2F;05&#x2F;%E5%9F%BA%E4%BA%8EMySql%E7%9A%84API%E5%88%86%E9%A1%B5%E8%AE%BE%E8%AE%A1&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySql/" rel="tag">MySql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" rel="tag">接口设计</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/09/07/%E5%88%86%E5%B8%83%E5%BC%8Fid/"><i class="iconfont iconleft"></i>分布式ID</a>
+    <a href="/2020/09/01/git/">git<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AAAPI%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个API例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%80-offset%E8%AF%AD%E6%B3%95"><span class="toc-text">2.优化点一: offset语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BC%98%E5%8C%96%E7%82%B9%E4%BA%8C-%E6%80%BB%E7%9A%84%E6%95%B0%E9%87%8F"><span class="toc-text">3.优化点二: 总的数量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%89-%E6%95%B0%E6%8D%AE%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98"><span class="toc-text">4.优化点三: 数据重复问题</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AAAPI%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个API例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%80-offset%E8%AF%AD%E6%B3%95"><span class="toc-text">2.优化点一: offset语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BC%98%E5%8C%96%E7%82%B9%E4%BA%8C-%E6%80%BB%E7%9A%84%E6%95%B0%E9%87%8F"><span class="toc-text">3.优化点二: 总的数量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%89-%E6%95%B0%E6%8D%AE%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98"><span class="toc-text">4.优化点三: 数据重复问题</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
