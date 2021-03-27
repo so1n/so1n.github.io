@@ -1,0 +1,422 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python的Dict实现 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记在Python中, Dict是一系列由键和值配对组...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: 'https://source.unsplash.com/random/1920x1080'
+        },
+        motto: {
+          default: '我们总说社会是个大染缸 其实是我们自己掉色',
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">Python的Dict实现</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python的Dict实现</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 16, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7323</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在Python中, Dict是一系列由键和值配对组成的元素的集合, 它是一个可变容器模型，可以存储任意类型对象. Dict的存取速度非常的快, 这全靠他的哈希算法的功劳, 在Python3.6之前Dict是无序的, Python3.6的绝大部分是有序的, 在Python3.6之后是绝对有序的, 而且占用内存空间更少, 对于万物依赖于Dict的Python,这算一个大优化, 也让我好奇Python是如何实现哈希有序的.</p>
+        <h2 id="1-哈希实现"><a href="#1-哈希实现" class="headerlink" title="1.哈希实现"></a>1.哈希实现</h2><p>Dict在读取和写入Key时, 都会对Key进行哈希计算(所以要求Key都是不可变类型), 根据计算的值, 与当前的数组空间长度进行取模计算, 得到的值就是当前Key在数组的下标, 通过下标就可以以O(1)的时间复杂度读取值. 这种实现非常棒, 也是分布式的常见做法, 但也有问题, 如果数组满了怎么办, 如果不同的Key, 但是哈希结果是一样的怎么办?</p>
+<p>针对第一个问题, 就是在合适的时候进行扩容, 在Python中, 数量占可用空间的2/3时, 则开始扩容, 为了减少key的迁移次数, 扩容后的总容量是扩容之前的一倍;</p>
+<p>而针对第二个问题则有两个解法:</p>
+<ul>
+<li>链接法: 原本数组里面存的是Key对应的值, 而链接法的数组存的是一个数组, 这个数组存了一个包含key和对应值的数组, 如下所示, key1和key2的哈希结果都是0, 那就会插入到数组的0下标中, key1在0下标的数组的第一位, 而key2在插入时,发现已经存在key1了, 再用key2与key1进行对比, 发现key其实不一样, 那就在0下标进行追加.  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python">array = [<br>    [<br>        (<span class="hljs-string">&#x27;key1&#x27;</span>, <span class="hljs-number">123</span>),<br>        (<span class="hljs-string">&#x27;key2&#x27;</span>, <span class="hljs-number">123</span>)<br>    ],<br>    [<br>        (<span class="hljs-string">&#x27;key3&#x27;</span>, <span class="hljs-number">123</span>)<br>    ]<br>]<br></code></pre></td></tr></table></figure></li>
+<li>开发寻址法: 开发寻址法走的是另外一个思路, 如果遇到了冲突那就去使用当前下标的下一位, 如果下一位还是冲突, 就继续用下一位…</li>
+</ul>
+<p>上面两个的方案的实现都很简单, 对比下也很容易知道他们的优缺点:</p>
+<ul>
+<li>链表法的优点:<ul>
+<li>删除记录方便, 直接处理数组对应下标的子数组即可.</li>
+<li>平均查找速度快, 如果冲突了, 只需要对子数组进行查询即可</li>
+</ul>
+</li>
+<li>链表法的缺点:<ul>
+<li>用到了指针, 导致了查询速度会偏慢一点, 内存占用可能会较高, 不适合序列化.<br>而开放寻址法的优缺点是跟链表法反过来的, 由于Python万物基于Dict, 且都需要序列化, 所以选择了开放寻址法. </li>
+</ul>
+</li>
+</ul>
+<p>通过对比链表法和开放寻执法都可以发现, 他们都是针对哈希冲突的一个解决方案, 如果存数据的数组够大, 那么哈希冲突的可能性就会很小, 但是占用的空间就会很大.所以一个好的哈希表实现初始值不能太大, 在Python中的初始值是8, 另外需要让存数据的数组的未使用空位保持在一个范围值内波动, 这样空间的使用和哈希冲突的概率都会保持在一个最优的情况, 但由于每次扩容都会消耗很大的性能, 也不能每次更改都进行一次扩容, 所以需要确定一个值, 当未使用/使用的占比达到这个值时, 就自动扩容, 在Python中这个值是2/3. 也就是当Dict里面使用了2/3的空间后, 他就会自动扩容, 使他达到一个新的最优平衡. 同时, 为了减少每次扩容时key的迁移次数, 扩容后的总容量一定是扩容之前的总容量的一倍, 这样的话, key只需要迁移一半的数量即可.</p>
+<p>但是如果按照上面是说法, Python基于开放寻址法还是有一个问题的, 比如下面的数组:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">arrray = [<span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">True</span>, <span class="hljs-literal">True</span>, <span class="hljs-literal">True</span>, <span class="hljs-literal">True</span>]<br></code></pre></td></tr></table></figure>
+<p>以True代表当前数组的位置已经被占用, 当前并未满足使用了数组的2/3空间, 数组不会扩容, 假设要插入一个Key, 刚好落在数组下标4, 那就要一直查下去, 最后发现只有数组下标0的位置的空的, 才真正的插入数据. 对于一个只有长度为8的数组, 需要执行5次才能插入数据, 那也太浪费性能了, 所以Python要实现一个算法, 尽量让冲突的数据插在别的地方.<br>在源码中, Python用到了公式<code>x = ((5*y) + 1) % 2**i</code>, x为数组的下一个坐标, y为当前发生冲突的坐标,i为容量系数, 比如初始化时, i为3, 那么容量就是8了,<br>第一次插入数据到坐标0冲突时, y = 0, 带入公式后, 求得x 等于1, 第二次插入数据到坐标0时, y = 1, 求得x 等于 6, 通过这样算下去, 可以发现数字生成轨迹是0&gt;1&gt;6&gt;7&gt;4&gt;5&gt;2&gt;3&gt;0一直循环着, 而且这样跳着插数据恰好可以解决上面场景的问题.</p>
+<h2 id="2-有序字典的原理"><a href="#2-有序字典的原理" class="headerlink" title="2.有序字典的原理"></a>2.有序字典的原理</h2><p>Python3.6之前实现的原理与第一步说的差不多, 它的数组大概是长这样的, 数组中存了子数组, 第一项为hash值, 第二项为key, 第三项为值.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python">array = [<br>    [],<br>    [<span class="hljs-number">123456</span>, <span class="hljs-string">&quot;key1&quot;</span>, <span class="hljs-number">1</span>],<br>    [],<br>    [],<br>    [],<br>    [<span class="hljs-number">234567</span>, <span class="hljs-string">&quot;key2&quot;</span>, <span class="hljs-number">2</span>],<br>    [],<br>    []<br>]<br></code></pre></td></tr></table></figure>
+<p>这种实现的空间大小在初始化时就固定了, 直到下次扩容再发送变化, 在遍历字典时, 时间上就是遍历数组, 只是把没有占用的空间进行跳过.这种遍历的生成的顺序只跟哈希结果相关, 无法跟插入顺序相关, 所以这种方法的实现是无序的.</p>
+<p>而在Python3.7之后, Python使用了新的数据结构, 在节省内存占用的同时, Python的内存占用也比老的Dict少了, 具体的实现是, 初始化时会生成两个数组, 插入值时, 在数组二追加当前的数据, 并获得当前追加数据所在的下标A, 然后对key进行哈希取模算出下标B, 最后对数组下标B的值更新为A, 简单的演示如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 初始的结构</span><br>array_1 = [<span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>]<br>array_2 = []<br><br><br><span class="hljs-comment"># 插入值后, 他就会变为:</span><br><br>array_1 = [<span class="hljs-literal">None</span>, <span class="hljs-number">0</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>, <span class="hljs-number">1</span>, <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>]<br>array_2 = [<br>    [<span class="hljs-number">123456</span>, <span class="hljs-string">&quot;key1&quot;</span>, <span class="hljs-number">1</span>],<br>    [<span class="hljs-number">234567</span>, <span class="hljs-string">&quot;key2&quot;</span>, <span class="hljs-number">2</span>],<br>]<br></code></pre></td></tr></table></figure>
+<p>可以看出, 数组2的容量跟当前放入的值相等的, 数组1虽然还会保持1/3的空闲标记位, 但他只保存数组二的下标, 占用空间也不多, 相比之前的方案会节省一些空间, 同时在遍历的时候可以直接遍历数组二, 这样Python的Dict就变为有序的了.<br>注: 为了保持操作高效, 在删除的时候, 只是把数组1的值设置为-2, 并把数组2对应的值设置为None, 而不去删除他.</p>
+<p>通过上面的了解后, 可以使用Python来写一个新版Dict的实现:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, Iterable, List, Optional, Tuple<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomerDict</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        self._init_seed: <span class="hljs-built_in">int</span> = <span class="hljs-number">3</span>  <span class="hljs-comment"># 容量因子</span><br>        self._init_length: <span class="hljs-built_in">int</span> = <span class="hljs-number">2</span> ** self._init_seed  <span class="hljs-comment"># 初始化数组大小</span><br>        self._load_factor: <span class="hljs-built_in">float</span> = <span class="hljs-number">2</span> / <span class="hljs-number">3</span>  <span class="hljs-comment"># 扩容因子</span><br>        self._index_array: List[<span class="hljs-built_in">int</span>] = [-<span class="hljs-number">1</span> <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(self._init_length)]  <span class="hljs-comment"># 存放下标的数组</span><br>        self._data_array: List[Optional[Tuple[<span class="hljs-built_in">int</span>, Any, Any]]] = []  <span class="hljs-comment"># 存放数据的数组</span><br>        self._used_count: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span>  <span class="hljs-comment"># 目前用的量</span><br>        self._delete_count: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span>  <span class="hljs-comment"># 被标记删除的量</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_create_new</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;扩容函数&quot;&quot;&quot;</span><br>        self._init_seed += <span class="hljs-number">1</span>  <span class="hljs-comment"># 增加容量因子</span><br>        self._init_length = <span class="hljs-number">2</span> ** self._init_seed<br>        old_data_array: List[Tuple[<span class="hljs-built_in">int</span>, Any, Any]] = self._data_array<br>        self._index_array: List[<span class="hljs-built_in">int</span>] = [-<span class="hljs-number">1</span> <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(self._init_length)]<br>        self._data_array: List[Tuple[<span class="hljs-built_in">int</span>, Any, Any]] = []<br>        self._used_count = <span class="hljs-number">0</span><br>        self._delete_count = <span class="hljs-number">0</span><br><br>        <span class="hljs-comment"># 这里只是简单实现, 实际上只需要搬运一半的数据</span><br>        <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> old_data_array:<br>            <span class="hljs-keyword">if</span> item <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>                self.__setitem__(item[<span class="hljs-number">1</span>], item[<span class="hljs-number">2</span>])<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_get_next</span>(<span class="hljs-params">self, index: <span class="hljs-built_in">int</span></span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;如果下标对应的值冲突了, 需要计算下一跳的下标&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">return</span> ((<span class="hljs-number">5</span>*index) + <span class="hljs-number">1</span>) % self._init_length<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_core</span>(<span class="hljs-params">self, key: Any, default_value: Optional[Any] = <span class="hljs-literal">None</span></span>) -&gt; Tuple[int, Any, int]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;获取数据或者得到可以放新数据的方法, 返回值是index_array的索引, 数据, data_array的索引&quot;&quot;&quot;</span><br>        index: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">hash</span>(key) % (self._init_length - <span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>            data_index: <span class="hljs-built_in">int</span> = self._index_array[index]<br>            <span class="hljs-comment"># 如果是-1则代表没有数据</span><br>            <span class="hljs-keyword">if</span> data_index == -<span class="hljs-number">1</span>:<br>                <span class="hljs-keyword">break</span><br>            <span class="hljs-comment"># 如果是-2则代表之前有数据则不过被删除了</span><br>            <span class="hljs-keyword">elif</span> data_index == -<span class="hljs-number">2</span>:<br>                index = self._get_next(index)<br>                <span class="hljs-keyword">continue</span><br><br>            _, new_key, default_value = self._data_array[data_index]<br>            <span class="hljs-comment"># 判断是不是对应的key</span><br>            <span class="hljs-keyword">if</span> key != new_key:<br>                index = self._get_next(index)<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">break</span><br>        <span class="hljs-keyword">return</span> index, default_value, data_index<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__getitem__</span>(<span class="hljs-params">self, key: Any</span>) -&gt; Any:</span><br>        _, value, data_index = self._core(key)<br>        <span class="hljs-keyword">if</span> data_index == -<span class="hljs-number">1</span>:<br>            <span class="hljs-keyword">raise</span> KeyError(key)<br>        <span class="hljs-keyword">return</span> value<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__setitem__</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">if</span> (self._used_count / self._init_length) &gt; self._load_factor:<br>            self._create_new()<br>        index, _, _ = self._core(key)<br><br>        self._index_array[index] = self._used_count<br>        self._data_array.append((<span class="hljs-built_in">hash</span>(key), key, value))<br>        self._used_count += <span class="hljs-number">1</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__delitem__</span>(<span class="hljs-params">self, key: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        index, _, data_index = self._core(key)<br>        <span class="hljs-keyword">if</span> data_index == -<span class="hljs-number">1</span>:<br>            <span class="hljs-keyword">raise</span> KeyError(key)<br>        self._index_array[index] = -<span class="hljs-number">2</span><br>        self._data_array[data_index] = <span class="hljs-literal">None</span><br>        self._delete_count += <span class="hljs-number">1</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__len__</span>(<span class="hljs-params">self</span>) -&gt; int:</span><br>        <span class="hljs-keyword">return</span> self._used_count - self._delete_count<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__iter__</span>(<span class="hljs-params">self</span>) -&gt; Iterable:</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">iter</span>(self._data_array)<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__str__</span>(<span class="hljs-params">self</span>) -&gt; str:</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">str</span>(&#123;item[<span class="hljs-number">1</span>]: item[<span class="hljs-number">2</span>] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> self._data_array <span class="hljs-keyword">if</span> item <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>&#125;)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">keys</span>(<span class="hljs-params">self</span>) -&gt; List[Any]:</span><br>        <span class="hljs-keyword">return</span> [item[<span class="hljs-number">1</span>] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> self._data_array <span class="hljs-keyword">if</span> item <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>]<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">values</span>(<span class="hljs-params">self</span>) -&gt; List[Any]:</span><br>        <span class="hljs-keyword">return</span> [item[<span class="hljs-number">2</span>] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> self._data_array <span class="hljs-keyword">if</span> item <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>]<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">items</span>(<span class="hljs-params">self</span>) -&gt; List[Tuple[Any, Any]]:</span><br>        <span class="hljs-keyword">return</span> [(item[<span class="hljs-number">1</span>], item[<span class="hljs-number">2</span>]) <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> self._data_array <span class="hljs-keyword">if</span> item <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>]<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    customer_dict: CustomerDict = CustomerDict()<br>    customer_dict[<span class="hljs-string">&quot;demo_1&quot;</span>] = <span class="hljs-string">&quot;a&quot;</span><br>    customer_dict[<span class="hljs-string">&quot;demo_2&quot;</span>] = <span class="hljs-string">&quot;b&quot;</span><br>    <span class="hljs-keyword">assert</span> <span class="hljs-built_in">len</span>(customer_dict) == <span class="hljs-number">2</span><br><br>    <span class="hljs-keyword">del</span> customer_dict[<span class="hljs-string">&quot;demo_1&quot;</span>]<br>    <span class="hljs-keyword">del</span> customer_dict[<span class="hljs-string">&quot;demo_2&quot;</span>]<br>    <span class="hljs-keyword">assert</span> <span class="hljs-built_in">len</span>(customer_dict) == <span class="hljs-number">0</span><br><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">30</span>):<br>        customer_dict[i] = i<br>    <span class="hljs-keyword">assert</span> <span class="hljs-built_in">len</span>(customer_dict) == <span class="hljs-number">30</span><br><br>    customer_dict_value_list: List[Any] = customer_dict.values()<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">30</span>):<br>        <span class="hljs-keyword">assert</span> i == customer_dict[i]<br><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">30</span>):<br>        <span class="hljs-keyword">assert</span> customer_dict[i] == i<br>        <span class="hljs-keyword">del</span> customer_dict[i]<br>    <span class="hljs-keyword">assert</span> <span class="hljs-built_in">len</span>(customer_dict) == <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/12/16/Python%E7%9A%84Dict%E5%AE%9E%E7%8E%B0/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;12&#x2F;16&#x2F;Python%E7%9A%84Dict%E5%AE%9E%E7%8E%B0&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;12&#x2F;16&#x2F;Python%E7%9A%84Dict%E5%AE%9E%E7%8E%B0&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2019/12/16/Python%E7%9A%84DIct%E5%AE%9E%E7%8E%B0/"><i class="iconfont iconleft"></i>Python的Dict实现</a>
+    <a href="/2019/12/05/linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6/">linux日志规则<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%93%88%E5%B8%8C%E5%AE%9E%E7%8E%B0"><span class="toc-text">1.哈希实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9C%89%E5%BA%8F%E5%AD%97%E5%85%B8%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">2.有序字典的原理</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%93%88%E5%B8%8C%E5%AE%9E%E7%8E%B0"><span class="toc-text">1.哈希实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9C%89%E5%BA%8F%E5%AD%97%E5%85%B8%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">2.有序字典的原理</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
