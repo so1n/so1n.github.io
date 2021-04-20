@@ -114,7 +114,7 @@
         page_black_list: ''
       },
       search: {
-        enable: false,
+        enable: true,
         path: 'search.xml'
       }
     }
@@ -143,6 +143,8 @@
       
         <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
       
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
       
     </div>
     <div class="center">Django入门的笔记</div>
@@ -198,7 +200,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 17, 2017</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5990</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5991</span>
     </div>
   </div>
 </section>
@@ -239,7 +241,7 @@ Django 默认的语言是英语，所以显示给我们的欢迎页面是英文�
 </ul>
 <h3 id="2-编写你的第一个Django应用，第2部分"><a href="#2-编写你的第一个Django应用，第2部分" class="headerlink" title="2.编写你的第一个Django应用，第2部分"></a>2.编写你的第一个Django应用，第2部分</h3><p>创建一个管理员用户¶</p>
 <blockquote>
-<p>首先，我们需要创建一个能够登录管理站点的用户。 运行如下命令：<br>$ python manage.py createsuperuser<br>键入你想要使用的用户名，然后按下回车键：<br>Username: admin<br>然后提示你输入想要使用的邮件地址：<br>Email address: <a href="mailto:&#x61;&#100;&#x6d;&#x69;&#110;&#x40;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#x65;&#x2e;&#99;&#x6f;&#109;">&#x61;&#100;&#x6d;&#x69;&#110;&#x40;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#x65;&#x2e;&#99;&#x6f;&#109;</a><br>你需要输入两次密码，第二次输入是确认密码<br>Password:<br>Password (again):<br>Superuser created successfully.</p>
+<p>首先，我们需要创建一个能够登录管理站点的用户。 运行如下命令：<br>$ python manage.py createsuperuser<br>键入你想要使用的用户名，然后按下回车键：<br>Username: admin<br>然后提示你输入想要使用的邮件地址：<br>Email address: <a href="mailto:&#x61;&#x64;&#x6d;&#105;&#x6e;&#x40;&#x65;&#x78;&#x61;&#x6d;&#x70;&#108;&#101;&#46;&#x63;&#x6f;&#x6d;">&#x61;&#x64;&#x6d;&#105;&#x6e;&#x40;&#x65;&#x78;&#x61;&#x6d;&#x70;&#108;&#101;&#46;&#x63;&#x6f;&#x6d;</a><br>你需要输入两次密码，第二次输入是确认密码<br>Password:<br>Password (again):<br>Superuser created successfully.</p>
 </blockquote>
 <p>其中，django会自动检测密码，密码跟邮箱或者用户名太像也不会通过。。。</p>
 <p>在polls/admin.py中，代码示例如下</p>
@@ -421,6 +423,20 @@ Django 默认的语言是英语，所以显示给我们的欢迎页面是英文�
 <script src="/js/color-mode.js"></script>
 
   
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
   
 </body>
 
