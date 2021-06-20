@@ -62,8 +62,8 @@
       pjax: false,
       lazyload: {
         enable: true,
-        only_post: 'false',
-        loading: '/images/theme/loading.gif'
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
       },
       donate: {
         enable: true,
@@ -86,10 +86,10 @@
       preview: {
         background: {
           default: '',
-          api: 'https://source.unsplash.com/random/1920x1080'
+          api: ''
         },
         motto: {
-          default: '笔记堆放处',
+          default: 'I`m   So1n',
           typing: true,
           api: '',
           data_contents: '["data","content"]'
@@ -191,7 +191,7 @@
       <div class="col-xl-6"><article class="article">
   <div class="wrap">
     <section class="head">
-  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <img src="/images/theme/post-image.jpg" draggable="false">
   <div class="head-mask">
     <h1 class="head-title">[MongoDB学习笔记]</h1>
     <div class="head-info">
@@ -252,7 +252,7 @@
 <figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-keyword">show </span>dbs<br></code></pre></td></tr></table></figure>
 <p>删除数据库(删除当前数据库)：</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-tag">db</span><span class="hljs-selector-class">.dropDatabase</span>()<br></code></pre></td></tr></table></figure>
-<p>创建数据库再删除示例<br><img   class="lazyload" data-original="http://ww2.sinaimg.cn/large/006HJ39wgy1fhsnpolv96j30f406n404.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ></p>
+<p>创建数据库再删除示例<br><img src="http://ww2.sinaimg.cn/large/006HJ39wgy1fhsnpolv96j30f406n404.jpg"></p>
 <h3 id="3-集合中文档的增删改查"><a href="#3-集合中文档的增删改查" class="headerlink" title="3.集合中文档的增删改查"></a>3.集合中文档的增删改查</h3><p>插入文档</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-tag">db</span><span class="hljs-selector-class">.COLLECTION_NAME</span><span class="hljs-selector-class">.insert</span>(<span class="hljs-selector-tag">document</span>)<br>示例：<br>&gt;<span class="hljs-selector-tag">db</span><span class="hljs-selector-class">.python</span><span class="hljs-selector-class">.insert</span>(&#123;<span class="hljs-attribute">title</span>: <span class="hljs-string">&#x27;python&#x27;</span>, <br>                   description: <span class="hljs-string">&#x27;动态语言&#x27;</span> , <br>                   url: <span class="hljs-string">&#x27;http://www.python.org&#x27;</span>, <br>                   tag: [<span class="hljs-string">&#x27;动态&#x27;</span>, <span class="hljs-string">&#x27;编程&#x27;</span>, <span class="hljs-string">&#x27;脚本&#x27;</span>],<br>                   likes: <span class="hljs-number">100</span><br> &#125;)<br></code></pre></td></tr></table></figure>
 <p>以上示例中python是我们的集合名称，如果该集合不在该数据库中，MongoDB会自动创建该集合并插入文档。插入的数据必须符合json格式</p>
@@ -332,7 +332,7 @@
         
           <section class="donate">
   <div id="qrcode-donate">
-    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
   </div>
   <div class="icon">
     <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>

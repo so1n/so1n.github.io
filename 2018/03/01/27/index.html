@@ -62,8 +62,8 @@
       pjax: false,
       lazyload: {
         enable: true,
-        only_post: 'false',
-        loading: '/images/theme/loading.gif'
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
       },
       donate: {
         enable: true,
@@ -86,10 +86,10 @@
       preview: {
         background: {
           default: '',
-          api: 'https://source.unsplash.com/random/1920x1080'
+          api: ''
         },
         motto: {
-          default: '笔记堆放处',
+          default: 'I`m   So1n',
           typing: true,
           api: '',
           data_contents: '["data","content"]'
@@ -191,7 +191,7 @@
       <div class="col-xl-6"><article class="article">
   <div class="wrap">
     <section class="head">
-  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <img src="/images/theme/post-image.jpg" draggable="false">
   <div class="head-mask">
     <h1 class="head-title">WEB用户验证的几种方式</h1>
     <div class="head-info">
@@ -243,7 +243,7 @@
 <p>时效性指 JWT 提供了 Token 的过期时间。<br>有效性指 JWT 可以验证当前的 Token 是否被修改。<br>JWT 的组成是这样的：Header||Payload||Signature<br>Header 标明了这是一个 JWT，而且使用了什么 Hash 算法<br>Payload 储存了你保存在用户数据和 JWT 自身的一些必要信息，必要信息常用的有iss（签发者），exp（过期时间），sub（面向的用户），aud（接收方），iat（签发时间）<br>Signature 是 Server 对 Header 和 Payload 的 HMAC 结果。也就是签名，签名的作用是保证 JWT 没有被篡改过。</p>
 <p>虽然使用了签名能确保JWT是否被篡改，使用编码能使JWT变为非人类视角的代码，但是还是很容易破解，因此JWT适合用于向Web应用传递一些非敏感信息。所以JWT经常用于设计用户认证和授权系统，甚至实现Web应用的单点登录。</p>
 <p>JWT流程：<br>1.首先，前端通过Web表单将自己的用户名和密码发送到后端的接口。这一过程一般是一个HTTP POST请求。建议的方式是通过SSL加密的传输（https协议），从而避免敏感信息被嗅探。<br>2.后端核对用户名和密码成功后，将用户的id等其他信息作为JWT Payload（负载），将其与头部分别进行Base64编码拼接后签名，形成一个JWT。形成的JWT就是一个形同lll.zzz.xxx的字符串。<br>3.后端将JWT字符串作为登录成功的返回结果返回给前端。前端可以将返回的结果保存在localStorage或sessionStorage上，退出登录时前端删除保存的JWT即可。<br>4.前端在每次请求时将JWT放入HTTP Header中的Authorization位。(解决XSS和XSRF问题)<br>5.后端检查是否存在，如存在验证JWT的有效性。例如，检查签名是否正确；检查Token是否过期；检查Token的接收方是否是自己（可选）。<br>6.验证通过后后端使用JWT中包含的用户信息进行其他逻辑操作，返回相应结果。</p>
-<p>流程图:<br><img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/JWT.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ></p>
+<p>流程图:<br><img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/JWT.jpg?raw=true"></p>
 <h3 id="单点登录"><a href="#单点登录" class="headerlink" title="单点登录"></a>单点登录</h3><p>还没使用过，待填坑<br>参考文章:<a target="_blank" rel="noopener" href="https://juejin.im/post/5a982eb8f265da239f06cba3">1</a>,<a target="_blank" rel="noopener" href="https://www.cnblogs.com/ywlaker/p/6113927.html">2</a></p>
       </section>
       <section class="extra">
@@ -259,7 +259,7 @@
         
           <section class="donate">
   <div id="qrcode-donate">
-    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
   </div>
   <div class="icon">
     <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>

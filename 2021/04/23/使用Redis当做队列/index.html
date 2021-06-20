@@ -62,8 +62,8 @@
       pjax: false,
       lazyload: {
         enable: true,
-        only_post: 'false',
-        loading: '/images/theme/loading.gif'
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
       },
       donate: {
         enable: true,
@@ -86,10 +86,10 @@
       preview: {
         background: {
           default: '',
-          api: 'https://source.unsplash.com/random/1920x1080'
+          api: ''
         },
         motto: {
-          default: '笔记堆放处',
+          default: 'I`m   So1n',
           typing: true,
           api: '',
           data_contents: '["data","content"]'
@@ -191,7 +191,7 @@
       <div class="col-xl-6"><article class="article">
   <div class="wrap">
     <section class="head">
-  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <img src="/images/theme/post-image.jpg" draggable="false">
   <div class="head-mask">
     <h1 class="head-title">使用Redis做消息队列</h1>
     <div class="head-info">
@@ -232,7 +232,7 @@
 <p>首先看看<code>Stream</code>的一个简单应用–发布与消费<br>在<code>Stream</code>之中, 通过<code>XADD</code>发布消息, 通过<code>XREAD</code>消费消息, 同时他的消息都带有自己的唯一ID, 也可以是我们自己设置的ID, 但要确保唯一, 使用如下:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># *代表redis自己生成的消息id, 格式是timestamp + 自增序号</span><br>127.0.0.1:6379&gt; XADD test_queue * field1 value1<br><span class="hljs-string">&quot;1620618087884-0&quot;</span><br>127.0.0.1:6379&gt; XADD test_queue * field1 value1 field2 value2<br><span class="hljs-string">&quot;1620618092658-0&quot;</span><br><br><span class="hljs-comment"># 代表从头获取3个消息, 由于目前只有2个, 只返回两个</span><br>127.0.0.1:6379&gt; XREAD COUNT 3 STREAMS test_queue 0-0<br>1) 1) <span class="hljs-string">&quot;test_queue&quot;</span><br>   2) 1) 1) <span class="hljs-string">&quot;1620618087884-0&quot;</span><br>         2) 1) <span class="hljs-string">&quot;field1&quot;</span><br>            2) <span class="hljs-string">&quot;value1&quot;</span><br>      2) 1) <span class="hljs-string">&quot;1620618092658-0&quot;</span><br>         2) 1) <span class="hljs-string">&quot;field1&quot;</span><br>            2) <span class="hljs-string">&quot;value1&quot;</span><br>            3) <span class="hljs-string">&quot;field2&quot;</span><br>            4) <span class="hljs-string">&quot;value2&quot;</span><br><span class="hljs-comment"># 获取上个消息ID之后的消息</span><br><br><span class="hljs-comment"># 如果没有消息, 会返回空(这里是iredis客户端解析的问题)</span><br>127.0.0.1:6379&gt; XREAD COUNT 1 STREAMS test_queue 1619024293085-0<br>(error) ERROR <span class="hljs-string">&#x27;NoneType&#x27;</span> object is not iterable<br><span class="hljs-comment"># 可以改用阻塞式拉取, 设置为0代表不超时, 设置其他参数代表超时时间, 单位为秒, 一般建议设置一个自己的超时时间数, 如果超时了继续发起一个等待, 防止没有开保活之类的机制导致客户端与服务端的链接断开.</span><br>127.0.0.1:6379&gt; XREAD COUNT 1 BLOCK 0 STREAMS test_queue 1619024293085-0<br></code></pre></td></tr></table></figure>
 <p>看起来<code>Stream</code>的发送和消费逻辑都挺正常的, 消费者只要通过上个消息的ID 来请求, 就能一直获取到新的消息, 而且还能读历史数据(可以试着断开客户端重新连上, 还是一样能获得到消息的).不过上面的<code>XREAD</code>是独立消费的命令, 一般情况下还是用消费者组来消费会比较好. <code>Redis</code>的<code>Stream</code>使用了一种类似<code>Kafka</code>的消费组概念, 如下图, 生产者会把数据投到消息队列中, 每个消息都带有自己的消息id, 且这些id是趋势递增的, 而与消息队列接触的只有消费组,  随着组内成员的消费, 消费者组会往右移动, 消费者组中有个last_delivered_is, 用来记录当前移动到哪里了. 而消费者只能订阅到消费组, 消费组中所有的消费者共享着同一个last_deliverd_id标记, 多个消费者会共同消费到一个消费者组的消息, 他们不会读到下标一样的消息.<br>此外, 每个消费者还有一个叫pending_ids的变量, 用来表示已经被客户端读取到的但是还未ack的消息id, 客户端获取消息时, 就会把消息id存到这个变量, 如果收到客户端发过来该消息的id,则从变量中把该消息id移除. </p>
-<p><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/redis-stream.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">redis-stream</span></p>
+<p><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/redis-stream.png?raw=true"  ><span class="image-caption">redis-stream</span></p>
 <p><code>Stream</code>功能比较多, 以下是几个使用<code>Stream</code>的例子:</p>
 <ul>
 <li>发布/订阅模式:<br>  了解了<code>Pub/Sub</code>后, 可以知道在消息队列中使用发布/订阅模式可以做一些兜底的操作, 比如消息需要比较及时响应时, 有多个消费者在消费同一个消息, 即使有一个挂了, 其他的消费者也能正常处理消息.<br>  在<code>Stream</code>中, 可以通过消费者组实现发布/订阅模式:   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建消费者组1</span><br>127.0.0.1:6379&gt; XGROUP CREATE test_queue test_group1 0-0<br><span class="hljs-string">&quot;OK&quot;</span><br><span class="hljs-comment"># 创建消费者组2</span><br>127.0.0.1:6379&gt; XGROUP CREATE test_queue test_group2 0-0<br><span class="hljs-string">&quot;OK&quot;</span><br><span class="hljs-comment"># 删除消费者组2</span><br>127.0.0.1:6379&gt; XGROUP DESTROY test_queue test_group2<br>(<span class="hljs-built_in">integer</span>) 1<br><span class="hljs-comment"># 创建消费者组2, 并设置以第二条消息的id为起点</span><br>127.0.0.1:6379&gt; XGROUP CREATE test_queue test_group2 1619024299524-0 <br><span class="hljs-string">&quot;OK&quot;</span><br><span class="hljs-comment"># 第一组消费者开始消费, 只消费一条, &gt; 代表从最新数据开始拉取, 由于没有携带NOCAK, 命令是自动ACK掉消息的</span><br>127.0.0.1:6379&gt; XREADGROUP GROUP test_group1 consumer COUNT 1 STREAMS test_queue &gt;<br>1) 1) <span class="hljs-string">&quot;test_queue&quot;</span><br>   2) 1) 1) <span class="hljs-string">&quot;1619024293085-0&quot;</span><br>         2) 1) <span class="hljs-string">&quot;field1&quot;</span><br>            2) <span class="hljs-string">&quot;value1&quot;</span><br>127.0.0.1:6379&gt; XREADGROUP GROUP test_group1 consumer COUNT 1 STREAMS test_queue &gt;<br>1) 1) <span class="hljs-string">&quot;test_queue&quot;</span><br>   2) 1) 1) <span class="hljs-string">&quot;1619024299524-0&quot;</span><br>         2) 1) <span class="hljs-string">&quot;field1&quot;</span><br>            2) <span class="hljs-string">&quot;value1&quot;</span><br>            3) <span class="hljs-string">&quot;field2&quot;</span><br>            4) <span class="hljs-string">&quot;value2&quot;</span> <br><span class="hljs-comment"># 第二组由于设置了是从第二条消息之后为起点, 所以是拿不到数据的</span><br>127.0.0.1:6379&gt; XREADGROUP GROUP test_group2 consumer COUNT 1 STREAMS test_queue &gt;<br>(error) ERROR <span class="hljs-string">&#x27;NoneType&#x27;</span> object is not iterable<br><br></code></pre></td></tr></table></figure></li>
@@ -255,7 +255,7 @@
         
           <section class="donate">
   <div id="qrcode-donate">
-    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
   </div>
   <div class="icon">
     <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>

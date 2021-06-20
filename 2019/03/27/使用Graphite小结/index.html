@@ -62,8 +62,8 @@
       pjax: false,
       lazyload: {
         enable: true,
-        only_post: 'false',
-        loading: '/images/theme/loading.gif'
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
       },
       donate: {
         enable: true,
@@ -86,10 +86,10 @@
       preview: {
         background: {
           default: '',
-          api: 'https://source.unsplash.com/random/1920x1080'
+          api: ''
         },
         motto: {
-          default: '笔记堆放处',
+          default: 'I`m   So1n',
           typing: true,
           api: '',
           data_contents: '["data","content"]'
@@ -191,7 +191,7 @@
       <div class="col-xl-6"><article class="article">
   <div class="wrap">
     <section class="head">
-  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <img src="/images/theme/post-image.jpg" draggable="false">
   <div class="head-mask">
     <h1 class="head-title">使用Graphite小结</h1>
     <div class="head-info">
@@ -284,7 +284,7 @@
 <p>如图,  A机器代表网关层节点上面跑着接受Metric的carbon-relay以及GraphiteWeb,carbon-relay负责接受Metric并利用hash分配到不同的机器B,C.而GraphiteWeb则根据请求去B,C机器采集数据,合并后返回给调用者.</p>
 <p>B,C机器代表存储节点,它的功能则是一样的,负责存储数据,基本与单机Graphite一样,由carbon-relay把Metric分发给两个carbon-cache,并由GraphiteWeb提供接口给master的GraphiteWeb获取数据</p>
 <p>这个架构的优点就是简单,没引入其他比较复杂的技术,同时网关节点跟存储节点横向拓展比较方便,特别是在引入配置中心后,配置文件的更改就可以自动化,只要做到安装Graphtie即可.</p>
-<p><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/graphite.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">Graphite架构图</span></p>
+<p><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/graphite.png?raw=true"  ><span class="image-caption">Graphite架构图</span></p>
 <h3 id="6-2如何配置"><a href="#6-2如何配置" class="headerlink" title="6.2如何配置"></a>6.2如何配置</h3><h4 id="6-2-1存储节点"><a href="#6-2-1存储节点" class="headerlink" title="6.2.1存储节点"></a>6.2.1存储节点</h4><p>首先是改造存储节点,如果只使用单个carbon-cache的话,可以根据内核数增加新的<strong>carbon-cache</strong>,将配置</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">[cache]<br>LINE_RECEIVER_INTERFACE = 0.0.0.0<br>LINE_RECEIVER_PORT = 2003<br>PICKLE_RECEIVER_INTERFACE = 0.0.0.0<br>PICKLE_RECEIVER_PORT = 2004<br>CACHE_QUERY_INTERFACE = 0.0.0.0<br>CACHE_QUERY_PORT = 7002<br></code></pre></td></tr></table></figure>
 <p>改为</p>
@@ -364,7 +364,7 @@
         
           <section class="donate">
   <div id="qrcode-donate">
-    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
   </div>
   <div class="icon">
     <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>

@@ -62,8 +62,8 @@
       pjax: false,
       lazyload: {
         enable: true,
-        only_post: 'false',
-        loading: '/images/theme/loading.gif'
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
       },
       donate: {
         enable: true,
@@ -86,10 +86,10 @@
       preview: {
         background: {
           default: '',
-          api: 'https://source.unsplash.com/random/1920x1080'
+          api: ''
         },
         motto: {
-          default: '笔记堆放处',
+          default: 'I`m   So1n',
           typing: true,
           api: '',
           data_contents: '["data","content"]'
@@ -191,7 +191,7 @@
       <div class="col-xl-6"><article class="article">
   <div class="wrap">
     <section class="head">
-  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <img src="/images/theme/post-image.jpg" draggable="false">
   <div class="head-mask">
     <h1 class="head-title">记一次TCP长连接过多的问题--实际上是被攻击了</h1>
     <div class="head-info">
@@ -219,9 +219,9 @@
 <h3 id="3-1误打误撞的找到问题"><a href="#3-1误打误撞的找到问题" class="headerlink" title="3.1误打误撞的找到问题"></a>3.1误打误撞的找到问题</h3><p>由于之前要写个定时程序来检测SIP服务器接口的可用性，本着能不造轮子就不造轮子的原则查了很多开源库，但查遍了python的开源库,要不就实现太完美了，接听电话都实现了也引用了很多其他的东西，要不就是要引用Twisted和zope,觉得这两个库太重了,要是出现问题再排查的话就很麻烦了。所以最后自己手撸了一个简单的SIP协议和利用sockets发送报文来模拟ping，检测SIP服务器接口的可用性。</p>
 <p>然后很碰巧，在上线这个程序后不久，SIP服务器就会发生这个问题，凭着一直认为自己很渣，写的程序有问题的态度后，开始排查这个程序是不是有忘记关闭socket等问题，然后在进行第一步输入ss -a查看所有socket时（见下图有个185.104..。。），发现有个ip在这个输出列表里出现了很多次，通过命令:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 如果是线上运行,该用ss命令性能更高</span><br>netstat -nat|grep ESTABLISHED|awk <span class="hljs-string">&#x27;&#123;split($5,ip_port,&quot;:&quot;);print ip_port[1]&#125;&#x27;</span> | sort | uniq -c | sort -rn<br></code></pre></td></tr></table></figure>
-<p><img    class="lazyload" data-original="https://raw.githubusercontent.com/so1n/so1n_blog_photo/blob/master/blog_photo/ip%E5%8D%A0%E7%94%A8%E7%AB%AF%E5%8F%A3.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">ip占用端口</span><br>发现该ip已经占用了684个链接了，而且之后利用tcpdump捉包发现该ip发的都是空包，并且在发送一段时间后自动转为半开链接,到此该问题的症状已经找到了—该ip发送大量的非法请求,导致占用了kamailio进程的可用文件描述符数量,导致kamailio进程无法再去处理正常链接而无法响应服务为止. </p>
+<p><img  src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/blob/master/blog_photo/ip%E5%8D%A0%E7%94%A8%E7%AB%AF%E5%8F%A3.png"  ><span class="image-caption">ip占用端口</span><br>发现该ip已经占用了684个链接了，而且之后利用tcpdump捉包发现该ip发的都是空包，并且在发送一段时间后自动转为半开链接,到此该问题的症状已经找到了—该ip发送大量的非法请求,导致占用了kamailio进程的可用文件描述符数量,导致kamailio进程无法再去处理正常链接而无法响应服务为止. </p>
 <p>到了找出问题时，监控服务器也上线了，对每台服务器的文件描述符都进行了监控，通过监控数据可以看到，都是数据量突然上升，两小时后才下降(这个两小时也是一个重点，后来TCP调优后再看此图时才发现，linux默认在创建链接的两小时后tcp发送keep_alive发现对方没回包，服务器主动关闭了该sockets)</p>
-<p><img    class="lazyload" data-original="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">img</span></p>
+<p><img  src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6.png"  ><span class="image-caption">img</span></p>
 <h3 id="2-2使用iptables限制请求"><a href="#2-2使用iptables限制请求" class="headerlink" title="2.2使用iptables限制请求"></a>2.2使用iptables限制请求</h3><p>找出问题后解决起来就容易多了，由于是短时间内有大量相同ip的请求，那只要不再响应或接受这部分请求就可以了，而iptables的recent模块就是实现这一功能的。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># iptables配置</span><br><span class="hljs-comment"># 触发条件就记录日志(确保没问题时可以去掉记录日志)</span><br>-A INPUT -p tcp -m tcp --dport 5061 --tcp-flags FIN,SYN,RST,ACK SYN -m recent --rcheck --seconds 600 --hitcount 128 --name 5061webpool --mask 255.255.255.255 --rsource -j LOG --log-prefix <span class="hljs-string">&quot;Iptable-p5061-recent:&quot;</span> --log-ip-options<br><span class="hljs-comment"># 触发条件就把该连接drop掉</span><br>-A INPUT -p tcp -m tcp --dport 5061 --tcp-flags FIN,SYN,RST,ACK SYN -m recent --rcheck --seconds 600 --hitcount 128 --name 5061webpool --mask 255.255.255.255 --rsource -j DROP<br><span class="hljs-comment"># 把ip加入对应的set，以及记录连接次数，以便上面可以判断是否触发条件</span><br>-A INPUT -p tcp -m tcp --dport 5061 --tcp-flags FIN,SYN,RST,ACK SYN -m recent --name 5061webpool --<span class="hljs-built_in">set</span> -j ACCEPT<br></code></pre></td></tr></table></figure>
 <p>通过iptables的recent模块的配置，目前可以防止请求，但是recent模块默认只记录100条记录，需要通过修改配置文件才可以去修改限制，而此时部分服务器长链接是数量基本都在2000,3000以上,后面预计长链接数可能会达到10000以上,靠这种方式效率还是太低了,而且占用了太多机器内存。</p>
@@ -279,7 +279,7 @@
         
           <section class="donate">
   <div id="qrcode-donate">
-    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
   </div>
   <div class="icon">
     <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>

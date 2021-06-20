@@ -62,8 +62,8 @@
       pjax: false,
       lazyload: {
         enable: true,
-        only_post: 'false',
-        loading: '/images/theme/loading.gif'
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
       },
       donate: {
         enable: true,
@@ -86,10 +86,10 @@
       preview: {
         background: {
           default: '',
-          api: 'https://source.unsplash.com/random/1920x1080'
+          api: ''
         },
         motto: {
-          default: '笔记堆放处',
+          default: 'I`m   So1n',
           typing: true,
           api: '',
           data_contents: '["data","content"]'
@@ -191,7 +191,7 @@
       <div class="col-xl-6"><article class="article">
   <div class="wrap">
     <section class="head">
-  <img   class="lazyload" data-original="/images/theme/post-image.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <img src="/images/theme/post-image.jpg" draggable="false">
   <div class="head-mask">
     <h1 class="head-title">基于django的博客(1)</h1>
     <div class="head-info">
@@ -257,7 +257,7 @@
 </ul>
 </li>
 </ul>
-<p>内部结构：<br>ListView类图<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django%E5%8D%9A%E5%AE%A21-1.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">ListView类图</span><br>DetailView类图<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django1-2.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">DetailView类图</span><br>在这两个类图中，最关键的组件就是MultiObjectMixin和SingleObjectMixin这两个类了，他们实现的功能是从数据库中读取数据，并且构建要传入template的context。每个类都有一些属性和方法可以覆盖，实现自定制，比如可以覆盖context_object_name变量，用来指定传入template的context的对象的变量名；可以覆盖get_context_data()方法，用来将其他的变量放到context中；为queryset赋值，就可以自己指定这个View操作的对象(列表)；或者是直接重写get_queryset()/get_object()方法，简单暴力。</p>
+<p>内部结构：<br>ListView类图<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django%E5%8D%9A%E5%AE%A21-1.png?raw=true"  ><span class="image-caption">ListView类图</span><br>DetailView类图<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django1-2.png?raw=true"  ><span class="image-caption">DetailView类图</span><br>在这两个类图中，最关键的组件就是MultiObjectMixin和SingleObjectMixin这两个类了，他们实现的功能是从数据库中读取数据，并且构建要传入template的context。每个类都有一些属性和方法可以覆盖，实现自定制，比如可以覆盖context_object_name变量，用来指定传入template的context的对象的变量名；可以覆盖get_context_data()方法，用来将其他的变量放到context中；为queryset赋值，就可以自己指定这个View操作的对象(列表)；或者是直接重写get_queryset()/get_object()方法，简单暴力。</p>
 <p>注意，这两个类，也是继承自TemplateResponseMixin，也就是说它们也是直接返回的TemplateResponse对象。</p>
 <h3 id="django的处理流程"><a href="#django的处理流程" class="headerlink" title="django的处理流程"></a>django的处理流程</h3><p><a href="/2017/08/24/26/">浏览器访问流程</a></p>
 <h4 id="web-server"><a href="#web-server" class="headerlink" title="web server"></a>web server</h4><p>django拥有一个自己的web server-runserver，主要用于开发和调试中，部署到线上环境时用的都是别的web server 如：nginx+uwsgi</p>
@@ -266,7 +266,7 @@
 <li>解析参数，并通过django.core.servers.basehttp.get_internal_wsgi_application方法获取wsgi handler;</li>
 <li>根据ip_address和port生成一个WSGIServer对象，接受用户请求<br>get_internal_wsgi_application的源码如下：</li>
 </ol>
-<p><img    class="lazyload" data-original="http://of66as8gb.bkt.clouddn.com/blog/20161017/174541324.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">image</span></p>
+<p><img  src="http://of66as8gb.bkt.clouddn.com/blog/20161017/174541324.png"  ><span class="image-caption">image</span></p>
 <p>通过上面的代码可知道，Django会先根据settings中的WSGI_APPLICATION来获取handler；<br>在创建project的时候，Django会默认创建一个wsgi.py文件，而settings中的WSGI_APPLICATION配置也会默认指向这个文件。看一下这个wsgi.py文件，其实它也和上面的逻辑一样，最终调用get_wsgi_application实现。</p>
 <h4 id="django-http请求处理流程-来源于网上"><a href="#django-http请求处理流程-来源于网上" class="headerlink" title="django http请求处理流程(来源于网上)"></a>django http请求处理流程(来源于网上)</h4><p>Django的具体处理流程大致如下：</p>
 <ol>
@@ -326,7 +326,7 @@
         
           <section class="donate">
   <div id="qrcode-donate">
-    <img   class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" >
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
   </div>
   <div class="icon">
     <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
