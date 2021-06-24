@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="google" content="notranslate" />
   
-  <meta name="description" content="分页设计是一个常见的需求, 通常是跟数据库强绑定的需求...">
+  <meta name="description" content="前记分页设计是一个常见的需求, 通常是跟数据库强绑定的...">
   <meta name="author" content="So1n">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
@@ -198,7 +198,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>September 05, 2020</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>4094</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>4858</span>
     </div>
   </div>
 </section>
@@ -206,33 +206,41 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <p>分页设计是一个常见的需求, 通常是跟数据库强绑定的需求, 对于一个API来说,经常会返回成千上百条记录, 一下子返回所有结果对服务器, 客户端来说是一个挑战, 于是就有了分页的功能, 所以分页设计很常见, 但是分页的功能并不是数据库的本职工作,  数据库只能尽量的提供分页功能. 所以分页的功能但又是很难的一个点, 并没有一个万金油选项, 只能根据业务定义自己的分页功能.</p>
-        <h2 id="1-一个API例子"><a href="#1-一个API例子" class="headerlink" title="1.一个API例子"></a>1.一个API例子</h2><p>首先先看看一个API例子, 对于客户端来说,需要一个如下的Url让客户端知道能请求第几页,每页有多少条数据:</p>
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>分页设计是一个常见的需求, 通常是跟数据库强绑定的需求, 对于一个API来说,经常会返回成千上百条记录, 一下子返回所有结果对服务器, 客户端来说都是一个挑战, 而用于也不会一次请求看完所有数据. 于是就有了分页的功能, 通过分页功能可以减少对服务器的负担, 加快响应速度. 分页设计很常见, 但是数据都存在数据库里面, 而很少有数据库会提供一个完备的分页功能, 数据库只能尽量的提供分页功能, 所以直接依赖数据库的分页功能容易带来性能问题. 所以对于后端开发来说, 分页的功能但又是很难的一个点, 在实现分页功能的时候, 需要避免性能低效. 目前分页方案很多, 但没有一个万金油选项, 只能根据业务以及技术服务定义自己的分页功能.</p>
+        <hr>
+<h2 id="1-一个API例子"><a href="#1-一个API例子" class="headerlink" title="1.一个API例子"></a>1.一个API例子</h2><p>首先先看看一个API例子, 对于客户端来说,需要一个如下的Url让客户端知道能请求第几页,每页有多少条数据:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">GET /api/book?page=10&amp;size=10<br></code></pre></td></tr></table></figure>
 <p>服务端在收到请求时,会转化为offset为100(10* 10), 并在数据库调用<code>select * from xxx limit 100, 10</code>的语法来查出数据, 同时在返回数据时,需要告诉客户端当前是第几页,总共有多少条数据:</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;page_info&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;page&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;page_size&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;total&quot;</span>: <span class="hljs-number">10000</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;data&quot;</span>: [<br>        ...<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>这样的设计看起来非常不错, 前后端都看得懂, 后端写起来也不费劲,但是对于服务端与MySql的交互还是需要优化的</p>
-<h2 id="2-优化点一-offset语法"><a href="#2-优化点一-offset语法" class="headerlink" title="2.优化点一: offset语法"></a>2.优化点一: offset语法</h2><p>该语法使用非常简单,但非常抵效率, 在前面几页, MySql的性能消耗都不高, 但当翻的页数再高时, 就开始有性能瓶颈了.还是以<code>select * from xxx limit 100, 10</code>为例子,offset为100时,数据库还是会查看前100条,只不过是跳过不返回数据而已(大多数提供分页功能的数据库都是这样), 数据库实际上是查了前110条,然后返回最后10条, 当offset非常大时, 数据库需要查的数据量就会更大.</p>
-<p>那这个方法不行, 该怎么优化呢, 如果数据表有良好的设计, 表里应该有个primary key索引的id字段, 他的数值还是自增的(论良好设计的重要性). 因为这个值是带有索引的, 并且保持有序的自增, 只要让MySql查询大于某个id的值(刚好是第一百条)再Limit10, 这时候MySQL只会扫描我们需要的10条,减少了其他的消耗, 那么我们可以把API的例子改为:</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"># page_start的值为id值<br>GET /api/book?page_start=100&amp;size=10<br><br>&#123;<br>    <span class="hljs-attr">&quot;page_info&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;page_start&quot;</span>: <span class="hljs-number">100</span>,<br>        <span class="hljs-attr">&quot;page_size&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;total&quot;</span>: <span class="hljs-number">10000</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;data&quot;</span>: [<br>        ...<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>如果觉得id会暴露自己的数据(比如当前的业务量),也可以用其他字段代替, 只要该字段满足有索引,且保持有序自增的条件. 如业务需求会按时间的相关性来查询, 这时就可以用时间这个字段来代替id了</p>
+<p>这样的设计看起来非常不错, 前后端都看得懂, 后端写起来也不费劲,但是对于服务端与<code>MySQL</code>的交互还是需要优化的</p>
+<h2 id="2-优化点一-offset语法"><a href="#2-优化点一-offset语法" class="headerlink" title="2.优化点一: offset语法"></a>2.优化点一: offset语法</h2><p>该语法使用非常简单,但非常抵效率, 在前面几页, <code>MySQL</code>的性能消耗都不高, 前面说过, 数据库只是尽量地去提供分页功能, 在实现翻页时, 确实是返回第n页后的数据, 但是数据库仍然会去扫描前n页的数据, 当翻的页数再高时, 由于扫描的数据过多, 就开始有性能瓶颈了.<br>还是以<code>select * from xxx limit 100, 10</code>为例子,offset为100时,数据库还是会查看前100条,只不过是跳过不返回数据而已(大多数提供分页功能的数据库都是这样), 数据库实际上是查了前110条,然后返回最后10条, 当offset非常大时, 数据库需要查的数据量就会更大.</p>
+<p>看来这个方法是不行的, 哪该怎么优化呢? 如果数据表有良好的设计, 表里应该有个<code>primary key</code>索引的id字段, 他的数值还是趋势自增的(论良好设计的重要性). 因为这个值是带有索引的, 并且保持有序的自增, 那只要每次查询数据的id都比上一页最后一条的id还大, 那当前的数据就是下一页数据了, limit限制每页获取的数据大小则不变.<br>基于这个思路, 我们可以这样设计, 在每次响应时, 都把当前结果的最后一条数据的id返回给前端, 前端带上这个id请求即可请求下一页, 如果翻到最后一页, 这个id则为空, 前端就知道不可以继续翻页了, 现在可以把API的例子改为:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"># page_start改为next_id<br>GET /api/book?next_id=xxxxxxx&amp;size=10<br><br>&#123;<br>    <span class="hljs-attr">&quot;page_info&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;next_id&quot;</span>: <span class="hljs-string">&quot;xxxxxxx&quot;</span>,<br>        <span class="hljs-attr">&quot;page_size&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;total&quot;</span>: <span class="hljs-number">10000</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;data&quot;</span>: [<br>        ...<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如果觉得id会暴露自己的数据(比如当前的业务量), 可以改用雪花id, 也可以用其他字段代替, 只要该字段满足有索引,且保持有序自增的条件即可. 如业务需求会按时间的相关性来查询, 这时就可以用时间这个字段来代替id了.</p>
 <p>改用了这种方法除了可以减少MySql查询时扫描的行数,提升性能外, 还可以规避另外一个问题, 如已经查询到了100-110条数据时, 0-100中突然插入新的10条数据, 下一页的数据还是下一页的数据, 而不是原来的下一页的数据还是原来的数据, 不用担心新的记录来扰乱.</p>
-<p>然而上面说了那么多好的,特别是对性能的提升非常明显,但他也有局限性, 最大的局限性就是在当前的相关性查询中必须有带索引且保持自增的字段, 此外还有一个局限性.如果用了很多数据库, 就会发现上面说的方法很像, ElasticSearch和Redis的游标, 实际上上面用到的方法正就是MySql的游标, 如果在代码里有保存对应的游标对象的话, 是能一直调用<code>cursor.fetchone</code>获取之后的数据的,只不过用一个索引数据来代替这个游标对象.由于我们使用了游标的功能,那么就会带来了一个显而易见的问题,没法回滚上一页, 需要用原本的offset…limit…的方法实现(或者通过缓存缓存之前加载的数据, 如果上一页刚好是缓存过的数据, 就可以直接返回了).</p>
+<p>然而上面说了那么多好的,特别是对性能的提升非常明显,但他也有局限性, 最大的局限性就是在当前的相关性查询中必须有带索引且保持自增的字段, 此外还有一个局限性.如果用了很多数据库, 就会发现上面说的方法很像ElasticSearch和Redis的游标, 实际上上面用到的方法正就是MySql的游标, 如果在代码里有保存对应的游标对象的话, 是能一直调用<code>cursor.fetchone</code>获取之后的数据的,只不过用一个索引数据来代替这个游标对象.由于我们使用了游标的功能,那么就会带来了一个显而易见的问题,没办法大范围跳页, 或者说使用大范围跳页带来的性能消耗会跟原本的offset…limit…的方法一样.</p>
 <h2 id="3-优化点二-总的数量"><a href="#3-优化点二-总的数量" class="headerlink" title="3.优化点二: 总的数量"></a>3.优化点二: 总的数量</h2><p>在返回响应中, 我们需要返回一个总的数量, 那么就需要执行两条语句:</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> xxx limit <span class="hljs-number">100</span>, <span class="hljs-number">10</span><br><span class="hljs-keyword">select</span> <span class="hljs-built_in">count</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">from</span> xxx<br></code></pre></td></tr></table></figure>
-<p>这样不止在写代码的时候十分麻烦, 同时要查两次也很浪费性能, 这时可以通过使用<code>FOUND_ROWS</code>函数来帮忙, 把语句改为如下:</p>
+<p>这样不止在写代码的时候十分麻烦, 同时要查两次也很浪费性能, 如果通过查阅资料就可以发现, 这时可以通过使用<code>FOUND_ROWS</code>函数来帮忙, 把语句改为如下:</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> SQL_CALC_FOUND_ROWS <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> xxx limit <span class="hljs-number">100</span>, <span class="hljs-number">10</span><br><span class="hljs-keyword">select</span> found_rows() count;<br></code></pre></td></tr></table></figure>
-<p>这样查询的查询量只有一次, 第二条语句会返回第一条语句不带limit查询的总值, 大大的增加了性能.<br>需要主要的是, 第一条语句一定要带有<code>sql_cale_found_rows</code>和<code>limit</code>, 不然第二条语句返回的结果会不对, 同时第二条语句会过滤一些为空的数据.</p>
+<p>这样查询的查询量只有一次, 第二条语句会返回第一条语句不带limit查询的总值, 大大的增加了性能.<br>需要注意的是, 第一条语句一定要带有<code>sql_cale_found_rows</code>和<code>limit</code>, 不然第二条语句返回的结果会不对, 同时第二条语句会过滤一些为空的数据.<br>但是…这种方法让人容易误解, 而且它是<code>MySQL</code>提供的功能, 而不是<code>MySQL</code>中引擎提供的功能, 对部分引擎来说, 性能提升并不是很大, 特别是对于我们常用的InnoDB引擎来说….<br>对于InnoDB引擎来说, 还是选择用<code>count(*)</code>, 因为它对<code>count</code>有一些特别的优化, 以下是<code>count</code>几种情形的执行原理:</p>
+<ul>
+<li>对于<code>count(pk)</code>, InnoDB会遍历整张表, 把每一行的id值都取出来, 返回给<code>MySQL</code>的server层, server层拿到id后, 通过判断是不是为空来累加.</li>
+<li>对于<code>count(1)</code>, InnoDB会遍历整张表, 但不取值, <code>MySQL</code>的server层对于返回的每一行, 都放一个数字1进去, 判断是不是为空再按行累加, 由于不用解析数据, 所以速度比<code>count(pk)</code>快一些.</li>
+<li>对于<code>count(字段)</code>, 会先判断这个字段是<code>not null</code>还是<code>null</code>, 如果是<code>not null</code>, 则一行行地从记录里读取这个字段, 判断不能为null再按行累加. 如果是<code>null</code>, 那么判断有可能为null, 则把值取出来判断, 最后判断不是null才累加.</li>
+<li>对于<code>count(*)</code>, 是一个特殊的优化, 他不取值, 也不判断是不是null, 直接按行累加.</li>
+</ul>
+<p>可以看出, 按照效率排行是 <code>count(*)</code> 约等于 <code>count(1)</code> &gt; <code>count(pk)</code> &gt; <code>count(字段)</code>.</p>
 <blockquote>
 <p>注: found_row方法并不是在所有的场景下都能增加性能, 不同的存储引擎, 以及查询语句是否根据索引过滤都会影响到该方法的性能, 如果不确定那种方法的性能好, 建议使用 select count(*) from xxx</p>
 <p>found_rows 性能说明链接:</p>
 <p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/1022482/is-there-an-effect-on-the-speed-of-a-query-when-using-sql-calc-found-rows-in-mys#">https://stackoverflow.com/questions/1022482/is-there-an-effect-on-the-speed-of-a-query-when-using-sql-calc-found-rows-in-mys#</a></p>
 <p><a target="_blank" rel="noopener" href="https://www.percona.com/blog/2007/08/28/to-sql_calc_found_rows-or-not-to-sql_calc_found_rows/">https://www.percona.com/blog/2007/08/28/to-sql_calc_found_rows-or-not-to-sql_calc_found_rows/</a></p>
 </blockquote>
-<p>虽然很好的解决需求, 以及增加了性能, 但是也需要MySql去计算总量, 还是有性能消耗的, 在性能要求高的情况下还是不能去查总的条数, 一般会通过缓存来减少计算次数, 但这样会出现总数不准的问题. 由于我们返回的总数主要还是告诉客户端是否还要继续翻页,  那就可以通过另外一个做法来解决, 假设我们每次获取10条, 如果在获取一次数据时得到的总数不足以10条时, 则应该返回应该标记, 告诉客户端当前已经没有数据可以获取了. </p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"># is_null代表是否有数据可以获取 <br>GET /api/book?page_start=100&amp;size=10<br><br>&#123;<br>    <span class="hljs-attr">&quot;page_info&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;page_start&quot;</span>: <span class="hljs-number">100</span>,<br>        <span class="hljs-attr">&quot;page_size&quot;</span>: <span class="hljs-number">10</span>,<br>        <span class="hljs-attr">&quot;is_null&quot;</span>: <span class="hljs-literal">false</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;data&quot;</span>: [<br>        ...<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
-<h2 id="4-优化点三-数据重复问题"><a href="#4-优化点三-数据重复问题" class="headerlink" title="4.优化点三: 数据重复问题"></a>4.优化点三: 数据重复问题</h2><p>在执行<code>select * from xxx limit 100, 10</code>时, 顺序都是一致的, 假设里面有个价格的参数,这个字段我们一般不会加索引的, 但是我们要按照他的大小来排序, 这时sql会写为<code>select * from xxx order by price desc limit 100, 10</code>. 经过这个改动后, 就会触发一个问题–不同的页面可能会出现相同的数据, 但是使用了<code>select * from xxx order by price desc, id desc limit 100, 10</code>就可以解决问题了(id为唯一索引).</p>
-<p>首先先看看MySql针对一个查询语句的执行顺序:</p>
+<p>那我们该如何改进呢? 首先是确定真的需要总页吗, 如果需要, 那则要根据查询条件为Key, 总数为Value存在缓存中, 每过一段时间再重新更新缓存, 由于内容很多造成页数很大, 即使数据有变动, 短时间内总页数不变动影响也不大, 这样既能满足需求, 又能解决性能上的问题.</p>
+<p>如果是不需要总页数, 那就更简单了, 这时候返回总页数主要是告诉客户端是否还要继续翻页,  那就可以通过另外一个做法来解决, 假设我们每次获取10条, 如果在获取一次数据时得到的总数不足以10条时, 就不再返回next_id了,客户端拿不到next_id就知道当前已经没有数据可以获取了. </p>
+<h2 id="4-优化点三-数据重复问题"><a href="#4-优化点三-数据重复问题" class="headerlink" title="4.优化点三: 数据重复问题"></a>4.优化点三: 数据重复问题</h2><p>在执行<code>select * from xxx limit 100, 10</code>时, 顺序都是一致的, 假设里面有个价格的参数,这个字段我们一般不会加索引的, 但是我们要按照他的大小来排序, 这时sql会写为<code>select * from xxx order by price desc limit 100, 10</code>. 经过这个改动后, 就会触发一个问题–不同的页面可能会出现相同的数据, 但是使用了<code>select * from xxx order by price desc, id desc limit 100, 10</code>就可以解决问题了(id为唯一索引), 为啥在排序条件中增加id这个字段后就可以解决问题呢?</p>
+<p>首先先看看<code>MySQL</code>针对一个查询语句的执行顺序:</p>
 <ul>
 <li><ol>
 <li>SELECT</li>
@@ -275,7 +283,7 @@
 </ol>
 </li>
 </ul>
-<p>可以看出, MySql在执行完排序后再执行limit语句的, 而出现上面这种情况, 是跟MySql5.6之后的更新有关的, 在MySql5.6之后优化器在遇到order by limit语句时, 会使用priority queue的一个优化, 使用 priority queue 的目的，就是在不能使用索引有序性的时候，如果要排序，并且使用了limit n，那么只需要在排序的过程中，保留n条记录即可.但是prioruty queue使用了堆排序的排序方法, 这种方法不是稳定排序的, 也就是值相同时, 顺序并不是一定的. 假设我们要排序的值都是一样的, 且有20个, 假设有两次查询, 一次查询的量是10个, 那会发现两次查询的值是有重复的.</p>
+<p>从执行顺序可以看出, <code>MySQL</code>在执行完排序后再执行limit语句的, 而出现上面不同页面可能有相同数据这种情况, 是跟<code>MySQL</code>5.6之后的更新有关的. 在<code>MySQL</code>5.6之, 后优化器在遇到order by limit语句时, 会使用priority queue的一个优化, 使用 priority queue 的目的是在不能使用索引有序性的时候，如果要排序，并且使用了limit n，那么只需要在排序的过程中，保留n条记录即可, 但是prioruty queue使用了堆排序的排序方法, 这种方法不是稳定排序的, 也就是值相同时, 顺序并不是一定的. 假设我们要排序的值都是一样的, 且有20个, 假设有两次查询, 一次查询的量是10个, 那会发现两次查询的值是有重复的.</p>
 <p>了解了问题的原因后就可以知道<code>select * from xxx order by price desc limit 100, 10</code>出现重复数据的原因是price有相同的值, 导致了数据的重复, 而在加了一个id后, 就没有一个值会重复了, 所以问题也就解决了.<br>但是需要注意的是, 还有一些极端的情况下会出现数据重复的情况, 因为我们的分页是在数据库提供的排序功能的基础上，衍生出来的应用需求，数据库并不保证分页的重复问题。</p>
       </section>
       <section class="extra">
@@ -349,14 +357,14 @@
           
   <aside class="toc-wrap">
     <h3 class="toc-title">文章目录：</h3>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AAAPI%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个API例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%80-offset%E8%AF%AD%E6%B3%95"><span class="toc-text">2.优化点一: offset语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BC%98%E5%8C%96%E7%82%B9%E4%BA%8C-%E6%80%BB%E7%9A%84%E6%95%B0%E9%87%8F"><span class="toc-text">3.优化点二: 总的数量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%89-%E6%95%B0%E6%8D%AE%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98"><span class="toc-text">4.优化点三: 数据重复问题</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AAAPI%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个API例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%80-offset%E8%AF%AD%E6%B3%95"><span class="toc-text">2.优化点一: offset语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BC%98%E5%8C%96%E7%82%B9%E4%BA%8C-%E6%80%BB%E7%9A%84%E6%95%B0%E9%87%8F"><span class="toc-text">3.优化点二: 总的数量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%89-%E6%95%B0%E6%8D%AE%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98"><span class="toc-text">4.优化点三: 数据重复问题</span></a></li></ol>
   </aside>
 
         
           
   <aside class="toc-wrap">
     <h3 class="toc-title">文章目录：</h3>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AAAPI%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个API例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%80-offset%E8%AF%AD%E6%B3%95"><span class="toc-text">2.优化点一: offset语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BC%98%E5%8C%96%E7%82%B9%E4%BA%8C-%E6%80%BB%E7%9A%84%E6%95%B0%E9%87%8F"><span class="toc-text">3.优化点二: 总的数量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%89-%E6%95%B0%E6%8D%AE%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98"><span class="toc-text">4.优化点三: 数据重复问题</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AAAPI%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个API例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%80-offset%E8%AF%AD%E6%B3%95"><span class="toc-text">2.优化点一: offset语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BC%98%E5%8C%96%E7%82%B9%E4%BA%8C-%E6%80%BB%E7%9A%84%E6%95%B0%E9%87%8F"><span class="toc-text">3.优化点二: 总的数量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96%E7%82%B9%E4%B8%89-%E6%95%B0%E6%8D%AE%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98"><span class="toc-text">4.优化点三: 数据重复问题</span></a></li></ol>
   </aside>
 
         
