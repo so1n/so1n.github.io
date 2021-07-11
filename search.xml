@@ -261,7 +261,7 @@
   </entry>
   <entry>
     <title>基于Python探针完成调用库的数据提取</title>
-    <url>/2020/11/18/%E5%9F%BA%E4%BA%8EPython%E6%8E%A2%E9%92%88%E5%AE%8C%E6%88%90aiomysql%E7%BB%9F%E8%AE%A1%E4%B8%8E%E7%9B%91%E6%8E%A7/</url>
+    <url>/2020/11/18/%E5%9F%BA%E4%BA%8EPython%E6%8E%A2%E9%92%88%E5%AE%8C%E6%88%90%E8%B0%83%E7%94%A8%E5%BA%93%E7%9A%84%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近在完善公司的监控系统, 发现在项目运行时经常会出现一些运行时的问题， 这些问题往往不是一个子服务引发的问题， 而可能是某个环节出现了问题， 这时候就需要引入APM系统。在收集APM数据时发现在<code>Python</code>生态中针对web框架都有完善的APM中间件用于接口统计与监控, 但是第三方调用库相关的APM实现都比较少(几乎没有)， 同时这些库大多数也都没提供一些钩子实现。这就需要自己去封装一些库， 为这些库实现一套调用过程的数据提供逻辑。</p>
 <p>本文是以<code>Python</code>的<code>aiomysql</code>库为例，阐述如何基于<code>Python</code>的探针完成调用库的调用过程统计与监控的封装。 </p>
 <a id="more"></a>
@@ -4309,95 +4309,6 @@
       </tags>
   </entry>
   <entry>
-    <title>WEB</title>
-    <url>/2017/12/13/20_web/</url>
-    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>【暂时废弃】<br>更新时间：2017-12-13 14:46:00</p>
-<p>WEB有很多东西，有些框架/库的功能也是交叉着，所以有点混乱。今天闲的无聊，百度后觉得别人说的还是不明白，就把之前保存的文档全看了一遍。了解一下，应该有很多认知错误的，以后深入了解后再改正。<br>所以这里就是类似与 <a href="http://so1n.me/2017/10/19/15/#more">前端小功能收集</a>,<a href="http://so1n.me/2017/08/23/14-redis/">Redis命令</a>一样，内容简单，纯粹记录下我刚接触时的感想，顺便把以前的东西也写进来了。回头可以看一看，回顾下，还有就是以后找资料容易点。。。。。。</p>
-<a id="more"></a>
-<p>主要是在今天看了vue,Angular(js框架)，RESTful，tornado，wsgi文档后，才能把他们正式区分开的。<br>文字不好，使用度不频繁，所以写的不太好，以后更熟悉时再改，相比之前不知道为什么需要使用vue，也不知道服务器、容器和应用的关系好多了。。。。。。。</p>
-<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p>之前我在找前端的资料时，就看到很多人在说前端更新很快，一不学习就要落后了，尤其是一个知乎的回复</p>
-<blockquote>
-<p>感谢前端，让我找回了大学学习的时光</p>
-</blockquote>
-<p><a href="https://www.awesomes.cn/">前端框架合集的网站</a></p>
-<p>css框架：bootstrap,uikit(我喜欢这个)等<br>可以不用自己写css就可以做出一个美化的网站，之前第一次接触时，就觉得写个页面美化居然那么简单。。。</p>
-<p>js框架：<a href="https://cn.vuejs.org/v2/guide/">vue.js</a>，<a href="https://doc.react-china.org/">React</a>，<a href="http://www.angularjs.net.cn/tutorial/">AngularJS</a>等<br>可以简化前端开发，提高生产力的东西，更让网页像个app一样，让后端只负责数据的传输、账户等校验和业务逻辑（要是之前看到就可以不用在模板上纠结那么久了，用vue代码几行就可以搞定[捂脸]）。<br>一开始以为就是个类似与jinja2的东西。，在看了同学发了个用前端实现路由（<a href="https://router.vuejs.org/zh-cn/">vue路由</a>）的朋友圈后，我就决定去看文档了(看的是vue)，发现真的是可以提高生产力，我这个js菜鸟可以边看文档边理解(AngularJS理解略难点？)，就可以写出很多之前觉得很难写出来的东西了(重点是，代码量也少）。也知道看我之前想实现的功能——spa，可以通过这些框架来实行。</p>
-<p>模块化开发:目前没有用到，待补充</p>
-<h2 id="中间"><a href="#中间" class="headerlink" title="中间"></a>中间</h2><p>那些tcp/ip协议啊,RFC(/d+)什么的虽然刚考完ccna还记得很清楚。。。但是感觉并不属于这个部分的</p>
-<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html">RESTful</a><br>RESTful,实际上只是一种设计风格，他是一种面向<em>资源</em>的设计<br>当前后端就只有服务器一个，前端的却后手机、平板、电脑等等，通过运用RESTful设计的url，可以让不同的前端一起使用共同的url，而且有充分利用了http的内容(一开始我都是post,get的,现在回头看觉得url设计的不是很好)</p>
-<p>1.RESTful,有一个统一的url来调用资源<br>调用资源的方式通过http1.1协议的方法,分别以不同的方式操作资源</p>
-<ul>
-<li>get    ：从服务器取出资源</li>
-<li>post   ：在服务器新建资源</li>
-<li>put    ：在服务器更新资源（客户端提供完整资源数据）</li>
-<li>patch  ：在服务器更新资源（客户端提供需要修改的资源数据）</li>
-<li>delect ：在服务器删除资源</li>
-</ul>
-<p>2.RESTful要求无状态<br>即所有的资源，都可以通过URI定位，而且这个定位与其他资源无关，也不会因为其他资源的变化而改变。<br>无状态与有状态的区别（比如要从数据库拿到一个音乐资源）：</p>
-<ul>
-<li>无状态：该资源是无需付费的，访客访问时，也可以用资源推给用户</li>
-<li>有状态：该资源是付费的，需要先登录，然后再判断这个用户是否有付费，有的时候才能把资源推给用户<br>可以看出，有状态通过url推送资源还需要进一步判断，而且上一步骤操作不成功时，后面的操作则无法进行，而无状态则不需要</li>
-</ul>
-<p>3.提供服务的服务器和使用服务的客户需要被隔离对待</p>
-<p>4.服务器必须让客户知道请求是否可以被缓存</p>
-<p>5.使用超媒体<br>不知道怎么说，等我看完《REST in Practice》，逃。</p>
-<p>附:</p>
-<p>1.简单来说，RESTful就是:</p>
-<blockquote>
-<p>看Url就知道要什么<br>看http method就知道干什么<br>看http status  code就知道结果如何<br>by 知乎:徐磊</p>
-</blockquote>
-<p>2.RESTful库：</p>
-<ul>
-<li>Django</li>
-<li><a href="http://www.django-rest-framework.org/">django-rest-framework</a>：一个强大灵活的工具，用来构建 web API。</li>
-<li><a href="http://tastypieapi.org/">django-tastypie</a>：为Django 应用开发API。</li>
-<li><a href="https://github.com/5monkeys/django-formapi">django-formapi</a>：为 Django 的表单验证，创建 JSON APIs 。</li>
-<li>Flask</li>
-<li><a href="http://www.flaskapi.org/">flask-api</a>：为 flask 开发的，可浏览 Web APIs 。</li>
-<li><a href="http://flask-restful.readthedocs.org/en/latest/">flask-restful</a>：为 flask 快速创建REST APIs 。</li>
-<li><a href="https://flask-restless.readthedocs.org/en/latest/">flask-restless</a>：为 SQLAlchemy 定义的数据库模型创建 RESTful APIs 。</li>
-<li><a href="https://github.com/marselester/flask-api-utils">flask-api-utils</a>：为 Flask 处理 API 表示和验证。</li>
-<li><a href="https://github.com/nicolaiarocci/eve">eve</a>：REST API 框架，由 Flask, MongoDB 等驱动。</li>
-<li>Pyramid</li>
-<li><a href="https://cornice.readthedocs.org/en/latest/">cornice</a>：一个Pyramid 的 REST 框架 。</li>
-<li>与框架无关的</li>
-<li><a href="http://falconframework.org/">falcon</a>：一个用来建立云 API 和 web app 后端的高性能框架。</li>
-<li><a href="https://github.com/jeffknupp/sandman">sandman</a>：为现存的数据库驱动系统自动创建 REST APIs 。</li>
-<li><a href="http://restless.readthedocs.org/en/latest/">restless</a>：框架无关的 REST 框架 ，基于从 Tastypie 学到的知识。</li>
-<li><a href="https://github.com/vertical-knowledge/ripozo">ripozo</a>：快速创建 REST/HATEOAS/Hypermedia APIs。</li>
-</ul>
-<p>3.初识时，可能觉得RESTful跟自己生成的api很像，但是还是有<strong>区别</strong>的</p>
-<p>举个具体API的例子：请求：<br>GET /posts HTTP/1.1<br>Accept: application/atom+xml</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml">响应：<br>HTTP/1.1 200 OK<br>Content-Type: application/atom+xml<br><br><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">feed</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2005/Atom&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Posts<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;self&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts?pn=2&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;next&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Post XXX<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/post-xxx&quot;</span> /&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">content</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;xhtml&quot;</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;</span><br>                <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is the post content.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">content</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">feed</span>&gt;</span><br></code></pre></td></tr></table></figure>
-<p>注意上面atom格式中的多个<link>元素，它们分别定义了当前状态下合法的状态转移。例如，这是一个指向自己的链接，其中rel属性指定了状态转移的关系为自身。<link href="http://example.org/posts" rel="self" /><br>这是下一页的链接，<link href="http://example.org/posts?pn=2" rel="next" /><br>如果当前不是第一页的话，就会有类似如下的链接来表示上一页，<link href="http://example.org/posts?pn=2" rel="prev" /><br>而这个是某一篇文章的链接，<link href="http://example.org/post-xxx" /><br>总结一下，就是：服务器生成包含状态转移的表征数据，用来响应客户端对于一个资源的请求；客户端借助这份表征数据，记录了当前的应用状态以及对应可转移状态的方式。当然，为了要实现这一系列的功能，一个不可或缺的东西就是超文本（hypertext）或者说超媒体类型（hypermedia type）。这绝对不是一个简简单单的媒体类型（例如，JSON属性列表）可以做到的。（参考：REST APIs must be hypertext-driven）因此，像下面这种API，1、获取文章</p>
-<figure class="highlight gradle"><table><tr><td class="code"><pre><code class="hljs gradle">请求：<br>GET <span class="hljs-regexp">/blog/</span>post<span class="hljs-regexp">/&#123;postId&#125; HTTP/</span><span class="hljs-number">1.1</span><br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">200</span> OK<br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br><span class="hljs-number">2</span>、发布文章<br><br>请求：<br>POST <span class="hljs-regexp">/blog/</span>post HTTP/<span class="hljs-number">1.1</span><br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">201</span> CREATED<br></code></pre></td></tr></table></figure>
-<p>绝对不是RESTful！绝对不是RESTful！绝对不是RESTful！</p>
-<p>以上引用：<br>作者：季文昊<br>链接：<a href="https://www.zhihu.com/question/28557115/answer/48120528">https://www.zhihu.com/question/28557115/answer/48120528</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>web上的server都叫web server，但是大家分工也有不同的，有服务器，容器，应用<br>服务器主要是处理请求，决定分发到那个应用(静态文件也在此处理)，容器则是负责初始化环境(设置环境变量，如异步通信，websocket也在此处)，应用则是提供应用功能。</p>
-<p>服务器: Apache/Nginx<br>容器:tonardo/Twisted<br>应用：用web框架开发的应用，web框架有Django,flask,Bottle,pyramid,CherryPy等(框架链接见<a href="https://github.com/jobbole/awesome-python-cn">这里</a>的web框架部分)</p>
-<p>上面是按照主要功能划分的，很多框架对于上面每个领域都有一些涉足，但擅长的不一样，像tonardo(因为我今天才刚刚看了这个的文档，Twisted还没看- -)<br>Tornado既是一个容器，也是应用。而它作为容器 采用的是asynchronous IO的网络模型，这是一种很高效的模型。在<a href="http://www.tornadoweb.cn/">文档</a>中，前半部分讲了tornado作为一个应用是如何使用的，后面，也是最主要的讲了如何运用tornado来实现他的异步和长轮询问以及使用WebSocket实现双工通信。</p>
-<p>大多时候后端都是通过服务器+容器+应用,栗子：<br>nginx+tornado+django:<br>1.Nginx作为反代理，分发到后端的torndo服务器<br>2.Django作为framwork搭建到tornado服务器上，使用其admin功能<br>在这个栗子中<br>服务器关心的是 HTTP 协议层面的传输和访问控制，所以在 Nginx上可以看到代理、负载均衡等功能。客户端通过服务器访问服务器上存储的资源（HTML 文件、图片文件等等）。通过 CGI 技术，也可以将处理过的内容通过服务器分发，但是一个服务器始终只是把服务器上的文件如实的通过 HTTP 协议传输给客户端。而容器，则是一个应用执行的容器。保证应用能够在应用服务器上正常运行。，我们可以通过框架来开发应用，让应用运行在应用执行的容器。他们能一起使用则是靠wsgi协议(容器那里可以说属于wsgi层，也就是通过wsgi协议分别连接服务器和应用的)</p>
-<p>还有另外一个栗子</p>
-<blockquote>
-<p>Apache/lighttpd: 相当于一个request proxy，根据配置，把不同的请求转发给不同的server处理，例如静态的文件请求自己处理，这个时候它就像一个web server，对于fastcgi/python这样的请求转发给flup这样的Server/Gateway进行处理 flup: 一个用python写的web server，也就是cgi中所谓的Server/Gateway，它负责接受apache/lighttpd转发的请求，并调用你写的程序 (application)，并将application处理的结果返回到apache/lighttpdfastcgi: apache/lighttpd的一个模块，虽然flup可以作为一个独立的web server使用，但是对于浏览器请求处理一般都交给 apache/lighttpd处理，然后由apache/lighttpd转发给flup处理，这样就需要一个东西来把apache/lighttpd跟flup联系起来，这个东西就是fastcgi，它通过环境变量以及socket将客户端请求的信息传送给flup并接收flup返回的结果web.py: 应该说有了上面的东西你就可以开始编写你的web程序了，但是问题是你就要自己处理浏览器的输入输出，还有cookie、session、模板等各种各样的问题了，web.py的作用就是帮你把这些工作都做好了，它就是所谓的web framework，另外一个出名的是django，不过感觉太复杂了，web.py差不多就够用了WSGI : 除了flup Server/Gateway外还有很多其他人的写的Server/Gateway, 这个时候就会出问题了，如果你在flup上写了一个程序，现在由于各种原因你要使用xdly了，这个时候你的程序也许就要做很多痛苦的修改才能使用 xdly server了，WSGI就是一个规范，他规范了flup这个服务应该怎么写，应该使用什么方式什么参数调用你写的程序(application)等，当然同时也规范你的程序应该怎么写了，这样的话，只要flup跟xdly都遵守WSGI的话，你的程序在两个上面都可以使用了，flup就是一个WSGI server</p>
-</blockquote>
-<h3 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h3><p><a href="https://www.zhihu.com/question/20215561/answer/40316953">WebSocket 是什么原理？为什么可以实现持久连接？ - Ovear的回答 - 知乎</a></p>
-<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><p>HTTP Server，充当着反向代理，有着均衡负荷，和分发静态文件等功能。<br>nginx的能力比Apache好，但目前我对nginx是使用只会简单的配置。<a href="http://www.nginx.cn/doc/">nginx文档</a></p>
-<h3 id="WSGI-uWSGI-uwsgi"><a href="#WSGI-uWSGI-uwsgi" class="headerlink" title="WSGI\uWSGI\uwsgi"></a>WSGI\uWSGI\uwsgi</h3><ul>
-<li><a href="https://www.zhihu.com/question/19998865/answer/74748765">WSGI</a>是一种通信协议。</li>
-<li>uwsgi是一种线路协议而不是通信协议，在此常用于在uWSGI服务器与其他网络服务器的数据通信。</li>
-<li>而uWSGI是实现了uwsgi和WSGI两种协议的Web服务器。</li>
-</ul>
-<p>可以说WSGI是一种编程接口，而uwsgi是一种传输协议，而uWSGI是一个服务器(但是主要是链接nginx与框架的中间层(wsgi))。<br>相关文档:<a href="http://blog.csdn.net/midion9/article/details/51354774">1</a>,<a href="http://blog.csdn.net/sraing/article/details/8455242">2</a></p>
-]]></content>
-      <categories>
-        <category>WEB</category>
-      </categories>
-      <tags>
-        <tag>WEB</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Mysql笔记(-第五章)</title>
     <url>/2017/12/13/24_high%20_performance_mySQL_3rd_notes/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>之前对数据库的使用都是写入，取出。最近想弄个数据库却涉及到太多东西去百度也百度不到自己想要的，然后在别人推荐下就看了《高性能Mysql》（第三版的书出版时5.6还没出来），所以这个文章是《高性能Mysql》读书笔记。由于太多了，所以我看多少就记多少。。。</p>
@@ -4939,6 +4850,95 @@
       </tags>
   </entry>
   <entry>
+    <title>WEB</title>
+    <url>/2017/12/13/20_web/</url>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>【暂时废弃】<br>更新时间：2017-12-13 14:46:00</p>
+<p>WEB有很多东西，有些框架/库的功能也是交叉着，所以有点混乱。今天闲的无聊，百度后觉得别人说的还是不明白，就把之前保存的文档全看了一遍。了解一下，应该有很多认知错误的，以后深入了解后再改正。<br>所以这里就是类似与 <a href="http://so1n.me/2017/10/19/15/#more">前端小功能收集</a>,<a href="http://so1n.me/2017/08/23/14-redis/">Redis命令</a>一样，内容简单，纯粹记录下我刚接触时的感想，顺便把以前的东西也写进来了。回头可以看一看，回顾下，还有就是以后找资料容易点。。。。。。</p>
+<a id="more"></a>
+<p>主要是在今天看了vue,Angular(js框架)，RESTful，tornado，wsgi文档后，才能把他们正式区分开的。<br>文字不好，使用度不频繁，所以写的不太好，以后更熟悉时再改，相比之前不知道为什么需要使用vue，也不知道服务器、容器和应用的关系好多了。。。。。。。</p>
+<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p>之前我在找前端的资料时，就看到很多人在说前端更新很快，一不学习就要落后了，尤其是一个知乎的回复</p>
+<blockquote>
+<p>感谢前端，让我找回了大学学习的时光</p>
+</blockquote>
+<p><a href="https://www.awesomes.cn/">前端框架合集的网站</a></p>
+<p>css框架：bootstrap,uikit(我喜欢这个)等<br>可以不用自己写css就可以做出一个美化的网站，之前第一次接触时，就觉得写个页面美化居然那么简单。。。</p>
+<p>js框架：<a href="https://cn.vuejs.org/v2/guide/">vue.js</a>，<a href="https://doc.react-china.org/">React</a>，<a href="http://www.angularjs.net.cn/tutorial/">AngularJS</a>等<br>可以简化前端开发，提高生产力的东西，更让网页像个app一样，让后端只负责数据的传输、账户等校验和业务逻辑（要是之前看到就可以不用在模板上纠结那么久了，用vue代码几行就可以搞定[捂脸]）。<br>一开始以为就是个类似与jinja2的东西。，在看了同学发了个用前端实现路由（<a href="https://router.vuejs.org/zh-cn/">vue路由</a>）的朋友圈后，我就决定去看文档了(看的是vue)，发现真的是可以提高生产力，我这个js菜鸟可以边看文档边理解(AngularJS理解略难点？)，就可以写出很多之前觉得很难写出来的东西了(重点是，代码量也少）。也知道看我之前想实现的功能——spa，可以通过这些框架来实行。</p>
+<p>模块化开发:目前没有用到，待补充</p>
+<h2 id="中间"><a href="#中间" class="headerlink" title="中间"></a>中间</h2><p>那些tcp/ip协议啊,RFC(/d+)什么的虽然刚考完ccna还记得很清楚。。。但是感觉并不属于这个部分的</p>
+<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html">RESTful</a><br>RESTful,实际上只是一种设计风格，他是一种面向<em>资源</em>的设计<br>当前后端就只有服务器一个，前端的却后手机、平板、电脑等等，通过运用RESTful设计的url，可以让不同的前端一起使用共同的url，而且有充分利用了http的内容(一开始我都是post,get的,现在回头看觉得url设计的不是很好)</p>
+<p>1.RESTful,有一个统一的url来调用资源<br>调用资源的方式通过http1.1协议的方法,分别以不同的方式操作资源</p>
+<ul>
+<li>get    ：从服务器取出资源</li>
+<li>post   ：在服务器新建资源</li>
+<li>put    ：在服务器更新资源（客户端提供完整资源数据）</li>
+<li>patch  ：在服务器更新资源（客户端提供需要修改的资源数据）</li>
+<li>delect ：在服务器删除资源</li>
+</ul>
+<p>2.RESTful要求无状态<br>即所有的资源，都可以通过URI定位，而且这个定位与其他资源无关，也不会因为其他资源的变化而改变。<br>无状态与有状态的区别（比如要从数据库拿到一个音乐资源）：</p>
+<ul>
+<li>无状态：该资源是无需付费的，访客访问时，也可以用资源推给用户</li>
+<li>有状态：该资源是付费的，需要先登录，然后再判断这个用户是否有付费，有的时候才能把资源推给用户<br>可以看出，有状态通过url推送资源还需要进一步判断，而且上一步骤操作不成功时，后面的操作则无法进行，而无状态则不需要</li>
+</ul>
+<p>3.提供服务的服务器和使用服务的客户需要被隔离对待</p>
+<p>4.服务器必须让客户知道请求是否可以被缓存</p>
+<p>5.使用超媒体<br>不知道怎么说，等我看完《REST in Practice》，逃。</p>
+<p>附:</p>
+<p>1.简单来说，RESTful就是:</p>
+<blockquote>
+<p>看Url就知道要什么<br>看http method就知道干什么<br>看http status  code就知道结果如何<br>by 知乎:徐磊</p>
+</blockquote>
+<p>2.RESTful库：</p>
+<ul>
+<li>Django</li>
+<li><a href="http://www.django-rest-framework.org/">django-rest-framework</a>：一个强大灵活的工具，用来构建 web API。</li>
+<li><a href="http://tastypieapi.org/">django-tastypie</a>：为Django 应用开发API。</li>
+<li><a href="https://github.com/5monkeys/django-formapi">django-formapi</a>：为 Django 的表单验证，创建 JSON APIs 。</li>
+<li>Flask</li>
+<li><a href="http://www.flaskapi.org/">flask-api</a>：为 flask 开发的，可浏览 Web APIs 。</li>
+<li><a href="http://flask-restful.readthedocs.org/en/latest/">flask-restful</a>：为 flask 快速创建REST APIs 。</li>
+<li><a href="https://flask-restless.readthedocs.org/en/latest/">flask-restless</a>：为 SQLAlchemy 定义的数据库模型创建 RESTful APIs 。</li>
+<li><a href="https://github.com/marselester/flask-api-utils">flask-api-utils</a>：为 Flask 处理 API 表示和验证。</li>
+<li><a href="https://github.com/nicolaiarocci/eve">eve</a>：REST API 框架，由 Flask, MongoDB 等驱动。</li>
+<li>Pyramid</li>
+<li><a href="https://cornice.readthedocs.org/en/latest/">cornice</a>：一个Pyramid 的 REST 框架 。</li>
+<li>与框架无关的</li>
+<li><a href="http://falconframework.org/">falcon</a>：一个用来建立云 API 和 web app 后端的高性能框架。</li>
+<li><a href="https://github.com/jeffknupp/sandman">sandman</a>：为现存的数据库驱动系统自动创建 REST APIs 。</li>
+<li><a href="http://restless.readthedocs.org/en/latest/">restless</a>：框架无关的 REST 框架 ，基于从 Tastypie 学到的知识。</li>
+<li><a href="https://github.com/vertical-knowledge/ripozo">ripozo</a>：快速创建 REST/HATEOAS/Hypermedia APIs。</li>
+</ul>
+<p>3.初识时，可能觉得RESTful跟自己生成的api很像，但是还是有<strong>区别</strong>的</p>
+<p>举个具体API的例子：请求：<br>GET /posts HTTP/1.1<br>Accept: application/atom+xml</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml">响应：<br>HTTP/1.1 200 OK<br>Content-Type: application/atom+xml<br><br><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">feed</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2005/Atom&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Posts<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;self&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts?pn=2&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;next&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Post XXX<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/post-xxx&quot;</span> /&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">content</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;xhtml&quot;</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;</span><br>                <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is the post content.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">content</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">feed</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<p>注意上面atom格式中的多个<link>元素，它们分别定义了当前状态下合法的状态转移。例如，这是一个指向自己的链接，其中rel属性指定了状态转移的关系为自身。<link href="http://example.org/posts" rel="self" /><br>这是下一页的链接，<link href="http://example.org/posts?pn=2" rel="next" /><br>如果当前不是第一页的话，就会有类似如下的链接来表示上一页，<link href="http://example.org/posts?pn=2" rel="prev" /><br>而这个是某一篇文章的链接，<link href="http://example.org/post-xxx" /><br>总结一下，就是：服务器生成包含状态转移的表征数据，用来响应客户端对于一个资源的请求；客户端借助这份表征数据，记录了当前的应用状态以及对应可转移状态的方式。当然，为了要实现这一系列的功能，一个不可或缺的东西就是超文本（hypertext）或者说超媒体类型（hypermedia type）。这绝对不是一个简简单单的媒体类型（例如，JSON属性列表）可以做到的。（参考：REST APIs must be hypertext-driven）因此，像下面这种API，1、获取文章</p>
+<figure class="highlight gradle"><table><tr><td class="code"><pre><code class="hljs gradle">请求：<br>GET <span class="hljs-regexp">/blog/</span>post<span class="hljs-regexp">/&#123;postId&#125; HTTP/</span><span class="hljs-number">1.1</span><br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">200</span> OK<br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br><span class="hljs-number">2</span>、发布文章<br><br>请求：<br>POST <span class="hljs-regexp">/blog/</span>post HTTP/<span class="hljs-number">1.1</span><br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">201</span> CREATED<br></code></pre></td></tr></table></figure>
+<p>绝对不是RESTful！绝对不是RESTful！绝对不是RESTful！</p>
+<p>以上引用：<br>作者：季文昊<br>链接：<a href="https://www.zhihu.com/question/28557115/answer/48120528">https://www.zhihu.com/question/28557115/answer/48120528</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>web上的server都叫web server，但是大家分工也有不同的，有服务器，容器，应用<br>服务器主要是处理请求，决定分发到那个应用(静态文件也在此处理)，容器则是负责初始化环境(设置环境变量，如异步通信，websocket也在此处)，应用则是提供应用功能。</p>
+<p>服务器: Apache/Nginx<br>容器:tonardo/Twisted<br>应用：用web框架开发的应用，web框架有Django,flask,Bottle,pyramid,CherryPy等(框架链接见<a href="https://github.com/jobbole/awesome-python-cn">这里</a>的web框架部分)</p>
+<p>上面是按照主要功能划分的，很多框架对于上面每个领域都有一些涉足，但擅长的不一样，像tonardo(因为我今天才刚刚看了这个的文档，Twisted还没看- -)<br>Tornado既是一个容器，也是应用。而它作为容器 采用的是asynchronous IO的网络模型，这是一种很高效的模型。在<a href="http://www.tornadoweb.cn/">文档</a>中，前半部分讲了tornado作为一个应用是如何使用的，后面，也是最主要的讲了如何运用tornado来实现他的异步和长轮询问以及使用WebSocket实现双工通信。</p>
+<p>大多时候后端都是通过服务器+容器+应用,栗子：<br>nginx+tornado+django:<br>1.Nginx作为反代理，分发到后端的torndo服务器<br>2.Django作为framwork搭建到tornado服务器上，使用其admin功能<br>在这个栗子中<br>服务器关心的是 HTTP 协议层面的传输和访问控制，所以在 Nginx上可以看到代理、负载均衡等功能。客户端通过服务器访问服务器上存储的资源（HTML 文件、图片文件等等）。通过 CGI 技术，也可以将处理过的内容通过服务器分发，但是一个服务器始终只是把服务器上的文件如实的通过 HTTP 协议传输给客户端。而容器，则是一个应用执行的容器。保证应用能够在应用服务器上正常运行。，我们可以通过框架来开发应用，让应用运行在应用执行的容器。他们能一起使用则是靠wsgi协议(容器那里可以说属于wsgi层，也就是通过wsgi协议分别连接服务器和应用的)</p>
+<p>还有另外一个栗子</p>
+<blockquote>
+<p>Apache/lighttpd: 相当于一个request proxy，根据配置，把不同的请求转发给不同的server处理，例如静态的文件请求自己处理，这个时候它就像一个web server，对于fastcgi/python这样的请求转发给flup这样的Server/Gateway进行处理 flup: 一个用python写的web server，也就是cgi中所谓的Server/Gateway，它负责接受apache/lighttpd转发的请求，并调用你写的程序 (application)，并将application处理的结果返回到apache/lighttpdfastcgi: apache/lighttpd的一个模块，虽然flup可以作为一个独立的web server使用，但是对于浏览器请求处理一般都交给 apache/lighttpd处理，然后由apache/lighttpd转发给flup处理，这样就需要一个东西来把apache/lighttpd跟flup联系起来，这个东西就是fastcgi，它通过环境变量以及socket将客户端请求的信息传送给flup并接收flup返回的结果web.py: 应该说有了上面的东西你就可以开始编写你的web程序了，但是问题是你就要自己处理浏览器的输入输出，还有cookie、session、模板等各种各样的问题了，web.py的作用就是帮你把这些工作都做好了，它就是所谓的web framework，另外一个出名的是django，不过感觉太复杂了，web.py差不多就够用了WSGI : 除了flup Server/Gateway外还有很多其他人的写的Server/Gateway, 这个时候就会出问题了，如果你在flup上写了一个程序，现在由于各种原因你要使用xdly了，这个时候你的程序也许就要做很多痛苦的修改才能使用 xdly server了，WSGI就是一个规范，他规范了flup这个服务应该怎么写，应该使用什么方式什么参数调用你写的程序(application)等，当然同时也规范你的程序应该怎么写了，这样的话，只要flup跟xdly都遵守WSGI的话，你的程序在两个上面都可以使用了，flup就是一个WSGI server</p>
+</blockquote>
+<h3 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h3><p><a href="https://www.zhihu.com/question/20215561/answer/40316953">WebSocket 是什么原理？为什么可以实现持久连接？ - Ovear的回答 - 知乎</a></p>
+<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><p>HTTP Server，充当着反向代理，有着均衡负荷，和分发静态文件等功能。<br>nginx的能力比Apache好，但目前我对nginx是使用只会简单的配置。<a href="http://www.nginx.cn/doc/">nginx文档</a></p>
+<h3 id="WSGI-uWSGI-uwsgi"><a href="#WSGI-uWSGI-uwsgi" class="headerlink" title="WSGI\uWSGI\uwsgi"></a>WSGI\uWSGI\uwsgi</h3><ul>
+<li><a href="https://www.zhihu.com/question/19998865/answer/74748765">WSGI</a>是一种通信协议。</li>
+<li>uwsgi是一种线路协议而不是通信协议，在此常用于在uWSGI服务器与其他网络服务器的数据通信。</li>
+<li>而uWSGI是实现了uwsgi和WSGI两种协议的Web服务器。</li>
+</ul>
+<p>可以说WSGI是一种编程接口，而uwsgi是一种传输协议，而uWSGI是一个服务器(但是主要是链接nginx与框架的中间层(wsgi))。<br>相关文档:<a href="http://blog.csdn.net/midion9/article/details/51354774">1</a>,<a href="http://blog.csdn.net/sraing/article/details/8455242">2</a></p>
+]]></content>
+      <categories>
+        <category>WEB</category>
+      </categories>
+      <tags>
+        <tag>WEB</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>python设计模式</title>
     <url>/2017/11/10/18_python_design_patterns/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>设计模式都是前人根据代码经验汇总而来的, 我们需要学习如何使用设计模式, 但是切忌被设计模式囚禁住我们的思想<br>设计模式虽然都是在描述编程的，但是很多也是来源于生活的实例，就拿一台单反来举例:</p>
@@ -5405,6 +5405,39 @@ Queue类可以通过限定队列中待处理的最大任务数量，使得相邻
       </tags>
   </entry>
   <entry>
+    <title>基于django和celery的邮件异步发送(记录)</title>
+    <url>/2017/10/21/21_Asynchronous%20sending%20of%20mail%20based%20on%20django%20and%20celery/</url>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在验证用户邮箱时，需要发送一个链接给用户的邮箱，让用户点击以确保用户输入的邮箱是他本人所有。<br>但是email是由提供商进行发送的，我们需要先把请求发给提供商再由提供商发送，如果不使用异步发送，在用户点击按钮后，必须等到后台收到提供商的返回结果，我们才能把数据返回给用户。</p>
+<a id="more"></a>
+
+<h2 id="1-Celery介绍"><a href="#1-Celery介绍" class="headerlink" title="1.Celery介绍"></a>1.Celery介绍</h2><p>由于使用同步发送带来了许多麻烦，所以可以考虑用任务队列进行异步发送，在python中的Celery库发挥的就是这个作用，而且Celery接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库。<br><a href="http://python.jobbole.com/87238/">更多介绍以及入门</a></p>
+<h2 id="2-与django结合异步发送邮件的服务"><a href="#2-与django结合异步发送邮件的服务" class="headerlink" title="2.与django结合异步发送邮件的服务"></a>2.与django结合异步发送邮件的服务</h2><p>假设之前已经完成了email发送逻辑（同步方式）</p>
+<h3 id="2-1setting-py设置"><a href="#2-1setting-py设置" class="headerlink" title="2.1setting.py设置"></a>2.1setting.py设置</h3><figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">EMAIL_HOST = <span class="hljs-string">&#x27;smtp.163.com&#x27;</span>                <span class="hljs-comment"># 服务提供商</span><br>EMAIL_PORT = <span class="hljs-number">25</span>                            <span class="hljs-comment"># 端口</span><br>EMAIL_HOST_USER = <span class="hljs-string">&quot;***&quot;</span>                    <span class="hljs-comment"># 用户名</span><br>EMAIL_HOST_PASSWORD = <span class="hljs-string">&quot;***&quot;</span>                <span class="hljs-comment"># 密码</span><br>EMAIL_USE_TLS = <span class="hljs-literal">False</span>                      <span class="hljs-comment"># False就好了</span><br>EMAIL_FROM = <span class="hljs-string">&quot;***&quot;</span>                         <span class="hljs-comment"># 来源名字</span><br><br><br><span class="hljs-comment">###配置Broker</span><br>BROKER_URL = <span class="hljs-string">&#x27;redis://127.0.0.1:6379/0&#x27;</span>    <br>BROKER_TRANSPORT = <span class="hljs-string">&#x27;redis&#x27;</span><br></code></pre></td></tr></table></figure>
+<h3 id="2-2celery文件"><a href="#2-2celery文件" class="headerlink" title="2.2celery文件"></a>2.2celery文件</h3><p>在自己的project文件夹内（与setting.py同级）<br>创建celery.py文件，代码如下</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> django<br><br><span class="hljs-keyword">from</span> celery <span class="hljs-keyword">import</span> Celery<br><span class="hljs-keyword">from</span> django.conf <span class="hljs-keyword">import</span> settings<br><br>os.environ.setdefault(<span class="hljs-string">&#x27;DJANGO_SETTINGS_MODULE&#x27;</span>, <span class="hljs-string">&#x27;django_project.settings&#x27;</span>)   <span class="hljs-comment"># django_project 为自己的project名</span><br>django.setup()<br><br>app = Celery(<span class="hljs-string">&#x27;django_project&#x27;</span>)            <span class="hljs-comment"># 定义自己的app名字后面调用需要用到</span><br><br>app.config_from_object(<span class="hljs-string">&#x27;django.conf:settings&#x27;</span>)<br>app.autodiscover_tasks(<span class="hljs-keyword">lambda</span>: settings.INSTALLED_APPS)<br><br></code></pre></td></tr></table></figure>
+<h3 id="2-3发送邮件的py"><a href="#2-3发送邮件的py" class="headerlink" title="2.3发送邮件的py"></a>2.3发送邮件的py</h3><p>主要是从celery文件导入app并在自己发送的函数上面使用@app.task装饰器<br>其他的全是我自己的发送邮件规则</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> random <span class="hljs-keyword">import</span> Random<br><br><br><span class="hljs-keyword">from</span> django.core.mail <span class="hljs-keyword">import</span> send_mail<br><span class="hljs-keyword">from</span> django_project.settings <span class="hljs-keyword">import</span> EMAIL_FROM<br><br><span class="hljs-keyword">from</span> users.models <span class="hljs-keyword">import</span> EmailVerifyRecord<br><span class="hljs-keyword">from</span> django_project.celery <span class="hljs-keyword">import</span> app<br><br><br><span class="hljs-meta">@app.task</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">send_register_email</span>(<span class="hljs-params">email, send_type=<span class="hljs-string">&quot;register&quot;</span>, num=<span class="hljs-number">16</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    发送注册邮件时的链接</span><br><span class="hljs-string">    :param email: email</span><br><span class="hljs-string">    :param send_type: &#x27;register&#x27;or&#x27;forget&#x27;</span><br><span class="hljs-string">    :return: </span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    email_record = EmailVerifyRecord()<br>    code_str = random_str(num)<br>    email_record.code = code_str<br>    email_record.email = email<br>    email_record.send_type = send_type<br>    email_record.save()<br><br>    <span class="hljs-keyword">if</span> send_type == <span class="hljs-string">&#x27;register&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;注册激活链接&quot;</span><br>        email_body = <span class="hljs-string">&quot;请点击下面的链接激活你的账号：http://127.0.0.1:8000/active/&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">elif</span> send_type == <span class="hljs-string">&#x27;forget&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;重置密码链接&quot;</span><br>        email_body = <span class="hljs-string">&quot;请点击下面的链接重置你的密码：http://127.0.0.1:8000/reset/&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">elif</span> send_type == <span class="hljs-string">&#x27;update_email&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;邮箱修改验证码&quot;</span><br>        email_body = <span class="hljs-string">&quot;验证码为：&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">pass</span><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">random_str</span>(<span class="hljs-params">random_length=<span class="hljs-number">8</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    随机字符串生成</span><br><span class="hljs-string">    :param random_length: 生成字符串长度(init)</span><br><span class="hljs-string">    :return: 返回字符串(str)</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    code_str = <span class="hljs-string">&#x27;&#x27;</span><br>    generate_random_str = [<span class="hljs-built_in">chr</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">65</span>, <span class="hljs-number">91</span>)] + \<br>                          [<span class="hljs-built_in">chr</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">97</span>, <span class="hljs-number">123</span>)] + \<br>                          [<span class="hljs-built_in">str</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>)]<br>    chars = <span class="hljs-string">&#x27;&#x27;</span>.join(generate_random_str)<br>    length = <span class="hljs-built_in">len</span>(chars) - <span class="hljs-number">1</span><br>    random = Random()<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(random_length):<br>        code_str += chars[random.randint(<span class="hljs-number">0</span>, length)]<br>    <span class="hljs-keyword">return</span> code_str<br><br><br></code></pre></td></tr></table></figure>
+<h3 id="2-4view"><a href="#2-4view" class="headerlink" title="2.4view"></a>2.4view</h3><p>将原本发送邮件的函数</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">send_register_email(email, <span class="hljs-string">&quot;update_email&quot;</span>, num=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
+<p>改为</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">send_register_email.delay(email, <span class="hljs-string">&quot;update_email&quot;</span>, num=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="2-5运行celery服务"><a href="#2-5运行celery服务" class="headerlink" title="2.5运行celery服务"></a>2.5运行celery服务</h3><p>Broker设置为redis所以必须先启动</p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><code class="hljs pgsql">service redis <span class="hljs-keyword">start</span><br></code></pre></td></tr></table></figure>
+<p>检查是否启动并监听端口</p>
+<figure class="highlight vim"><table><tr><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">ps</span> aux|<span class="hljs-keyword">grep</span> redis<br></code></pre></td></tr></table></figure>
+<p>在celery所在目录输入命令启动celery</p>
+<figure class="highlight nginx"><table><tr><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">celery</span> -A (自己定义的名字) worker -l <span class="hljs-literal">debug</span><br></code></pre></td></tr></table></figure>
+<h3 id="2-6测试"><a href="#2-6测试" class="headerlink" title="2.6测试"></a>2.6测试</h3><p>发送时celery服务的提示，显示succeeded<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/celery%E5%8F%91%E9%82%AE%E4%BB%B611.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">image</span></p>
+]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>django</tag>
+        <tag>celery</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>xadmin的使用</title>
     <url>/2017/10/21/23_use_xadmin/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>Django自身带的admin功能众多，但基于admin开发的xadmin功能更完善，开发也简便且美观</p>
@@ -5454,39 +5487,6 @@ Queue类可以通过限定队列中待处理的最大任务数量，使得相邻
       <tags>
         <tag>django</tag>
         <tag>xadmin</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>基于django和celery的邮件异步发送(记录)</title>
-    <url>/2017/10/21/21_Asynchronous%20sending%20of%20mail%20based%20on%20django%20and%20celery/</url>
-    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在验证用户邮箱时，需要发送一个链接给用户的邮箱，让用户点击以确保用户输入的邮箱是他本人所有。<br>但是email是由提供商进行发送的，我们需要先把请求发给提供商再由提供商发送，如果不使用异步发送，在用户点击按钮后，必须等到后台收到提供商的返回结果，我们才能把数据返回给用户。</p>
-<a id="more"></a>
-
-<h2 id="1-Celery介绍"><a href="#1-Celery介绍" class="headerlink" title="1.Celery介绍"></a>1.Celery介绍</h2><p>由于使用同步发送带来了许多麻烦，所以可以考虑用任务队列进行异步发送，在python中的Celery库发挥的就是这个作用，而且Celery接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库。<br><a href="http://python.jobbole.com/87238/">更多介绍以及入门</a></p>
-<h2 id="2-与django结合异步发送邮件的服务"><a href="#2-与django结合异步发送邮件的服务" class="headerlink" title="2.与django结合异步发送邮件的服务"></a>2.与django结合异步发送邮件的服务</h2><p>假设之前已经完成了email发送逻辑（同步方式）</p>
-<h3 id="2-1setting-py设置"><a href="#2-1setting-py设置" class="headerlink" title="2.1setting.py设置"></a>2.1setting.py设置</h3><figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">EMAIL_HOST = <span class="hljs-string">&#x27;smtp.163.com&#x27;</span>                <span class="hljs-comment"># 服务提供商</span><br>EMAIL_PORT = <span class="hljs-number">25</span>                            <span class="hljs-comment"># 端口</span><br>EMAIL_HOST_USER = <span class="hljs-string">&quot;***&quot;</span>                    <span class="hljs-comment"># 用户名</span><br>EMAIL_HOST_PASSWORD = <span class="hljs-string">&quot;***&quot;</span>                <span class="hljs-comment"># 密码</span><br>EMAIL_USE_TLS = <span class="hljs-literal">False</span>                      <span class="hljs-comment"># False就好了</span><br>EMAIL_FROM = <span class="hljs-string">&quot;***&quot;</span>                         <span class="hljs-comment"># 来源名字</span><br><br><br><span class="hljs-comment">###配置Broker</span><br>BROKER_URL = <span class="hljs-string">&#x27;redis://127.0.0.1:6379/0&#x27;</span>    <br>BROKER_TRANSPORT = <span class="hljs-string">&#x27;redis&#x27;</span><br></code></pre></td></tr></table></figure>
-<h3 id="2-2celery文件"><a href="#2-2celery文件" class="headerlink" title="2.2celery文件"></a>2.2celery文件</h3><p>在自己的project文件夹内（与setting.py同级）<br>创建celery.py文件，代码如下</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> django<br><br><span class="hljs-keyword">from</span> celery <span class="hljs-keyword">import</span> Celery<br><span class="hljs-keyword">from</span> django.conf <span class="hljs-keyword">import</span> settings<br><br>os.environ.setdefault(<span class="hljs-string">&#x27;DJANGO_SETTINGS_MODULE&#x27;</span>, <span class="hljs-string">&#x27;django_project.settings&#x27;</span>)   <span class="hljs-comment"># django_project 为自己的project名</span><br>django.setup()<br><br>app = Celery(<span class="hljs-string">&#x27;django_project&#x27;</span>)            <span class="hljs-comment"># 定义自己的app名字后面调用需要用到</span><br><br>app.config_from_object(<span class="hljs-string">&#x27;django.conf:settings&#x27;</span>)<br>app.autodiscover_tasks(<span class="hljs-keyword">lambda</span>: settings.INSTALLED_APPS)<br><br></code></pre></td></tr></table></figure>
-<h3 id="2-3发送邮件的py"><a href="#2-3发送邮件的py" class="headerlink" title="2.3发送邮件的py"></a>2.3发送邮件的py</h3><p>主要是从celery文件导入app并在自己发送的函数上面使用@app.task装饰器<br>其他的全是我自己的发送邮件规则</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> random <span class="hljs-keyword">import</span> Random<br><br><br><span class="hljs-keyword">from</span> django.core.mail <span class="hljs-keyword">import</span> send_mail<br><span class="hljs-keyword">from</span> django_project.settings <span class="hljs-keyword">import</span> EMAIL_FROM<br><br><span class="hljs-keyword">from</span> users.models <span class="hljs-keyword">import</span> EmailVerifyRecord<br><span class="hljs-keyword">from</span> django_project.celery <span class="hljs-keyword">import</span> app<br><br><br><span class="hljs-meta">@app.task</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">send_register_email</span>(<span class="hljs-params">email, send_type=<span class="hljs-string">&quot;register&quot;</span>, num=<span class="hljs-number">16</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    发送注册邮件时的链接</span><br><span class="hljs-string">    :param email: email</span><br><span class="hljs-string">    :param send_type: &#x27;register&#x27;or&#x27;forget&#x27;</span><br><span class="hljs-string">    :return: </span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    email_record = EmailVerifyRecord()<br>    code_str = random_str(num)<br>    email_record.code = code_str<br>    email_record.email = email<br>    email_record.send_type = send_type<br>    email_record.save()<br><br>    <span class="hljs-keyword">if</span> send_type == <span class="hljs-string">&#x27;register&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;注册激活链接&quot;</span><br>        email_body = <span class="hljs-string">&quot;请点击下面的链接激活你的账号：http://127.0.0.1:8000/active/&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">elif</span> send_type == <span class="hljs-string">&#x27;forget&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;重置密码链接&quot;</span><br>        email_body = <span class="hljs-string">&quot;请点击下面的链接重置你的密码：http://127.0.0.1:8000/reset/&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">elif</span> send_type == <span class="hljs-string">&#x27;update_email&#x27;</span>:<br>        email_title = <span class="hljs-string">&quot;邮箱修改验证码&quot;</span><br>        email_body = <span class="hljs-string">&quot;验证码为：&#123;0&#125;&quot;</span>.<span class="hljs-built_in">format</span>(code_str)<br><br>        send_mail(email_title, email_body, EMAIL_FROM, [email])<br><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">pass</span><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">random_str</span>(<span class="hljs-params">random_length=<span class="hljs-number">8</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    随机字符串生成</span><br><span class="hljs-string">    :param random_length: 生成字符串长度(init)</span><br><span class="hljs-string">    :return: 返回字符串(str)</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    code_str = <span class="hljs-string">&#x27;&#x27;</span><br>    generate_random_str = [<span class="hljs-built_in">chr</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">65</span>, <span class="hljs-number">91</span>)] + \<br>                          [<span class="hljs-built_in">chr</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">97</span>, <span class="hljs-number">123</span>)] + \<br>                          [<span class="hljs-built_in">str</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>)]<br>    chars = <span class="hljs-string">&#x27;&#x27;</span>.join(generate_random_str)<br>    length = <span class="hljs-built_in">len</span>(chars) - <span class="hljs-number">1</span><br>    random = Random()<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(random_length):<br>        code_str += chars[random.randint(<span class="hljs-number">0</span>, length)]<br>    <span class="hljs-keyword">return</span> code_str<br><br><br></code></pre></td></tr></table></figure>
-<h3 id="2-4view"><a href="#2-4view" class="headerlink" title="2.4view"></a>2.4view</h3><p>将原本发送邮件的函数</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">send_register_email(email, <span class="hljs-string">&quot;update_email&quot;</span>, num=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
-<p>改为</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">send_register_email.delay(email, <span class="hljs-string">&quot;update_email&quot;</span>, num=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
-<h3 id="2-5运行celery服务"><a href="#2-5运行celery服务" class="headerlink" title="2.5运行celery服务"></a>2.5运行celery服务</h3><p>Broker设置为redis所以必须先启动</p>
-<figure class="highlight pgsql"><table><tr><td class="code"><pre><code class="hljs pgsql">service redis <span class="hljs-keyword">start</span><br></code></pre></td></tr></table></figure>
-<p>检查是否启动并监听端口</p>
-<figure class="highlight vim"><table><tr><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">ps</span> aux|<span class="hljs-keyword">grep</span> redis<br></code></pre></td></tr></table></figure>
-<p>在celery所在目录输入命令启动celery</p>
-<figure class="highlight nginx"><table><tr><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">celery</span> -A (自己定义的名字) worker -l <span class="hljs-literal">debug</span><br></code></pre></td></tr></table></figure>
-<h3 id="2-6测试"><a href="#2-6测试" class="headerlink" title="2.6测试"></a>2.6测试</h3><p>发送时celery服务的提示，显示succeeded<br><img    class="lazyload" data-original="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/celery%E5%8F%91%E9%82%AE%E4%BB%B611.png?raw=true" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">image</span></p>
-]]></content>
-      <categories>
-        <category>后端</category>
-      </categories>
-      <tags>
-        <tag>django</tag>
-        <tag>celery</tag>
       </tags>
   </entry>
   <entry>
