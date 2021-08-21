@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>RPC框架编写实践--最小RPC框架的依赖 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记在2019上半年时， 项目需要用到RPC来为不同服...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">RPC框架编写实践--最小RPC框架的依赖</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://i.loli.net/2021/08/21/Ej3dvTzMVRycZ1t.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">RPC框架编写实践--最小RPC框架的依赖</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 22, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7585</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在2019上半年时， 项目需要用到<code>RPC</code>来为不同服务间建立连接, 便开始调研<code>RPC</code>相关的内容， 由于项目本身是基于<code>Asyncio</code>生态的， 所以就开始找基于<code>asyncio</code>生态的<code>RPC</code>框架， 那时候<code>Python</code>上关于<code>Asyncio</code>的<code>RPC</code>框架比较少, 只有一个<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 它能满足<code>RPC</code>的基本功能, 但缺少了其他的<code>RPC</code>框架带有的服务治理功能(称为服务管理会不会更好点???), 所以在那时候开始， 我就想开始造一个<code>Python Asyncio</code>生态的<code>RPC</code>框架, 这个项目除了满足在任一语言的<code>RPC</code>的功能外(虽然其他语言的没编写…), 还要满足快;核心功能简单;可以单独为python提供高阶功能; 在没其他服务依赖的情况下就能单独使用, 同时又可以通过插件的形式进行功能拓展。</p>
+        <p>注：由于用到了<code>Asyncio</code>所以他有一些<a target="_blank" rel="noopener" href="https://python-gino.org/docs/zh/1.1b2/explanation/async.html#pros-and-cons">利弊</a></p>
+<h2 id="1-RPC框架需要什么"><a href="#1-RPC框架需要什么" class="headerlink" title="1.RPC框架需要什么"></a>1.RPC框架需要什么</h2><p>毫无疑问， RPC框架最重要的部分就是RPC, RPC的全称为远程过程调用, 它的本质是客户端把用户的本地调用转化成一个消息， 通过一个连接发送到服务端, 而服务端根据收到的消息进行解析, 并根据消息调用函数再计算结果， 最后把结果返回给客户端， 并由客户端返回给用户的过程。</p>
+<p>而RPC框架则是上述调用过程的封装， 使得调用者可以通过RPC框架像调用本地函数一样调用远程的函数， 从而无须关注底层细节。<br>那这个调用过程需要什么呢？ 我先设想了一个最简单的业务–用户调用一个<code>foo</code>函数:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">foo</span>(<span class="hljs-params">a: <span class="hljs-built_in">int</span>, b: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>然后再把这个业务的调用转换为一个设想的RPC请求流程， 便是如下图：<br><img  src="https://i.loli.net/2021/08/20/nFvkjBZrUIXRoe3.png"  ><span class="image-caption">image.png</span><br>可以看出RPC框架需要先把调用的函数签名根据应用层协议进行转换， 通过连接把数据传输到服务端； 服务端在收到请求后根据应用层协议提取信息， 并根据信息查找对应的函数再进行调用， 最后把生成的结果返回给客户端， 由客户端处理后返回给用户。此外， 由于要传输信息， 序列化和反序列化是必不可少的。<br>从整个流程可以发现， 一个RPC框架起码要拥有应用层协议， 序列化与反序列化， 以及网络传输, 完成了这几点， 就能编写出一个最简单的RPC框架。</p>
+<h2 id="2-传输层协议"><a href="#2-传输层协议" class="headerlink" title="2.传输层协议"></a>2.传输层协议</h2><p>目前RPC框架的协议一般都是多种协议组合在一起的， 有传输层协议， 应用层协议等等（采用OSI模型分层， 下同）。<br>目前传输层协议有两种， 一种是TCP, 它传输稳定可靠，能尽量的保障信息不丢包。 而另一种是UDP， 它的可定制性很强， 传输的性能开销小， 但跨网络时会有可能丢包。<br>而RPC框架要做到适用性和可用性都比较强， 所以目前的RPC框架的传输层协议都是选用了TCP协议(只有用在内网网络的才会去考虑UDP)， 而我也选择了TCP作为了我的传输协议。</p>
+<h2 id="3-应用层协议"><a href="#3-应用层协议" class="headerlink" title="3.应用层协议"></a>3.应用层协议</h2><p>通过调研发现， 目前是开源RPC框架要不就是基于TCP协议来开发自己的应用层协议， 要不就是直接使用HTTP来作为自己的应用层协议。这两种方式都各有各的优势， 选用HTTP作为应用层协议， 就能拥有成熟的生态，可以使用<code>Nginx</code>等中间件， 但是HTTP请求会传输很多字段， 有些字段可能是永远都用不到了，会浪费传输性能， 而选择了自己定制应用层协议， 则不能使用一些成熟的中间件， 但能尽量的使请求体保持简单， 在经过综合考虑后， 我选择了自己定制应用层协议。</p>
+<p>在定制应用层协议之前， 需要先想清楚需要基于应用层协议来实现哪些功能，在查阅了一些RPC框架后， 我确定了几个基本的功能：</p>
+<ul>
+<li><code>one-by-one</code>形式的收发消息： 这个功能用于最基础的收发消息。</li>
+<li>双工形式的收发消息： 目前市面上的RPC框架都支持该类型的消息， HTTP也通过WebSocket来支持双工收发消息， 我也想让我的框架支持这种消息， 并且命名为<code>Channel</code></li>
+<li>控制连接状态的消息： 为了让连接保持稳定以及及时发现错误， 需要通过<code>Keep-Alive</code>机制来保活， 而这类消息是独立在用户调用的消息之外的。</li>
+<li>加快传输速度： 由于RPC框架会承担很大的流量， 同时要为用户保障性能和足够低的响应时间， 所以就需要尽量的加快传输速度， 同时也不要增加太多系统占用。</li>
+</ul>
+<p>确定好了基本功能后就可以开始制定协议了， 好的协议必须拥有良好的拓展性和简洁性, 由于我也是第一次订制私有协议, 还在探索中, 所以就从HTTP协议里面吸取一些灵感(少部分从AMQP协议吸取灵感)。</p>
+<p>首先是HTTP/1, 也就是用得最多的HTTP请求形式–<code>one-by-one</code>， 这种请求只会请求一次响应一次， 如果没有进行优化， 每次请求都会经历创建TCP， 进行请求， 读取响应，销毁TCP四个阶段， 而TCP的创建和销毁是非常浪费性能并且会增加很多时间。 所以到了后面HTTP就开始支持连接复用， 也就是持久化连接， 这种方式可以让客户端对同一域名长期持有一个或多个不会用完即断的TCP连接， 典型的做法就是客户端维护一个FIFO队列， 在每次取完数据之后一段时间先不自动断开连接, 而是放回队列里，以便在获取下一个资源时直接复用，省去了TCP创建销毁的成本。<br>但是， 连接复用这一技术并不完美， 它最明显的副作用就是<code>队首阻塞</code>的问题， 比如有两个请求A和B，他们使用了同一个TCP连接， 当A请求发送后且对应的服务端一直没有响应时， B请求就得一直等待， 直到TCP连接收到了A请求的响应。 实际上TCP连接是可以近乎同时发送A请求和B请求, 也可以近乎同时收到A响应和B响应， 但是HTTP/1.0并无法识别这个响应是那个请求产生的。<br>到了HTTP/2, 它就开始利用TCP的流机制， 在HTTP/2中， 帧是最小粒度的信息单位，它可以用来描述各种数据，譬如请求的Headers、Body，或者用来做控制标识，譬如打开，关闭连接等。 同时每个帧都附带了一个流ID以标识这个帧是属于哪个流， 这样子客户端就可以根据标识ID将不同的响应与请求一一配对，从而解决了无法识别同一连接在同一时刻收到两个请求的问题。 这个设计的HTTP/2的最重要的技术特征之一，它被称为HTTP/2多路复用。</p>
+<blockquote>
+<p>在习惯<code>one-by-one</code>后初识HTTP/2的多路复用可能很难转变过来， 我在理解的时候， 会把一个HTTP连接比作一条河流, 每个请求相当于一个货物， 发送者发送货物时会给货物打上自己的标记， 然后交由船来运输， 有的船都会载上货物从A地驶向B地， 有的船会载上货物从B地驶向A地， 他们不用关心货物是什么， 而货物都有自己的一个标识， 码头根据标识就可以知道这个货物是那个请求发出， 要收回什么请求。</p>
+</blockquote>
+<p>从HTTP协议的迭代史可以发现， HTTP是在逐渐的提高对TCP连接的复用, 从而减少资源的浪费， 而对于RPC来说, 它天生需要极好的传输性能和较少的机器成本开销， 同时从客户端建立连接时创建的连接会一直存在， 直到双方有一方出现异常等原因才会断开连接， 所有请求通过连接来传输数据， 场景十分简单， 所以它会更需要多路复用。</p>
+<p>那要怎么实现多路复用呢? 大概步骤如下：</p>
+<ul>
+<li>请求函数在进行请求之前会分配到一个唯一的标签， 然后会通过标签在一个共享容器创建一个空位置等待数据的到来， 接着会按照协议把标签放到请求体里面, 并发送给服务端。</li>
+<li>服务端收到请求生成响应时就会按照协议把该标签放入到响应体中并返回数据到客户端的连接。</li>
+<li>客户端的连接在创建的时候会启动一个后台任务, 这个任务会一直从连接读取数据， 如果有数据来了， 就会解析数据， 根据协议提取标签并把数据放到容器的指定位置， 如果没有找到对应的位置则需要丢弃数据（证明这个连接没发送过该标签的数据）。</li>
+<li>请求函数从空位置中等到数据的到来， 会返回给用户， 并且删除该位置， 防止内存溢出。</li>
+</ul>
+<p>以下是简单的伪代码说明（具体源码可以见：<a target="_blank" rel="noopener" href="https://github.com/so1n/rap/blob/master/rap/client/transport/transport.py%EF%BC%89">https://github.com/so1n/rap/blob/master/rap/client/transport/transport.py）</a>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 伪代码</span><br><span class="hljs-comment"># 确定好传输的为 id, header, body</span><br><span class="hljs-comment"># 响应体传输的为 id, header, status_code, body</span><br><span class="hljs-comment"># 两者的id用来识别属于哪个请求</span><br><span class="hljs-comment"># 只要确保每个请求有不一样的id就可以实现了连接复用了</span><br><br><span class="hljs-comment"># 首先有个dict用于存放已经发送请求,但没收到响应的future(asyncio.Future())</span><br>future_dict = <span class="hljs-built_in">dict</span>()<br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">response</span>():</span><br>    <span class="hljs-comment"># 统一处理响应, 会有一个程序让他后台运行</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    	<span class="hljs-keyword">try</span>:<br>    		<span class="hljs-comment"># 按照协议从连接取出响应数据</span><br>    	    msg_id, header, status_code, body = <span class="hljs-keyword">await</span> conn.read() <br>    	<span class="hljs-keyword">except</span> ValueError:<br>    	    <span class="hljs-keyword">return</span><br>    	<span class="hljs-comment"># 把结果存入future中,这样request就能收到响应了</span><br>        <span class="hljs-keyword">if</span> msg_id <span class="hljs-keyword">in</span> future_dict:<br>    		future_dict[msg_id].set_result(Response(msg_id, header, status_code, body))<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request</span>():</span><br>    <span class="hljs-comment"># 请求体</span><br>    request = (msg_id, header, body)<br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-comment"># 设置等待响应的future</span><br>        future_dict[msg_id] = asyncio.Future()<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 表示通过连接conn发送请求</span><br>            <span class="hljs-keyword">await</span> conn.write(request)<br>        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>            <span class="hljs-keyword">raise</span> e<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 等待响应,超过9秒没响应则报请求超时</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> asyncio.wait_for(future_dict[msg_id], <span class="hljs-number">9</span>)<br>        <span class="hljs-keyword">except</span> asyncio.TimeoutError:<br>            <span class="hljs-keyword">raise</span> asyncio.TimeoutError(<span class="hljs-string">f&quot;msg_id:<span class="hljs-subst">&#123;msg_id&#125;</span> request timeout&quot;</span>)<br>    <span class="hljs-keyword">finally</span>:<br>        <span class="hljs-comment"># 删除future, 回收资源</span><br>        future_dict.pop(msg_id, <span class="hljs-literal">None</span>)<br></code></pre></td></tr></table></figure>
+<p>了解完了多路复用可以发现， 协议中有一个必不可少的字段， 这个字段就是上面所说的消息标签， 这个字段我在协议中命名为相关id, 此外在了解连接复用的时候， 我也顺便了解了HTTP协议的设计， 通过HTTP协议的设计， 我从中提取了几个字段, 最后整合成以下几个字段：</p>
+<ul>
+<li>消息id： 这个消息id是单调递增的， 可以让双方知道是否有消息重发以及为以后功能做拓展。</li>
+<li>协议版本： 一般协议都会随着迭代而发生变化， 所以需要一个字段来标识当前的协议版本是哪个， 方便客户端和服务端针对性的识别。同时， 这个字段应该尽量的处在协议的最前面， 因为它是最不可能发生更改的。</li>
+<li>消息类型： 从HTTP/2的设计可以看出， HTTP/2会单独传送一个请求来控制打开和关闭连接， 此外还会发送<code>keep alive</code>请求来保持与服务端的连通， 这类请求与普通的<code>one-by-one</code>请求是不一样的。 而且我还希望有类型<code>websocket</code>的场景， 他也与上述两种请求类型不一样的， 所以就需要一个字段来区分他们的类型, 具体的类型如下：<ul>
+<li><code>event</code>: 这类消息用来控制传输的连接状态和行为, 这类请求允许客户端和服务端都可以收发，比如<code>ping</code>, <code>pong</code>以及确定连接生命周期的<code>declare</code>, <code>msg</code>, <code>drop</code>等等。</li>
+<li><code>msg</code>: 这类消息跟传统HTTP/1很像, 也是最经典常见的消息模型，他只接受一发一收，收发的相关id必须一致</li>
+<li><code>channel</code>： 这类消息可以类似于<code>Websocket</code>, 是一种可以同时双向收发的消息模型， 也可以改为一发多收或者多发一收， 完全由实现者自己定义。</li>
+</ul>
+</li>
+<li>相关id: 这个值的存在就是为了实现上面所说的多路复用， 客户端通过相关id可以找到这个响应是哪个请求的响应。</li>
+<li>目标url: 这个字段就像HTTP的URL一样, 客户端可以通过url找到服务端对应的路由函数。 不过对于RPC来说url没必要那么长， 一般rpc的目标函数匹配都是通过哪个组， 组里面的哪个函数来查找， 所以url会以<code>/&#123;group&#125;/&#123;func name&#125;</code>来表示。  </li>
+<li>header： 协议的设计不仅要精简， 也要容易拓展， HTTP中的header就很方便用户自定义拓展, 所以我也采用了header字段</li>
+<li>body： 该字段存的是响应体和请求体，也是类似于HTTP.body。</li>
+<li>status code： 该字段跟HTTP一样，只有响应的时候才有的， 小于300的为正常请求， 大于300小于400的为功能上的拓展， 大于400小于500的为异常请求， 大于500则是有破坏性的异常。</li>
+</ul>
+<p>需要的字段确定完后， 就可以排列成一个协议， 按照简单和变动比较少的放前面的原则， 最终请求消息协议定义为:</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs d"># 消息id, 协议版本, 消息类型， 相关id, 目标url, header, <span class="hljs-keyword">body</span><br>msg_id, <span class="hljs-keyword">version</span>, msg_type, correlation_id, target, header, <span class="hljs-keyword">body</span><br></code></pre></td></tr></table></figure>
+<p>响应消息协议则定义为：</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs d"># 消息id, 协议版本, 消息类型， 相关id, 目标url, status_code, header, <span class="hljs-keyword">body</span><br>msg_id, <span class="hljs-keyword">version</span>, msg_type, correlation_id, target, status_code, header, <span class="hljs-keyword">body</span><br></code></pre></td></tr></table></figure>
+<p>现在， 应用层协议终于定制完了， 但是还是不够， 因为程序里的在读写的协议实际上还都是存在内存中的数据结构或对象， 然而网络传输只传输二进制编码, 同时不同的语言中的对象类型的表达方式是不一样的， 所以需要一种通用的且能把数据结构或对象转换为二进制编码的方法–序列化, 以及反向操作–反序列化。</p>
+<h2 id="4-序列化与反序列化"><a href="#4-序列化与反序列化" class="headerlink" title="4.序列化与反序列化"></a>4.序列化与反序列化</h2><p>序列化与反序列化是网络传输中的重中之重, 本质上也是一个协议， 大概处于OSI模型的表示层。<br>一般人接触最多的序列化协议是Json, 它通用， 成熟， 调试起来也非常方便， 但是占用空间大， 序列化时也会比较久， 从而影响了传输的性能， 所以我并没有挑选Json作为我的序列化协议(之前在使用<code>starlette</code>框架时知道<code>Python</code>中有<code>ujson</code>和<code>ojson</code>两个库, 它们本质上也都是Json, 但是通过特定的方法减少了序列化时对CPU的性能影响）。<br>但是我没有能力开发一个成熟稳定的序列化协议， 所以只能在开源协议中挑选， 开源的序列化协议每种都有优点和缺点，它们在设计之初有自己独特的应用场景， 而在挑选序列化协议时， 我根据以下几点进行分析：</p>
+<ul>
+<li>通用性： 也就是这种协议是否支持跨平台， 跨语言， 不过不支持， 那通用性就会大大降低。</li>
+<li>流行性： 流行性主要是用的人多不多， 如果用的人不多， 资料会比较少， 解决坑的速度也会变慢。</li>
+<li>成熟性： 协议是否成熟， 部分序列化协议诞生的时候性能很强， 但功能不多， 同时也不稳定， 不安全， 如果想要做一个稳定的RPC框架， 使用的序列化协议也必须成熟稳定。</li>
+<li>空间占用： 如果序列化后占用的空间还是比较多， 会增加网络的传输压力， 减少响应时间。</li>
+<li>时间占用： 如果序列化协议比较复杂， 那解析时间就会比较久， 占用更多的CPU时间， 由于我使用<code>Python asyncio</code>生态进行开发， 复杂的协议会导致占用CPU时间比较多, 会降低QPS， 所以这类协议不能挑选。<br>除此之外还有一个是可读性， 人们容易阅读可读性高的序列化协议， 这样的话调试会十分方便， 但增加可读性必定会导致空间占用大， CPU解析时间久， 所以这一特性不纳入我的考虑范围内。</li>
+</ul>
+<p>在经过寻找后， 我发现了<code>msgpack</code>这个序列化协议， 它是一个二进制的Json序列化协议， 与Json很像， 但是还是有一些区别, 如下图：<br><img  src="https://i.loli.net/2021/08/20/3NjxH86bgmGh9uo.png"  ><span class="image-caption">uTools_1629389662645.png</span><br>这是官网的一个截图， 它介绍一个数据结构序列化后Json和<code>msgpack</code>的占用空间大小和结果， 可以看出它针对网络传输进行了设计， 序列化的结果本身非常的紧凑， 体积减小了很多， 这样可以减少网络传输的流量， 提高了传输的性能， 同时通过它的文档了解到它的使用方法跟Json差不多， 对使用者而言它的使用方法跟Json差不多， 没多少学习成本, 对于我的需要来说简直是完美搭配的。</p>
+<blockquote>
+<p>对于序列化的一些见解， 以及一些序列化的对比可见<a target="_blank" rel="noopener" href="https://tech.meituan.com/2015/02/26/serialization-vs-deserialization.html">序列化和反序列化</a></p>
+</blockquote>
+<blockquote>
+<p><code>maspcak</code>基准测试可以见：<a target="_blank" rel="noopener" href="https://github.com/alecthomas/go_serialization_benchmarks">https://github.com/alecthomas/go_serialization_benchmarks</a> 或者是：<a target="_blank" rel="noopener" href="https://github.com/endel/msgpack-benchmark">https://github.com/endel/msgpack-benchmark</a></p>
+</blockquote>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5.总结"></a>5.总结</h2><p>调研完了传输协议， 序列化协议， 以及定制好了自己的传输协议后， 就可以开始写一个最简单的RPC框架了, 但是展示所有代码会占用大量篇幅， 所以这里会以图展示一个简单的请求流程， 首先是连接的生命周期流程：<br><img  src="https://i.loli.net/2021/08/21/ZTOr8FhIecp7GEt.png"  ><span class="image-caption">image.png</span><br>然后是每个请求的流程（与一开始构想的流程很像）：<br><img  src="https://i.loli.net/2021/08/21/Ej3dvTzMVRycZ1t.png"  ><span class="image-caption">image.png</span></p>
+<p>从图里可以看出， 图里除了上面描述的东西外， 还多了一些钩子， 这是因为图里所示只是完成一个最基本的RPC框架， 它只满足了最简单的远程过程调用功能。 但是RPC涉及到了网络传输， 有了很多不确定的因素， 所以框架还需要一些服务治理的相关功能, 而这些功能大部分将通过钩子进行拓展， 后面将慢慢介绍这些服务治理的相关功能， 有些是单独出现， 有些是组合出现。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/11/22/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;11&#x2F;22&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;11&#x2F;22&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/" rel="tag">RPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/12/10/Celery%E8%B0%83%E7%94%A8%E4%B8%8D%E5%90%8C%E9%A1%B9%E7%9B%AE%E7%9A%84%E4%BB%BB%E5%8A%A1/"><i class="iconfont iconleft"></i>Celery调用不同项目的任务</a>
+    <a href="/2020/11/18/%E5%9F%BA%E4%BA%8EPython%E6%8E%A2%E9%92%88%E5%AE%8C%E6%88%90%E8%B0%83%E7%94%A8%E5%BA%93%E7%9A%84%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/">基于Python探针完成调用库的数据提取<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-RPC%E6%A1%86%E6%9E%B6%E9%9C%80%E8%A6%81%E4%BB%80%E4%B9%88"><span class="toc-text">1.RPC框架需要什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%A0%E8%BE%93%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="toc-text">2.传输层协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="toc-text">3.应用层协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="toc-text">4.序列化与反序列化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-RPC%E6%A1%86%E6%9E%B6%E9%9C%80%E8%A6%81%E4%BB%80%E4%B9%88"><span class="toc-text">1.RPC框架需要什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%A0%E8%BE%93%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="toc-text">2.传输层协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="toc-text">3.应用层协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="toc-text">4.序列化与反序列化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
