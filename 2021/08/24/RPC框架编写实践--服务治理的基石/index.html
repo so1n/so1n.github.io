@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>RPC框架编写实践--服务治理的基石 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记由于服务的调用是通过网络间来调用了， 服务并不在同...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">RPC框架编写实践--服务治理的基石</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://i.loli.net/2021/08/23/Yly1rP7Av6fDmC2.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">RPC框架编写实践--服务治理的基石</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 24, 2021</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>8549</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>由于服务的调用是通过网络间来调用了， 服务并不在同一个进程内， 程序可能崩溃、节点可能宕机、网络可能中断，这些意外情况其实全部都在意料之中, 微服务的一个思想就是， 所有假设会出错的东西一定会出现， 而且没办法完全避免， 只能通过一些功能去增加容错性， 稳定性和可用性， 这类功能被统称为服务治理， 大部分功能都会利用过去一段时间产生的数据来决策接下来的请求该怎么做， 而这些数据就是服务治理的基石。</p>
+        <blockquote>
+<p><a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写框架<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>的想法和总结。</p>
+</blockquote>
+<h2 id="1-指标数据"><a href="#1-指标数据" class="headerlink" title="1.指标数据"></a>1.指标数据</h2><p>在服务治理中的一些常见功能如限流、 负载均衡、 熔断器、监控统计等等都需要一些指标数据（Metric）, 有了这些数据， 大部分的服务治理功能才得以实践。</p>
+<p>指标数据在服务治理中的位置非常重要， 它是过去一段时间内收集再统计的数据, 不是实时数据。 不直接使用实时数据是有原因的， 比如每秒QPS之类统计好的数据， 如果每次使用时都统计一次， 不仅麻烦， 还浪费性能， 而且每秒QPS的关键点是每秒， 意味它的间隔要精确到秒， 实时数据的话间隔不可控的可能大于或者小于秒； 再比如监控的数据， 它是一个单位时间内的数据汇总，而不是实时数据, 因为实时的数据会带来较大的计算开销。 对于一个监控系统来说， 实时地收集数据会让机器的CPU没有停歇的时间， 同时硬盘会被写满大量的数据， 但是有很多数据都是没用到的， 所以最好的方法就是每隔一段时间写入该时间区间内的汇总数据， 而间隔时间的大小则取决于监控的精度和计算性能之间做取舍。 </p>
+<p>由指标数据的变化可以看出这些数据会经历汇聚， 固定两个阶段， 汇聚阶段只能写入/更新数据， 不可读， 固定数据只可读不可写入， 同时机器一切的资源都是有限的， 我们不会无限的存储汇总数据， 所以指标数据还会有销毁阶段， 这三个阶段每个阶段都有自己的特点：</p>
+<ul>
+<li>汇聚阶段（可写）： 当前的数据不可用， 会随着时间发生变化， 比如被重新设定一个新值， 或者被累加累减等</li>
+<li>固定阶段（可读）： 当前的数据仅可读而不可写入。</li>
+<li>销毁阶段（不可写不可读）： 当前的数据不可读不可写， 只能等待被清理。</li>
+</ul>
+<p>此外指标数据的状态是不可逆的， 而且会跟随着触发条件而发送变动， 当条件触发时， 固定阶段的状态会变为销毁阶段， 汇聚阶段的状态会变为固定阶段， 然后重新诞生一个新的汇聚阶段来收集数据。</p>
+<h2 id="2-通过滑动窗口实现一段时间内的数据收集统计"><a href="#2-通过滑动窗口实现一段时间内的数据收集统计" class="headerlink" title="2.通过滑动窗口实现一段时间内的数据收集统计"></a>2.通过滑动窗口实现一段时间内的数据收集统计</h2><p>假设把每个指标数据的状态当成一个槽， 这个槽可以存很多<code>Metric</code>， 而且会随着固定的时间定向变动， 那么这时它的原理就会跟滑动窗口一模一样， 如下图， 指针指到的槽为汇聚阶段， 指针-1的槽为固定阶段， 指针-2的槽为销毁阶段：<br><img  src="https://i.loli.net/2021/08/23/Yly1rP7Av6fDmC2.png"  ><span class="image-caption">image.png</span><br>从图中可以看到， 一开始指针指向的是<code>1600000020</code>这个窗口， 当下一个窗口时间时， 指针指向<code>1600000030</code>, 而<code>1600000000</code>的窗口已经消失了。</p>
+<p>同时从图中可以发现， 这个时间窗口只有3个， 而最后一个是待回收的， 没有别的操作， 对于带有GC的语言来说， 直接移除该对象的引用后就会被GC统一回收， 十分方便, 我们在实现的时候可以把固定阶段切换为销毁阶段的方法变为指定该槽的指针被移除， 随后槽就会被GC移除， 这时候需要操作的就只剩两个槽了， 而两个槽的实现就非常简单， 直接把指针进行替换即可， 以下是一个简单的实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 汇聚桶 </span><br>        self.temp_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>        <span class="hljs-comment"># 固定桶</span><br>        self.fixed_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.temp_dict[key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">return</span> self.fixed_dict.get(key)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">replace_dict</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 切换逻辑</span><br>        self.fixed_dict = self.temp_dict<br>        self.temp_dict = &#123;&#125;<br></code></pre></td></tr></table></figure>
+<p>里面有三个方法， <code>set</code>负责把数据存入到汇聚桶中， <code>get</code>负责从固定桶获取数据， 两个方法调用的是不同的桶， 而<code>replace_dict</code>的方法就是负责替换桶。 那么， 该怎么确保每个窗口时间到的时候进行切换呢， 由于我的RPC框架是基于<code>Asyncio</code>的， 所以会考虑用到<code>Asyncio</code>来进行调度，在<code>Asyncio</code>中有个<code>loop.call_at</code>的方法， 用于指定几时执行这个函数, 假设间隔时间为10秒， 可以把方法改为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 汇聚桶 </span><br>        self.temp_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>        <span class="hljs-comment"># 固定桶</span><br>        self.fixed_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>        self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.temp_dict[key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">return</span> self.fixed_dict.get(key)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">replace_dict</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 切换逻辑</span><br>        self.fixed_dict = self.temp_dict<br>        self.temp_dict = &#123;&#125;<br>        <span class="hljs-comment"># 表示10秒后调用replace_dict这个函数</span><br>        self.loop.call_at(self.loop.time() + <span class="hljs-number">10</span>, self.replace_dict)<br></code></pre></td></tr></table></figure>
+<p>之后只要事件循环一直在运行， <code>replace_dict</code>从第一次被调用后就会被一直运行， 而且是通过事件循环运行的， 还不会出现最大递归的问题。</p>
+<p>但是这里会暴露出两个问题， 一个是当窗口时间非常小时， 比如1秒， 这时候事件循环调度的误差会被扩大， 因为调度是非常复杂的， 它只能尽量的确定在那个时间点附近能调用到， 误差有多少会由很多的复杂因素共同决定的（对于线程调度等也是一样的原理）；另一个问题是当这个窗口时间被限定为1秒时， 如果要统计2秒的数据， 只能另开一个时间窗口为2秒的统计， 如果要统计3秒的数据， 就只能再开一个时间窗口为3的统计…以此类推， 会非常麻烦， 需要一种好的统一的方法来处理。</p>
+<blockquote>
+<p>启用一个线程在后台循环， 每隔n秒自动切换这个方案看似没问题， 但是线程也是由调用器来调度的， 当时间窗口再小一些时，也会暴露一些问题。同时我会在切换数据那里会调用一些钩子函数， 所以也会增加间隔的误差， 该方案不可采纳。</p>
+</blockquote>
+<h2 id="3-通过时间轮实现一段时间内的数据收集统计"><a href="#3-通过时间轮实现一段时间内的数据收集统计" class="headerlink" title="3.通过时间轮实现一段时间内的数据收集统计"></a>3.通过时间轮实现一段时间内的数据收集统计</h2><p>上面说到， 滑动窗口的方案会暴露出两个问题，导致使用体验上没那么好， 需要解决掉。</p>
+<p>首先是第一个问题： 交由调度在自动切换时会存在一些调用误差。 这个问题的核心是， 数据跟时间是强相关的， 所以一定会依赖于时间, 数据的读写必须要跟时间相关， 而上面时间窗口的方案使用的是被动切换的， 他会降低时间的准确性， 那被动方案不行就可以反过来， 使用主动切换。 </p>
+<p>主动切换的逻辑是根据操作时的时间来判断要操作哪个槽， 再读取数据或者写入数据（性能会稍微降低）, 这个方案需要把读写的逻辑改一下：</p>
+<ul>
+<li>1.首先存储的数组要把销毁阶段的槽复原，不然在极端的情况下写入和读取的下标可能会一致的， 这时候这个数组的长度为3， 然后记录一个开始时间。</li>
+<li>2.假设间隔为1秒， 每次读写数据时， 就会根据当前时间与起始时间的差除以1再与数组长度求出余数， 余数的范围在0， 1， 2之中，而这个0， 1， 2刚好是存数据的数组的下标范围， 随着时间的推移， 得到的下标会一直以0， 1， 2， 0， 1， 2一直循环变化着。</li>
+<li>3.基本逻辑都搞定了， 但是每次读取数据的时间是不固定的， 比如第一次写入数据时， 刚好命中下标0， 第二次写入数据时， 刚好命中下标2，如果刚好遇到读数据1, 这时候要识别这里1的数据并不是有效的， 同时0， 1， 2这样一直循环着， 1可能已经走到第二轮了， 2还是第一轮的数据， 所以这时候就需要有个变量来标记轮数， 而轮数也很简单， 就是当前时间与起始时间相差再于时间间隔取商。</li>
+</ul>
+<p>大概逻辑了解完了， 可以把上面的代码进行改写， 改写完代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Dict, List, Tuple<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 首先那个销毁的桶要复原, 不然在极端情况下会导致放置和获取的下标是一致的， 然后就像真正的滑动窗口一样变为一个数组 </span><br>        <span class="hljs-comment"># 元素中cnt代表这是第几轮的数据</span><br>        self.bucket_list: List[Tuple[<span class="hljs-built_in">dict</span>]] = [&#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125;, &#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125;, &#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125;]<br>        <span class="hljs-comment"># 总长度</span><br>        self.bucket_len: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">len</span>(self.bucket_list)<br>        <span class="hljs-comment"># 设置一个变量， 记录开始时间 </span><br>        self.start_timestamp: <span class="hljs-built_in">float</span> = time.time()<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_index</span>(<span class="hljs-params">self</span>) -&gt; Tuple[int, int]:</span><br>        <span class="hljs-comment"># *1000是兼容有些间隔是毫秒的</span><br>        <span class="hljs-comment"># 返回的数据中， 第一个为数组下标(也就是指针)， 第二个代表第几轮</span><br>        diff: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">int</span>((time.time() - self.start_timestamp) * <span class="hljs-number">1000</span>)<br>        <span class="hljs-keyword">return</span> diff % self.bucket_len, diff // self.bucket_len<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        index, cnt = self.get_index()<br>        bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index]<br>        <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>            <span class="hljs-comment"># 轮次不一样需要初始化</span><br>            bucket = &#123;key: value, <span class="hljs-string">&#x27;cnt&#x27;</span>: cnt&#125;<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 轮次一样更新数据</span><br>            bucket[key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        index, cnt = self.get_index()<br>        index = index - <span class="hljs-number">1</span><br>        <span class="hljs-comment"># 获取的数据要小于当前的指针</span><br>        <span class="hljs-keyword">if</span> index == -<span class="hljs-number">1</span>:<br>            index = self.bucket_len - <span class="hljs-number">1</span><br>        bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index]<br>        <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>            <span class="hljs-comment"># 轮次不一样, 代表数据不存在</span><br>            <span class="hljs-keyword">raise</span> KeyError(key)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 轮次一样更新数据</span><br>            <span class="hljs-keyword">return</span> bucket.get(key)<br></code></pre></td></tr></table></figure>
+<p>代码非常简单， 移除了<code>replace_dict</code>这个被动切换的逻辑， 改为每次<code>set</code>和<code>get</code>来计算应该落到哪个区间。 这样第一个问题就解决了， 可以来考虑第二个问题， 从问题一中的代码可以发现里面的<code>bucket_list</code>虽然是一个数组， 但通过时间和数组长度算出的商来获得下标会一直以0， 1， 2， 0， 1，2循环， 所以实际运行起来就像一个时间轮一直转着，新的轮次的数据会覆盖旧的轮次， 而这个时间轮的槽总量不变的， 如下图（draw.io画出来的有点点丑）:</p>
+<p><img  src="https://i.loli.net/2021/08/24/gyLDAPQCzHk21NM.png"  ><span class="image-caption">uTools_1629791108206.png</span></p>
+<p>而时间轮也是刚好可以解决问题二的一个方案， 首先假设我们的时间间隔为60秒， 如果要兼容1秒， 2秒，3秒，4秒，5秒等多种的时间间隔统计， 那么就可以取他们的最小公因数1作为一个子间隔， 它需要60个槽位, 我们可以把时间轮当成一个整体， 然后把这个时间轮切为60个等份的槽， 再通过时间来算出指针要指向哪个槽位（指针会跟着操作时间与时间轮总槽数取的余数来变化）， 写数据时会写入指针指定的槽位， 这个槽位也就是汇聚数据槽， 而指针逆时针方向后面的槽位根据是否有数据来区分固定槽和空槽（初始化时， 所有槽位都是空槽， 第一次写了数据后就只能成为固定槽或者汇聚槽）， 取数据只能取当前指针后面的， 且是本轮的数据且不为空槽的数据 。 </p>
+<p>然后1秒间隔的统计只取指针后面一格的槽数据， 2秒间隔的统计只取指针后面两格的槽数据求和， 3秒间隔的统计只取指针间隔后面三格的槽数据求和， 以次类推， 这样就能以一个类来兼容多种时间间隔的统计了。不过这个方案有个缺点， 就是上述的时间轮有60个槽位， 一个槽被定义会数据汇聚槽， 那剩下的最多只有59个固定槽可以获取数据， 还缺少一个槽位， 这时候就需要进行补槽处理， 比如60个槽就可以拓展为65个槽， 然后限制只能获取最近的60个槽即可， 剩下的5个槽可以用来当做缓冲位， 重新更改后的代码如下：</p>
+<blockquote>
+<p>这个方案是兼容小范围的数据， 使用1分钟的时间间隔来兼容秒级的时钟间隔， 如果要兼容大范围的时间间隔， 比如5分钟， 10分钟，15分钟等等， 则可以采用指针式时钟一样的方案。 如果你了解<code>Kafka</code>的时间轮设计， 就可以知道<code>Kafka</code>有多层时间轮， 小层转动一层， 大层就转动一格（就像秒指针跑完一圈， 分指针就动一格一样）， 等到大层的数据的到期时间范围小于等于小层时， 数据就会流向小层。不过服务治理的数据还是需要尽量的有效， 所以它的时间跨度一般不会超过一分钟。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Dict, List, Tuple<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, max_interval: <span class="hljs-built_in">int</span> = <span class="hljs-number">60</span>, min_interval: <span class="hljs-built_in">int</span> = <span class="hljs-number">1</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.max_interval = max_interval<br>        <span class="hljs-comment"># 算出有多少个槽</span><br>        self.bucket_len: <span class="hljs-built_in">int</span> = (max_interval // min_interval) + <span class="hljs-number">5</span><br>        <span class="hljs-comment"># 设置槽，元素中第一位代表这是第几轮的数据， 方便覆盖</span><br>        self.bucket_list: List[<span class="hljs-built_in">dict</span>] = [&#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125; <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(self.bucket_len)]<br>        <span class="hljs-comment"># 设置一个变量， 记录开始时间 </span><br>        self.start_timestamp: <span class="hljs-built_in">float</span> = time.time()<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_index</span>(<span class="hljs-params">self</span>) -&gt; Tuple[int, int]:</span><br>        <span class="hljs-comment"># *1000是兼容有些间隔是毫秒的</span><br>        <span class="hljs-comment"># 返回的数据中， 第一个为数组下标(也就是指针)， 第二个代表第几轮</span><br>        diff: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">int</span>((time.time() - self.start_timestamp) * <span class="hljs-number">1000</span>)<br>        <span class="hljs-keyword">return</span> diff % self.bucket_len, diff // self.bucket_len<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        index, cnt = self.get_index()<br>        bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index]<br>        <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>            <span class="hljs-comment"># 轮次不一样需要初始化</span><br>            bucket = &#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: cnt, key: value&#125;<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 轮次一样更新数据</span><br>            bucket[<span class="hljs-number">1</span>][key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any, diff: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 新增diff参数， 用于指定要获取从指针后到第几个槽的数据</span><br>        <span class="hljs-keyword">if</span> diff &gt; max_interval:<br>            <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&quot;diff:<span class="hljs-subst">&#123;diff&#125;</span> &gt; <span class="hljs-subst">&#123;max_interval&#125;</span>&quot;</span>)<br>        index, cnt = self.get_index()<br>        value: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span><br><br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(diff):<br>            bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index - i]<br>            <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>                <span class="hljs-keyword">break</span><br>            value += bucket.get(key, <span class="hljs-number">0</span>)<br>        <span class="hljs-keyword">return</span> value<br></code></pre></td></tr></table></figure>
+<p>上面的代码是一个简单的实现， 为了做到可用， 还需要增加一些逻辑, 以及优化读写的一些性能， 同时还可以根据自己的需求增加一些功能， 比如我在实现时就增加了一些功能：</p>
+<ul>
+<li>在指标数据中， 会区分<code>Gauge</code>和<code>Count</code>两种， 一种是稳定实时变化的， 对应的只获取最新的固定数据槽的数据即可， 一种是累加的， 要把这段时间的所有槽位数据都累加起来， 为了能做到区分， 需要为每种数据都加上类型标识。</li>
+<li><code>get</code>的方式比较繁琐， 如果能缓存起来会好一些， 减少读取时的性能损耗。或者有些数据需要被动的等待推送， 这时候还是可以调用上面的callback模式， 比如每5秒调用一次， 虽然5秒执行一次数据， 但是由于时间轮的存在， 这时候还是可以获取最近一轮的数据的。</li>
+</ul>
+<p>最后实现起来的代码会比较长， 可以访问我在<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>框架中实现的代码<a target="_blank" rel="noopener" href="https://github.com/so1n/rap/blob/master/rap/common/collect_statistics.py">collect_statistics.py</a></p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/08/24/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86%E7%9A%84%E5%9F%BA%E7%9F%B3/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;08&#x2F;24&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86%E7%9A%84%E5%9F%BA%E7%9F%B3&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;08&#x2F;24&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86%E7%9A%84%E5%9F%BA%E7%9F%B3&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/" rel="tag">RPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2021/08/10/%E4%BF%9D%E9%9A%9CPython%E9%A1%B9%E7%9B%AE%E8%B4%A8%E9%87%8F%E7%9A%84%E5%B7%A5%E5%85%B7/">保障Python项目质量的工具<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%8C%87%E6%A0%87%E6%95%B0%E6%8D%AE"><span class="toc-text">1.指标数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%80%9A%E8%BF%87%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E5%AE%9E%E7%8E%B0%E4%B8%80%E6%AE%B5%E6%97%B6%E9%97%B4%E5%86%85%E7%9A%84%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86%E7%BB%9F%E8%AE%A1"><span class="toc-text">2.通过滑动窗口实现一段时间内的数据收集统计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%80%9A%E8%BF%87%E6%97%B6%E9%97%B4%E8%BD%AE%E5%AE%9E%E7%8E%B0%E4%B8%80%E6%AE%B5%E6%97%B6%E9%97%B4%E5%86%85%E7%9A%84%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86%E7%BB%9F%E8%AE%A1"><span class="toc-text">3.通过时间轮实现一段时间内的数据收集统计</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%8C%87%E6%A0%87%E6%95%B0%E6%8D%AE"><span class="toc-text">1.指标数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%80%9A%E8%BF%87%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E5%AE%9E%E7%8E%B0%E4%B8%80%E6%AE%B5%E6%97%B6%E9%97%B4%E5%86%85%E7%9A%84%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86%E7%BB%9F%E8%AE%A1"><span class="toc-text">2.通过滑动窗口实现一段时间内的数据收集统计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%80%9A%E8%BF%87%E6%97%B6%E9%97%B4%E8%BD%AE%E5%AE%9E%E7%8E%B0%E4%B8%80%E6%AE%B5%E6%97%B6%E9%97%B4%E5%86%85%E7%9A%84%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86%E7%BB%9F%E8%AE%A1"><span class="toc-text">3.通过时间轮实现一段时间内的数据收集统计</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

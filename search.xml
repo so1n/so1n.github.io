@@ -17,6 +17,66 @@
       </tags>
   </entry>
   <entry>
+    <title>RPC框架编写实践--服务治理的基石</title>
+    <url>/2021/08/24/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86%E7%9A%84%E5%9F%BA%E7%9F%B3/</url>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>由于服务的调用是通过网络间来调用了， 服务并不在同一个进程内， 程序可能崩溃、节点可能宕机、网络可能中断，这些意外情况其实全部都在意料之中, 微服务的一个思想就是， 所有假设会出错的东西一定会出现， 而且没办法完全避免， 只能通过一些功能去增加容错性， 稳定性和可用性， 这类功能被统称为服务治理， 大部分功能都会利用过去一段时间产生的数据来决策接下来的请求该怎么做， 而这些数据就是服务治理的基石。</p>
+<a id="more"></a>
+<blockquote>
+<p><a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写框架<a href="https://github.com/so1n/rap">rap</a>的想法和总结。</p>
+</blockquote>
+<h2 id="1-指标数据"><a href="#1-指标数据" class="headerlink" title="1.指标数据"></a>1.指标数据</h2><p>在服务治理中的一些常见功能如限流、 负载均衡、 熔断器、监控统计等等都需要一些指标数据（Metric）, 有了这些数据， 大部分的服务治理功能才得以实践。</p>
+<p>指标数据在服务治理中的位置非常重要， 它是过去一段时间内收集再统计的数据, 不是实时数据。 不直接使用实时数据是有原因的， 比如每秒QPS之类统计好的数据， 如果每次使用时都统计一次， 不仅麻烦， 还浪费性能， 而且每秒QPS的关键点是每秒， 意味它的间隔要精确到秒， 实时数据的话间隔不可控的可能大于或者小于秒； 再比如监控的数据， 它是一个单位时间内的数据汇总，而不是实时数据, 因为实时的数据会带来较大的计算开销。 对于一个监控系统来说， 实时地收集数据会让机器的CPU没有停歇的时间， 同时硬盘会被写满大量的数据， 但是有很多数据都是没用到的， 所以最好的方法就是每隔一段时间写入该时间区间内的汇总数据， 而间隔时间的大小则取决于监控的精度和计算性能之间做取舍。 </p>
+<p>由指标数据的变化可以看出这些数据会经历汇聚， 固定两个阶段， 汇聚阶段只能写入/更新数据， 不可读， 固定数据只可读不可写入， 同时机器一切的资源都是有限的， 我们不会无限的存储汇总数据， 所以指标数据还会有销毁阶段， 这三个阶段每个阶段都有自己的特点：</p>
+<ul>
+<li>汇聚阶段（可写）： 当前的数据不可用， 会随着时间发生变化， 比如被重新设定一个新值， 或者被累加累减等</li>
+<li>固定阶段（可读）： 当前的数据仅可读而不可写入。</li>
+<li>销毁阶段（不可写不可读）： 当前的数据不可读不可写， 只能等待被清理。</li>
+</ul>
+<p>此外指标数据的状态是不可逆的， 而且会跟随着触发条件而发送变动， 当条件触发时， 固定阶段的状态会变为销毁阶段， 汇聚阶段的状态会变为固定阶段， 然后重新诞生一个新的汇聚阶段来收集数据。</p>
+<h2 id="2-通过滑动窗口实现一段时间内的数据收集统计"><a href="#2-通过滑动窗口实现一段时间内的数据收集统计" class="headerlink" title="2.通过滑动窗口实现一段时间内的数据收集统计"></a>2.通过滑动窗口实现一段时间内的数据收集统计</h2><p>假设把每个指标数据的状态当成一个槽， 这个槽可以存很多<code>Metric</code>， 而且会随着固定的时间定向变动， 那么这时它的原理就会跟滑动窗口一模一样， 如下图， 指针指到的槽为汇聚阶段， 指针-1的槽为固定阶段， 指针-2的槽为销毁阶段：<br><img    class="lazyload" data-original="https://i.loli.net/2021/08/23/Yly1rP7Av6fDmC2.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">image.png</span><br>从图中可以看到， 一开始指针指向的是<code>1600000020</code>这个窗口， 当下一个窗口时间时， 指针指向<code>1600000030</code>, 而<code>1600000000</code>的窗口已经消失了。</p>
+<p>同时从图中可以发现， 这个时间窗口只有3个， 而最后一个是待回收的， 没有别的操作， 对于带有GC的语言来说， 直接移除该对象的引用后就会被GC统一回收， 十分方便, 我们在实现的时候可以把固定阶段切换为销毁阶段的方法变为指定该槽的指针被移除， 随后槽就会被GC移除， 这时候需要操作的就只剩两个槽了， 而两个槽的实现就非常简单， 直接把指针进行替换即可， 以下是一个简单的实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 汇聚桶 </span><br>        self.temp_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>        <span class="hljs-comment"># 固定桶</span><br>        self.fixed_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.temp_dict[key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">return</span> self.fixed_dict.get(key)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">replace_dict</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 切换逻辑</span><br>        self.fixed_dict = self.temp_dict<br>        self.temp_dict = &#123;&#125;<br></code></pre></td></tr></table></figure>
+<p>里面有三个方法， <code>set</code>负责把数据存入到汇聚桶中， <code>get</code>负责从固定桶获取数据， 两个方法调用的是不同的桶， 而<code>replace_dict</code>的方法就是负责替换桶。 那么， 该怎么确保每个窗口时间到的时候进行切换呢， 由于我的RPC框架是基于<code>Asyncio</code>的， 所以会考虑用到<code>Asyncio</code>来进行调度，在<code>Asyncio</code>中有个<code>loop.call_at</code>的方法， 用于指定几时执行这个函数, 假设间隔时间为10秒， 可以把方法改为：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 汇聚桶 </span><br>        self.temp_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>        <span class="hljs-comment"># 固定桶</span><br>        self.fixed_dict: <span class="hljs-built_in">dict</span> = &#123;&#125;<br>        self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.temp_dict[key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">return</span> self.fixed_dict.get(key)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">replace_dict</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 切换逻辑</span><br>        self.fixed_dict = self.temp_dict<br>        self.temp_dict = &#123;&#125;<br>        <span class="hljs-comment"># 表示10秒后调用replace_dict这个函数</span><br>        self.loop.call_at(self.loop.time() + <span class="hljs-number">10</span>, self.replace_dict)<br></code></pre></td></tr></table></figure>
+<p>之后只要事件循环一直在运行， <code>replace_dict</code>从第一次被调用后就会被一直运行， 而且是通过事件循环运行的， 还不会出现最大递归的问题。</p>
+<p>但是这里会暴露出两个问题， 一个是当窗口时间非常小时， 比如1秒， 这时候事件循环调度的误差会被扩大， 因为调度是非常复杂的， 它只能尽量的确定在那个时间点附近能调用到， 误差有多少会由很多的复杂因素共同决定的（对于线程调度等也是一样的原理）；另一个问题是当这个窗口时间被限定为1秒时， 如果要统计2秒的数据， 只能另开一个时间窗口为2秒的统计， 如果要统计3秒的数据， 就只能再开一个时间窗口为3的统计…以此类推， 会非常麻烦， 需要一种好的统一的方法来处理。</p>
+<blockquote>
+<p>启用一个线程在后台循环， 每隔n秒自动切换这个方案看似没问题， 但是线程也是由调用器来调度的， 当时间窗口再小一些时，也会暴露一些问题。同时我会在切换数据那里会调用一些钩子函数， 所以也会增加间隔的误差， 该方案不可采纳。</p>
+</blockquote>
+<h2 id="3-通过时间轮实现一段时间内的数据收集统计"><a href="#3-通过时间轮实现一段时间内的数据收集统计" class="headerlink" title="3.通过时间轮实现一段时间内的数据收集统计"></a>3.通过时间轮实现一段时间内的数据收集统计</h2><p>上面说到， 滑动窗口的方案会暴露出两个问题，导致使用体验上没那么好， 需要解决掉。</p>
+<p>首先是第一个问题： 交由调度在自动切换时会存在一些调用误差。 这个问题的核心是， 数据跟时间是强相关的， 所以一定会依赖于时间, 数据的读写必须要跟时间相关， 而上面时间窗口的方案使用的是被动切换的， 他会降低时间的准确性， 那被动方案不行就可以反过来， 使用主动切换。 </p>
+<p>主动切换的逻辑是根据操作时的时间来判断要操作哪个槽， 再读取数据或者写入数据（性能会稍微降低）, 这个方案需要把读写的逻辑改一下：</p>
+<ul>
+<li>1.首先存储的数组要把销毁阶段的槽复原，不然在极端的情况下写入和读取的下标可能会一致的， 这时候这个数组的长度为3， 然后记录一个开始时间。</li>
+<li>2.假设间隔为1秒， 每次读写数据时， 就会根据当前时间与起始时间的差除以1再与数组长度求出余数， 余数的范围在0， 1， 2之中，而这个0， 1， 2刚好是存数据的数组的下标范围， 随着时间的推移， 得到的下标会一直以0， 1， 2， 0， 1， 2一直循环变化着。</li>
+<li>3.基本逻辑都搞定了， 但是每次读取数据的时间是不固定的， 比如第一次写入数据时， 刚好命中下标0， 第二次写入数据时， 刚好命中下标2，如果刚好遇到读数据1, 这时候要识别这里1的数据并不是有效的， 同时0， 1， 2这样一直循环着， 1可能已经走到第二轮了， 2还是第一轮的数据， 所以这时候就需要有个变量来标记轮数， 而轮数也很简单， 就是当前时间与起始时间相差再于时间间隔取商。</li>
+</ul>
+<p>大概逻辑了解完了， 可以把上面的代码进行改写， 改写完代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Dict, List, Tuple<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 首先那个销毁的桶要复原, 不然在极端情况下会导致放置和获取的下标是一致的， 然后就像真正的滑动窗口一样变为一个数组 </span><br>        <span class="hljs-comment"># 元素中cnt代表这是第几轮的数据</span><br>        self.bucket_list: List[Tuple[<span class="hljs-built_in">dict</span>]] = [&#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125;, &#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125;, &#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125;]<br>        <span class="hljs-comment"># 总长度</span><br>        self.bucket_len: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">len</span>(self.bucket_list)<br>        <span class="hljs-comment"># 设置一个变量， 记录开始时间 </span><br>        self.start_timestamp: <span class="hljs-built_in">float</span> = time.time()<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_index</span>(<span class="hljs-params">self</span>) -&gt; Tuple[int, int]:</span><br>        <span class="hljs-comment"># *1000是兼容有些间隔是毫秒的</span><br>        <span class="hljs-comment"># 返回的数据中， 第一个为数组下标(也就是指针)， 第二个代表第几轮</span><br>        diff: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">int</span>((time.time() - self.start_timestamp) * <span class="hljs-number">1000</span>)<br>        <span class="hljs-keyword">return</span> diff % self.bucket_len, diff // self.bucket_len<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        index, cnt = self.get_index()<br>        bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index]<br>        <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>            <span class="hljs-comment"># 轮次不一样需要初始化</span><br>            bucket = &#123;key: value, <span class="hljs-string">&#x27;cnt&#x27;</span>: cnt&#125;<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 轮次一样更新数据</span><br>            bucket[key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        index, cnt = self.get_index()<br>        index = index - <span class="hljs-number">1</span><br>        <span class="hljs-comment"># 获取的数据要小于当前的指针</span><br>        <span class="hljs-keyword">if</span> index == -<span class="hljs-number">1</span>:<br>            index = self.bucket_len - <span class="hljs-number">1</span><br>        bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index]<br>        <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>            <span class="hljs-comment"># 轮次不一样, 代表数据不存在</span><br>            <span class="hljs-keyword">raise</span> KeyError(key)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 轮次一样更新数据</span><br>            <span class="hljs-keyword">return</span> bucket.get(key)<br></code></pre></td></tr></table></figure>
+<p>代码非常简单， 移除了<code>replace_dict</code>这个被动切换的逻辑， 改为每次<code>set</code>和<code>get</code>来计算应该落到哪个区间。 这样第一个问题就解决了， 可以来考虑第二个问题， 从问题一中的代码可以发现里面的<code>bucket_list</code>虽然是一个数组， 但通过时间和数组长度算出的商来获得下标会一直以0， 1， 2， 0， 1，2循环， 所以实际运行起来就像一个时间轮一直转着，新的轮次的数据会覆盖旧的轮次， 而这个时间轮的槽总量不变的， 如下图（draw.io画出来的有点点丑）:</p>
+<p><img    class="lazyload" data-original="https://i.loli.net/2021/08/24/gyLDAPQCzHk21NM.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">uTools_1629791108206.png</span></p>
+<p>而时间轮也是刚好可以解决问题二的一个方案， 首先假设我们的时间间隔为60秒， 如果要兼容1秒， 2秒，3秒，4秒，5秒等多种的时间间隔统计， 那么就可以取他们的最小公因数1作为一个子间隔， 它需要60个槽位, 我们可以把时间轮当成一个整体， 然后把这个时间轮切为60个等份的槽， 再通过时间来算出指针要指向哪个槽位（指针会跟着操作时间与时间轮总槽数取的余数来变化）， 写数据时会写入指针指定的槽位， 这个槽位也就是汇聚数据槽， 而指针逆时针方向后面的槽位根据是否有数据来区分固定槽和空槽（初始化时， 所有槽位都是空槽， 第一次写了数据后就只能成为固定槽或者汇聚槽）， 取数据只能取当前指针后面的， 且是本轮的数据且不为空槽的数据 。 </p>
+<p>然后1秒间隔的统计只取指针后面一格的槽数据， 2秒间隔的统计只取指针后面两格的槽数据求和， 3秒间隔的统计只取指针间隔后面三格的槽数据求和， 以次类推， 这样就能以一个类来兼容多种时间间隔的统计了。不过这个方案有个缺点， 就是上述的时间轮有60个槽位， 一个槽被定义会数据汇聚槽， 那剩下的最多只有59个固定槽可以获取数据， 还缺少一个槽位， 这时候就需要进行补槽处理， 比如60个槽就可以拓展为65个槽， 然后限制只能获取最近的60个槽即可， 剩下的5个槽可以用来当做缓冲位， 重新更改后的代码如下：</p>
+<blockquote>
+<p>这个方案是兼容小范围的数据， 使用1分钟的时间间隔来兼容秒级的时钟间隔， 如果要兼容大范围的时间间隔， 比如5分钟， 10分钟，15分钟等等， 则可以采用指针式时钟一样的方案。 如果你了解<code>Kafka</code>的时间轮设计， 就可以知道<code>Kafka</code>有多层时间轮， 小层转动一层， 大层就转动一格（就像秒指针跑完一圈， 分指针就动一格一样）， 等到大层的数据的到期时间范围小于等于小层时， 数据就会流向小层。不过服务治理的数据还是需要尽量的有效， 所以它的时间跨度一般不会超过一分钟。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Dict, List, Tuple<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, max_interval: <span class="hljs-built_in">int</span> = <span class="hljs-number">60</span>, min_interval: <span class="hljs-built_in">int</span> = <span class="hljs-number">1</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.max_interval = max_interval<br>        <span class="hljs-comment"># 算出有多少个槽</span><br>        self.bucket_len: <span class="hljs-built_in">int</span> = (max_interval // min_interval) + <span class="hljs-number">5</span><br>        <span class="hljs-comment"># 设置槽，元素中第一位代表这是第几轮的数据， 方便覆盖</span><br>        self.bucket_list: List[<span class="hljs-built_in">dict</span>] = [&#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: <span class="hljs-number">0</span>&#125; <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(self.bucket_len)]<br>        <span class="hljs-comment"># 设置一个变量， 记录开始时间 </span><br>        self.start_timestamp: <span class="hljs-built_in">float</span> = time.time()<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_index</span>(<span class="hljs-params">self</span>) -&gt; Tuple[int, int]:</span><br>        <span class="hljs-comment"># *1000是兼容有些间隔是毫秒的</span><br>        <span class="hljs-comment"># 返回的数据中， 第一个为数组下标(也就是指针)， 第二个代表第几轮</span><br>        diff: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">int</span>((time.time() - self.start_timestamp) * <span class="hljs-number">1000</span>)<br>        <span class="hljs-keyword">return</span> diff % self.bucket_len, diff // self.bucket_len<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set</span>(<span class="hljs-params">self, key: Any, value: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        index, cnt = self.get_index()<br>        bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index]<br>        <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>            <span class="hljs-comment"># 轮次不一样需要初始化</span><br>            bucket = &#123;<span class="hljs-string">&#x27;cnt&#x27;</span>: cnt, key: value&#125;<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 轮次一样更新数据</span><br>            bucket[<span class="hljs-number">1</span>][key] = value<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">self, key: Any, diff: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 新增diff参数， 用于指定要获取从指针后到第几个槽的数据</span><br>        <span class="hljs-keyword">if</span> diff &gt; max_interval:<br>            <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&quot;diff:<span class="hljs-subst">&#123;diff&#125;</span> &gt; <span class="hljs-subst">&#123;max_interval&#125;</span>&quot;</span>)<br>        index, cnt = self.get_index()<br>        value: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span><br><br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(diff):<br>            bucket: <span class="hljs-built_in">dict</span> = self.bucket_list[index - i]<br>            <span class="hljs-keyword">if</span> bucket[<span class="hljs-string">&#x27;cnt&#x27;</span>] != cnt:<br>                <span class="hljs-keyword">break</span><br>            value += bucket.get(key, <span class="hljs-number">0</span>)<br>        <span class="hljs-keyword">return</span> value<br></code></pre></td></tr></table></figure>
+<p>上面的代码是一个简单的实现， 为了做到可用， 还需要增加一些逻辑, 以及优化读写的一些性能， 同时还可以根据自己的需求增加一些功能， 比如我在实现时就增加了一些功能：</p>
+<ul>
+<li>在指标数据中， 会区分<code>Gauge</code>和<code>Count</code>两种， 一种是稳定实时变化的， 对应的只获取最新的固定数据槽的数据即可， 一种是累加的， 要把这段时间的所有槽位数据都累加起来， 为了能做到区分， 需要为每种数据都加上类型标识。</li>
+<li><code>get</code>的方式比较繁琐， 如果能缓存起来会好一些， 减少读取时的性能损耗。或者有些数据需要被动的等待推送， 这时候还是可以调用上面的callback模式， 比如每5秒调用一次， 虽然5秒执行一次数据， 但是由于时间轮的存在， 这时候还是可以获取最近一轮的数据的。</li>
+</ul>
+<p>最后实现起来的代码会比较长， 可以访问我在<a href="https://github.com/so1n/rap">rap</a>框架中实现的代码<a href="https://github.com/so1n/rap/blob/master/rap/common/collect_statistics.py">collect_statistics.py</a></p>
+]]></content>
+      <categories>
+        <category>RPC框架编写实践</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>RPC</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>保障Python项目质量的工具</title>
     <url>/2021/08/10/%E4%BF%9D%E9%9A%9CPython%E9%A1%B9%E7%9B%AE%E8%B4%A8%E9%87%8F%E7%9A%84%E5%B7%A5%E5%85%B7/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在编写项目时，都会对代码质量有一定的追求， 比如代码艺术， 设计模式， 重构设计等等。 但是一个良好Python项目除了程序员本身的代码质量能力之外， 还有系统设计和代码质量工具等等。不过由于每个系统的设计都会有一些不同， 系统设计需要程序员一定的经验， 需要跟着项目去一起成长。 而代码质量工具是可以都抽离出来，应用到每个项目中， 本文则是我这些代码质量工具的简要使用总结。</p>
@@ -402,7 +462,9 @@
     <url>/2020/11/22/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在2019上半年时， 项目需要用到<code>RPC</code>来为不同服务间建立连接, 便开始调研<code>RPC</code>相关的内容， 由于项目本身是基于<code>Asyncio</code>生态的， 所以就开始找基于<code>asyncio</code>生态的<code>RPC</code>框架， 那时候<code>Python</code>上关于<code>Asyncio</code>的<code>RPC</code>框架比较少, 只有一个<a href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 它能满足<code>RPC</code>的基本功能, 但缺少了其他的<code>RPC</code>框架带有的服务治理功能(称为服务管理会不会更好点???), 所以在那时候开始， 我就想开始造一个<code>Python Asyncio</code>生态的<code>RPC</code>框架–<a href="https://github.com/so1n/rap">rap</a>, 这个项目除了满足在任一语言的<code>RPC</code>的功能外(虽然其他语言的没编写…), 还要满足快;核心功能简单;可以单独为python提供高阶功能; 在没其他服务依赖的情况下就能单独使用, 同时又可以通过插件的形式进行功能拓展。<br>而<a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写这个框架时的想法和总结。</p>
 <a id="more"></a>
+<blockquote>
 <p>注：由于用到了<code>Asyncio</code>所以他有一些<a href="https://python-gino.org/docs/zh/1.1b2/explanation/async.html#pros-and-cons">利弊</a></p>
+</blockquote>
 <h2 id="1-RPC框架需要什么"><a href="#1-RPC框架需要什么" class="headerlink" title="1.RPC框架需要什么"></a>1.RPC框架需要什么</h2><p>毫无疑问， RPC框架最重要的部分就是RPC, RPC的全称为远程过程调用, 它的本质是客户端把用户的本地调用转化成一个消息， 通过一个连接发送到服务端, 而服务端根据收到的消息进行解析, 并根据消息调用函数再计算结果， 最后把结果返回给客户端， 并由客户端返回给用户的过程。</p>
 <p>而RPC框架则是上述调用过程的封装， 使得调用者可以通过RPC框架像调用本地函数一样调用远程的函数， 从而无须关注底层细节。<br>那这个调用过程需要什么呢？ 我先设想了一个最简单的业务–用户调用一个<code>foo</code>函数:</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">foo</span>(<span class="hljs-params">a: <span class="hljs-built_in">int</span>, b: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
@@ -3977,6 +4039,21 @@
       </tags>
   </entry>
   <entry>
+    <title>vim手册查阅</title>
+    <url>/2018/02/16/29/</url>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>之前照抄了一个关于vim命令的<a href="http://so1n.me/2017/08/17/11-vim/">文章</a>，其实就是vim的简单命令使用，但也是符合vim手册查阅哈哈哈。</p>
+<h2 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h2><p>vim 快捷键很多，不常用的话一下子就忘记了，但是经常用的话，效率挺高的。</p>
+<p><a href="https://www.runoob.com/w3cnote/all-vim-cheatsheat.html">vim快捷键查询</a></p>
+<p><img    class="lazyload" data-original="/tmp/1550501639103.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">vim快捷键简体中文版</span></p>
+]]></content>
+      <categories>
+        <category>计划</category>
+      </categories>
+      <tags>
+        <tag>计划</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>2018plan</title>
     <url>/2018/02/16/28_2018plan/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>mv 2017plan.md 2018plan.md</p>
@@ -3987,21 +4064,6 @@
 <h2 id="读书"><a href="#读书" class="headerlink" title="读书"></a>读书</h2><p>去年电脑里放太多书了，今年争取能读完库存的一半（剩下的留给明年= =），还有一些邮件列表，也要跟这读<br>还有每周留点时间练练字，太久没写字，字都不能见人了。。。。<br>（有kindle是最吼的）</p>
 <h2 id="随心"><a href="#随心" class="headerlink" title="随心"></a>随心</h2><p>毕业前，找个时间去重庆独自游玩！</p>
 <h2 id="main"><a href="#main" class="headerlink" title="main"></a>main</h2><p>继续跟着大佬了解后端，踏进门后发现后端还是有许多东西还没接触到</p>
-]]></content>
-      <categories>
-        <category>计划</category>
-      </categories>
-      <tags>
-        <tag>计划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vim手册查阅</title>
-    <url>/2018/02/16/29/</url>
-    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>之前照抄了一个关于vim命令的<a href="http://so1n.me/2017/08/17/11-vim/">文章</a>，其实就是vim的简单命令使用，但也是符合vim手册查阅哈哈哈。</p>
-<h2 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h2><p>vim 快捷键很多，不常用的话一下子就忘记了，但是经常用的话，效率挺高的。</p>
-<p><a href="https://www.runoob.com/w3cnote/all-vim-cheatsheat.html">vim快捷键查询</a></p>
-<p><img    class="lazyload" data-original="/tmp/1550501639103.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">vim快捷键简体中文版</span></p>
 ]]></content>
       <categories>
         <category>计划</category>
@@ -4452,6 +4514,95 @@
         <tag>web</tag>
         <tag>RESTful</tag>
         <tag>flask</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>WEB</title>
+    <url>/2017/12/13/20_web/</url>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>【暂时废弃】<br>更新时间：2017-12-13 14:46:00</p>
+<p>WEB有很多东西，有些框架/库的功能也是交叉着，所以有点混乱。今天闲的无聊，百度后觉得别人说的还是不明白，就把之前保存的文档全看了一遍。了解一下，应该有很多认知错误的，以后深入了解后再改正。<br>所以这里就是类似与 <a href="http://so1n.me/2017/10/19/15/#more">前端小功能收集</a>,<a href="http://so1n.me/2017/08/23/14-redis/">Redis命令</a>一样，内容简单，纯粹记录下我刚接触时的感想，顺便把以前的东西也写进来了。回头可以看一看，回顾下，还有就是以后找资料容易点。。。。。。</p>
+<a id="more"></a>
+<p>主要是在今天看了vue,Angular(js框架)，RESTful，tornado，wsgi文档后，才能把他们正式区分开的。<br>文字不好，使用度不频繁，所以写的不太好，以后更熟悉时再改，相比之前不知道为什么需要使用vue，也不知道服务器、容器和应用的关系好多了。。。。。。。</p>
+<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p>之前我在找前端的资料时，就看到很多人在说前端更新很快，一不学习就要落后了，尤其是一个知乎的回复</p>
+<blockquote>
+<p>感谢前端，让我找回了大学学习的时光</p>
+</blockquote>
+<p><a href="https://www.awesomes.cn/">前端框架合集的网站</a></p>
+<p>css框架：bootstrap,uikit(我喜欢这个)等<br>可以不用自己写css就可以做出一个美化的网站，之前第一次接触时，就觉得写个页面美化居然那么简单。。。</p>
+<p>js框架：<a href="https://cn.vuejs.org/v2/guide/">vue.js</a>，<a href="https://doc.react-china.org/">React</a>，<a href="http://www.angularjs.net.cn/tutorial/">AngularJS</a>等<br>可以简化前端开发，提高生产力的东西，更让网页像个app一样，让后端只负责数据的传输、账户等校验和业务逻辑（要是之前看到就可以不用在模板上纠结那么久了，用vue代码几行就可以搞定[捂脸]）。<br>一开始以为就是个类似与jinja2的东西。，在看了同学发了个用前端实现路由（<a href="https://router.vuejs.org/zh-cn/">vue路由</a>）的朋友圈后，我就决定去看文档了(看的是vue)，发现真的是可以提高生产力，我这个js菜鸟可以边看文档边理解(AngularJS理解略难点？)，就可以写出很多之前觉得很难写出来的东西了(重点是，代码量也少）。也知道看我之前想实现的功能——spa，可以通过这些框架来实行。</p>
+<p>模块化开发:目前没有用到，待补充</p>
+<h2 id="中间"><a href="#中间" class="headerlink" title="中间"></a>中间</h2><p>那些tcp/ip协议啊,RFC(/d+)什么的虽然刚考完ccna还记得很清楚。。。但是感觉并不属于这个部分的</p>
+<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html">RESTful</a><br>RESTful,实际上只是一种设计风格，他是一种面向<em>资源</em>的设计<br>当前后端就只有服务器一个，前端的却后手机、平板、电脑等等，通过运用RESTful设计的url，可以让不同的前端一起使用共同的url，而且有充分利用了http的内容(一开始我都是post,get的,现在回头看觉得url设计的不是很好)</p>
+<p>1.RESTful,有一个统一的url来调用资源<br>调用资源的方式通过http1.1协议的方法,分别以不同的方式操作资源</p>
+<ul>
+<li>get    ：从服务器取出资源</li>
+<li>post   ：在服务器新建资源</li>
+<li>put    ：在服务器更新资源（客户端提供完整资源数据）</li>
+<li>patch  ：在服务器更新资源（客户端提供需要修改的资源数据）</li>
+<li>delect ：在服务器删除资源</li>
+</ul>
+<p>2.RESTful要求无状态<br>即所有的资源，都可以通过URI定位，而且这个定位与其他资源无关，也不会因为其他资源的变化而改变。<br>无状态与有状态的区别（比如要从数据库拿到一个音乐资源）：</p>
+<ul>
+<li>无状态：该资源是无需付费的，访客访问时，也可以用资源推给用户</li>
+<li>有状态：该资源是付费的，需要先登录，然后再判断这个用户是否有付费，有的时候才能把资源推给用户<br>可以看出，有状态通过url推送资源还需要进一步判断，而且上一步骤操作不成功时，后面的操作则无法进行，而无状态则不需要</li>
+</ul>
+<p>3.提供服务的服务器和使用服务的客户需要被隔离对待</p>
+<p>4.服务器必须让客户知道请求是否可以被缓存</p>
+<p>5.使用超媒体<br>不知道怎么说，等我看完《REST in Practice》，逃。</p>
+<p>附:</p>
+<p>1.简单来说，RESTful就是:</p>
+<blockquote>
+<p>看Url就知道要什么<br>看http method就知道干什么<br>看http status  code就知道结果如何<br>by 知乎:徐磊</p>
+</blockquote>
+<p>2.RESTful库：</p>
+<ul>
+<li>Django</li>
+<li><a href="http://www.django-rest-framework.org/">django-rest-framework</a>：一个强大灵活的工具，用来构建 web API。</li>
+<li><a href="http://tastypieapi.org/">django-tastypie</a>：为Django 应用开发API。</li>
+<li><a href="https://github.com/5monkeys/django-formapi">django-formapi</a>：为 Django 的表单验证，创建 JSON APIs 。</li>
+<li>Flask</li>
+<li><a href="http://www.flaskapi.org/">flask-api</a>：为 flask 开发的，可浏览 Web APIs 。</li>
+<li><a href="http://flask-restful.readthedocs.org/en/latest/">flask-restful</a>：为 flask 快速创建REST APIs 。</li>
+<li><a href="https://flask-restless.readthedocs.org/en/latest/">flask-restless</a>：为 SQLAlchemy 定义的数据库模型创建 RESTful APIs 。</li>
+<li><a href="https://github.com/marselester/flask-api-utils">flask-api-utils</a>：为 Flask 处理 API 表示和验证。</li>
+<li><a href="https://github.com/nicolaiarocci/eve">eve</a>：REST API 框架，由 Flask, MongoDB 等驱动。</li>
+<li>Pyramid</li>
+<li><a href="https://cornice.readthedocs.org/en/latest/">cornice</a>：一个Pyramid 的 REST 框架 。</li>
+<li>与框架无关的</li>
+<li><a href="http://falconframework.org/">falcon</a>：一个用来建立云 API 和 web app 后端的高性能框架。</li>
+<li><a href="https://github.com/jeffknupp/sandman">sandman</a>：为现存的数据库驱动系统自动创建 REST APIs 。</li>
+<li><a href="http://restless.readthedocs.org/en/latest/">restless</a>：框架无关的 REST 框架 ，基于从 Tastypie 学到的知识。</li>
+<li><a href="https://github.com/vertical-knowledge/ripozo">ripozo</a>：快速创建 REST/HATEOAS/Hypermedia APIs。</li>
+</ul>
+<p>3.初识时，可能觉得RESTful跟自己生成的api很像，但是还是有<strong>区别</strong>的</p>
+<p>举个具体API的例子：请求：<br>GET /posts HTTP/1.1<br>Accept: application/atom+xml</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml">响应：<br>HTTP/1.1 200 OK<br>Content-Type: application/atom+xml<br><br><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">feed</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2005/Atom&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Posts<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;self&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts?pn=2&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;next&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Post XXX<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/post-xxx&quot;</span> /&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">content</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;xhtml&quot;</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;</span><br>                <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is the post content.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">content</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">feed</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<p>注意上面atom格式中的多个<link>元素，它们分别定义了当前状态下合法的状态转移。例如，这是一个指向自己的链接，其中rel属性指定了状态转移的关系为自身。<link href="http://example.org/posts" rel="self" /><br>这是下一页的链接，<link href="http://example.org/posts?pn=2" rel="next" /><br>如果当前不是第一页的话，就会有类似如下的链接来表示上一页，<link href="http://example.org/posts?pn=2" rel="prev" /><br>而这个是某一篇文章的链接，<link href="http://example.org/post-xxx" /><br>总结一下，就是：服务器生成包含状态转移的表征数据，用来响应客户端对于一个资源的请求；客户端借助这份表征数据，记录了当前的应用状态以及对应可转移状态的方式。当然，为了要实现这一系列的功能，一个不可或缺的东西就是超文本（hypertext）或者说超媒体类型（hypermedia type）。这绝对不是一个简简单单的媒体类型（例如，JSON属性列表）可以做到的。（参考：REST APIs must be hypertext-driven）因此，像下面这种API，1、获取文章</p>
+<figure class="highlight gradle"><table><tr><td class="code"><pre><code class="hljs gradle">请求：<br>GET <span class="hljs-regexp">/blog/</span>post<span class="hljs-regexp">/&#123;postId&#125; HTTP/</span><span class="hljs-number">1.1</span><br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">200</span> OK<br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br><span class="hljs-number">2</span>、发布文章<br><br>请求：<br>POST <span class="hljs-regexp">/blog/</span>post HTTP/<span class="hljs-number">1.1</span><br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">201</span> CREATED<br></code></pre></td></tr></table></figure>
+<p>绝对不是RESTful！绝对不是RESTful！绝对不是RESTful！</p>
+<p>以上引用：<br>作者：季文昊<br>链接：<a href="https://www.zhihu.com/question/28557115/answer/48120528">https://www.zhihu.com/question/28557115/answer/48120528</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>web上的server都叫web server，但是大家分工也有不同的，有服务器，容器，应用<br>服务器主要是处理请求，决定分发到那个应用(静态文件也在此处理)，容器则是负责初始化环境(设置环境变量，如异步通信，websocket也在此处)，应用则是提供应用功能。</p>
+<p>服务器: Apache/Nginx<br>容器:tonardo/Twisted<br>应用：用web框架开发的应用，web框架有Django,flask,Bottle,pyramid,CherryPy等(框架链接见<a href="https://github.com/jobbole/awesome-python-cn">这里</a>的web框架部分)</p>
+<p>上面是按照主要功能划分的，很多框架对于上面每个领域都有一些涉足，但擅长的不一样，像tonardo(因为我今天才刚刚看了这个的文档，Twisted还没看- -)<br>Tornado既是一个容器，也是应用。而它作为容器 采用的是asynchronous IO的网络模型，这是一种很高效的模型。在<a href="http://www.tornadoweb.cn/">文档</a>中，前半部分讲了tornado作为一个应用是如何使用的，后面，也是最主要的讲了如何运用tornado来实现他的异步和长轮询问以及使用WebSocket实现双工通信。</p>
+<p>大多时候后端都是通过服务器+容器+应用,栗子：<br>nginx+tornado+django:<br>1.Nginx作为反代理，分发到后端的torndo服务器<br>2.Django作为framwork搭建到tornado服务器上，使用其admin功能<br>在这个栗子中<br>服务器关心的是 HTTP 协议层面的传输和访问控制，所以在 Nginx上可以看到代理、负载均衡等功能。客户端通过服务器访问服务器上存储的资源（HTML 文件、图片文件等等）。通过 CGI 技术，也可以将处理过的内容通过服务器分发，但是一个服务器始终只是把服务器上的文件如实的通过 HTTP 协议传输给客户端。而容器，则是一个应用执行的容器。保证应用能够在应用服务器上正常运行。，我们可以通过框架来开发应用，让应用运行在应用执行的容器。他们能一起使用则是靠wsgi协议(容器那里可以说属于wsgi层，也就是通过wsgi协议分别连接服务器和应用的)</p>
+<p>还有另外一个栗子</p>
+<blockquote>
+<p>Apache/lighttpd: 相当于一个request proxy，根据配置，把不同的请求转发给不同的server处理，例如静态的文件请求自己处理，这个时候它就像一个web server，对于fastcgi/python这样的请求转发给flup这样的Server/Gateway进行处理 flup: 一个用python写的web server，也就是cgi中所谓的Server/Gateway，它负责接受apache/lighttpd转发的请求，并调用你写的程序 (application)，并将application处理的结果返回到apache/lighttpdfastcgi: apache/lighttpd的一个模块，虽然flup可以作为一个独立的web server使用，但是对于浏览器请求处理一般都交给 apache/lighttpd处理，然后由apache/lighttpd转发给flup处理，这样就需要一个东西来把apache/lighttpd跟flup联系起来，这个东西就是fastcgi，它通过环境变量以及socket将客户端请求的信息传送给flup并接收flup返回的结果web.py: 应该说有了上面的东西你就可以开始编写你的web程序了，但是问题是你就要自己处理浏览器的输入输出，还有cookie、session、模板等各种各样的问题了，web.py的作用就是帮你把这些工作都做好了，它就是所谓的web framework，另外一个出名的是django，不过感觉太复杂了，web.py差不多就够用了WSGI : 除了flup Server/Gateway外还有很多其他人的写的Server/Gateway, 这个时候就会出问题了，如果你在flup上写了一个程序，现在由于各种原因你要使用xdly了，这个时候你的程序也许就要做很多痛苦的修改才能使用 xdly server了，WSGI就是一个规范，他规范了flup这个服务应该怎么写，应该使用什么方式什么参数调用你写的程序(application)等，当然同时也规范你的程序应该怎么写了，这样的话，只要flup跟xdly都遵守WSGI的话，你的程序在两个上面都可以使用了，flup就是一个WSGI server</p>
+</blockquote>
+<h3 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h3><p><a href="https://www.zhihu.com/question/20215561/answer/40316953">WebSocket 是什么原理？为什么可以实现持久连接？ - Ovear的回答 - 知乎</a></p>
+<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><p>HTTP Server，充当着反向代理，有着均衡负荷，和分发静态文件等功能。<br>nginx的能力比Apache好，但目前我对nginx是使用只会简单的配置。<a href="http://www.nginx.cn/doc/">nginx文档</a></p>
+<h3 id="WSGI-uWSGI-uwsgi"><a href="#WSGI-uWSGI-uwsgi" class="headerlink" title="WSGI\uWSGI\uwsgi"></a>WSGI\uWSGI\uwsgi</h3><ul>
+<li><a href="https://www.zhihu.com/question/19998865/answer/74748765">WSGI</a>是一种通信协议。</li>
+<li>uwsgi是一种线路协议而不是通信协议，在此常用于在uWSGI服务器与其他网络服务器的数据通信。</li>
+<li>而uWSGI是实现了uwsgi和WSGI两种协议的Web服务器。</li>
+</ul>
+<p>可以说WSGI是一种编程接口，而uwsgi是一种传输协议，而uWSGI是一个服务器(但是主要是链接nginx与框架的中间层(wsgi))。<br>相关文档:<a href="http://blog.csdn.net/midion9/article/details/51354774">1</a>,<a href="http://blog.csdn.net/sraing/article/details/8455242">2</a></p>
+]]></content>
+      <categories>
+        <category>WEB</category>
+      </categories>
+      <tags>
+        <tag>WEB</tag>
       </tags>
   </entry>
   <entry>
@@ -4993,95 +5144,6 @@
       <tags>
         <tag>Mysql</tag>
         <tag>读书笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>WEB</title>
-    <url>/2017/12/13/20_web/</url>
-    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>【暂时废弃】<br>更新时间：2017-12-13 14:46:00</p>
-<p>WEB有很多东西，有些框架/库的功能也是交叉着，所以有点混乱。今天闲的无聊，百度后觉得别人说的还是不明白，就把之前保存的文档全看了一遍。了解一下，应该有很多认知错误的，以后深入了解后再改正。<br>所以这里就是类似与 <a href="http://so1n.me/2017/10/19/15/#more">前端小功能收集</a>,<a href="http://so1n.me/2017/08/23/14-redis/">Redis命令</a>一样，内容简单，纯粹记录下我刚接触时的感想，顺便把以前的东西也写进来了。回头可以看一看，回顾下，还有就是以后找资料容易点。。。。。。</p>
-<a id="more"></a>
-<p>主要是在今天看了vue,Angular(js框架)，RESTful，tornado，wsgi文档后，才能把他们正式区分开的。<br>文字不好，使用度不频繁，所以写的不太好，以后更熟悉时再改，相比之前不知道为什么需要使用vue，也不知道服务器、容器和应用的关系好多了。。。。。。。</p>
-<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p>之前我在找前端的资料时，就看到很多人在说前端更新很快，一不学习就要落后了，尤其是一个知乎的回复</p>
-<blockquote>
-<p>感谢前端，让我找回了大学学习的时光</p>
-</blockquote>
-<p><a href="https://www.awesomes.cn/">前端框架合集的网站</a></p>
-<p>css框架：bootstrap,uikit(我喜欢这个)等<br>可以不用自己写css就可以做出一个美化的网站，之前第一次接触时，就觉得写个页面美化居然那么简单。。。</p>
-<p>js框架：<a href="https://cn.vuejs.org/v2/guide/">vue.js</a>，<a href="https://doc.react-china.org/">React</a>，<a href="http://www.angularjs.net.cn/tutorial/">AngularJS</a>等<br>可以简化前端开发，提高生产力的东西，更让网页像个app一样，让后端只负责数据的传输、账户等校验和业务逻辑（要是之前看到就可以不用在模板上纠结那么久了，用vue代码几行就可以搞定[捂脸]）。<br>一开始以为就是个类似与jinja2的东西。，在看了同学发了个用前端实现路由（<a href="https://router.vuejs.org/zh-cn/">vue路由</a>）的朋友圈后，我就决定去看文档了(看的是vue)，发现真的是可以提高生产力，我这个js菜鸟可以边看文档边理解(AngularJS理解略难点？)，就可以写出很多之前觉得很难写出来的东西了(重点是，代码量也少）。也知道看我之前想实现的功能——spa，可以通过这些框架来实行。</p>
-<p>模块化开发:目前没有用到，待补充</p>
-<h2 id="中间"><a href="#中间" class="headerlink" title="中间"></a>中间</h2><p>那些tcp/ip协议啊,RFC(/d+)什么的虽然刚考完ccna还记得很清楚。。。但是感觉并不属于这个部分的</p>
-<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html">RESTful</a><br>RESTful,实际上只是一种设计风格，他是一种面向<em>资源</em>的设计<br>当前后端就只有服务器一个，前端的却后手机、平板、电脑等等，通过运用RESTful设计的url，可以让不同的前端一起使用共同的url，而且有充分利用了http的内容(一开始我都是post,get的,现在回头看觉得url设计的不是很好)</p>
-<p>1.RESTful,有一个统一的url来调用资源<br>调用资源的方式通过http1.1协议的方法,分别以不同的方式操作资源</p>
-<ul>
-<li>get    ：从服务器取出资源</li>
-<li>post   ：在服务器新建资源</li>
-<li>put    ：在服务器更新资源（客户端提供完整资源数据）</li>
-<li>patch  ：在服务器更新资源（客户端提供需要修改的资源数据）</li>
-<li>delect ：在服务器删除资源</li>
-</ul>
-<p>2.RESTful要求无状态<br>即所有的资源，都可以通过URI定位，而且这个定位与其他资源无关，也不会因为其他资源的变化而改变。<br>无状态与有状态的区别（比如要从数据库拿到一个音乐资源）：</p>
-<ul>
-<li>无状态：该资源是无需付费的，访客访问时，也可以用资源推给用户</li>
-<li>有状态：该资源是付费的，需要先登录，然后再判断这个用户是否有付费，有的时候才能把资源推给用户<br>可以看出，有状态通过url推送资源还需要进一步判断，而且上一步骤操作不成功时，后面的操作则无法进行，而无状态则不需要</li>
-</ul>
-<p>3.提供服务的服务器和使用服务的客户需要被隔离对待</p>
-<p>4.服务器必须让客户知道请求是否可以被缓存</p>
-<p>5.使用超媒体<br>不知道怎么说，等我看完《REST in Practice》，逃。</p>
-<p>附:</p>
-<p>1.简单来说，RESTful就是:</p>
-<blockquote>
-<p>看Url就知道要什么<br>看http method就知道干什么<br>看http status  code就知道结果如何<br>by 知乎:徐磊</p>
-</blockquote>
-<p>2.RESTful库：</p>
-<ul>
-<li>Django</li>
-<li><a href="http://www.django-rest-framework.org/">django-rest-framework</a>：一个强大灵活的工具，用来构建 web API。</li>
-<li><a href="http://tastypieapi.org/">django-tastypie</a>：为Django 应用开发API。</li>
-<li><a href="https://github.com/5monkeys/django-formapi">django-formapi</a>：为 Django 的表单验证，创建 JSON APIs 。</li>
-<li>Flask</li>
-<li><a href="http://www.flaskapi.org/">flask-api</a>：为 flask 开发的，可浏览 Web APIs 。</li>
-<li><a href="http://flask-restful.readthedocs.org/en/latest/">flask-restful</a>：为 flask 快速创建REST APIs 。</li>
-<li><a href="https://flask-restless.readthedocs.org/en/latest/">flask-restless</a>：为 SQLAlchemy 定义的数据库模型创建 RESTful APIs 。</li>
-<li><a href="https://github.com/marselester/flask-api-utils">flask-api-utils</a>：为 Flask 处理 API 表示和验证。</li>
-<li><a href="https://github.com/nicolaiarocci/eve">eve</a>：REST API 框架，由 Flask, MongoDB 等驱动。</li>
-<li>Pyramid</li>
-<li><a href="https://cornice.readthedocs.org/en/latest/">cornice</a>：一个Pyramid 的 REST 框架 。</li>
-<li>与框架无关的</li>
-<li><a href="http://falconframework.org/">falcon</a>：一个用来建立云 API 和 web app 后端的高性能框架。</li>
-<li><a href="https://github.com/jeffknupp/sandman">sandman</a>：为现存的数据库驱动系统自动创建 REST APIs 。</li>
-<li><a href="http://restless.readthedocs.org/en/latest/">restless</a>：框架无关的 REST 框架 ，基于从 Tastypie 学到的知识。</li>
-<li><a href="https://github.com/vertical-knowledge/ripozo">ripozo</a>：快速创建 REST/HATEOAS/Hypermedia APIs。</li>
-</ul>
-<p>3.初识时，可能觉得RESTful跟自己生成的api很像，但是还是有<strong>区别</strong>的</p>
-<p>举个具体API的例子：请求：<br>GET /posts HTTP/1.1<br>Accept: application/atom+xml</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml">响应：<br>HTTP/1.1 200 OK<br>Content-Type: application/atom+xml<br><br><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">feed</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2005/Atom&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Posts<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;self&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts?pn=2&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;next&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Post XXX<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/post-xxx&quot;</span> /&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">content</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;xhtml&quot;</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;</span><br>                <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is the post content.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">content</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">feed</span>&gt;</span><br></code></pre></td></tr></table></figure>
-<p>注意上面atom格式中的多个<link>元素，它们分别定义了当前状态下合法的状态转移。例如，这是一个指向自己的链接，其中rel属性指定了状态转移的关系为自身。<link href="http://example.org/posts" rel="self" /><br>这是下一页的链接，<link href="http://example.org/posts?pn=2" rel="next" /><br>如果当前不是第一页的话，就会有类似如下的链接来表示上一页，<link href="http://example.org/posts?pn=2" rel="prev" /><br>而这个是某一篇文章的链接，<link href="http://example.org/post-xxx" /><br>总结一下，就是：服务器生成包含状态转移的表征数据，用来响应客户端对于一个资源的请求；客户端借助这份表征数据，记录了当前的应用状态以及对应可转移状态的方式。当然，为了要实现这一系列的功能，一个不可或缺的东西就是超文本（hypertext）或者说超媒体类型（hypermedia type）。这绝对不是一个简简单单的媒体类型（例如，JSON属性列表）可以做到的。（参考：REST APIs must be hypertext-driven）因此，像下面这种API，1、获取文章</p>
-<figure class="highlight gradle"><table><tr><td class="code"><pre><code class="hljs gradle">请求：<br>GET <span class="hljs-regexp">/blog/</span>post<span class="hljs-regexp">/&#123;postId&#125; HTTP/</span><span class="hljs-number">1.1</span><br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">200</span> OK<br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br><span class="hljs-number">2</span>、发布文章<br><br>请求：<br>POST <span class="hljs-regexp">/blog/</span>post HTTP/<span class="hljs-number">1.1</span><br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">201</span> CREATED<br></code></pre></td></tr></table></figure>
-<p>绝对不是RESTful！绝对不是RESTful！绝对不是RESTful！</p>
-<p>以上引用：<br>作者：季文昊<br>链接：<a href="https://www.zhihu.com/question/28557115/answer/48120528">https://www.zhihu.com/question/28557115/answer/48120528</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>web上的server都叫web server，但是大家分工也有不同的，有服务器，容器，应用<br>服务器主要是处理请求，决定分发到那个应用(静态文件也在此处理)，容器则是负责初始化环境(设置环境变量，如异步通信，websocket也在此处)，应用则是提供应用功能。</p>
-<p>服务器: Apache/Nginx<br>容器:tonardo/Twisted<br>应用：用web框架开发的应用，web框架有Django,flask,Bottle,pyramid,CherryPy等(框架链接见<a href="https://github.com/jobbole/awesome-python-cn">这里</a>的web框架部分)</p>
-<p>上面是按照主要功能划分的，很多框架对于上面每个领域都有一些涉足，但擅长的不一样，像tonardo(因为我今天才刚刚看了这个的文档，Twisted还没看- -)<br>Tornado既是一个容器，也是应用。而它作为容器 采用的是asynchronous IO的网络模型，这是一种很高效的模型。在<a href="http://www.tornadoweb.cn/">文档</a>中，前半部分讲了tornado作为一个应用是如何使用的，后面，也是最主要的讲了如何运用tornado来实现他的异步和长轮询问以及使用WebSocket实现双工通信。</p>
-<p>大多时候后端都是通过服务器+容器+应用,栗子：<br>nginx+tornado+django:<br>1.Nginx作为反代理，分发到后端的torndo服务器<br>2.Django作为framwork搭建到tornado服务器上，使用其admin功能<br>在这个栗子中<br>服务器关心的是 HTTP 协议层面的传输和访问控制，所以在 Nginx上可以看到代理、负载均衡等功能。客户端通过服务器访问服务器上存储的资源（HTML 文件、图片文件等等）。通过 CGI 技术，也可以将处理过的内容通过服务器分发，但是一个服务器始终只是把服务器上的文件如实的通过 HTTP 协议传输给客户端。而容器，则是一个应用执行的容器。保证应用能够在应用服务器上正常运行。，我们可以通过框架来开发应用，让应用运行在应用执行的容器。他们能一起使用则是靠wsgi协议(容器那里可以说属于wsgi层，也就是通过wsgi协议分别连接服务器和应用的)</p>
-<p>还有另外一个栗子</p>
-<blockquote>
-<p>Apache/lighttpd: 相当于一个request proxy，根据配置，把不同的请求转发给不同的server处理，例如静态的文件请求自己处理，这个时候它就像一个web server，对于fastcgi/python这样的请求转发给flup这样的Server/Gateway进行处理 flup: 一个用python写的web server，也就是cgi中所谓的Server/Gateway，它负责接受apache/lighttpd转发的请求，并调用你写的程序 (application)，并将application处理的结果返回到apache/lighttpdfastcgi: apache/lighttpd的一个模块，虽然flup可以作为一个独立的web server使用，但是对于浏览器请求处理一般都交给 apache/lighttpd处理，然后由apache/lighttpd转发给flup处理，这样就需要一个东西来把apache/lighttpd跟flup联系起来，这个东西就是fastcgi，它通过环境变量以及socket将客户端请求的信息传送给flup并接收flup返回的结果web.py: 应该说有了上面的东西你就可以开始编写你的web程序了，但是问题是你就要自己处理浏览器的输入输出，还有cookie、session、模板等各种各样的问题了，web.py的作用就是帮你把这些工作都做好了，它就是所谓的web framework，另外一个出名的是django，不过感觉太复杂了，web.py差不多就够用了WSGI : 除了flup Server/Gateway外还有很多其他人的写的Server/Gateway, 这个时候就会出问题了，如果你在flup上写了一个程序，现在由于各种原因你要使用xdly了，这个时候你的程序也许就要做很多痛苦的修改才能使用 xdly server了，WSGI就是一个规范，他规范了flup这个服务应该怎么写，应该使用什么方式什么参数调用你写的程序(application)等，当然同时也规范你的程序应该怎么写了，这样的话，只要flup跟xdly都遵守WSGI的话，你的程序在两个上面都可以使用了，flup就是一个WSGI server</p>
-</blockquote>
-<h3 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h3><p><a href="https://www.zhihu.com/question/20215561/answer/40316953">WebSocket 是什么原理？为什么可以实现持久连接？ - Ovear的回答 - 知乎</a></p>
-<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><p>HTTP Server，充当着反向代理，有着均衡负荷，和分发静态文件等功能。<br>nginx的能力比Apache好，但目前我对nginx是使用只会简单的配置。<a href="http://www.nginx.cn/doc/">nginx文档</a></p>
-<h3 id="WSGI-uWSGI-uwsgi"><a href="#WSGI-uWSGI-uwsgi" class="headerlink" title="WSGI\uWSGI\uwsgi"></a>WSGI\uWSGI\uwsgi</h3><ul>
-<li><a href="https://www.zhihu.com/question/19998865/answer/74748765">WSGI</a>是一种通信协议。</li>
-<li>uwsgi是一种线路协议而不是通信协议，在此常用于在uWSGI服务器与其他网络服务器的数据通信。</li>
-<li>而uWSGI是实现了uwsgi和WSGI两种协议的Web服务器。</li>
-</ul>
-<p>可以说WSGI是一种编程接口，而uwsgi是一种传输协议，而uWSGI是一个服务器(但是主要是链接nginx与框架的中间层(wsgi))。<br>相关文档:<a href="http://blog.csdn.net/midion9/article/details/51354774">1</a>,<a href="http://blog.csdn.net/sraing/article/details/8455242">2</a></p>
-]]></content>
-      <categories>
-        <category>WEB</category>
-      </categories>
-      <tags>
-        <tag>WEB</tag>
       </tags>
   </entry>
   <entry>
