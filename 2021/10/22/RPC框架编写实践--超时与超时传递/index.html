@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>RPC框架编写实践--超时与超时传递 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记接触开发以来发现很多连锁故障的场景的一个常用问题都...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">RPC框架编写实践--超时与超时传递</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2021/10/dd78b4185d960438.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">RPC框架编写实践--超时与超时传递</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 22, 2021</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>10015</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>接触开发以来发现很多连锁故障的场景的一个常用问题都是多端调用时，服务端正在消耗处理的时间过长或者网络传输异常导致服务端无法及时响应， 造成客户端一直等待，无法释放当前请求响应导致的， 而这种方法可以通过超时机制来进行解决。</p>
+<p>超时机制， 是一个简单又方便的控制网络请求异常的一种方法， 它可以保证服务稳定(本质是快速失败)， 良好的超时控制策略可以尽快的释放高延迟的请求，避免请求堆积, 而设计不合理的超时会导致整个服务架构出问题。</p>
+        <h2 id="1-常见超时机制的弊端"><a href="#1-常见超时机制的弊端" class="headerlink" title="1.常见超时机制的弊端"></a>1.常见超时机制的弊端</h2><p>编写的服务端代码是不可能一直不会失败的， 因为它会进行网络通信， 而这个网络世界并不是完美的。 常见的客户端在进行网络请求的时候都会有一个超时机制， 以<code>Python</code>中一个著名的请求库<code>httpx</code>为例子, 它比常用的<code>requests</code>更优秀, 也支持通过timeout实现超时机制， 在使用时如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 使用get方法请求， 超时时间为9秒</span><br><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> httpx<br><br>asyncio.run(httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>, timeout=<span class="hljs-number">9</span>))<br></code></pre></td></tr></table></figure>
+<p>可以看到这个使用方法非常的简单， 也通俗易懂, 但是这个方法在使用起来会有一个弊端。 假设现在有一个方法<code>demo</code>， 它总的超时时间为9秒, 但是需要请求两次， 如果还是按照原来那么写， 会十分糟糕, 代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> httpx<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>, timeout=<span class="hljs-number">9</span>)<br>    <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>, timeout=<span class="hljs-number">9</span>)<br></code></pre></td></tr></table></figure>
+<p>这种情况下假设该方法的每个请求时长为8秒， 那么他的总请求时长为16秒， 已经超出要求的总的超时时长为9秒的要求的, 但每个请求都没有触发超时机制。 可以看出， 超时是简单易懂的， 但是在某些情况下它并不能很好的胜任工作。 </p>
+<p>不过在超时无法胜任某些工作时， 我们可以换个思路， 超时的原本意思是， 在n秒后中断此次请求, 也就是在某个时刻时终止请求， 那么代码可以改写如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> requests<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>(<span class="hljs-params">timeout: <span class="hljs-built_in">int</span> = <span class="hljs-number">9</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    deadline: <span class="hljs-built_in">float</span> = time.time() + <span class="hljs-number">9</span><br>    requests.get(<span class="hljs-string">&quot;http://so1n.me&quot;</span>, timeout=time.time() - deadline)<br>    requests.get(<span class="hljs-string">&quot;http://so1n.me&quot;</span>, timeout=time.time() - deadline)<br><br></code></pre></td></tr></table></figure>
+<p>这段代码可以完美的工作， 假设第一个请求的时长为5秒， 那么第二次请求的超时参数的值会是4秒， 这是非常ok， 代码也依然保持简单。 不过目前还是有个缺点， 就是每次都要手写一遍， 然后显示传进去, 这个超时是不可传递的， 如果有一个抽象能方便的使用， 那是非常好的。</p>
+<h2 id="2-可传递的超时对象–deadline"><a href="#2-可传递的超时对象–deadline" class="headerlink" title="2.可传递的超时对象–deadline"></a>2.可传递的超时对象–deadline</h2><p>从上面的例子可以看出， 我们正真需要的是在某片代码范围内(如上面就是在一个<code>demo</code>函数里面)， 所有的函数调用共享一个截止时间， 当抵达截止时间时， 无论执行到那个函数调用， 都会触发超时异常。 通常如果要管理一个代码范围， 通常都是写一个函数调用， 并在外部使用超时控制， 代码则变成如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> httpx<br><span class="hljs-keyword">import</span> time<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sub_demo</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>)<br>    <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>)<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">await</span> asyncio.wait_for(sub_demo(), timeout=<span class="hljs-number">9</span>)<br><br><br>asyncio.run(demo())<br></code></pre></td></tr></table></figure>
+<p>但是， 这样的实现总觉得会差点意思， 每有一个共享截止时间的代码范围， 就需要写一个函数出来, 会觉得写出来的代码不是特别的优雅， 同时如果需要传的参数比较多， 那简直就是灾难了。好在<code>Python</code>提供了<code>with</code>语句， 凡是在<code>with</code>语句裹着的， 都属于该代码范围里面， 所以一个deadline抽象的使用会变为如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 伪代码</span><br><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> httpx<br><span class="hljs-keyword">import</span> time<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>(<span class="hljs-params">timeout: <span class="hljs-built_in">int</span> = <span class="hljs-number">9</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">with</span> Deadline(timeout=<span class="hljs-number">9</span>):<br>        <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>)<br>        <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>)<br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">bad_demo</span>(<span class="hljs-params">timeout: <span class="hljs-built_in">int</span> = <span class="hljs-number">9</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">with</span> Deadline(timeout=<span class="hljs-number">9</span>) <span class="hljs-keyword">as</span> d:<br>        <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>, timeout=d.timeout)<br>        <span class="hljs-keyword">await</span> httpx.AsyncClient().get(url=<span class="hljs-string">&quot;http://so1n.me&quot;</span>, timeout=d.timeout)<br></code></pre></td></tr></table></figure>
+<p>可以看到请求的<code>get</code>调用能享用到<code>demo</code>作用域下的所有参数， 但是<code>bad_demo</code>的实现还是回到一开始的每次调用都要传参的问题。可以看到<code>demo</code>非常的优雅， 实现也非常方便， 只是这里<code>deadline</code>与get调用是没有任何交互的， 不清楚它是如何去终止这些超时请求， 也就是超时的机制变为隐形了。</p>
+<p>在经过查阅资料后， 发现了<code>Python</code>协程的两个方法：<br>-1.在<code>event loop</code>运行中可以通过<code>asyncio.current_task</code>来获取当前正在运行的协程。<br>-2.在对某个协程发起<code>cancel</code>时， 会递归到该协程的正在运行的子协程， 然后抛出<code>Cancel</code>的错误（认为<code>demo</code>是<code>with</code>捕获的协程， 两次请求是<code>demo</code>的子协程）</p>
+<p>那么可以在通过<code>with</code>语句捕获当前的协程， 并存放在对应的内存区域中， 并启动通知<code>event loop</code>在n秒后执行取消捕获的协程， 然后就把控制权转给使用者。 这样当使用者的代码在指定时间内没完成时， 就会马上抛出超时异常， 以下是我的<code>Deadline</code>的抽象实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 这是一个简化版本的伪代码, 存在一些逻辑漏洞, 但是都包含了主要流程了，</span><br><span class="hljs-comment"># 完整版见：https://github.com/so1n/rap/blob/master/rap/common/asyncio_helper.py</span><br><span class="hljs-comment"># 中的Deadline方法</span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Deadline</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        delay: Optional[<span class="hljs-built_in">float</span>],</span></span><br><span class="hljs-function"><span class="hljs-params">        loop: Optional[asyncio.AbstractEventLoop] = <span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">        timeout_exc: Optional[Exception] = <span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>):</span><br>        <span class="hljs-comment"># 代表多少秒后超时</span><br>        self._delay: Optional[<span class="hljs-built_in">float</span>] = delay<br>        <span class="hljs-comment"># asyncio需要的事件循环</span><br>        self._loop = loop <span class="hljs-keyword">or</span> get_event_loop()<br>        <span class="hljs-comment"># 当超时时，如何抛异常</span><br>        self._timeout_exc: Exception = timeout_exc <span class="hljs-keyword">or</span> asyncio.TimeoutError()<br><br>        <span class="hljs-comment"># 是否进入with语境</span><br>        self._is_active: <span class="hljs-built_in">bool</span> = <span class="hljs-literal">False</span><br>        <span class="hljs-comment"># 控制结束的future</span><br>        self._deadline_future: asyncio.Future = asyncio.Future()<br>        <span class="hljs-comment"># 注册with语句捕获的future</span><br>        self._with_scope_future: Optional[asyncio.Future] = <span class="hljs-literal">None</span> <br>        <span class="hljs-keyword">if</span> self._delay <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-comment"># 计算截止时间和注册截止时间回调</span><br>            self._end_timestamp: Optional[<span class="hljs-built_in">float</span>] = time.time() + self._delay<br>            self._end_loop_time: Optional[<span class="hljs-built_in">float</span>] = self._loop.time() + self._delay<br>            <span class="hljs-comment"># 通知event loop在截止时间执行超时机制</span><br>            self._loop.call_at(self._end_loop_time, self._set_deadline_future_result)<br>        <span class="hljs-keyword">else</span>:<br>            self._end_timestamp = <span class="hljs-literal">None</span><br>            self._end_loop_time = <span class="hljs-literal">None</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_set_deadline_future_result</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 当到截止时间时， 设置执行结束， 并对还在执行的with future进行cancel操作</span><br>        self._deadline_future.set_result(<span class="hljs-literal">True</span>)<br>        <span class="hljs-keyword">if</span> self._with_scope_future <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> self._with_scope_future.cancelled():<br>            self._with_scope_future.cancel()<br><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__enter__</span>(<span class="hljs-params">self</span>) -&gt; &quot;Deadline&quot;:</span><br>        <span class="hljs-comment"># 进入with语句范围</span><br>        <span class="hljs-keyword">if</span> self._with_scope_future:<br>            <span class="hljs-comment"># 一个实例同时只能调用一次， 多次调用会出错</span><br>            <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;`with` can only be called once&quot;</span>)<br>        <span class="hljs-keyword">if</span> self._delay <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-comment"># 启动了超时机制</span><br><br>            <span class="hljs-comment"># 获取当前运行的协程</span><br>            main_task: Optional[asyncio.Task] = current_task(self._loop)<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> main_task:<br>                <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Can not found current task&quot;</span>)<br>            <span class="hljs-comment"># 注册with语句所在的future</span><br>            self._with_scope_future = main_task<br>        <span class="hljs-keyword">return</span> self<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__exit__</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        exc_type: Optional[Type[BaseException]],</span></span><br><span class="hljs-function"><span class="hljs-params">        exc_val: Optional[BaseException],</span></span><br><span class="hljs-function"><span class="hljs-params">        exc_tb: Optional[TracebackType],</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; Optional[bool]:</span><br>        <span class="hljs-comment"># 由于执行完成或者是异常退出with语句范围</span><br>        <span class="hljs-keyword">if</span> self._with_scope_future:<br>            self._with_scope_future = <span class="hljs-literal">None</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br><br>        <span class="hljs-keyword">if</span> self._deadline_future.done():<br>            <span class="hljs-comment"># 如果控制结束的future已经结束， 代表此次with语句范围的代码执行超时了</span><br>            <span class="hljs-keyword">if</span> exc_type:<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(self._timeout_exc, IgnoreDeadlineTimeoutExc):<br>                    <span class="hljs-comment"># 如果初始化时声明忽略异常， 那么在退出with语句范围时不会抛出异常</span><br>                    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>            <span class="hljs-comment"># 捕获到异常了， 准备退出...</span><br>            <span class="hljs-keyword">raise</span> self._timeout_exc<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br></code></pre></td></tr></table></figure>
+<p>可以看到， <code>Deadline</code>的实现十分简单， 但是还会遇到层层调用传递的情况， 如果觉得显示传递的很烦的话， 还可以使用<code>contextvars</code>模块进行封装从而可以隐式调用, 只需要改造<code>__enter__</code>和<code>__exit__</code>方法即可, 具体看完整版代码。</p>
+<blockquote>
+<p>Note: <code>contextvars</code>模块使用具体见<a href="https://so1n.me/2019/06/13/contextvars%E6%A8%A1%E5%9D%97/">如何使用contextvars模块和源码分析</a></p>
+</blockquote>
+<h3 id="3-服务间的传递"><a href="#3-服务间的传递" class="headerlink" title="3.服务间的传递"></a>3.服务间的传递</h3><p>到了微服务时， 超时的影响更加严重， 因为在微服务架构里面， 一次请求可能要经过一个很长的链路，跨多个服务调用后才能返回结果， 如果能提前触发超时机制的话， 则可以省下一些不必要的后续调用, 减少机器的计算和网络开销， 防止服务雪崩等问题。<br>但是超时用不好时， 也会带来一些副作用， 我在编写<code>rap</code>框架时， 为了支持更快的请求和<code>channel</code>双通道机制， 使用了单连接复用的思路， 客户端在发送请求抵达服务端请求后， 就一直在等待服务端返回数据， 当服务端超时返回数据时， 客户端会对本次请求抛出超时异常， 但是不会关闭连接, 客户端伪代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 伪代码</span><br><span class="hljs-comment"># 确定好传输的为 id, header, body</span><br><span class="hljs-comment"># 响应体传输的为 id, header, status_code, body</span><br><span class="hljs-comment"># 两者的id用来识别属于哪个请求</span><br><span class="hljs-comment"># 只要确保每个请求有不一样的id就可以实现了连接复用了</span><br><br><span class="hljs-comment"># 首先有个dict用于存放已经发送请求,但没收到响应的future(asyncio.Future())</span><br>future_dict = <span class="hljs-built_in">dict</span>()<br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">response</span>():</span><br>    <span class="hljs-comment"># 统一处理响应, 会有一个程序让他后台运行</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    	<span class="hljs-keyword">try</span>:<br>    		<span class="hljs-comment"># 按照协议从连接取出响应数据</span><br>    	    msg_id, header, status_code, body = <span class="hljs-keyword">await</span> conn.read() <br>    	<span class="hljs-keyword">except</span> ValueError:<br>    	    <span class="hljs-keyword">return</span><br>    	<span class="hljs-comment"># 把结果存入future中,这样request就能收到响应了</span><br>        <span class="hljs-keyword">if</span> msg_id <span class="hljs-keyword">in</span> future_dict:<br>    		future_dict[msg_id].set_result(Response(msg_id, header, status_code, body))<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request</span>():</span><br>    <span class="hljs-comment"># 请求体</span><br>    request = (msg_id, header, body)<br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-comment"># 设置等待响应的future</span><br>        future_dict[msg_id] = asyncio.Future()<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 表示通过连接conn发送请求</span><br>            <span class="hljs-keyword">await</span> conn.write(request)<br>        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>            <span class="hljs-keyword">raise</span> e<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 等待响应,超过9秒没响应则报请求超时</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> asyncio.wait_for(future_dict[msg_id], <span class="hljs-number">9</span>)<br>        <span class="hljs-keyword">except</span> asyncio.TimeoutError:<br>            <span class="hljs-keyword">raise</span> asyncio.TimeoutError(<span class="hljs-string">f&quot;msg_id:<span class="hljs-subst">&#123;msg_id&#125;</span> request timeout&quot;</span>)<br>    <span class="hljs-keyword">finally</span>:<br>        <span class="hljs-comment"># 删除future, 回收资源</span><br>        future_dict.pop(msg_id, <span class="hljs-literal">None</span>)<br></code></pre></td></tr></table></figure>
+<p>可以发现在这种情况会忽略几个问题：</p>
+<ul>
+<li>1.客户端已经丢弃请求了， 但服务端可能还在处理数据， 并在完成的时候返回数据， 但是这时候服务端返回的数据会被客户端丢弃的。 </li>
+<li>2.如果客户端带有重试机制， 那么客户端会继续发送请求，此时服务端除了会同时多处理多个问题外， 在接口没做幂等性处理时还会出现脏数据的问题。</li>
+<li>3.如果客户端带有重试机制， 客户端会发送多个请求到服务端，服务端的压力会变大， 导致整个服务链路异常进而造成服务雪崩。 </li>
+</ul>
+<p>可以发现， 客户端在这种情况下发生超时时， 除了自己抛异常外， 还要通知服务端进行超时处理， 而不是让服务端继续处理下去， 从而影响服务端性能， 但是通知服务端超时的请求也可能发生异常导致通知失败， 也会占用部分网络资源， 所以最好的方法是把截止时间跟随请求传到服务端(如果是一个超时参数， 则传递参数后， 服务端无法知道真实所剩的超时时间)， 服务端通过截止时间来判断何时结束这个调用, 这种方法很简单， 在<code>rap</code>中就是这样处理的, 首先是客户端：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_base_request</span>(<span class="hljs-params">self, request: Request, conn: Connection</span>) -&gt; Response:</span><br>    <span class="hljs-comment"># 生成请求id</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> request.correlation_id:<br>        request.correlation_id = <span class="hljs-built_in">str</span>(async_get_snowflake_id())<br>    resp_future_id: <span class="hljs-built_in">str</span> = <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;conn.sock_tuple&#125;</span>:<span class="hljs-subst">&#123;request.correlation_id&#125;</span>&quot;</span><br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-comment"># 注册一个等待响应的future</span><br>        response_future: asyncio.Future[Response] = asyncio.Future()<br>        self._resp_future_dict[resp_future_id] = response_future<br><br>        <span class="hljs-comment"># 通过asyncio的context获取到当前的Deadline对象</span><br>        deadline: Optional[Deadline] = deadline_context.get()<br>        <span class="hljs-keyword">if</span> self.app.through_deadline <span class="hljs-keyword">and</span> deadline:<br>            <span class="hljs-comment"># 把Deadline对象的截止时间end_timestamp放在名为X-rap-deadline的Header字段中</span><br>            request.header[<span class="hljs-string">&quot;X-rap-deadline&quot;</span>] = deadline.end_timestamp<br>        <span class="hljs-comment"># 发送请求</span><br>        <span class="hljs-keyword">await</span> self.write_to_conn(request, conn)<br>        <span class="hljs-comment"># 接收请求</span><br>        response: Response = <span class="hljs-keyword">await</span> as_first_completed(<br>            [response_future],<br>            not_cancel_future_list=[conn.conn_future],<br>        )<br>        response.state = request.state<br>        <span class="hljs-keyword">return</span> response<br>    <span class="hljs-keyword">finally</span>:<br>        <span class="hljs-comment"># 回收资源</span><br>        pop_future: Optional[asyncio.Future] = self._resp_future_dict.pop(resp_future_id, <span class="hljs-literal">None</span>)<br>        <span class="hljs-keyword">if</span> pop_future:<br>            safe_del_future(pop_future)<br></code></pre></td></tr></table></figure>
+<p>然后是服务端， 服务端也非常简单， 直接从Header获取值， 再应用到超时函数即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">try</span>:<br>    <span class="hljs-comment"># 通过header获取截止时间</span><br>    deadline_timestamp: <span class="hljs-built_in">int</span> = request.header.get(<span class="hljs-string">&quot;X-rap-deadline&quot;</span>, <span class="hljs-number">0</span>)<br>    <span class="hljs-keyword">if</span> deadline_timestamp:<br>        timeout: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">int</span>(time.time() - deadline_timestamp)<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-comment"># 如果获取不到就按照默认的时间</span><br>        timeout = self._run_timeout<br>    <span class="hljs-comment"># 执行任务， 如果超时会抛出timeout的错误</span><br>    result: Any = <span class="hljs-keyword">await</span> asyncio.wait_for(coroutine, timeout)<br><span class="hljs-keyword">except</span> asyncio.TimeoutError:<br>    <span class="hljs-comment"># 捕获错误</span><br>    <span class="hljs-keyword">return</span> call_id, RpcRunTimeError(<span class="hljs-string">f&quot;Call <span class="hljs-subst">&#123;func_model.func.__name__&#125;</span> timeout&quot;</span>)<br><span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>    <span class="hljs-keyword">return</span> call_id, e<br></code></pre></td></tr></table></figure>
+<p>这样即可完成跨进程跨服务的超时传递， 不过这种实现是有一个前提， 就是所有机器的时间得保持一致的（或者说只差一点点）， 而微服务基本上都满足这种前提， 他们基本上都在同一个内网里面， 或者同个公司管理的跨区域机器里面。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/10/22/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E8%B6%85%E6%97%B6%E4%B8%8E%E8%B6%85%E6%97%B6%E4%BC%A0%E9%80%92/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;10&#x2F;22&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E8%B6%85%E6%97%B6%E4%B8%8E%E8%B6%85%E6%97%B6%E4%BC%A0%E9%80%92&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;10&#x2F;22&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E8%B6%85%E6%97%B6%E4%B8%8E%E8%B6%85%E6%97%B6%E4%BC%A0%E9%80%92&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/" rel="tag">RPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2021/10/19/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E8%87%AA%E5%8A%A8%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">RPC框架编写实践--自动负载均衡<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E8%B6%85%E6%97%B6%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BC%8A%E7%AB%AF"><span class="toc-text">1.常见超时机制的弊端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8F%AF%E4%BC%A0%E9%80%92%E7%9A%84%E8%B6%85%E6%97%B6%E5%AF%B9%E8%B1%A1%E2%80%93deadline"><span class="toc-text">2.可传递的超时对象–deadline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%9C%8D%E5%8A%A1%E9%97%B4%E7%9A%84%E4%BC%A0%E9%80%92"><span class="toc-text">3.服务间的传递</span></a></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%81%E8%B6%85%E6%97%B6%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BC%8A%E7%AB%AF"><span class="toc-text">1.常见超时机制的弊端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8F%AF%E4%BC%A0%E9%80%92%E7%9A%84%E8%B6%85%E6%97%B6%E5%AF%B9%E8%B1%A1%E2%80%93deadline"><span class="toc-text">2.可传递的超时对象–deadline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%9C%8D%E5%8A%A1%E9%97%B4%E7%9A%84%E4%BC%A0%E9%80%92"><span class="toc-text">3.服务间的传递</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
