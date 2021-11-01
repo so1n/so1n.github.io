@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>RPC框架编写实践--优化框架性能流水日记 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记所有提供服务的框架都需要跑性能测试， 经过性能测试...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">RPC框架编写实践--优化框架性能流水日记</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2021/10/dd78b4185d960438.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">RPC框架编写实践--优化框架性能流水日记</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 29, 2021</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>11871</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>所有提供服务的框架都需要跑性能测试， 经过性能测试来发现了解服务的qps有多少， 是否有人为的因素导致性能不足以及是否有需要优化的代码。</p>
+<p>一般来说，服务框架的性能测试都需要跟同类的框架一起做比较， 我在编写<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>之前， 用的是<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 所以在设计<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>时参考了<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 最后进行性能测试的时候也是跟<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>进行比较。</p>
+<p>由于我引入了单连接复用的功能， 所以在预想中我编写的框架性能应该是比<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>性能好， 可是最后的测试结果却是不如意的， 所以就开始了优化之旅。</p>
+        <h2 id="1-性能对比"><a href="#1-性能对比" class="headerlink" title="1.性能对比"></a>1.性能对比</h2><p>在<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>简介中列出作者对几个相关框架压测的qps数据对比, 如下:</p>
+<table>
+<thead>
+<tr>
+<th>aiorpc</th>
+<th>Official MesssagePack RPC</th>
+<th>ZeroRPC</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2236</td>
+<td>3112</td>
+<td>352</td>
+</tr>
+</tbody></table>
+<p>可以看到<code>aiorpc</code>比<code>Official MesssagePack RPC</code>性能差一些， 但两者相近， 所以我就以<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>为模板， 同时复制了他的代码， 在本地一起压测, 压测结果如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># aiorpc的性能数据</span><br><span class="hljs-comment"># aiorpc的压测具体见：https://github.com/choleraehyq/aiorpc/blob/master/benchmarks/benchmark_aiorpc_inet.py</span><br>➜  rap git:(master) ✗ py run python example/benchmark/benchmark_aiorpc.py                                                                <br>call: 12182 qps<br><span class="hljs-comment"># rap的性能数据(忽略代码中的await asyncio.sleep(0.01))</span><br>➜  rap git:(master) ✗ py run python example/benchmark/benchmark_rap.py   <br>call: 1654 qps<br><span class="hljs-comment"># rap单连接复用的性能数据(忽略代码中的await asyncio.sleep(0.01))</span><br>➜  rap git:(master) ✗ py run python example/benchmark/benchmark_rap_by_single_conn_multiplexing.py <br>call: 3898 qps<br></code></pre></td></tr></table></figure>
+<p>通过结果可以发现[rap]的性能也太拉跨了， 同样的实现, 同样的原理， 性能却是[aiorpc]的10分之一， 即使用了单连接复用后， 性能也只有[aiorpc]的3分之一, 急需优化， 同时也可以看出有大量的优化空间。 </p>
+<h2 id="2-优化性能工具"><a href="#2-优化性能工具" class="headerlink" title="2.优化性能工具"></a>2.优化性能工具</h2><p>性能优化首先要找到瓶颈在什么地方，才能做针对性的优化， 但是函数的调用链非常的长， 我们需要借助一些工具来帮忙剖析调用情况， 在<code>Python</code>生态中， 现有且还有更新的性能剖析方法有官方自带的<a target="_blank" rel="noopener" href="https://docs.python.org/2/library/profile.html">cProfile</a>和<a target="_blank" rel="noopener" href="https://github.com/joerick/pyinstrument">pyinstrument</a>, 他们都是非侵入式的， 在官方实现的模块能满足我的需求的时候， 我都会优先使用官方的模块, 同时他的数据是最准确的， 所以本次选用的性能剖析工具是<code>cProfile</code>。</p>
+<blockquote>
+<p>NOTE: 性能剖析工具分为<code>Deterministic profiler</code>和<code>Sampling profiler</code>两大类, cProfile是基于<code>Deterministic Profiling</code>实现的，这类型是通过<a target="_blank" rel="noopener" href="https://docs.python.org/3.10/library/sys.html#sys.settrace">sys.settrance</a>在各个调用的函数打点，并在运行时记录所有函数每次的执行状况， 所以开销会比较大, 数据也比较准确。<br>而<code>pyinstrument</code>是通过<code>Sampling profiler</code>实现的， 这类型是调用<code>POSIX Interval timer</code>每隔一段时间中端进程获取整个堆栈信息，以此来估计每个函数的执行时间和开销，性能开销比较小， 但记录可能不会准确。</p>
+</blockquote>
+<h3 id="2-1-cProfile"><a href="#2-1-cProfile" class="headerlink" title="2.1.cProfile"></a>2.1.cProfile</h3><p><code>cProfile</code>是<code>Python</code>标准库中内置的性能分析模块，基于C的扩展，非侵入式，不需要修改代码。它的使用方法是:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">python -m cProfile [-s sort_order] main.py<br></code></pre></td></tr></table></figure>
+<p>其中<code>-s</code>指定输出的排序方法, 有<code>ncalls</code>, <code>tottime</code>, <code>cumtime</code>几个字段可选,于是我就按照使用方法运行程序， 输出如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs Python">➜  rap git:(master) ✗ py run python -m cProfile -s cumtime example/benchmark/benchmark_rap_by_single_conn_multiplexing.py<br>call: <span class="hljs-number">2853</span> qps<br>         <span class="hljs-number">2583236</span> function calls (<span class="hljs-number">2569633</span> primitive calls) <span class="hljs-keyword">in</span> <span class="hljs-number">4.668</span> seconds<br><br>   Ordered by: cumulative time<br><br>   ncalls  tottime  percall  cumtime  percall filename:lineno(function)<br>    <span class="hljs-number">319</span>/<span class="hljs-number">1</span>    <span class="hljs-number">0.004</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">4.682</span>    <span class="hljs-number">4.682</span> &#123;built-<span class="hljs-keyword">in</span> method builtins.<span class="hljs-built_in">exec</span>&#125;<br>        <span class="hljs-number">1</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">4.682</span>    <span class="hljs-number">4.682</span> benchmark_rap_by_single_conn_multiplexing.py:<span class="hljs-number">1</span>(&lt;module&gt;)<br>        <span class="hljs-number">1</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">3.517</span>    <span class="hljs-number">3.517</span> benchmark_rap_by_single_conn_multiplexing.py:<span class="hljs-number">26</span>(run_client)<br>        <span class="hljs-number">3</span>    <span class="hljs-number">1.584</span>    <span class="hljs-number">0.528</span>    <span class="hljs-number">3.516</span>    <span class="hljs-number">1.172</span> &#123;method <span class="hljs-string">&#x27;run_until_complete&#x27;</span> of <span class="hljs-string">&#x27;uvloop.loop.Loop&#x27;</span> objects&#125;<br>    <span class="hljs-number">29900</span>    <span class="hljs-number">0.019</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">1.537</span>    <span class="hljs-number">0.000</span> tasks.py:<span class="hljs-number">596</span>(_wrap_awaitable)<br>    <span class="hljs-number">29900</span>    <span class="hljs-number">0.039</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">1.501</span>    <span class="hljs-number">0.000</span> core.py:<span class="hljs-number">124</span>(wrapper)<br>    <span class="hljs-number">29900</span>    <span class="hljs-number">0.048</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">1.150</span>    <span class="hljs-number">0.000</span> core.py:<span class="hljs-number">178</span>(raw_invoke)<br>        <span class="hljs-number">1</span>    <span class="hljs-number">1.001</span>    <span class="hljs-number">1.001</span>    <span class="hljs-number">1.001</span>    <span class="hljs-number">1.001</span> &#123;built-<span class="hljs-keyword">in</span> method time.sleep&#125;<br>    <span class="hljs-number">20000</span>    <span class="hljs-number">0.041</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.953</span>    <span class="hljs-number">0.000</span> transport.py:<span class="hljs-number">286</span>(request)<br>    <span class="hljs-number">20008</span>    <span class="hljs-number">0.091</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.864</span>    <span class="hljs-number">0.000</span> transport.py:<span class="hljs-number">237</span>(_base_request)<br>    <span class="hljs-number">20008</span>    <span class="hljs-number">0.026</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.361</span>    <span class="hljs-number">0.000</span> asyncio_helper.py:<span class="hljs-number">61</span>(as_first_completed)<br>       <span class="hljs-number">28</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.345</span>    <span class="hljs-number">0.012</span> __init__.py:<span class="hljs-number">1</span>(&lt;module&gt;)<br>    <span class="hljs-number">20010</span>    <span class="hljs-number">0.113</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.331</span>    <span class="hljs-number">0.000</span> tasks.py:<span class="hljs-number">335</span>(wait)<br>    <span class="hljs-number">10005</span>    <span class="hljs-number">0.047</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.305</span>    <span class="hljs-number">0.000</span> transport.py:<span class="hljs-number">267</span>(write_to_conn)<br>    <span class="hljs-number">10000</span>    <span class="hljs-number">0.032</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.281</span>    <span class="hljs-number">0.000</span> utils.py:<span class="hljs-number">121</span>(param_handle)<br>      <span class="hljs-number">277</span>    <span class="hljs-number">0.010</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.222</span>    <span class="hljs-number">0.001</span> base.py:<span class="hljs-number">114</span>(_listen_conn)<br>    <span class="hljs-number">10282</span>    <span class="hljs-number">0.031</span>    <span class="hljs-number">0.000</span>    <span class="hljs-number">0.198</span>    <span class="hljs-number">0.000</span> transport.py:<span class="hljs-number">93</span>(dispatch_resp_from_conn)<br>...<br>...<br>...<br></code></pre></td></tr></table></figure>
+<p>这段输出会显示很多数据， 每个字段都有不同的含义：</p>
+<ul>
+<li>ncalls:每个函数被调用次数</li>
+<li>tottime:表示该函数本身的执行时间，不包括该函数调用的子函数</li>
+<li>cumtime:表示该函数累计执行时间，包括该函数调用的子函数</li>
+<li>percall: 第一个<code>percall</code>表示 <code>tottime/ncalls</code>, 第二个<code>percall</code>表示<code>cumtime/primitive calls</code>，<code>primitive calls</code>表示除去递归后本函数被调用次数。</li>
+</ul>
+<p>虽然输出很详细， 但是这样看数据排查问题也太废眼睛了， 我看没几分钟就开始受不了， 也觉得麻烦。</p>
+<h3 id="2-2-火焰图"><a href="#2-2-火焰图" class="headerlink" title="2.2.火焰图"></a>2.2.火焰图</h3><p><code>cProfile</code>输出了很多内容， 但是很难从终端输出直观的看出主要是开销是哪些函数， 这时就需要一些Gui工具来帮忙快速发现问题函数了。</p>
+<p>工具<a target="_blank" rel="noopener" href="https://github.com/baverman/flameprof">flameprof</a>可以通过解析<code>cProfile</code>生成的prof文件来生成火焰图, 火焰图能直观的反应函数的调用关系与调用时长， 使用命令如下： </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python">python -m cProfile -o demo.prof main.py<br>flameprof demo.prof &gt; demo.svg<br></code></pre></td></tr></table></figure>
+<p>于是我调用命令生成火焰图：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python">python -m cProfile  -o aaa.prof example/benchmark/benchmark_rap_by_single_conn_multiplexing.py<br>flameprof aaa.prof aaa.svg<br></code></pre></td></tr></table></figure>
+<p><img src="https://ftp.bmp.ovh/imgs/2021/10/3bc7c2767f1a5ef8.png"><br>这个火焰图分为上下两部分， 上部的图是按照函数调用栈和执行时间排列。下部反方向的图按照函数执行时间比例从大到小排列。上部的图中<code>run_client</code>是最顶层的函数，往上是它调用的子函数，直到调用链最底层的函数。宽度表示每个函数的执行时间占用的比例，越宽表示越耗时。 可以看出来火焰图比<code>cProfile</code>直观一些, 可视化有助于我们快速发现问题函数， 但是这种火焰图只局限于展示， 没有提供更多的操作， 当调用层级较高时（也就是火焰图最上面的调用数据展示）， 上面的函数就很难一下子看懂了, 在经过一番搜索后发现了<a target="_blank" rel="noopener" href="https://jiffyclub.github.io/snakeviz/">snakeviz</a>， 它基于prof文件生成一个火焰图页面， 使用者可以在火焰图页面做一些交互操作， 更容易发现问题函数。</p>
+<h2 id="3-分析问题"><a href="#3-分析问题" class="headerlink" title="3.分析问题"></a>3.分析问题</h2><p>工具搞定了， 就可以开始分析问题了， 首先看<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">aiorpc</a>的运行火焰图:<br><img  src="https://ftp.bmp.ovh/imgs/2021/10/84e19d3b27bae5b8.png"  ><span class="image-caption">aiorpc火焰图</span><br>结合代码发现它的主要调用方法<code>call</code>只用了0.394秒, 而我的框架的主要调用火焰图如下:<br><img  src="https://ftp.bmp.ovh/imgs/2021/10/ebcfa7225df6d373.png"  ><span class="image-caption">rap火焰图</span><br>主要调用方法<code>core.py:122(wrapper)</code>方法用了1.43s,是<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">aiorpc</a>的三倍， 其中参数调用方法<code>param_handle</code>耗时为0.53，请求方法<code>raw_invoke</code>耗时0.82, 这时候想要往下看<code>param_handle</code>会发现展示区域太小了， 可以点击<code>param_handle</code>块，然后就会跳转到以<code>param_handle</code>为顶层的页面，展示的数据更多了:<br><img  src="https://ftp.bmp.ovh/imgs/2021/10/1d727c65ed4a423a.png"  ><span class="image-caption">rap param_handle火焰图</span></p>
+<p>通过火焰图可以发现，<code>param_handle</code>的火焰图中包含大量的<code>inspect</code>模块的相关使用以及<code>check_func_type</code>函数, 所以他们的运行性能会影响到<code>param_handle</code>的运行性能, 其中<code>inspect.signature</code>最耗时间, 这时需要从源码进行分析， 它们的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">check_func_type</span>(<span class="hljs-params">func: Callable, param_list: Sequence[Any], default_param_dict: Dict[<span class="hljs-built_in">str</span>, Any]</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;Check whether the input parameter type is consistent with the function parameter type&quot;&quot;&quot;</span><br>    func_sig: inspect.Signature = inspect.signature(func)<br>    <span class="hljs-keyword">for</span> index, parameter_tuple <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(func_sig.parameters.items()):<br>        name, parameter = parameter_tuple<br>        <span class="hljs-keyword">if</span> parameter.default <span class="hljs-keyword">is</span> parameter.empty:<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> is_type(<span class="hljs-built_in">type</span>(param_list[index]), parameter.annotation):<br>                <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;param_list[index]&#125;</span> type must: <span class="hljs-subst">&#123;parameter.annotation&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> is_type(<span class="hljs-built_in">type</span>(default_param_dict.get(name, parameter.default)), parameter.annotation):<br>                <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;default_param_dict[name]&#125;</span> type must: <span class="hljs-subst">&#123;parameter.annotation&#125;</span>&quot;</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">param_handle</span>(<span class="hljs-params">func: Callable, param_list: Sequence[Any], default_param_dict: Dict[<span class="hljs-built_in">str</span>, Any]</span>) -&gt; Tuple[Any, ...]:</span><br>    <span class="hljs-string">&quot;&quot;&quot;Check whether the parameter is legal and whether the parameter type is correct&quot;&quot;&quot;</span><br>    new_param_list: Tuple[Any, ...] = inspect.signature(func).bind(*param_list, **default_param_dict).args<br>    check_func_type(func, param_list, default_param_dict)<br>    <span class="hljs-keyword">return</span> new_param_list<br></code></pre></td></tr></table></figure>
+<p>通过代码可以发现<code>inspect.signature</code>的所在位置, 它的功能是用于生成函数签名， 但是函数签名这个东西是不会变动的， 同时调用端基本上都使用了<code>Python</code>的装饰器， 在启动的时候就可以生成函数签名了， 所以这个函数可以逻辑可以改为只接收<code>inspect.Signature</code>对象， 减少重复生成开销, 修改后如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">check_func_type</span>(<span class="hljs-params">func_sig: inspect.Signature, param_list: Sequence[Any], default_param_dict: Dict[<span class="hljs-built_in">str</span>, Any]</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;Check whether the input parameter type is consistent with the function parameter type&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">for</span> index, parameter_tuple <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(func_sig.parameters.items()):<br>        name, parameter = parameter_tuple<br>        <span class="hljs-keyword">if</span> parameter.default <span class="hljs-keyword">is</span> parameter.empty:<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> is_type(<span class="hljs-built_in">type</span>(param_list[index]), parameter.annotation):<br>                <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;param_list[index]&#125;</span> type must: <span class="hljs-subst">&#123;parameter.annotation&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> is_type(<span class="hljs-built_in">type</span>(default_param_dict.get(name, parameter.default)), parameter.annotation):<br>                <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;default_param_dict[name]&#125;</span> type must: <span class="hljs-subst">&#123;parameter.annotation&#125;</span>&quot;</span>)<br><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">param_handle</span>(<span class="hljs-params">func_sig: inspect.Signature, param_list: Sequence[Any], default_param_dict: Dict[<span class="hljs-built_in">str</span>, Any]</span>) -&gt; Tuple[Any, ...]:</span><br>    <span class="hljs-string">&quot;&quot;&quot;Check whether the parameter is legal and whether the parameter type is correct&quot;&quot;&quot;</span><br>    new_param_list: Tuple[Any, ...] = func_sig.bind(*param_list, **default_param_dict).args<br>    check_func_type(func_sig, param_list, default_param_dict)<br>    <span class="hljs-keyword">return</span> new_param_list<br></code></pre></td></tr></table></figure>
+<p>其次就是<code>check_func_type</code>这个函数了， 里面都是我自己通过<code>debug</code>慢慢调试出来写的校验参数的代码， 没多少优化空间了， 只能转战下一个地方， 现在点击右上角的<code>Call  Stack</code>选择回到一开始的界面， 重新选择请求流程的另外一块<code>raw_invoke</code>:<br><img src="https://ftp.bmp.ovh/imgs/2021/10/9a85fc9a8037a2d8.png"></p>
+<p>通过火焰图可以看到，请求流程<code>raw_invoke</code>的总耗时0.857秒, 其中主要占用为<code>request</code>的0.675耗时， 其他没显示出来的具体是选择连接<code>pick</code>(0.07s), 信号量封装(共计0.05s)， 这两个基本上没有多少优化的空间了， 除非是不需要健全的服务调用功能。</p>
+<p>所以我的排查重点来到了<code>transport.py</code>的<code>_base_request</code>调用, 其中蓝色箭头所指的是获取雪花id的函数调用<code>async_get_snowflake_id</code>：<br><img src="https://ftp.bmp.ovh/imgs/2021/10/c708d6afce024124.png"><br>可以发现主要的时间消耗是<code>as_first_completed</code>, <code>write_to_conn</code>和<code>async_get_snowflake_id</code>, <code>_base_request</code>函数， 它们的源代码如下， 可以看到三个函数所处的位置:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_base_request</span>(<span class="hljs-params">self, request: Request, conn: Connection</span>) -&gt; Response:</span><br>    <span class="hljs-string">&quot;&quot;&quot;Send data to the server and get the response from the server.</span><br><span class="hljs-string">    :param request: client request obj</span><br><span class="hljs-string">    :param conn: client conn</span><br><span class="hljs-string"></span><br><span class="hljs-string">    :return: return server response</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    <span class="hljs-comment"># 函数1</span><br>    request.correlation_id = <span class="hljs-built_in">str</span>(<span class="hljs-keyword">await</span> async_get_snowflake_id())<br>    resp_future_id: <span class="hljs-built_in">str</span> = <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;conn.sock_tuple&#125;</span>:<span class="hljs-subst">&#123;request.correlation_id&#125;</span>&quot;</span><br>    <span class="hljs-keyword">try</span>:<br>        response_future: asyncio.Future[Response] = asyncio.Future()<br>        self._resp_future_dict[resp_future_id] = response_future<br>        deadline: Optional[Deadline] = deadline_context.get()<br>        <span class="hljs-keyword">if</span> self.app.through_deadline <span class="hljs-keyword">and</span> deadline:<br>            request.header[<span class="hljs-string">&quot;X-rap-deadline&quot;</span>] = deadline.end_timestamp<br>        <span class="hljs-comment"># 函数2</span><br>        <span class="hljs-keyword">await</span> self.write_to_conn(request, conn)<br>        <span class="hljs-comment"># 函数3</span><br>        response: Response = <span class="hljs-keyword">await</span> as_first_completed(<br>            [response_future],<br>            not_cancel_future_list=[conn.conn_future],<br>        )<br>        response.state = request.state<br>        <span class="hljs-keyword">return</span> response<br>    <span class="hljs-keyword">finally</span>:<br>        pop_future: Optional[asyncio.Future] = self._resp_future_dict.pop(resp_future_id, <span class="hljs-literal">None</span>)<br>        <span class="hljs-keyword">if</span> pop_future:<br>            safe_del_future(pop_future)<br></code></pre></td></tr></table></figure>
+<p>从函数开头开始分析， 首先有个获取<code>correlation_id</code>的函数<code>async_get_snowflake_id</code>, 本来想进行优化的， 后面发现下面的uuid4获取耗时比它还差一点点， 对比后就不想优化了。然后是<code>write_to_conn</code>, 它的主要耗时在序列化， 等待连接drain，打印日志等等, 大部分都是内置函数， 很难再优化下去的， 最后的<code>as_first_completed</code>函数也是一些系统调用，没多少优化机会， 都是应有的流程， 这时我开始怀疑是我排查路径出现问题，于是我就重新对比两个调用过程：<br>|类别|rap|aiorpc|<br>|—|—|—|<br>|调用图|<img  src="https://ftp.bmp.ovh/imgs/2021/10/065f6d33eee6ddbc.png"  ><span class="image-caption">rpc调用图</span> |<img  src="https://ftp.bmp.ovh/imgs/2021/10/950d63d5592edeaf.png"  ><span class="image-caption">aiorpc请求调用图</span> |<br>|发送时长|0.2333s|0.146s|<br>|接收时长|0.235s|0.153s|</p>
+<p>从表格的数据和图可以发现我实现的框架无论是发送时长还是接收时长，都会比<code>aiorpc</code>长一些， 在经过梳理后发现这些影响时长的调用大部分都是为了增加一些可用性等功能才添加的， 拆分为一小块一小块的分析时发现问题也不大， 这时我就十分纳闷了， 按道理我单连接复用会比没复用的快很多啊， 怎么跑出来的结果不仅不一样， 还慢很多呢？ 于是我重新查看火焰图， 看到<code>aiorpc</code>火焰图client.py:69(call)的时间也就是请求消耗时间为0.394， 而<code>rap</code>同为请求的火焰图块core.py:112(wrapper)显示的时间为1.43s， 他们的差距大概在3倍左右， 与压测跑的qps相差倍数是一样的, 我猜想这个压测代码的主要耗时都是函数调用耗时， 而io耗时占比非常的少。 于是我重新看了压测代码， 这时才发现， server的调用代码是纯cpu计算， 没有io耗时的相关代码, 代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run_server</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test_sum</span>(<span class="hljs-params">a: <span class="hljs-built_in">int</span>, b: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>        <span class="hljs-keyword">return</span> a + b<br><br>    loop: asyncio.AbstractEventLoop = uvloop.new_event_loop()<br>    asyncio.set_event_loop(loop)<br>    rpc_server: Server = Server(<span class="hljs-string">&quot;example&quot;</span>)<br>    rpc_server.register(test_sum)<br>    loop.run_until_complete(rpc_server.run_forever())<br></code></pre></td></tr></table></figure>
+<p>这段代码没有任何io耗时， 本质上框架io相关的代码也不多， 同时是在本地压测， 网络数据没有经过拆解包和路由跳转等， 网络io相关的也不多， 这时client与server的调用就像本地间的函数调用一样, 基本上无须等待网络io, 主要耗时都是在函数的封装调用上， 所以单路复用的优势并没有体现出来。<br>于是， 我都给他们的服务器执行函数增加一个模拟的io操作， 休眠0.01秒：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run_server</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test_sum</span>(<span class="hljs-params">a: <span class="hljs-built_in">int</span>, b: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.01</span>)<br>        <span class="hljs-keyword">return</span> a + b<br><br>    loop: asyncio.AbstractEventLoop = uvloop.new_event_loop()<br>    asyncio.set_event_loop(loop)<br>    rpc_server: Server = Server(<span class="hljs-string">&quot;example&quot;</span>)<br>    rpc_server.register(test_sum)<br>    loop.run_until_complete(rpc_server.run_forever())<br></code></pre></td></tr></table></figure>
+<p>然后重新跑代码， 执行结果如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">➜  rap git:(master) ✗ py run python example/benchmark/benchmark_rap.py<br>call: 92 qps<br>➜  rap git:(master) ✗ py run python example/benchmark/benchmark_aiorpc.py <br>call: 95 qps<br>➜  rap git:(master) ✗ py run python example/benchmark/benchmark_rap_by_single_conn_multiplexing.py <br>call: 4265 qps<br></code></pre></td></tr></table></figure>
+<p>这时可以明显的看出来， <code>aiorpc</code>与的<code>rap</code>框架的qps都很低， 在90左右， 而<code>rap</code>的单连接复用版本的qps基本上不变。</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h2><p>本次简单学习和运用了性能分析优化， 但是整个框架的主体优化不多， 可能是运行的压测代码覆盖范围不够。 不过倒是学习了一个重要的点， 就是压测的代码要尽量的去模拟真实的环境， 大多数<code>Hello World</code>级别的压测代码很难去反应真实的数据结果， 同时在挑选框架时， 不要只看看文章介绍的性能对比， 也要去了解下压测代码， 看他的实现是否符合真实环境， 压测的结果是否有价值。</p>
+<blockquote>
+<p>NOTE: 在Python的Asyncio生态中， 曾经有一段时间有大量的Asyncio Web框架出现， 他们的压测结果都是十分的美好， 但是都是<code>Hello World</code>级别的压测代码， 所以很多人都不认可这些框架， 当然这些框架也就慢慢的沉没在历史的大海里。</p>
+</blockquote>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/10/29/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5-Python%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;10&#x2F;29&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5-Python%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;10&#x2F;29&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5-Python%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/" rel="tag">RPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2021/10/22/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E8%B6%85%E6%97%B6%E4%B8%8E%E8%B6%85%E6%97%B6%E4%BC%A0%E9%80%92/">RPC框架编写实践--超时与超时传递<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-text">1.性能对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E6%80%A7%E8%83%BD%E5%B7%A5%E5%85%B7"><span class="toc-text">2.优化性能工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-cProfile"><span class="toc-text">2.1.cProfile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E7%81%AB%E7%84%B0%E5%9B%BE"><span class="toc-text">2.2.火焰图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%88%86%E6%9E%90%E9%97%AE%E9%A2%98"><span class="toc-text">3.分析问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-text">1.性能对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BC%98%E5%8C%96%E6%80%A7%E8%83%BD%E5%B7%A5%E5%85%B7"><span class="toc-text">2.优化性能工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-cProfile"><span class="toc-text">2.1.cProfile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E7%81%AB%E7%84%B0%E5%9B%BE"><span class="toc-text">2.2.火焰图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%88%86%E6%9E%90%E9%97%AE%E9%A2%98"><span class="toc-text">3.分析问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
