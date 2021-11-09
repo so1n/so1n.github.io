@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>初识Python协程的实现 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记上一遍文章简单的介绍了Python的通过Async...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">初识Python协程的实现</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2021/11/42b835643bb64c94.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">初识Python协程的实现</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 08, 2021</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>21332</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><a href="https://so1n.me/2021/10/29/Python%E7%9A%84Sync%E4%B8%8EAsync%E6%89%A7%E8%A1%8C%E9%80%9F%E5%BA%A6%E7%9A%84%E5%BF%AB%E6%85%A2/">上一遍文章</a>简单的介绍了<code>Python</code>的通过<code>Async</code>语法实现协程的优劣性以及它的特点， 在io比较多的场景中， <code>Async</code>语法编写的程序会以更少的时间， 更少的资源来完成相同的任务， 这篇文章则是介绍了<code>Python</code>的<code>Async</code>语法的协程是如何实现的。</p>
+        <h2 id="1-传统的Sync语法请求例子"><a href="#1-传统的Sync语法请求例子" class="headerlink" title="1.传统的Sync语法请求例子"></a>1.传统的Sync语法请求例子</h2><p>还是一样， 在了解<code>Async</code>语法的实现之前， 先从一个<code>Sync</code>的语法例子开始， 现在假设有一个HTTP请求， 这个程序会通过这个请求获取对应的响应内容， 并打印出来, 代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> socket<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request</span>(<span class="hljs-params">host: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;模拟请求并打印响应体&quot;&quot;&quot;</span><br>    url: <span class="hljs-built_in">str</span> = <span class="hljs-string">f&quot;http://<span class="hljs-subst">&#123;host&#125;</span>&quot;</span><br>    sock: socket.SocketType = socket.socket()<br>    sock.connect((host, <span class="hljs-number">80</span>))<br>    sock.send(<span class="hljs-string">f&quot;GET <span class="hljs-subst">&#123;url&#125;</span> HTTP/1.0\r\nHost: <span class="hljs-subst">&#123;host&#125;</span>\r\n\r\n&quot;</span>.encode(<span class="hljs-string">&quot;ascii&quot;</span>))<br><br>    response_bytes: <span class="hljs-built_in">bytes</span> = <span class="hljs-string">b&quot;&quot;</span><br>    chunk: <span class="hljs-built_in">bytes</span> = sock.recv(<span class="hljs-number">4096</span>)<br>    <span class="hljs-keyword">while</span> chunk:<br>        response_bytes += chunk<br>        chunk = sock.recv(<span class="hljs-number">4096</span>)<br>    print(<span class="hljs-string">&quot;\n&quot;</span>.join([i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> response_bytes.decode().split(<span class="hljs-string">&quot;\r\n&quot;</span>)]))<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    request(<span class="hljs-string">&quot;so1n.me&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>运行程序， 程序能够正常输出, 上部分打印了对应的HTTP响应Header, 下部分打印了HTTP响应体, , 可以看到服务端叫我们以https的形式重新请求， 输出结果如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs bash">HTTP/1.1 301 Moved Permanently<br>Server: GitHub.com<br>Content-Type: text/html<br>Location: https://so1n.me/<br>X-GitHub-Request-Id: A744:3871:4136AF:48BD9F:6188DB50<br>Content-Length: 162<br>Accept-Ranges: bytes<br>Date: Mon, 08 Nov 2021 08:11:37 GMT<br>Via: 1.1 varnish<br>Age: 104<br>Connection: close<br>X-Served-By: cache-qpg1272-QPG<br>X-Cache: HIT<br>X-Cache-Hits: 2<br>X-Timer: S1636359097.026094,VS0,VE0<br>Vary: Accept-Encoding<br>X-Fastly-Request-ID: 22fa337f777553d33503cee5282598c6a293fb5e<br><br>&lt;html&gt;<br>&lt;head&gt;&lt;title&gt;301 Moved Permanently&lt;/title&gt;&lt;/head&gt;<br>&lt;body&gt;<br>&lt;center&gt;&lt;h1&gt;301 Moved Permanently&lt;/h1&gt;&lt;/center&gt;<br>&lt;hr&gt;&lt;center&gt;nginx&lt;/center&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;<br></code></pre></td></tr></table></figure>
+<p>不过这里并不是想说HTTP请求是如何实现的， 具体我也不太了解， 在这个代码中， socket的默认调用是阻塞的， 当线程调用<code>connect</code>或者<code>recv</code>时(<code>send</code>是不用等待的， 但在高并发下需要先等待<code>drain</code>后才可以<code>send</code>, 小demo不需要用到<code>drain</code>方法)， 程序将会暂停直到操作完成。 当一次要下载很多网页的话， 这将会如上篇文章所说的一样， 大部分的等待时间都花在io上面， cpu却一直空闲时， 而使用线程池虽然可以解决这个问题， 但是开销是很大的， 同时操作系统往往会限制一个进程，用户或者机器可以使用的线程数， 而协程却没有这些限制， 占用的资源少， 也没有系统限制瓶颈。</p>
+<h2 id="2-异步的请求"><a href="#2-异步的请求" class="headerlink" title="2.异步的请求"></a>2.异步的请求</h2><p>异步可以让一个单独的线程处理并发的操作， 不过在上面已经说过了， socket是默认阻塞的， 所以需要把socket设置为非阻塞的, socket提供了<code>setblocking</code>这个方法供开发者选择是否阻塞， 在设置了非阻塞后， <code>connect</code>和<code>recv</code>方法也要进行更改。</p>
+<p>由于没有了阻塞， 程序在调用了<code>connect</code>后会马上返回， 只不过<code>Python</code>的底层是<code>C</code>, 这段代码在<code>C</code>中调用非阻塞的socket.connect后会抛出一个异常， 我们需要捕获它， 就像这样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> socket<br><br>sock: socket.SocketType = socket.socket()<br>sock.setblocking(Flase)<br><span class="hljs-keyword">try</span>:<br>    sock.connect((<span class="hljs-string">&quot;so1n.me&quot;</span>, <span class="hljs-number">80</span>))<br><span class="hljs-keyword">except</span> BlockingIOError:<br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>经过一顿操作后， 就开始申请建立连接了， 但是我们还不知道连接啥时候完成建立， 由于连接没建立时调用<code>send</code>会报错， 所以可以一直轮询调用<code>send</code>直到没报错就认为是成功（真实代码需要加超时）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    <span class="hljs-keyword">try</span>: <br>        sock.send(request)<br>        <span class="hljs-keyword">break</span><br>    <span class="hljs-keyword">except</span> OSError <span class="hljs-keyword">as</span> e:<br>        <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>但是这样让CPU空转太浪费性能了， 而且期间还不能做别的事情， 就像我们点外卖后一直打电话过去问饭菜做好了没有， 十分浪费电话费用， 要是饭菜做完了就打电话告诉我们， 那就只产生了一笔费用， 非常的省钱（正常情况下也是这样子）。<br>这时就需要事件循环登场了，在类UNIX中， 有一个叫<code>select</code>的功能， 它可以等待事件发生后再调用监听的函数， 不过一开始的实现性能不是很好， 在<code>Linux</code>上被<code>epoll</code>取代， 不过接口是类似的， 所在在<code>Python</code>中把这几个不同的事件循环都封装在<code>selectors</code>库中， 同时可以通过<code>DefaultSelector</code>从系统中挑出最好的类<code>select</code>函数。<br>这里先暂时不说事件循环的原理， 事件循环最主要的是他名字的两部分， 一个是事件， 一个是循环， 在<code>Python</code>中， 可以通过如下方法把事件注册到事件循环中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>():</span> <span class="hljs-keyword">pass</span><br><br>selector.register(fd, EVENT_WRITE, demo)<br></code></pre></td></tr></table></figure>
+<p>这样这个事件循环就会监听对应的文件描述符fd, 当这个文件描述符触发写入事件(EVENT_WRITE)时，事件循环就会告诉我们可以去调用注册的函数<code>demo</code>。不过如果把上面的代码都改为这种方法去运行的话就会发现， 程序好像没跑就结束了， 但程序其实是有跑的， 只不过他们是完成的了注册， 然后就等待开发者接收事件循环的事件进行下一步的操作， 所以我们只需要在代码的最后面写上如下代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    <span class="hljs-keyword">for</span> key, mask <span class="hljs-keyword">in</span> selector.select():<br>        key.data()<br></code></pre></td></tr></table></figure>
+<p>这样程序就会一直运行, 当捕获到事件的时候， 就会通过for循环告诉我们， 其中<code>key.data</code>是我们注册的回调函数， 当事件发生时， 就会通知我们， 我们可以通过拿到回调函数然后就运行, 了解完毕后， 我们可以来编写我们的第一个并发程序， 他实现了一个简单的I/O复用的小逻辑, 代码和注释如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> socket<br><span class="hljs-keyword">from</span> selectors <span class="hljs-keyword">import</span> DefaultSelector, EVENT_READ, EVENT_WRITE<br><br><br><span class="hljs-comment"># 选择事件循环</span><br>selector: DefaultSelector = DefaultSelector()<br><span class="hljs-comment"># 用于判断是否有事件在运行</span><br>running_cnt: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request</span>(<span class="hljs-params">host: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;模拟请求并打印响应体&quot;&quot;&quot;</span><br>    <span class="hljs-comment"># 告诉主函数， 自己的事件还在运行</span><br>    <span class="hljs-keyword">global</span> running_cnt<br>    running_cnt += <span class="hljs-number">1</span><br>    <br>    <span class="hljs-comment"># 初始化socket</span><br>    url: <span class="hljs-built_in">str</span> = <span class="hljs-string">f&quot;http://<span class="hljs-subst">&#123;host&#125;</span>&quot;</span><br>    sock: socket.SocketType = socket.socket()<br>    sock.setblocking(<span class="hljs-literal">False</span>)<br>    <span class="hljs-keyword">try</span>:<br>        sock.connect((host, <span class="hljs-number">80</span>))<br>    <span class="hljs-keyword">except</span> BlockingIOError:<br>        <span class="hljs-keyword">pass</span><br><br>    response_bytes: <span class="hljs-built_in">bytes</span> = <span class="hljs-string">b&quot;&quot;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">read_response</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;接收响应参数， 并判断请求是否结束&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">nonlocal</span> response_bytes<br>        chunk: <span class="hljs-built_in">bytes</span> = sock.recv(<span class="hljs-number">4096</span>)<br>        print(<span class="hljs-string">f&quot;recv <span class="hljs-subst">&#123;host&#125;</span> body success&quot;</span>)<br>        <span class="hljs-keyword">if</span> chunk:<br>            response_bytes += chunk<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 没有数据代表请求结束了， 注销监听</span><br>            selector.unregister(sock.fileno())<br>            <span class="hljs-keyword">global</span> running_cnt<br>            running_cnt -= <span class="hljs-number">1</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">connected</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;socket建立连接时的回调&quot;&quot;&quot;</span><br>        <span class="hljs-comment"># 取消监听</span><br>        selector.unregister(sock.fileno())<br>        print(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;host&#125;</span> connect success&quot;</span>)<br>        <span class="hljs-comment"># 发送请求， 并监听读事件， 以及注册对应的接收响应函数</span><br>        sock.send(<span class="hljs-string">f&quot;GET <span class="hljs-subst">&#123;url&#125;</span> HTTP/1.0\r\nHost: <span class="hljs-subst">&#123;host&#125;</span>\r\n\r\n&quot;</span>.encode(<span class="hljs-string">&quot;ascii&quot;</span>))<br>        selector.register(sock.fileno(), EVENT_READ, read_response)<br><br>    selector.register(sock.fileno(), EVENT_WRITE, connected)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-comment"># 同时多个请求</span><br>    request(<span class="hljs-string">&quot;so1n.me&quot;</span>)<br>    request(<span class="hljs-string">&quot;github.com&quot;</span>)<br>    request(<span class="hljs-string">&quot;google.com&quot;</span>)<br>    request(<span class="hljs-string">&quot;baidu.com&quot;</span>)<br>    <span class="hljs-comment"># 监听是否有事件在运行</span><br>    <span class="hljs-keyword">while</span> running_cnt &gt; <span class="hljs-number">0</span>:<br>        <span class="hljs-comment"># 等待事件循环通知事件是否已经完成</span><br>        <span class="hljs-keyword">for</span> key, mask <span class="hljs-keyword">in</span> selector.select():<br>            key.data()<br></code></pre></td></tr></table></figure>
+<p>这段代码接近同时注册了4个请求并注册建立连接回调， 然后就进入事件循环逻辑， 也就是把控制权交给事件循环， 直到事件循环告诉程序说收到了socket建立的通知， 程序就会取消注册的回调然后发送请求， 并注册一个读的事件回调， 然后又把控制权交给事件循环， 直到收到了响应的结果才进入处理响应结果函数并且只有收完所有响应结果才会退出程序。 下面是我其中的一次执行结果</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">so1n.me connect success<br>github.com connect success<br>google.com connect success<br>recv google.com body success<br>recv google.com body success<br>baidu.com connect success<br>recv github.com body success<br>recv github.com body success<br>recv baidu.com body success<br>recv baidu.com body success<br>recv so1n.me body success<br>recv so1n.me body success<br></code></pre></td></tr></table></figure>
+<p>可以看到他们的执行顺序是随机的， 不是严格的按照<code>so1n.me</code>, <code>github.com</code>, <code>google.com</code>, <code>baidu.com</code>顺序执行， 同时他们执行速度很快， 这个程序的耗时约等于响应时长最长的函数耗时。<br>但是可以看出， 这个程序里面出现了两个回调， 回调会让代码变得非常的奇怪, 降低可读性， 也容易造成回调地狱， 而且当回调发生报错的时候， 我们是很难知道这是由于什么导致的错误， 因为它的上下文丢失了， 这样子排查问题十分的困惑。 作为程序员， 一般都不止满足于速度快的代码， 真正想要的是又快， 又能像<code>Sync</code>的代码一样简单, 可读性强, 也能容易排查问题的代码, 这种组合形式的代码的设计模式就叫协程。</p>
+<p>协程出现得很早， 它不像线程一样， 被系统调度， 而是能自主的暂停， 并等待事件循环通知恢复。由于协程是软件层面实现的， 所以它的实现方式有很多种， 这里要说的是基于生成器的协程， 因为生成器跟协程一样， 都有暂停让步和恢复的方法(还可以通过<code>throw</code>来抛错）， 同时它跟<code>Async</code>语法的协程很像， 通过了解基于生成器的协程， 可以了解<code>Async</code>的协程是如何实现的。</p>
+<h2 id="3-基于生成器的协程"><a href="#3-基于生成器的协程" class="headerlink" title="3.基于生成器的协程"></a>3.基于生成器的协程</h2><h3 id="3-1生成器"><a href="#3-1生成器" class="headerlink" title="3.1生成器"></a>3.1生成器</h3><p>在了解基于生成器的协程之前， 需要先了解下生成器， <code>Python</code>的生成器函数与普通的函数会有一些不同, 只有普通函数中带有关键字<code>yield</code>， 那么它就是生成器函数， 具体有什么不同可以通过他们的字节码来了解：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs Python">In [<span class="hljs-number">1</span>]: <span class="hljs-keyword">import</span> dis<br><br><span class="hljs-comment"># 普通函数</span><br>In [<span class="hljs-number">2</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">aaa</span>():</span> <span class="hljs-keyword">pass</span><br><br>In [<span class="hljs-number">3</span>]: dis.dis(aaa)<br>                                                                                                                                                                                <br>  <span class="hljs-number">1</span>           <span class="hljs-number">0</span> LOAD_CONST               <span class="hljs-number">0</span> (<span class="hljs-literal">None</span>)<br>              <span class="hljs-number">2</span> RETURN_VALUE<br><br><span class="hljs-comment"># 普通函数调用函数</span><br>In [<span class="hljs-number">4</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">bbb</span>():</span> <br>   ...:     aaa() <br>   ...:<br><br><br>In [<span class="hljs-number">5</span>]: dis.dis(bbb)<br><br>  <span class="hljs-number">2</span>           <span class="hljs-number">0</span> LOAD_GLOBAL              <span class="hljs-number">0</span> (aaa)<br>              <span class="hljs-number">2</span> CALL_FUNCTION            <span class="hljs-number">0</span><br>              <span class="hljs-number">4</span> POP_TOP<br>              <span class="hljs-number">6</span> LOAD_CONST               <span class="hljs-number">0</span> (<span class="hljs-literal">None</span>)<br>              <span class="hljs-number">8</span> RETURN_VALUE<br><br><span class="hljs-comment"># 普通生成器函数</span><br>In [<span class="hljs-number">6</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ccc</span>():</span> <span class="hljs-keyword">yield</span><br><br>In [<span class="hljs-number">7</span>]: dis.dis(ccc)<br>                                                                                                                                                                                <br>  <span class="hljs-number">1</span>           <span class="hljs-number">0</span> LOAD_CONST               <span class="hljs-number">0</span> (<span class="hljs-literal">None</span>)<br>              <span class="hljs-number">2</span> YIELD_VALUE<br>              <span class="hljs-number">4</span> POP_TOP<br>              <span class="hljs-number">6</span> LOAD_CONST               <span class="hljs-number">0</span> (<span class="hljs-literal">None</span>)<br>              <span class="hljs-number">8</span> RETURN_VALUE<br></code></pre></td></tr></table></figure>
+<p>上面分别是普通函数， 普通函数调用函数和普通生成器函数的字节码， 从字节码可以看出来， 最简单的函数只需要<code>LOAD_CONST</code>来加载变量None压入自己的栈， 然后通过<code>RETURN_VALUE</code>来返回值， 而有函数调用的普通函数则先加载变量， 把全局变量的函数<code>aaa</code>加载到自己的栈里面， 然后通过<code>CALL_FUNCTION</code>来调用函数， 最后通过<code>POP_TOP</code>把函数的返回值从栈里抛出来， 再把通过<code>LOAD_CONST</code>把None压入自己的栈， 最后返回值。<br>而生成器函数则不一样， 它会先通过<code>LOAD_CONST</code>来加载变量None压入自己的栈， 然后通过<code>YIELD_VALUE</code>返回值， 接着通过<code>POP_TOP</code>弹出刚才的栈并重新把变量None压入自己的栈， 最后通过<code>RETURN_VALUE</code>来返回值。从字节码来分析可以很清楚的看到， 生成器能够在<code>yield</code>区分两个栈帧, 一个函数调用可以分为多次返回， 很符合协程多次等待的特点。</p>
+<p>接着来看看生成器的一个使用, 这个生成器会有两次<code>yield</code>调用, 并在最后返回字符串<code>&#39;None&#39;</code>， 代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs Python">In [<span class="hljs-number">8</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>():</span> <br>   ...:     a = <span class="hljs-number">1</span> <br>   ...:     b = <span class="hljs-number">2</span> <br>   ...:     print(<span class="hljs-string">&#x27;aaa&#x27;</span>, <span class="hljs-built_in">locals</span>()) <br>   ...:     <span class="hljs-keyword">yield</span> <span class="hljs-number">1</span> <br>   ...:     print(<span class="hljs-string">&#x27;bbb&#x27;</span>, <span class="hljs-built_in">locals</span>()) <br>   ...:     <span class="hljs-keyword">yield</span> <span class="hljs-number">2</span> <br>   ...:     <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;None&#x27;</span> <br>   ...:<br>                                                                                                                                                                                                   <br>In [<span class="hljs-number">9</span>]: demo_gen = demo()<br><br>In [<span class="hljs-number">10</span>]: demo_gen.send(<span class="hljs-literal">None</span>)<br><br>aaa &#123;<span class="hljs-string">&#x27;a&#x27;</span>: <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;b&#x27;</span>: <span class="hljs-number">2</span>&#125;<br>Out[<span class="hljs-number">10</span>]: <span class="hljs-number">1</span><br><br>In [<span class="hljs-number">11</span>]: demo_gen.send(<span class="hljs-literal">None</span>)<br><br>bbb &#123;<span class="hljs-string">&#x27;a&#x27;</span>: <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;b&#x27;</span>: <span class="hljs-number">2</span>&#125;<br>Out[<span class="hljs-number">11</span>]: <span class="hljs-number">2</span><br><br>In [<span class="hljs-number">12</span>]: demo_gen.send(<span class="hljs-literal">None</span>)<br><br>---------------------------------------------------------------------------<br>StopIteration                             Traceback (most recent call last)<br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">12</span>-8f8cb075d6af&gt; <span class="hljs-keyword">in</span> &lt;module&gt;<br>----&gt; 1 demo_gen.send(None)<br><br>StopIteration: <span class="hljs-literal">None</span><br><br></code></pre></td></tr></table></figure>
+<p>这段代码首先通过函数调用生成一个<code>demo_gen</code>的生成器对象, 然后第一次<code>send</code>调用时返回值1， 第二次<code>send</code>调用时返回值2， 第三次<code>send</code>调用则抛出<code>StopIteration</code>异常， 异常提示为<code>None</code>, 同时可以看到第一次打印<code>aaa</code>和第二次打印<code>bbb</code>时， 他们都能打印到当前的函数局部变量， 可以发现在即使在不同的栈帧中， 他们读取到当前的局部函数内的局部变量是一致的， 这意味着如果使用生成器来模拟协程时， 它还是会一直读取到当前上下文的， 非常的完美。</p>
+<p>此外， <code>Python</code>还支持通过<code>yield from</code>语法来返回一个生成器, 代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs Python">In [<span class="hljs-number">1</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_gen_1</span>():</span> <br>   ...:     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>): <br>   ...:         <span class="hljs-keyword">yield</span> i <br>   ...:<br><br>In [<span class="hljs-number">2</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_gen_2</span>():</span> <br>   ...:     <span class="hljs-keyword">yield</span> <span class="hljs-keyword">from</span> demo_gen_1() <br>   ...:<br><br>In [<span class="hljs-number">3</span>]: demo_gen_obj = demo_gen_2()<br><br>In [<span class="hljs-number">4</span>]: demo_gen_obj.send(<span class="hljs-literal">None</span>)<br>                                                                                                                                                                     <br>Out[<span class="hljs-number">4</span>]: <span class="hljs-number">0</span><br><br>In [<span class="hljs-number">5</span>]: demo_gen_obj.send(<span class="hljs-literal">None</span>)<br><br>Out[<span class="hljs-number">5</span>]: <span class="hljs-number">1</span><br><br>In [<span class="hljs-number">6</span>]: demo_gen_obj.send(<span class="hljs-literal">None</span>)<br><br>Out[<span class="hljs-number">6</span>]: <span class="hljs-number">2</span><br><br>In [<span class="hljs-number">7</span>]: demo_gen_obj.send(<span class="hljs-literal">None</span>)<br>                                                                                                                                    <br>---------------------------------------------------------------------------<br>StopIteration                             Traceback (most recent call last)<br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">7</span>-f9922a2f64c9&gt; <span class="hljs-keyword">in</span> &lt;module&gt;<br>----&gt; 1 demo_gen_obj.send(None)<br><br>StopIteration: <br><br><br></code></pre></td></tr></table></figure>
+<p>通过<code>yield from</code>就可以很方便的支持生成器调用， 假如把每个生成器函数都当做一个协程， 那通过<code>yield from</code>就可以很方便的实现协程间的调用， 此外生成器的抛出异常后的提醒非常人性化， 也支持<code>throw</code>来抛出异常， 这样我们就可以实现在协程运行时设置异常， 比如<code>Cancel</code>，演示代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs Python">In [<span class="hljs-number">1</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_exc</span>():</span> <br>   ...:     <span class="hljs-keyword">yield</span> <span class="hljs-number">1</span> <br>   ...:     <span class="hljs-keyword">raise</span> RuntimeError() <br>   ...:<br><br>In [<span class="hljs-number">2</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_exc_1</span>():</span> <br>   ...:     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>): <br>   ...:         <span class="hljs-keyword">yield</span> i <br>   ...:<br><br>In [<span class="hljs-number">3</span>]: demo_exc_gen = demo_exc()<br><br>In [<span class="hljs-number">4</span>]: demo_exc_gen.send(<span class="hljs-literal">None</span>)<br>                                                                                                                                                                     <br>Out[<span class="hljs-number">4</span>]: <span class="hljs-number">1</span><br><br>In [<span class="hljs-number">5</span>]: demo_exc_gen.send(<span class="hljs-literal">None</span>)<br>                                                                                                                                     <br>---------------------------------------------------------------------------<br>RuntimeError                              Traceback (most recent call last)<br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">5</span>-09fbb75fdf7d&gt; <span class="hljs-keyword">in</span> &lt;module&gt;<br>----&gt; 1 demo_exc_gen.send(None)<br><br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">1</span>-69afbc1f9c19&gt; <span class="hljs-keyword">in</span> demo_exc()<br>      <span class="hljs-number">1</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_exc</span>():</span><br>      <span class="hljs-number">2</span>     <span class="hljs-keyword">yield</span> <span class="hljs-number">1</span><br>----&gt; 3     raise RuntimeError()<br>      <span class="hljs-number">4</span> <br><br>RuntimeError: <br><br>In [<span class="hljs-number">6</span>]: demo_exc_gen_1 = demo_exc_1()<br><br>In [<span class="hljs-number">7</span>]: demo_exc_gen_1.send(<span class="hljs-literal">None</span>)<br>                                                                                                                                        Out[<span class="hljs-number">7</span>]: <span class="hljs-number">0</span><br><br>In [<span class="hljs-number">8</span>]: demo_exc_gen_1.send(<span class="hljs-literal">None</span>)<br>                                                                                                                                        Out[<span class="hljs-number">8</span>]: <span class="hljs-number">1</span><br><br>In [<span class="hljs-number">9</span>]: demo_exc_gen_1.throw(RuntimeError)<br>                                                                                                                                        ---------------------------------------------------------------------------<br>RuntimeError                              Traceback (most recent call last)<br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">9</span>-1a1cc55d71f4&gt; <span class="hljs-keyword">in</span> &lt;module&gt;<br>----&gt; 1 demo_exc_gen_1.throw(RuntimeError)<br><br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">2</span>-2617b2366dce&gt; <span class="hljs-keyword">in</span> demo_exc_1()<br>      <span class="hljs-number">1</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_exc_1</span>():</span><br>      <span class="hljs-number">2</span>     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):<br>----&gt; 3         yield i<br>      <span class="hljs-number">4</span> <br><br>RuntimeError: <br></code></pre></td></tr></table></figure>
+<p>从中可以看到在运行中抛出异常时， 会有一个非常清楚的抛错， 可以明显看出错误堆栈， 同时<code>throw</code>指定异常后， 会在下一处<code>yield</code>抛出异常(所以协程调用<code>Cancel</code>后不会马上取消， 而是下一次调用的时候才被取消)。</p>
+<h3 id="3-2用生成器实现协程"><a href="#3-2用生成器实现协程" class="headerlink" title="3.2用生成器实现协程"></a>3.2用生成器实现协程</h3><p>我们已经简单的了解到了生成器是非常的贴合协程的编程模型， 同时也知道哪些生成器API是我们需要的API， 接下来可以模仿<code>Asyncio</code>的接口来实现一个简单的协程。</p>
+<p>首先是在<code>Asyncio</code>中有一个封装叫<code>Feature</code>, 它用来表示协程正在等待将来时的结果, 以下是我根据<code>asyncio.Feature</code>封装的一个简单的<code>Feature</code>, 它的API没有<code>asyncio.Feature</code>全, 代码和注释如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Status</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;用于判断Future状态&quot;&quot;&quot;</span><br>    pending: <span class="hljs-built_in">int</span> = <span class="hljs-number">1</span><br>    finished: <span class="hljs-built_in">int</span> = <span class="hljs-number">2</span><br>    cancelled: <span class="hljs-built_in">int</span> = <span class="hljs-number">3</span><br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Future</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;初始化时， Feature处理pending状态， 等待set result&quot;&quot;&quot;</span><br>        self.status: <span class="hljs-built_in">int</span> = Status.pending<br>        self._result: Any = <span class="hljs-literal">None</span><br>        self._exception: Optional[Exception] = <span class="hljs-literal">None</span><br>        self._callbacks: List[Callable[[<span class="hljs-string">&#x27;Future&#x27;</span>], <span class="hljs-literal">None</span>]] = []<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">add_done_callback</span>(<span class="hljs-params">self, fn: [[<span class="hljs-string">&#x27;Future&#x27;</span>], <span class="hljs-literal">None</span>]Callable</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;添加完成时的回调&quot;&quot;&quot;</span><br>        self._callbacks.append(fn)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">cancel</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;取消当前的Feature&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.status != Status.pending:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        self.status = Status.cancelled<br>        <span class="hljs-keyword">for</span> fn <span class="hljs-keyword">in</span> self._callbacks:<br>            fn(self)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set_exception</span>(<span class="hljs-params">self, exc: Exception</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;设置异常&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.status != Status.pending:<br>            <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Can not set exc&quot;</span>)<br>        self._exception = exc<br>        self.status = Status.finished<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">set_result</span>(<span class="hljs-params">self, result: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;设置结果&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.status != Status.pending:<br>            <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Can not set result&quot;</span>)<br>        self.status = Status.finished<br>        self._result = result<br>        <span class="hljs-keyword">for</span> fn <span class="hljs-keyword">in</span> self._callbacks:<br>            fn(self)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">result</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;获取结果&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.status == Status.cancelled:<br>            <span class="hljs-keyword">raise</span> asyncio.CancelledError<br>        <span class="hljs-keyword">elif</span> self.status != Status.finished:<br>            <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Result is not read&quot;</span>)<br>        <span class="hljs-keyword">elif</span> self._exception <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-keyword">raise</span> self._exception<br>        <span class="hljs-keyword">return</span> self._result<br><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__iter__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;通过生成器来模拟协程， 当收到结果通知时， 会返回结果&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.status == Status.pending:<br>            <span class="hljs-keyword">yield</span> self<br>        <span class="hljs-keyword">return</span> self.result()<br></code></pre></td></tr></table></figure>
+<p>在理解<code>Future</code>时， 可以把它假想为一个状态机， 在启动初始化的时候是<code>peding</code>状态， 在运行的时候我们可以切换它的状态, 并且通过<code>__iter__</code>方法来支持调用者使用<code>yield from Future()</code>来等待<code>Future</code>本身， 直到收到了事件通知时， 可以得到结果。</p>
+<p>但是可以发现这个<code>Future</code>是无法自我驱动, 调用了<code>__iter__</code>的程序不知道何时被调用了<code>set_result</code>， 在<code>Asyncio</code>中是通过一个叫<code>Task</code>的类来驱动<code>Future</code>, 它将一个协程的执行过程安排好， 并负责在事件循环中执行该协程。它主要有两个方法:</p>
+<ul>
+<li>1.初始化时， 会先通过<code>send</code>方法激活生成器</li>
+<li>2.后续被调度后马上安排下一次等待， 除非抛出<code>StopIteration</code>异常</li>
+</ul>
+<p>还有一个支持取消运行托管协程的方法(在原代码中， <code>Task</code>是继承于<code>Future</code>, 所以<code>Future</code>有的它都有), 经过简化后的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Task</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, coro: Generator</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 初始化状态</span><br>        self.cancelled: <span class="hljs-built_in">bool</span> = <span class="hljs-literal">False</span><br>        self.coro: Generator = coro<br>        <span class="hljs-comment"># 预激一个普通的future</span><br>        f: Future = Future()<br>        f.set_result(<span class="hljs-literal">None</span>)<br>        self.step(f)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">cancel</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;用于取消托管的coro&quot;&quot;&quot;</span><br>        self.coro.throw(asyncio.CancelledError)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">step</span>(<span class="hljs-params">self, f: Future</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;用于调用coro的下一步, 从第一次激活开始， 每次都添加完成时的回调， 直到遇到取消或者StopIteration异常&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">try</span>:<br>            _future = self.coro.send(f.result())<br>        <span class="hljs-keyword">except</span> asyncio.CancelledError:<br>            self.cancelled = <span class="hljs-literal">True</span><br>            <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">except</span> StopIteration:<br>            <span class="hljs-keyword">return</span><br><br>        _future.add_done_callback(self.step)<br></code></pre></td></tr></table></figure>
+<p>这样<code>Future</code>和<code>Task</code>就封装好了， 可以简单的试一试效果如何:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs Python">In [<span class="hljs-number">2</span>]:<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wait_future</span>(<span class="hljs-params">f: Future, flag_int: <span class="hljs-built_in">int</span></span>) -&gt; Generator[Future, <span class="hljs-keyword">None</span>, <span class="hljs-keyword">None</span>]:</span> <br>   ...:    result = <span class="hljs-keyword">yield</span> <span class="hljs-keyword">from</span> f <br>   ...:    print(flag_int, result) <br>   ...:<br>   ...:future: Future = Future() <br>   ...:<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>): <br>   ...:    coro = wait_future(future, i) <br>   ...:    <span class="hljs-comment"># 托管wait_future这个协程， 里面的Future也会通过yield from被托管 </span><br>   ...:    Task(coro) <br>   ...:<br>   ...:print(<span class="hljs-string">&#x27;ready&#x27;</span>) <br>   ...:future.set_result(<span class="hljs-string">&#x27;ok&#x27;</span>) <br>   ...:<br>   ...:future = Future() <br>   ...:Task(wait_future(future, <span class="hljs-number">3</span>)).cancel() <br>   ...: <br>                                                                                                                                        ready<br><span class="hljs-number">0</span> ok<br><span class="hljs-number">1</span> ok<br><span class="hljs-number">2</span> ok<br>---------------------------------------------------------------------------<br>CancelledError                            Traceback (most recent call last)<br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">2</span>-2d1b04db2604&gt; <span class="hljs-keyword">in</span> &lt;module&gt;<br>     <span class="hljs-number">12</span> <br>     <span class="hljs-number">13</span> future = Future()<br>---&gt; 14 Task(wait_future(future, 3)).cancel()<br><br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">1</span>-ec3831082a88&gt; <span class="hljs-keyword">in</span> cancel(self)<br>     <span class="hljs-number">81</span> <br>     <span class="hljs-number">82</span>     <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">cancel</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>---&gt; 83         self.coro.throw(asyncio.CancelledError)<br>     <span class="hljs-number">84</span> <br>     <span class="hljs-number">85</span>     <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">step</span>(<span class="hljs-params">self, f: Future</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br><br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">2</span>-2d1b04db2604&gt; <span class="hljs-keyword">in</span> wait_future(f, flag_int)<br>      <span class="hljs-number">1</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wait_future</span>(<span class="hljs-params">f: Future, flag_int: <span class="hljs-built_in">int</span></span>) -&gt; Generator[Future, <span class="hljs-keyword">None</span>, <span class="hljs-keyword">None</span>]:</span><br>----&gt; 2     result = yield from f<br>      <span class="hljs-number">3</span>     print(flag_int, result)<br>      <span class="hljs-number">4</span> <br>      <span class="hljs-number">5</span> future: Future = Future()<br><br>&lt;ipython-<span class="hljs-built_in">input</span>-<span class="hljs-number">1</span>-ec3831082a88&gt; <span class="hljs-keyword">in</span> __iter__(self)<br>     <span class="hljs-number">68</span>         <span class="hljs-string">&quot;&quot;&quot;通过生成器来模拟协程， 当收到结果通知时， 会返回结果&quot;&quot;&quot;</span><br>     <span class="hljs-number">69</span>         <span class="hljs-keyword">if</span> self.status == Status.pending:<br>---&gt; 70             yield self<br>     <span class="hljs-number">71</span>         <span class="hljs-keyword">return</span> self.result()<br>     <span class="hljs-number">72</span> <br><br>CancelledError: <br></code></pre></td></tr></table></figure>
+<p>这段程序会先初始化<code>Future</code>, 并把<code>Future</code>传给<code>wait_future</code>并生成生成器, 再交由给<code>Task</code>托管， 预激,  由于<code>Future</code>是在生成器函数<code>wait_future</code>中通过<code>yield from</code>与函数绑定的， 真正被预激的其实是<code>Future</code>的<code>__iter__</code>方法中的<code>yield self</code>, 此时代码逻辑会暂停在<code>yield self</code>并返回。<br>在全部预激后， 通过调用<code>Future</code>的<code>set_result</code>方法， 使<code>Future</code>变为结束状态， 由于<code>set_result</code>会执行注册的回调， 这时它就会执行托管它的<code>Task</code>的<code>step</code>方法中的<code>send</code>方法, 代码逻辑回到<code>Future</code>的<code>__iter__</code>方法中的<code>yield self</code>， 并继续往下走， 然后遇到<code>return</code>返回结果, 并继续走下去, 从输出可以发现程序封装完成且打印了<code>ready</code>后， 会依次打印对应的返回结果， 而在最后一个的测试<code>cancel</code>方法中可以看到，<code>Future</code>抛出异常了， 同时这些异常很容易看懂， 能够追随到调用的地方。</p>
+<p>现在<code>Future</code>和<code>Task</code>正常运行了， 可以跟我们一开始执行的程序进行整合, 代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HttpRequest</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, host: <span class="hljs-built_in">str</span></span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;初始化变量和sock&quot;&quot;&quot;</span><br>        self._host: <span class="hljs-built_in">str</span> = host<br>        <span class="hljs-keyword">global</span> running_cnt<br>        running_cnt += <span class="hljs-number">1</span><br>        self.url: <span class="hljs-built_in">str</span> = <span class="hljs-string">f&quot;http://<span class="hljs-subst">&#123;host&#125;</span>&quot;</span><br>        self.sock: socket.SocketType = socket.socket()<br>        self.sock.setblocking(<span class="hljs-literal">False</span>)<br>        <span class="hljs-keyword">try</span>:<br>            self.sock.connect((host, <span class="hljs-number">80</span>))<br>        <span class="hljs-keyword">except</span> BlockingIOError:<br>            <span class="hljs-keyword">pass</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">read</span>(<span class="hljs-params">self</span>) -&gt; Generator[Future, <span class="hljs-keyword">None</span>, bytes]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;从socket获取响应数据， 并set到Future中， 并通过Future.__iter__方法或得到数据并通过变量chunk_future返回&quot;&quot;&quot;</span><br>        f: Future = Future()<br>        selector.register(self.sock.fileno(), EVENT_READ, <span class="hljs-keyword">lambda</span>: f.set_result(self.sock.recv(<span class="hljs-number">4096</span>)))<br>        chunk_future = <span class="hljs-keyword">yield</span> <span class="hljs-keyword">from</span> f<br>        selector.unregister(self.sock.fileno())<br>        <span class="hljs-keyword">return</span> chunk_future  <span class="hljs-comment"># type: ignore</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">read_response</span>(<span class="hljs-params">self</span>) -&gt; Generator[Future, <span class="hljs-keyword">None</span>, bytes]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;接收响应参数， 并判断请求是否结束&quot;&quot;&quot;</span><br>        response_bytes: <span class="hljs-built_in">bytes</span> = <span class="hljs-string">b&quot;&quot;</span><br>        chunk = <span class="hljs-keyword">yield</span> <span class="hljs-keyword">from</span> self.read()<br>        <span class="hljs-keyword">while</span> chunk:<br>            response_bytes += chunk<br>            chunk = <span class="hljs-keyword">yield</span> <span class="hljs-keyword">from</span> self.read()<br>        <span class="hljs-keyword">return</span> response_bytes<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">connected</span>(<span class="hljs-params">self</span>) -&gt; Generator[Future, <span class="hljs-keyword">None</span>, <span class="hljs-keyword">None</span>]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;socket建立连接时的回调&quot;&quot;&quot;</span><br>        <span class="hljs-comment"># 取消监听</span><br>        f: Future = Future()<br>        selector.register(self.sock.fileno(), EVENT_WRITE, <span class="hljs-keyword">lambda</span>: f.set_result(<span class="hljs-literal">None</span>))<br>        <span class="hljs-keyword">yield</span> f<br>        selector.unregister(self.sock.fileno())<br>        print(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;self._host&#125;</span> connect success&quot;</span>)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request</span>(<span class="hljs-params">self</span>) -&gt; Generator[Future, <span class="hljs-keyword">None</span>, <span class="hljs-keyword">None</span>]:</span><br>        <span class="hljs-comment"># 发送请求， 并监听读事件， 以及注册对应的接收响应函数</span><br>        <span class="hljs-keyword">yield</span> <span class="hljs-keyword">from</span> self.connected()<br>        self.sock.send(<span class="hljs-string">f&quot;GET <span class="hljs-subst">&#123;self.url&#125;</span> HTTP/1.0\r\nHost: <span class="hljs-subst">&#123;self._host&#125;</span>\r\n\r\n&quot;</span>.encode(<span class="hljs-string">&quot;ascii&quot;</span>))<br>        response = <span class="hljs-keyword">yield</span> <span class="hljs-keyword">from</span> self.read_response()<br>        print(<span class="hljs-string">f&quot;request <span class="hljs-subst">&#123;self._host&#125;</span> success, length:<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(response)&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">global</span> running_cnt<br>        running_cnt -= <span class="hljs-number">1</span><br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-comment"># 同时多个请求</span><br>    Task(HttpRequest(<span class="hljs-string">&quot;so1n.me&quot;</span>).request())<br>    Task(HttpRequest(<span class="hljs-string">&quot;github.com&quot;</span>).request())<br>    Task(HttpRequest(<span class="hljs-string">&quot;google.com&quot;</span>).request())<br>    Task(HttpRequest(<span class="hljs-string">&quot;baidu.com&quot;</span>).request())<br>    <span class="hljs-comment"># 监听是否有事件在运行</span><br>    <span class="hljs-keyword">while</span> running_cnt &gt; <span class="hljs-number">0</span>:<br>        <span class="hljs-comment"># 等待事件循环通知事件是否已经完成</span><br>        <span class="hljs-keyword">for</span> key, mask <span class="hljs-keyword">in</span> selector.select():<br>            key.data()<br></code></pre></td></tr></table></figure>
+<p>这段代码通过<code>Future</code>和生成器方法尽量的解耦回调函数， 如果忽略了<code>HttpRequest</code>中的<code>connected</code>和<code>read</code>方法则可以发现整段代码跟同步的代码基本上是一样的, 只是通过<code>yield</code>和<code>yield from</code>交出控制权和通过事件循环恢复控制权。 同时通过上面的异常例子可以发现异常排查非常的方便， 这样一来就没有了回调的各种糟糕的事情， 开发者只需要按照同步的思路进行开发即可， 不过我们的事件循环是一个非常简单的事件循环例子， 同时对于socket相关都没有进行封装， 也缺失一些常用的API， 而这些都会被<code>Python</code>官方封装到<code>Asyncio</code>这个库中， 通过该库， 我们可以近乎完美的编写<code>Async</code>语法的代码。</p>
+<blockquote>
+<p>NOTE: 由于生成器协程中无法通过<code>yield from</code>语法使用生成器， 所以<code>Python</code>在3.5之后使用了<code>Await</code>的原生协程。</p>
+</blockquote>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/11/08/%E5%88%9D%E8%AF%86Python%20Async%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;08&#x2F;%E5%88%9D%E8%AF%86Python%20Async%E7%9A%84%E5%AE%9E%E7%8E%B0&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;08&#x2F;%E5%88%9D%E8%AF%86Python%20Async%E7%9A%84%E5%AE%9E%E7%8E%B0&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asyncio/" rel="tag">Asyncio</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2021/11/04/Python%E7%9A%84Sync%E4%B8%8EAsync%E6%89%A7%E8%A1%8C%E9%80%9F%E5%BA%A6%E7%9A%84%E5%BF%AB%E6%85%A2/">Python的Sync与Async执行速度的快慢<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BC%A0%E7%BB%9F%E7%9A%84Sync%E8%AF%AD%E6%B3%95%E8%AF%B7%E6%B1%82%E4%BE%8B%E5%AD%90"><span class="toc-text">1.传统的Sync语法请求例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%BC%82%E6%AD%A5%E7%9A%84%E8%AF%B7%E6%B1%82"><span class="toc-text">2.异步的请求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9F%BA%E4%BA%8E%E7%94%9F%E6%88%90%E5%99%A8%E7%9A%84%E5%8D%8F%E7%A8%8B"><span class="toc-text">3.基于生成器的协程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E7%94%9F%E6%88%90%E5%99%A8"><span class="toc-text">3.1生成器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2%E7%94%A8%E7%94%9F%E6%88%90%E5%99%A8%E5%AE%9E%E7%8E%B0%E5%8D%8F%E7%A8%8B"><span class="toc-text">3.2用生成器实现协程</span></a></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BC%A0%E7%BB%9F%E7%9A%84Sync%E8%AF%AD%E6%B3%95%E8%AF%B7%E6%B1%82%E4%BE%8B%E5%AD%90"><span class="toc-text">1.传统的Sync语法请求例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%BC%82%E6%AD%A5%E7%9A%84%E8%AF%B7%E6%B1%82"><span class="toc-text">2.异步的请求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9F%BA%E4%BA%8E%E7%94%9F%E6%88%90%E5%99%A8%E7%9A%84%E5%8D%8F%E7%A8%8B"><span class="toc-text">3.基于生成器的协程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E7%94%9F%E6%88%90%E5%99%A8"><span class="toc-text">3.1生成器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2%E7%94%A8%E7%94%9F%E6%88%90%E5%99%A8%E5%AE%9E%E7%8E%B0%E5%8D%8F%E7%A8%8B"><span class="toc-text">3.2用生成器实现协程</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
