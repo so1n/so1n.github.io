@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>uvicorn源码分析 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记Uvicorn是一个基于uvloop和httpto...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">uvicorn源码分析</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2021/11/5c8d300b7d67d800.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">uvicorn源码分析</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 19, 2021</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>17711</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Uvicorn</code>是一个基于<code>uvloop</code>和<code>httptools</code>的ASGI服务器, 性能比较强劲， 通过它可以与使用ASGI规范的<code>Python</code>应用程序进行交互。ASGI与WSGI很像， 只不过ASGI原生支持HTTP2.0和WebSocket， 同时更多的是支持<code>Python</code>的<code>Asyncio</code>生态的WEB应用程序。通过了解<code>Uvicron</code>，能知道一个稳定的Web服务器的工作方式以及能更好的去了解其他基于ASGI的WEB应用程序</p>
+        <p><code>Uvicron</code>通过一个通用的协定接口与ASGI应用程序交互， 应用程序只要实现如下代码， 即可通过<code>Uvicorn</code>发送和接收信息：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">app</span>(<span class="hljs-params">scope, receive, send</span>):</span><br>    <span class="hljs-comment"># 一个最简单的ASGI应用程序</span><br>    <span class="hljs-keyword">assert</span> scope[<span class="hljs-string">&#x27;type&#x27;</span>] == <span class="hljs-string">&#x27;http&#x27;</span><br>    <span class="hljs-keyword">await</span> send(&#123;<br>        <span class="hljs-string">&#x27;type&#x27;</span>: <span class="hljs-string">&#x27;http.response.start&#x27;</span>,<br>        <span class="hljs-string">&#x27;status&#x27;</span>: <span class="hljs-number">200</span>,<br>        <span class="hljs-string">&#x27;headers&#x27;</span>: [<br>            [<span class="hljs-string">b&#x27;content-type&#x27;</span>, <span class="hljs-string">b&#x27;text/plain&#x27;</span>],<br>        ]<br>    &#125;)<br>    <span class="hljs-keyword">await</span> send(&#123;<br>        <span class="hljs-string">&#x27;type&#x27;</span>: <span class="hljs-string">&#x27;http.response.body&#x27;</span>,<br>        <span class="hljs-string">&#x27;body&#x27;</span>: <span class="hljs-string">b&#x27;Hello, world!&#x27;</span>,<br>    &#125;)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-comment"># uvicorn服务</span><br>    <span class="hljs-keyword">import</span> uvicorn<br>    uvicorn.run(app, host=<span class="hljs-string">&quot;127.0.0.1&quot;</span>, port=<span class="hljs-number">5000</span>, log_level=<span class="hljs-string">&quot;info&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>其中应用程序的<code>scope</code>代表有关传入连接信息的字典， <code>receive</code>是一个从服务器接收传入信息的通道, <code>send</code>是一个将消息发送到服务器的通道, 不过这不是本文的重点， 更多<code>scope</code>信息可以访问<a target="_blank" rel="noopener" href="http://www.uvicorn.org/#the-asgi-interface">ASGI interface</a>了解, 接下来将从例子的<code>uvicorn.run</code>开始, 通过源码分析<code>uvicorn</code>工作原理。</p>
+<h2 id="1-uvicorn主流程源码分析"><a href="#1-uvicorn主流程源码分析" class="headerlink" title="1.uvicorn主流程源码分析"></a>1.uvicorn主流程源码分析</h2><p>分析源码之前， 首先是了解它的源码结构， <code>uvicorn</code>的源码结构如下：<br>├── lifespan<br>├── loops<br>├── protocols<br>├── middleware<br>├── supervisors<br>├── config.py<br>├── importer.py<br>├── <strong>init</strong>.py<br>├── logging.py<br>├── <strong>main</strong>.py<br>├── main.py<br>├── server.py<br>├── subprocess.py<br>├── _types.py<br>└── workers.py</p>
+<p><code>uvicron</code>做了很好的分类， 每个文件夹/文件都有自己的功能:</p>
+<ul>
+<li>lifespan<br>  告诉基于ASGI的应用程序<code>uvicorn</code>即将启动和停止的消息， <code>uvicorn</code>在启动的时候会初始化，然后发送初始化协议并等待ASGI应用程序返回， 如果ASGI应用程序返回<code>complele</code>则<code>uvicorn</code>会继续运行， 返回<code>failed</code>则报错退出。</li>
+<li>loops<br>  自动加载事件循环， 优先加载<code>uvloop</code>， 这将会获得极大的性能提升</li>
+<li>protocols<br>  里面存放着读取连接数据和解析消息体的协议， 如HTTP和WebSockets, 可以把他认为是一个序列化器。</li>
+<li>middleware<br>  存放着一些简单通用的ASGI中间件</li>
+<li>supervisors<br>  <code>uvicorn</code>本身是以一个进程启动的， 这个文件夹存放着<code>uvicorn</code>的几种启动方式， 如多进程启动，监控文件变动自动重启的方式等。</li>
+<li>config.py<br>  <code>uvicorn</code>的配置文件， 它不仅读取用户的配置， 还自动加载上面所述的<code>lifespan</code>, <code>loops</code>, <code>protocols</code>等等</li>
+<li>importer.py<br>  <code>uvicron</code>中很多地方使用了动态加载配置和动态加载库， 这里是把这个方法进行统一封装</li>
+<li>logging.py<br>  提供了根据日志等级渲染不同颜色的日志以及访问日志(但是很少人用)</li>
+<li>main.py<br>  <code>uvicorn</code>的入口文件， 包括代码运行和命令行运行两种方式</li>
+<li>server.py<br>  <code>uvicorn</code>的核心服务， 用于处理进出流量以及处理自身的服务状态</li>
+<li>subprocess.py<br>  给<code>supervisors/multiprocess.py</code>使用的， 可能是为了以后拓展需要， 才放在一级目录</li>
+<li>workers.py<br>  其他工作模式的<code>Uvicorn</code>， 比如里面有个<code>UvicornWorker</code>, 就是用于<code>gunicorn</code>启动<code>uvicorn</code> </li>
+</ul>
+<p>结构了解完， 接下来开始正式步入源码之旅， 这里直接忽略掉命令行的启动方式， 从<code>uvicorn.run</code>开始, 实际上命令行启动方式也是通过获取参数， 然后传入<code>uvicorn</code>方法中, 这个<code>uvicorn.run</code>方法会接受符合ASGI的app和<code>kwargs</code>参数， 然后生成对应的配置实例<code>config</code>, 再生成<code>server</code>， 接着依靠配置判断是否启动模式， 具体代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span>(<span class="hljs-params">app, **kwargs</span>):</span><br>    <span class="hljs-comment"># 加载配置</span><br>    config = Config(app, **kwargs)<br>    <span class="hljs-comment"># 加载server</span><br>    server = Server(config=config)<br><br>    <span class="hljs-keyword">if</span> (config.reload <span class="hljs-keyword">or</span> config.workers &gt; <span class="hljs-number">1</span>) <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> <span class="hljs-built_in">isinstance</span>(app, <span class="hljs-built_in">str</span>):<br>        <span class="hljs-comment"># 只有命令行模式才可以使用reload</span><br>        logger = logging.getLogger(<span class="hljs-string">&quot;uvicorn.error&quot;</span>)<br>        logger.warning(<br>            <span class="hljs-string">&quot;You must pass the application as an import string to enable &#x27;reload&#x27; or &quot;</span><br>            <span class="hljs-string">&quot;&#x27;workers&#x27;.&quot;</span><br>        )<br>        sys.exit(<span class="hljs-number">1</span>)<br><br>    <span class="hljs-keyword">if</span> config.should_reload:<br>        <span class="hljs-comment"># 启动reload逻辑</span><br>        sock = config.bind_socket()<br>        supervisor = ChangeReload(config, target=server.run, sockets=[sock])<br>        supervisor.run()<br>    <span class="hljs-keyword">elif</span> config.workers &gt; <span class="hljs-number">1</span>:<br>        <span class="hljs-comment"># 多进程方式启动</span><br>        sock = config.bind_socket()<br>        supervisor = Multiprocess(config, target=server.run, sockets=[sock])<br>        supervisor.run()<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-comment"># 最普通的方法启动</span><br>        server.run()<br></code></pre></td></tr></table></figure>
+<p><code>config</code>很简单， 它负责装填配置， 然后调用<code>configure_logging</code>配置全局的<code>logger</code>, 此外还有一个<code>load</code>的方法， 将会在<code>Server</code>中调用, 接下来， 先忽略其中涉及到的模板， 到<code>server.run</code>之中， 看看普通模式下， 服务是怎么启动的。</p>
+<p>这个<code>run</code>方法很简单， 就是设置事件循环， 然后通过事件循环调用<code>serve</code>来启动服务:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span>(<span class="hljs-params">self, sockets=<span class="hljs-literal">None</span></span>):</span><br>    self.config.setup_event_loop()<br>    loop = asyncio.get_event_loop()<br>    loop.run_until_complete(self.serve(sockets=sockets))<br></code></pre></td></tr></table></figure>
+<p><code>serve</code>是启动服务的最核心代码， 首先会执行<code>config.load</code>方法加载一些动态的配置， 如解析http的库， 解析websocket的库， 还有通过用户传过来的app来加载app, 并判断是使用<code>WSGI</code>，<code>ASGI2</code>或者是<code>ASGI3</code>， 并进行配置(<code>uvicorn</code>在这里是通过ASGI中间件的方式来支持), 最后根据配置启动对应的中间件。<br>接着会跳转到<code>server.startup</code>方法， 该方法首先会通过<code>lifaspan.startup</code>与用户传过来的<code>app</code>通信， 校验是否是合法的应用程序， 然后初始化变量, 先是初始化一个信号处理函数， 当收到信号时， 会把变量<code>should_exit</code>设置会<code>True</code>。<br>然后会初始化一个名为<code>create_protocol</code>的变量， 它是继承于<code>asyncio.Protocol</code>, <code>asyncio.Protocol</code>主要用于从socket获取数据和写入数据， 同时也有一些TCP相关的调用, <code>create_protocol</code>的主要作用就是作为socket和应用程序的中间层， 负责把HTTP数据与ASGI数据互转, 如下图:<br><img  src="https://ftp.bmp.ovh/imgs/2021/11/423eec08a34e2797.png"  ><span class="image-caption">协议转换</span><br>接着根据用户传过来的变量方式来启动服务, 这些都是<code>Python</code>的<code>Asyncio</code>封装好的， 具体为以下几种：</p>
+<ul>
+<li>当用户传socket过来的时候： 基于该scoket和<code>create_protocol</code>创建服务， 如果是多进程且是Windows系统， 则要显示的共享socket。</li>
+<li>当用户传文件描述符的时候： 基于该文件描述符获取scoket， 并通过该socket和<code>create_protocol</code>创建服务。</li>
+<li>当用户传unix domain socket的时候: 基于unix domain socket和<code>create_protocol</code>创建服务。</li>
+<li>当用户传host和port参数的时候: 基于host和port和<code>create_protocol</code>创建服务。</li>
+</ul>
+<p>创建完服务后， socket的处理就转给了应用程序了， 但是采用了事件循环的思路， 需要<code>uvicorn</code>使用<code>while</code>使程序一直跑， 防止主程序退出:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main_loop</span>(<span class="hljs-params">self</span>):</span><br>    counter = <span class="hljs-number">0</span><br>    should_exit = <span class="hljs-keyword">await</span> self.on_tick(counter)<br>    <span class="hljs-keyword">while</span> <span class="hljs-keyword">not</span> should_exit:<br>        counter += <span class="hljs-number">1</span><br>        counter = counter % <span class="hljs-number">864000</span><br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br>        should_exit = <span class="hljs-keyword">await</span> self.on_tick(counter)<br></code></pre></td></tr></table></figure>
+<p>每次循环执行的时候都会调用<code>on_tick</code>方法， 该方法主要是进行服务统计以及判断啥时候可以退出服务, 比如请求总数超过配置的限制数， 或者收到信号，把变量<code>should_exit</code>设置为<code>True</code>等等， 如果在循环中判断程序需要进行退出, 就会进入退出逻辑<code>shutdown</code>, 该逻辑比较简单， 注释和代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">shutdown</span>(<span class="hljs-params">self, sockets=<span class="hljs-literal">None</span></span>):</span><br>    logger.info(<span class="hljs-string">&quot;Shutting down&quot;</span>)<br><br>    <span class="hljs-comment"># 关闭socket， 不让有新的连接建立</span><br>    <span class="hljs-keyword">for</span> server <span class="hljs-keyword">in</span> self.servers:<br>        server.close()<br>    <span class="hljs-keyword">for</span> sock <span class="hljs-keyword">in</span> sockets <span class="hljs-keyword">or</span> []:<br>        sock.close()<br>    <span class="hljs-keyword">for</span> server <span class="hljs-keyword">in</span> self.servers:<br>        <span class="hljs-keyword">await</span> server.wait_closed()<br><br>    <span class="hljs-comment"># 关闭已经创建的连接， 并等待他们处理完毕 </span><br>    <span class="hljs-keyword">for</span> connection <span class="hljs-keyword">in</span> <span class="hljs-built_in">list</span>(self.server_state.connections):<br>        connection.shutdown()<br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br><br>    <span class="hljs-comment"># 等待连接关闭或者用户强制关闭</span><br>    <span class="hljs-keyword">if</span> self.server_state.connections <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> self.force_exit:<br>        msg = <span class="hljs-string">&quot;Waiting for connections to close. (CTRL+C to force quit)&quot;</span><br>        logger.info(msg)<br>        <span class="hljs-keyword">while</span> self.server_state.connections <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> self.force_exit:<br>            <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br><br>    <span class="hljs-comment"># 等待后台任务完成或者用户强制关闭</span><br>    <span class="hljs-keyword">if</span> self.server_state.tasks <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> self.force_exit:<br>        msg = <span class="hljs-string">&quot;Waiting for background tasks to complete. (CTRL+C to force quit)&quot;</span><br>        logger.info(msg)<br>        <span class="hljs-keyword">while</span> self.server_state.tasks <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> self.force_exit:<br>            <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br><br>    <span class="hljs-comment"># 通过lifespan告诉ASGI应用程序即将关闭</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> self.force_exit:<br>        <span class="hljs-keyword">await</span> self.lifespan.shutdown()<br></code></pre></td></tr></table></figure>
+<p>至此整个主流程分析完毕， 下图是我整理后的一个流程图：<br><img src="https://ftp.bmp.ovh/imgs/2021/11/5c8d300b7d67d800.png"><br>从图中可以很清晰的看清<code>uvicorn</code>与ASGI应用程序的关系, 接下来是上面部分没有详细讲过的小组件源码分析。</p>
+<h2 id="2-uvicorn-protocols源码分析"><a href="#2-uvicorn-protocols源码分析" class="headerlink" title="2.uvicorn.protocols源码分析"></a>2.uvicorn.protocols源码分析</h2><p>在了解了<code>uvicorn</code>的主流程后只大概的知道<code>uvicorn</code>是通过<code>uvicorn.protocols</code>与应用程序进行通信， 但是不明白他们具体是如何通信的， 接下来就开始了解<code>uvicorn</code>中最核心的<code>uvicorn.protocols</code>。</p>
+<p>从上面的分析中我们可以知道， 作为一个Web服务器， <code>uvicorn</code>是通过一个socket来接收发发送请求的。 而对于socket来说， 它只关心怎么创建连接，关闭连接以及如何传输内容， 它不会关心传输的字节流的上层协议是如何实现的。<br>好在<code>Asyncio</code>提供了几种简单的网络传输模型, 它们都是对于这些传输数据的抽象， 这些抽象会在如<code>loop.create_server</code>和<code>loop.create_unix_server</code>方法中使用, 通过这个抽象我们能很方便的使用TCP和UDP连接。 </p>
+<p><code>uvicorn</code>在基于<code>Asyncio</code>创建服务器时， 把<code>protocol</code>抽象通过protocols参数传入<code>loop.create_server</code>和<code>loop.create_unix_server</code>后, 维护他们返回的<code>server</code>对象， 剩下的与ASGI应用程序的数据交互全由<code>protocol</code>对象处理。<br><code>uvicorn</code>封装的对象继承于<code>asyncio.Protocols</code>, 它是针对TCP协议的封装, 它总共有6个方法，包括启动时的<code>connection_made</code>, 接收数据时的<code>data_received</code>, 断开时的<code>eof_received</code>以及丢失连接时的<code>connection_lost</code>, 然后还有当TCP连接出现堵塞时的暂停<code>pause_writing</code>和恢复<code>resume_writing</code>, 具体的方法传输的参数和使用方法如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Protocol</span>(<span class="hljs-params">BaseProtocol</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">connection_made</span>(<span class="hljs-params">self, transport</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        在建立连接时调用.</span><br><span class="hljs-string"></span><br><span class="hljs-string">        参数是表示管道连接的transport, </span><br><span class="hljs-string">        此时得到的transport需要设置为该类的transport， 方便后续connection_lost控制关闭管道.</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">data_received</span>(<span class="hljs-params">self, data</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        通过该方法可以获取到客户端传输过来的数据</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">eof_received</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        当另一端调用write_eof()或等效函数时调用.</span><br><span class="hljs-string"></span><br><span class="hljs-string">        如果返回一个假值(包括None)，则传输将关闭自身。</span><br><span class="hljs-string">        如果它返回true值，则关闭传输取决于协议.</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">connection_lost</span>(<span class="hljs-params">self, exc</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        当连接丢失或关闭时调用, 根据exc判断是否要关闭trnasport.</span><br><span class="hljs-string">        参数是一个异常对象或None(后者表示接收到常规EOF或中止或关闭连接).</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">pause_writing</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        当transport缓冲区超过高水位(high-water mark)时调用, </span><br><span class="hljs-string">        此时应该能控制外部不再写入数据（通常是一个asyncio.Future）,</span><br><span class="hljs-string">        同时应该通过transport.pause_reading来停止获取数据， 之后TCP就会通过拥塞机制使得客户端减缓发送数据的速度。</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">resume_writing</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        当transport缓冲区排放低于低水位线(low-water mark)时调用. </span><br><span class="hljs-string">        此时要释放标志， 使得外部可以继续写入数据， </span><br><span class="hljs-string">        同时通过transport.resume_reading来恢复获取数据， </span><br><span class="hljs-string">        之后TCP就会通过拥塞机制知道服务端的处理能力上来了， 使客户端加快发送速度。</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br></code></pre></td></tr></table></figure>
+<p>了解完<code>asycnio.Protocol</code>后, 可以正式了解<code>uvicorn</code>对<code>asyncio.Protocol</code>做了哪些修改来达到跟应用程序进行通信, 由于各个<code>Protocol</code>的封装差不多， 这里以<code>httptools_impl.HttpToolsProtocol</code>为例子进行说明。</p>
+<p>首先是类的初始化， <code>HttpToolsProtocol</code> 在初始化时会加载<code>config</code>并配置到日志，对应的websocket协议处理，对应的http解析器以及<code>serve</code>创建的统计容器等， 其中需要注意的是， 在初始化时， 传入的变量是<code>HttpToolsProtocol</code>的实例化本身。<br>接着是<code>Protocol</code>的几大主要协议接口函数, 这里以源码和注释进行分析：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HttpToolsProtocol</span>(<span class="hljs-params">asyncio.Protocol</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">connection_made</span>(<span class="hljs-params">self, transport</span>):</span><br>        <span class="hljs-comment"># 添加实例本身到集合， 代表当前还有连接在处理</span><br>        self.connections.add(self)<br><br>        self.transport = transport<br>        <span class="hljs-comment"># 初始化流控制</span><br>        self.flow = FlowControl(transport)<br>        <span class="hljs-comment"># 简单的初始化实例trsnaport的相关编列</span><br>        self.server = get_local_addr(transport)<br>        self.client = get_remote_addr(transport)<br>        self.scheme = <span class="hljs-string">&quot;https&quot;</span> <span class="hljs-keyword">if</span> is_ssl(transport) <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;http&quot;</span><br><br>        <span class="hljs-keyword">if</span> self.logger.level &lt;= TRACE_LOG_LEVEL:<br>            prefix = <span class="hljs-string">&quot;%s:%d - &quot;</span> % <span class="hljs-built_in">tuple</span>(self.client) <span class="hljs-keyword">if</span> self.client <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;&quot;</span><br>            self.logger.log(TRACE_LOG_LEVEL, <span class="hljs-string">&quot;%sConnection made&quot;</span>, prefix)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">connection_lost</span>(<span class="hljs-params">self, exc</span>):</span><br>        <span class="hljs-comment"># 从集合删除实例本身， 代表当前连接已经处理玩了， 不需要进入统计容器</span><br>        self.connections.discard(self)<br><br>        <span class="hljs-keyword">if</span> self.logger.level &lt;= TRACE_LOG_LEVEL:<br>            prefix = <span class="hljs-string">&quot;%s:%d - &quot;</span> % <span class="hljs-built_in">tuple</span>(self.client) <span class="hljs-keyword">if</span> self.client <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;&quot;</span><br>            self.logger.log(TRACE_LOG_LEVEL, <span class="hljs-string">&quot;%sConnection lost&quot;</span>, prefix)<br><br>        <span class="hljs-comment"># 设置cycle， 告诉他连接已经断开</span><br>        <span class="hljs-keyword">if</span> self.cycle <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> self.cycle.response_complete:<br>            self.cycle.disconnected = <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">if</span> self.cycle <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            self.cycle.message_event.<span class="hljs-built_in">set</span>()<br>        <span class="hljs-keyword">if</span> self.flow <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            self.flow.resume_writing()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_unset_keepalive_if_required</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;取消keep alive timeout的任务，</span><br><span class="hljs-string">        一般来说， 在发送数据后服务端会等待客户端发送数据， 如果超过多少秒没有发送数据则可以判断该客户端已经断开了， 服务端可以主动关闭连接</span><br><span class="hljs-string">        而uvicorn通过timeout_keep_alive_task来实现</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.timeout_keep_alive_task <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            self.timeout_keep_alive_task.cancel()<br>            self.timeout_keep_alive_task = <span class="hljs-literal">None</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">data_received</span>(<span class="hljs-params">self, data</span>):</span><br>        self._unset_keepalive_if_required()<br><br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 接受字节数据， 并交由http解析器进行解析</span><br>            self.parser.feed_data(data)<br>        <span class="hljs-keyword">except</span> httptools.HttpParserError <span class="hljs-keyword">as</span> exc:<br>            <span class="hljs-comment"># 解析失败， 应该不是http协议的数据， 断开连接</span><br>            msg = <span class="hljs-string">&quot;Invalid HTTP request received.&quot;</span><br>            self.logger.warning(msg, exc_info=exc)<br>            self.transport.close()<br>        <span class="hljs-keyword">except</span> httptools.HttpParserUpgrade:<br>            <span class="hljs-comment"># 已经超过了解析器能解析的协议版本， 应该交由更新的协议解析器处理</span><br>            self.handle_upgrade()<br></code></pre></td></tr></table></figure>
+<p>分析完了几个跟连接相关的主要方法后就会发现分析路线已经断了， 而该类中还有很多<code>on_xxx</code>的方法, 它们也没有被其他方法调用。<br>这是因为在初始化HTTP协议解析器的时候，<code>uvicorn.protocol</code>把自己的实例传入了HTTP解析器中， 解析器会边接收数据边按照url, header, body来顺序解析， 并在执行每种数据解析后， 会通过回调告诉传入的实例， <code>uvicorn</code>正是通过<code>on_xxx</code>方法来监听这些回调并处理解析完的HTTP数据:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HttpToolsProtocol</span>(<span class="hljs-params">asyncio.Protocol</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_url</span>(<span class="hljs-params">self, url</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;这是收到一个请求后的第一次解析, 可以认为是该请求体的初始化， 此时会根据url和连接数据进行初始化， 并存放在实例的scope中&quot;&quot;&quot;</span><br>        method = self.parser.get_method()<br>        parsed_url = httptools.parse_url(url)<br>        raw_path = parsed_url.path<br>        path = raw_path.decode(<span class="hljs-string">&quot;ascii&quot;</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;%&quot;</span> <span class="hljs-keyword">in</span> path:<br>            path = urllib.parse.unquote(path)<br>        self.url = url<br>        self.expect_100_continue = <span class="hljs-literal">False</span><br>        self.headers = []<br>        self.scope = &#123;<br>            <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;http&quot;</span>,<br>            <span class="hljs-string">&quot;asgi&quot;</span>: &#123;<span class="hljs-string">&quot;version&quot;</span>: self.config.asgi_version, <span class="hljs-string">&quot;spec_version&quot;</span>: <span class="hljs-string">&quot;2.1&quot;</span>&#125;,<br>            <span class="hljs-string">&quot;http_version&quot;</span>: <span class="hljs-string">&quot;1.1&quot;</span>,<br>            <span class="hljs-string">&quot;server&quot;</span>: self.server,<br>            <span class="hljs-string">&quot;client&quot;</span>: self.client,<br>            <span class="hljs-string">&quot;scheme&quot;</span>: self.scheme,<br>            <span class="hljs-string">&quot;method&quot;</span>: method.decode(<span class="hljs-string">&quot;ascii&quot;</span>),<br>            <span class="hljs-string">&quot;root_path&quot;</span>: self.root_path,<br>            <span class="hljs-string">&quot;path&quot;</span>: path,<br>            <span class="hljs-string">&quot;raw_path&quot;</span>: raw_path,<br>            <span class="hljs-string">&quot;query_string&quot;</span>: parsed_url.query <span class="hljs-keyword">if</span> parsed_url.query <span class="hljs-keyword">else</span> <span class="hljs-string">b&quot;&quot;</span>,<br>            <span class="hljs-string">&quot;headers&quot;</span>: self.headers,<br>        &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_header</span>(<span class="hljs-params">self, name: <span class="hljs-built_in">bytes</span>, value: <span class="hljs-built_in">bytes</span></span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;解析器在解析header时， 是按照header一行一行进行解析的， 所以每即系一行header都会调用一次on_header, 并把他们存在实例的headers中&quot;&quot;&quot;</span><br>        name = name.lower()<br>        <span class="hljs-keyword">if</span> name == <span class="hljs-string">b&quot;expect&quot;</span> <span class="hljs-keyword">and</span> value.lower() == <span class="hljs-string">b&quot;100-continue&quot;</span>:<br>            self.expect_100_continue = <span class="hljs-literal">True</span><br>        self.headers.append((name, value))<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_headers_complete</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;对于大部分前置web框架来说， 一般解析到header后就结束不再解析了， 会开始发送到正真处理的应用程序, uvicorn也是这样的&quot;&quot;&quot;</span><br>        http_version = self.parser.get_http_version()<br>        <span class="hljs-keyword">if</span> http_version != <span class="hljs-string">&quot;1.1&quot;</span>:<br>            self.scope[<span class="hljs-string">&quot;http_version&quot;</span>] = http_version<br>        <span class="hljs-keyword">if</span> self.parser.should_upgrade():<br>            <span class="hljs-comment"># 如果发现当前http版本更加高级（比如websocket）, 则不再处理, 在另外一个逻辑会转到websocket处理</span><br>            <span class="hljs-keyword">return</span><br><br>        <span class="hljs-comment"># Handle 503 responses when &#x27;limit_concurrency&#x27; is exceeded.</span><br>        <span class="hljs-keyword">if</span> self.limit_concurrency <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> (<br>            <span class="hljs-built_in">len</span>(self.connections) &gt;= self.limit_concurrency<br>            <span class="hljs-keyword">or</span> <span class="hljs-built_in">len</span>(self.tasks) &gt;= self.limit_concurrency<br>        ):<br>            <span class="hljs-comment"># 当前并发数过高， 不再转发给后面的应用程序， 直接返回错误, 这里是一个具有ASGI标准函数签名的函数, 里面实现的功能是发送错误信息到socket</span><br>            app = service_unavailable<br>            message = <span class="hljs-string">&quot;Exceeded concurrency limit.&quot;</span><br>            self.logger.warning(message)<br>        <span class="hljs-keyword">else</span>:<br>            app = self.app<br><br>        <span class="hljs-comment"># cycle相当于一个request的处理流程</span><br>        <span class="hljs-comment"># 普通的HTTP请求只对应一个cycle就可以了， 这里是兼容Pipelined HTTP请求</span><br>        existing_cycle = self.cycle<br>        self.cycle = RequestResponseCycle(<br>            scope=self.scope,<br>            transport=self.transport,<br>            flow=self.flow,<br>            logger=self.logger,<br>            access_logger=self.access_logger,<br>            access_log=self.access_log,<br>            default_headers=self.default_headers,<br>            message_event=asyncio.Event(),<br>            expect_100_continue=self.expect_100_continue,<br>            keep_alive=http_version != <span class="hljs-string">&quot;1.0&quot;</span>,<br>            on_response=self.on_response_complete,<br>        )<br>        <span class="hljs-keyword">if</span> existing_cycle <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">or</span> existing_cycle.response_complete:<br>            <span class="hljs-comment"># 如果上个请求已经处理完了， 则开始处理这个请求(通过run_asgi来运行)</span><br>            task = self.loop.create_task(self.cycle.run_asgi(app))<br>            task.add_done_callback(self.tasks.discard)<br>            self.tasks.add(task)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 如果上个请求没有处理完， 就先暂停读取数据， 并把该cycle放到pipeline暂存</span><br>            self.flow.pause_reading()<br>            self.pipeline.insert(<span class="hljs-number">0</span>, (self.cycle, app))<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_body</span>(<span class="hljs-params">self, body: <span class="hljs-built_in">bytes</span></span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;读取到原生的body字节， 如果ASGI处理者还在运行， 且不是websocket, 则转给ASGI处理者</span><br><span class="hljs-string">        注： 一个请求可能会触发多次on_body&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.parser.should_upgrade() <span class="hljs-keyword">or</span> self.cycle.response_complete:<br>            <span class="hljs-keyword">return</span><br>        self.cycle.body += body<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(self.cycle.body) &gt; HIGH_WATER_LIMIT:<br>            <span class="hljs-comment"># 由于ASGI应用程序会根据调用者需要才来获取body(比如starlette的 await request.body())， 如果应用程序没有需要则会暂缓获取body数据</span><br>            self.flow.pause_reading()<br>        <span class="hljs-comment"># 告诉ASGI应用程序， body已经获取结束（通常在cycle的more_body为False的时候, 才会检查message_event）</span><br>        self.cycle.message_event.<span class="hljs-built_in">set</span>()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_message_complete</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-keyword">if</span> self.parser.should_upgrade() <span class="hljs-keyword">or</span> self.cycle.response_complete:<br>            <span class="hljs-keyword">return</span><br>        <span class="hljs-comment"># 表示body已经读取结束了 </span><br>        self.cycle.more_body = <span class="hljs-literal">False</span><br>        self.cycle.message_event.<span class="hljs-built_in">set</span>()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_response_complete</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;返回响应时的回调&quot;&quot;&quot;</span><br>        self.server_state.total_requests += <span class="hljs-number">1</span><br><br>        <span class="hljs-keyword">if</span> self.transport.is_closing():<br>            <span class="hljs-keyword">return</span><br><br>        <span class="hljs-comment"># 设置一个keep_alive的机制， 服务端返回响应后会设置一个倒计时future, 该future只有在上面data_received收到请求的时候才会取消</span><br>        <span class="hljs-comment"># 如果该future没有取消， 则会调用timeout_keep_alive_handler函数来关闭transport通道</span><br>        self._unset_keepalive_if_required()<br><br>        self.timeout_keep_alive_task = self.loop.call_later(<br>            self.timeout_keep_alive, self.timeout_keep_alive_handler<br>        )<br><br>        <span class="hljs-comment"># 恢复读取数据</span><br>        self.flow.resume_reading()<br><br>        <span class="hljs-keyword">if</span> self.pipeline:<br>            <span class="hljs-comment"># 如果是pipeline请求， 则开始处理刚才暂存的cycle</span><br>            cycle, app = self.pipeline.pop()<br>            task = self.loop.create_task(cycle.run_asgi(app))<br>            task.add_done_callback(self.tasks.discard)<br>            self.tasks.add(task)<br><br></code></pre></td></tr></table></figure>
+<p>在了解解析HTTP数据的时候， 经常会遇到一个cycle对象， 这个对象是基于ASGI负责读写数据转换的对象， 这个对象有<code>send</code>和<code>receive</code>两个方法, 这两个方法的命名是站在ASGI应用程序的角度来命名的。<br>其中<code>send</code>通过传入的参数<code>message</code>获取到ASGI应用程序返回的数据， 并依据ASGI协议进行解析， 并拼接成HTTP协议的字节流， 当ASGI应用程序发送结束标记时， <code>send</code>会把拼接的字节流通过socket返回给客户端, 同时触发<code>on_response_complete</code>方法。<br>而<code>receive</code>比较简单， 它只负责接收获取到已经解析完成的HTTP数据（早前面on_xxx时会把数据传给cycle）， 然后发送到ASGI应用程序中。<br>这两个方法都是通过<code>on_headers_complete</code>中执行的<code>run_asgi</code>方法来调用的， 通过该方法， <code>uvicorn</code>会把数据的处理权转给ASGI应用程序, 如果ASGI应用程序处理异常， 则会返回HTTP状态码为500的响应给客户端并关闭transport。</p>
+<p>分析完了cycle对象后， 再次回到protocol的<code>data_received</code>的方法中， 这里通过获取<code>httptools.HttpParserUpgrade</code>异常的方式得知当前可能是一个WebSocket请求， 于是进入<code>handle_upgrade</code>逻辑， 这个逻辑会检查是否加载了解析WebSocket解析器以及请求体是否满足WebSocket条件， 如果不满足就会返回一个响应体告诉客户端当前无法支持该HTTP请求的升级协议， 如果满足则会生成WebSocketProtocols来处理socket的数据， 并把它设置为当前的transport向关联， 不过这个WebsocketProtocols基本上是HTTP protocols和cycle两个对象的融合， 具体处理步骤也差不多， 这里就不多做描述了。</p>
+<p>至此， 大体上的<code>uvicorn.protocols</code>源码就分析完了， 由于<code>uvicorn</code>是把<code>asyncio.Protocol</code>, 解析器， <code>cycle</code>三者结合在一起， 所以分析起来要经常跳转， 因此我把他们的流程转成如下的图：<br><img  src="https://ftp.bmp.ovh/imgs/2021/11/a32784eec69cae1b.png"  ><span class="image-caption">流处理图</span></p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h2><p>至此， <code>uvicorn</code>的核心流程已经分析完了， 它先是通过<code>server</code>来启动一个服务， 并管理服务状态， 然后再通过<code>protocol</code>负责做双端的序列化, 使ASGI应用程序能够按照ASGI协议读写数据， 其中<code>protocol</code>还融合了HTTP解析器解析HTTP并通过它来解析数据。<br>当然， 除了上述主流程外， <code>uvicorn</code>还包括了中间件， 多进程启动以及监控文件变化重启服务等组件， 这些组件的代码量不大， 分析源码也说不出啥， 这里就简单略过。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/08/19/uvicorn/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;08&#x2F;19&#x2F;uvicorn&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;08&#x2F;19&#x2F;uvicorn&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2021/08/19/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96/"><i class="iconfont iconleft"></i>RPC框架编写实践--最小RPC框架的依赖</a>
+    <a href="/2021/08/10/%E4%BF%9D%E9%9A%9CPython%E9%A1%B9%E7%9B%AE%E8%B4%A8%E9%87%8F%E7%9A%84%E5%B7%A5%E5%85%B7/">保障Python项目质量的工具<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-uvicorn%E4%B8%BB%E6%B5%81%E7%A8%8B%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">1.uvicorn主流程源码分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-uvicorn-protocols%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">2.uvicorn.protocols源码分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-uvicorn%E4%B8%BB%E6%B5%81%E7%A8%8B%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">1.uvicorn主流程源码分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-uvicorn-protocols%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">2.uvicorn.protocols源码分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
