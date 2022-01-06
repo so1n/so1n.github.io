@@ -11,8 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="google" content="notranslate" />
   
-  <meta name="description" content="前记
-NOTE: 虽然本文是在编写RPC框架有感而发，...">
+  <meta name="description" content="前记在微服务中， 虽然服务间的调用都是可信的， 但是服...">
   <meta name="author" content="So1n">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
@@ -208,10 +207,10 @@ NOTE: 虽然本文是在编写RPC框架有感而发，...">
       <section class="content">
         <!-- 展示文章摘录 -->
         
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><blockquote>
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在微服务中， 虽然服务间的调用都是可信的， 但是服务端也需要堤防一些流量， 防止被意外的流量击垮， 而通过限流可以防止问题的发生。此外， 使用不同的限流规则还能根据系统间不同服务的请求进行限制， 解决某个函数被频繁调用而拖垮整个系统的问题。</p>
+<blockquote>
 <p>NOTE: 虽然本文是在编写RPC框架有感而发， 但是也适用于常见的Web服务等有流量进出的场景。</p>
 </blockquote>
-<p>在微服务中， 虽然服务间的调用都是可信的， 但是服务端也需要堤防一些流量， 防止被意外的流量击垮， 而通过限流可以防止问题的发生。此外， 使用不同的限流规则还能根据系统间不同服务的请求进行限制， 解决某个函数被频繁调用而拖垮整个系统的问题。</p>
 <h2 id="1-限流的简介"><a href="#1-限流的简介" class="headerlink" title="1 限流的简介"></a>1 限流的简介</h2><h3 id="1-1-限流的作用和场景"><a href="#1-1-限流的作用和场景" class="headerlink" title="1.1 限流的作用和场景"></a>1.1 限流的作用和场景</h3><p>对于后端服务来说， 他们提供的服务都有一个极限的QPS(除代码逻辑外，也跟机器配置有关)， 当服务端的压力超过这个极限值的时候， 服务端的响应性能就会快速的下降, 然后无法提供服务， 所以服务端需要一个类似于可以限制请求数的功能， 使服务端能牺牲掉部分请求， 保证还能处理一定量的请求， 防止服务端出现压力瓶颈，无法处理所有请求。 </p>
 <p>不过这个功能还需要尽量的智能， 在设计时可以根据流量场景不同来做有差别的限制， 使其在不影响其它请求的情况下， 实现部分请求的网络流量整形， 达到减少系统资源消耗的效果， 常见的几种需要做差别限制的场景如下：</p>
 <table>
