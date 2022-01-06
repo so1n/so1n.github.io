@@ -24,7 +24,36 @@
 </blockquote>
 <p>在微服务中， 虽然服务间的调用都是可信的， 但是服务端也需要堤防一些流量， 防止被意外的流量击垮， 而通过限流可以防止问题的发生。此外， 使用不同的限流规则还能根据系统间不同服务的请求进行限制， 解决某个函数被频繁调用而拖垮整个系统的问题。</p>
 <h2 id="1-限流的简介"><a href="#1-限流的简介" class="headerlink" title="1 限流的简介"></a>1 限流的简介</h2><h3 id="1-1-限流的作用和场景"><a href="#1-1-限流的作用和场景" class="headerlink" title="1.1 限流的作用和场景"></a>1.1 限流的作用和场景</h3><p>对于后端服务来说， 他们提供的服务都有一个极限的QPS(除代码逻辑外，也跟机器配置有关)， 当服务端的压力超过这个极限值的时候， 服务端的响应性能就会快速的下降, 然后无法提供服务， 所以服务端需要一个类似于可以限制请求数的功能， 使服务端能牺牲掉部分请求， 保证还能处理一定量的请求， 防止服务端出现压力瓶颈，无法处理所有请求。 </p>
-<p>不过这个功能还需要尽量的智能， 在设计时可以根据流量场景不同来做有差别的限制， 使其在不影响其它请求的情况下， 实现部分请求的网络流量整形， 达到减少系统资源消耗的效果， 常见的几种需要做差别限制的场景如下：<br>|场景|可能造成的影响|限流的作用|<br>|–|–|–|<br>|总体的API有大量的并发调用， 导致系统QPS超过设计值|机器可能会扛不住， 造成系统崩溃|减少进入业务的流量， 保证QPS被限制在某个合理值， 其它请求会被丢弃|<br>|某个API耗时比较长， 其它API的QPS位于合理范围内|由于API耗时较长， 该API的调用次数变多的情况下， 会明显消耗系统资源， 同时也可能造成数据竞争的情况|针对性的限制耗时API， 防止该API引起系统崩溃|<br>|总体API的QPS位于合理范围内， 但是有部分参数会引起较大的系统资源消耗|比如某个筛选参数造成查全表的情况， 此时可能造成数据库处理能力下降，进而造成后端服务无响应|针对性的根据耗时API的参数进行限制限制， 防止该API引起系统崩溃|<br>|总体API的QPS位于合理范围内， 但某个API的某个参数被大多数人调用， 导致整个API无法提供服务， 比如微博的话题功能， 如果有个爆炸性话题， 这个话题就会成为热点参数|造成整个API无法使用， 严重时会造成整个服务不可用|通过对热点参数的限制， 保证其它功能能正常使用|</p>
+<p>不过这个功能还需要尽量的智能， 在设计时可以根据流量场景不同来做有差别的限制， 使其在不影响其它请求的情况下， 实现部分请求的网络流量整形， 达到减少系统资源消耗的效果， 常见的几种需要做差别限制的场景如下：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>可能造成的影响</th>
+<th>限流的作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>总体的API有大量的并发调用， 导致系统QPS超过设计值</td>
+<td>机器可能会扛不住， 造成系统崩溃</td>
+<td>减少进入业务的流量， 保证QPS被限制在某个合理值， 其它请求会被丢弃</td>
+</tr>
+<tr>
+<td>某个API耗时比较长， 其它API的QPS位于合理范围内</td>
+<td>由于API耗时较长， 该API的调用次数变多的情况下， 会明显消耗系统资源， 同时也可能造成数据竞争的情况</td>
+<td>针对性的限制耗时API， 防止该API引起系统崩溃</td>
+</tr>
+<tr>
+<td>总体API的QPS位于合理范围内， 但是有部分参数会引起较大的系统资源消耗</td>
+<td>比如某个筛选参数造成查全表的情况， 此时可能造成数据库处理能力下降，进而造成后端服务无响应</td>
+<td>针对性的根据耗时API的参数进行限制限制， 防止该API引起系统崩溃</td>
+</tr>
+<tr>
+<td>总体API的QPS位于合理范围内， 但某个API的某个参数被大多数人调用， 导致整个API无法提供服务， 比如微博的话题功能， 如果有个爆炸性话题， 这个话题就会成为热点参数</td>
+<td>造成整个API无法使用， 严重时会造成整个服务不可用</td>
+<td>通过对热点参数的限制， 保证其它功能能正常使用</td>
+</tr>
+</tbody></table>
 <h3 id="1-2-限流的组件"><a href="#1-2-限流的组件" class="headerlink" title="1.2 限流的组件"></a>1.2 限流的组件</h3><p>通过上述场景可以看到， 在这些场景中限流的作用是差不多的, 一般只涉及到两个维度：</p>
 <ul>
 <li>时间： 对某个时间窗口进行限流</li>
@@ -74,9 +103,14 @@
 <p>了解完算法的实现后， 接下来就是核心的判断逻辑, 具体见注释:</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LimitProcessor</span>(<span class="hljs-params">BaseProcessor</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, backend: BaseLimitBackend, rule_list: List[Tuple[RULE_FUNC_TYPE, Rule]]</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;初始化规则和算法逻辑， 这里的规则之所以是使用传参的方式是仅供参考， 后续整个框架的配置都会抽离成一个config， 供其它组件调用&quot;&quot;&quot;</span><br>        self._backend: BaseLimitBackend = backend<br>        self._rule_list: List[Tuple[RULE_FUNC_TYPE, Rule]] = rule_list<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_request</span>(<span class="hljs-params">self, request: Request</span>) -&gt; Request:</span><br>        <span class="hljs-comment"># not limit client event</span><br>        <span class="hljs-keyword">if</span> request.msg_type == constant.CLIENT_EVENT:<br>            <span class="hljs-comment"># 屏蔽event请求</span><br>            <span class="hljs-keyword">return</span> request<br><br>        <span class="hljs-keyword">for</span> func, rule <span class="hljs-keyword">in</span> self._rule_list:<br>            <span class="hljs-comment"># 获取该请求的key</span><br>            <span class="hljs-keyword">if</span> inspect.iscoroutinefunction(func):<br>                key, is_ignore_limit = <span class="hljs-keyword">await</span> func(request)  <span class="hljs-comment"># type: ignore</span><br>            <span class="hljs-keyword">else</span>:<br>                key, is_ignore_limit = func(request)<br>            <span class="hljs-keyword">if</span> is_ignore_limit:<br>                <span class="hljs-comment"># 如果该请求不应该限流， 直接跳过限流逻辑</span><br>                <span class="hljs-keyword">return</span> request<br>            <span class="hljs-keyword">if</span> key:<br>                <span class="hljs-comment"># 匹配到key， 进入限流逻辑</span><br>                <span class="hljs-keyword">break</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">raise</span> TooManyRequest()<br><br>        <span class="hljs-comment"># 通过backend判断是否限流</span><br>        key = <span class="hljs-string">f&quot;rap:processor:<span class="hljs-subst">&#123;self.__class__.__name__&#125;</span>:<span class="hljs-subst">&#123;key&#125;</span>&quot;</span><br>        can_requests: Union[<span class="hljs-built_in">bool</span>, Awaitable[<span class="hljs-built_in">bool</span>]] = self._backend.can_requests(key, rule)<br>        <span class="hljs-keyword">if</span> inspect.isawaitable(can_requests):<br>            can_requests = <span class="hljs-keyword">await</span> can_requests  <span class="hljs-comment"># type: ignore</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> can_requests:<br>            <span class="hljs-comment"># 如果被限流， 返回异常， 并告知要何时后才可以再次请求</span><br>            expected_time: Union[<span class="hljs-built_in">float</span>, Awaitable[<span class="hljs-built_in">float</span>]] = self._backend.expected_time(key, rule)<br>            <span class="hljs-keyword">if</span> inspect.isawaitable(expected_time):<br>                expected_time = <span class="hljs-keyword">await</span> expected_time  <span class="hljs-comment"># type: ignore</span><br>            <span class="hljs-keyword">raise</span> TooManyRequest(extra_msg=<span class="hljs-string">f&quot;expected time: <span class="hljs-subst">&#123;expected_time&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">return</span> request<br></code></pre></td></tr></table></figure>
 <p>至此， 整个限流逻辑实现完毕, 本章内容完。</p>
-<h2 id="3-拓展"><a href="#3-拓展" class="headerlink" title="3.拓展"></a>3.拓展</h2><h3 id="3-1-热点参数实现"><a href="#3-1-热点参数实现" class="headerlink" title="3.1.热点参数实现"></a>3.1.热点参数实现</h3><p>由于大部分的限流实现的backend都只要依赖于<code>Redis</code>, 所以代码仓里面只有<code>Redis</code>一种类型的backend，但是有一些限流实现需要依赖于一些特殊的backend，比如热点参数限流。</p>
-<p>热点参数限流是一个写大于读的应用场景， 而且跟时间强相关， 所以选用时序数据库做backend，后端服务会把每次请求参数都记录到时序数据库中， 并使用一个定时脚本每隔一段时间把最近的热点参数数据拉取到缓存中， 供后端服务的限流组件判断是否该放行。 其中， 这个间隔一般控制在1秒左右， 所以这是一个近实时的实现, 具体的实现图如下：<br><img   class="lazyload" data-original="https://ftp.bmp.ovh/imgs/2022/01/4ec83cd3eaff271f.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ></p>
-<h3 id="3-2-限流算法拓展"><a href="#3-2-限流算法拓展" class="headerlink" title="3.2.限流算法拓展"></a>3.2.限流算法拓展</h3><p>限流算法不止是用于算法， 也可以用于别的地方，比如有一些游戏活动，体力值满时为5, 然后玩家每次出发活动会减少1个体力值, 然后可以使用限流算法每隔一个固定时间则增加一个体力值等等。</p>
+<h2 id="3-其它碎碎念"><a href="#3-其它碎碎念" class="headerlink" title="3.其它碎碎念"></a>3.其它碎碎念</h2><h3 id="3-1-热点参数实现"><a href="#3-1-热点参数实现" class="headerlink" title="3.1.热点参数实现"></a>3.1.热点参数实现</h3><p>由于大部分的限流实现的backend都只要依赖于<code>Redis</code>, 所以代码仓里面只有<code>Redis</code>一种类型的backend，但是有一些限流实现需要依赖于一些特殊的backend，比如热点参数限流, 还有蜜罐之类的场景。</p>
+<p>以热点参数限流场景为例子， 热点参数是一个写大于读的应用场景， 而且跟时间强相关， 所以选用时序数据库做backend，之前选用过<code>Graphite</code>当做backend, 具体实现如图后端服务会把每次请求参数都记录到时序数据库中， 并使用一个定时脚本每隔一段时间把最近的热点参数数据拉取到缓存中， 供后端服务的限流组件判断是否该放行。 其中， 这个间隔一般控制在1秒左右， 所以这是一个近实时的实现, 具体的实现图如下：<br><img   class="lazyload" data-original="https://ftp.bmp.ovh/imgs/2022/01/4ec83cd3eaff271f.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ><br>当请求进来的时候， 限流中间件会通过异步的方法把数据记录到时序数据库中， 比如一个请求为<code>http://127.0.0.1:80?q=1&amp;b=2</code>，中间件就会发送一个以<code>&#123;prefix&#125;.hot_param.b=2&amp;b=2</code>为key, value为1的标准<code>Statsd</code>的count类型数据到<code>Statsd</code>组件中。</p>
+<blockquote>
+<p>这个Key采用标准的<code>Statsd</code>命令, 以<code>.</code>分割有三个值， 第一个是前缀它与业务相关, 如业务名， 函数名，namespace等等; 第二个是代表是热点参数的业务； 第三个是参数Key, 这里以<code>&amp;</code>为分割号， 然后按Key顺序排序，重新拼接为一个字符串， 这样即使请求时顺序不一致也能识别到时同种请求。</p>
+</blockquote>
+<p><code>Statsd</code>组件收到了数据后会自行进行统计， 统计一个时间区间都数据并写入到<code>Graphite</code>中， 然后通过定时脚本使用<code>Graphite API</code>拉取统计次数大于条件的数据写入到<code>Redis</code>缓存中， 其中<code>Statsd</code>组件的时间区间和定时脚本的定时时间都会控制在一秒左右， 所以这是一个近实时的实现， 在计算性能消耗和实现效果直接做取舍。</p>
+<p>数据写入到<code>Redis</code>后， 这个写入数据和统计的异步流程就结束了， 中间件在记录数据后， 会通过<code>Redis</code>判断是否是热点参数， 并根据规则判断是否放行， 到了这里就跟上面的限流流程差不多了。</p>
+<h3 id="3-2-限流算法拓展"><a href="#3-2-限流算法拓展" class="headerlink" title="3.2.限流算法拓展"></a>3.2.限流算法拓展</h3><p>限流算法不止是用于算法， 也可以用于别的地方，比如有一些游戏活动，体力值满时为5, 然后玩家每次出发活动会减少1个体力值, 然后可以使用限流算法每隔一个固定时间则增加一个体力值等等。 在遇到业务需求有跟时间相关且像上述所说的体力值会恢复的情况时， 可以往限流算法思考。</p>
 ]]></content>
       <categories>
         <category>RPC框架编写实践</category>
