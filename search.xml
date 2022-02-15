@@ -27,12 +27,13 @@
 </blockquote>
 <h3 id="1-2-gRPC为什么要采用Protocol-Buffer做序列化协议"><a href="#1-2-gRPC为什么要采用Protocol-Buffer做序列化协议" class="headerlink" title="1.2.gRPC为什么要采用Protocol Buffer做序列化协议"></a>1.2.gRPC为什么要采用Protocol Buffer做序列化协议</h3><p><code>gRPC</code>早期只支持Protobuf，最新的版本已经开始支持Json了，但是没有多少人使用。为什么<code>gRPC</code>一开始要选择Protobuf呢，有一个很重要的原因是Protobuf同样也是谷歌自己的产品，这样<code>gRPC</code>在进行功能升级的时候，Protobuf也能及时的迭代， 目前Protobuf的版本已经迭代到第3版，但是大家能接触到的只有第二版和第三版，因为第一版是谷歌之前内部使用的。<br>不过<code>gRPC</code>采用Protobuf的重要的原因是在常见的场景下，<code>gRPC</code>的效率要比现在大家用到的Json高一些，Protobuf的效率为什么会高呢？天下是没有免费的午餐的，有得既有失，在理解Protobuf之前我们先来看一段Json数据:</p>
 <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs Json">&#123;<br>  <span class="hljs-attr">&quot;project&quot;</span>: <span class="hljs-string">&quot;Test&quot;</span>, <br>  <span class="hljs-attr">&quot;timestamp&quot;</span>: <span class="hljs-number">1600000000</span>, <br>  <span class="hljs-attr">&quot;status&quot;</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">&quot;data&quot;</span>: [<br>    &#123;<br>      <span class="hljs-attr">&quot;demo_key&quot;</span>: <span class="hljs-string">&quot;fake_value&quot;</span>,<br>    &#125;,<br>    &#123;<br>      <span class="hljs-attr">&quot;demo_key&quot;</span>: <span class="hljs-string">&quot;fake_value&quot;</span>,<br>    &#125;,<br>    &#123;<br>      <span class="hljs-attr">&quot;demo_key&quot;</span>: <span class="hljs-string">&quot;fake_value&quot;</span>,<br>    &#125;<br>  ]<br>&#125;<br></code></pre></td></tr></table></figure>
+
 <p>这段Json数据是一段文本， 这就是Json效率低下的第一个点–编码低效。比如字段<code>status</code>对应的值<code>true</code>在内存中只占用1个字节，但在这个数据中却占用了4个字节, 再比如字段<code>timestamp</code>的值是int类型，int类型在内存中占用的空间并不大，但是在Json数据中却是以字符串呈现会占用更多的空间。<br>此外我们可以很快的通过这段数据看得出里面有什么内容，这是Json的一个优点，但也带来了另一个缺点–信息冗余。比如字段<code>data</code>的数据是一个数组，但是里面的结构是一致的，这样就会重复多传了n次的字段名。</p>
 <p>Protobuf为了解决这些问题，首先引进了一些带有优化的编码方案，解决了编码低效的问题， 比如针对数字引入了VarInts对数字进行编码解码， 这个方案能节省数字的空间占用，同时使用的是位运算来编码解码，效率非常的高，具体可以通过<a href="https://segmentfault.com/a/1190000020500985">详解varint编码原理</a>进行了解。<br>而另一方面的改进则是去掉字段名了，改用字段编号代替，传输的时候只传输编号，这样就可以解决了冗余问题，但是这时候需要双方有一个记录编号的翻译本从而可以通过字段编号来得到真实的字段名，就像莫斯电码通信一样，而在Protobuf中proto文件就是这样的一个密码本，它记录了字段和编号的关系以及这个请求是属于哪个调用的接口和服务。<br>以上文<a href="https://so1n.me/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/">Python-gRPC实践（1）–gRPC简介</a>中的捉包结果<img    class="lazyload" data-original="https://ftp.bmp.ovh/imgs/2022/01/0adf7176d3f129a9.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">images</span><br>为例子，图中展示的是与proto文件:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs proto">syntax &#x3D; &quot;proto3&quot;;<br>package user;<br>import &quot;google&#x2F;protobuf&#x2F;empty.proto&quot;;<br><br>&#x2F;&#x2F; delete user<br>message DeleteUserRequest &#123;<br>  string uid &#x3D; 1;<br>&#125;<br><br><br>service User &#123;<br>  rpc delete_user(DeleteUserRequest) returns (google.protobuf.Empty);<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>有关的请求，请求中表明<code>Field</code>为1，值为999, 接受端收到请求后就会先从proto文件查数据， 通过URL得出这个请求是service为<code>User</code>， rpc为<code>delete_user</code>的请求， 那么请求的message就是<code>DeleteUserRequest</code>，接下来就能知道<code>Field</code>为1实际的字段名是<code>uid</code>。</p>
 <h2 id="2-使用Protocol-Buffer"><a href="#2-使用Protocol-Buffer" class="headerlink" title="2.使用Protocol Buffer"></a>2.使用Protocol Buffer</h2><p>Protobuf的编码原理是值得一看的，目前网上资料有很多，这里就先略过直接到如何使用Protobuf(实际上我目前对Protobuf的编码了解的也不是很多- -)。</p>
-<p>从上面的示例可以看出<code>gRPC</code>在运行的时候需要proto文件来反查得出正真的字段数据，而<code>gRPC</code>是支持多语言的，那么每个语言的<code>gRPC</code>是如何通过proto文件来查出数据呢。</p>
+<p>从上面的示例可以看出<code>gRPC</code>在运行的时候需要proto文件来反查得出真正的字段数据，而<code>gRPC</code>是支持多语言的，那么每个语言的<code>gRPC</code>是如何通过proto文件来查出数据呢。</p>
 <p>我们在编写项目时，大多都会通过一份接口代码就来生成对应的OpenAPI文件，然后其它工具如Swagger就能通过读取该文件渲染出一个API文档。而proto文件的作用也跟OpenAPI文件类似，只不过不是代码生成，而是由开发者编写的，然后开发者再通过不同的工具来根据proto文件生成不同语言的代码并放到项目工程中使用，所以要用好<code>gRPC</code>需要先知道如何编写proto文件(通常在使用gRPC时，也是基于Protobuf文件生成对应的调用代码)。</p>
 <h3 id="2-1-Protobuf语法"><a href="#2-1-Protobuf语法" class="headerlink" title="2.1.Protobuf语法"></a>2.1.Protobuf语法</h3><p>在介绍语法之前，先看看proto文件都内容有什么，首先我们再回头看一看上面说的proto文件:</p>
 <figure class="highlight plain"><figcaption><span>Buffer</span></figcaption><table><tr><td class="code"><pre><code class="hljs Protocol">syntax &#x3D; &quot;proto3&quot;;<br>package user;<br>import &quot;google&#x2F;protobuf&#x2F;empty.proto&quot;;<br><br>&#x2F;&#x2F; delete user<br>message DeleteUserRequest &#123;<br>  string uid &#x3D; 1;<br>&#125;<br><br><br>service User &#123;<br>  rpc delete_user(DeleteUserRequest) returns (google.protobuf.Empty);<br>&#125;<br></code></pre></td></tr></table></figure>
@@ -67,19 +68,15 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs proto">&#x2F;&#x2F; 声明包名为demo_b<br>package demo_b<br>import &quot;project&#x2F;demo_a.proto&quot;;<br><br>message DemoRequest &#123;<br>  &#x2F;&#x2F; 引用a文件的消息体<br>  project.demo_a.DemoRequest result &#x3D; 1;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>此外， Protobuf还支持定义其它类型，这些类型具有跟Python等价类型的用法，但是在使用的时候还是有些区别：</p>
-<ul>
-<li><p>Timestamp:</p>
-<p>Timestamp是Protobuf中的时间类型，Protobuf使用语法如下：</p>
+<h4 id="Timestamp"><a href="#Timestamp" class="headerlink" title="Timestamp:"></a>Timestamp:</h4><p>Timestamp是Protobuf中的时间类型，Protobuf使用语法如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs proto">import &quot;google&#x2F;protobuf&#x2F;timestamp.proto&quot;;<br><br>message DemoRequest &#123;<br>  google.protobuf.Timestamp timestamp &#x3D; 1;<br>&#125; <br></code></pre></td></tr></table></figure>
 <p>该类型实际上是timestamp的封装，它的默认值是timestamp=0（对应到的日期是1970-01-01），在Python代码中，可以通过语法<code>ToDatetime</code>转为datetime，也可以通过语法<code>FormDatetime</code>把datetime转为Protobuf的Timestamp:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> google.protobuf.timestamp_pb2 <span class="hljs-keyword">import</span> Timestamp<br><br>Timestamp().ToDatetime()<br><br><span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime<br><br>Timestamp().FormDatetime(datetime.now())<br></code></pre></td></tr></table></figure></li>
-<li><p>Repeated：</p>
-<p>Repeated 可以使该字段表重复任意次数，就像Python的Sequence对象，但是实际上可以认为是Python的List对象，Protobuf使用Repeated语法如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> google.protobuf.timestamp_pb2 <span class="hljs-keyword">import</span> Timestamp<br><br>Timestamp().ToDatetime()<br><br><span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime<br><br>Timestamp().FormDatetime(datetime.now())<br></code></pre></td></tr></table></figure>
+
+<h4 id="Repeated："><a href="#Repeated：" class="headerlink" title="Repeated："></a>Repeated：</h4><p>Repeated 可以使该字段表重复任意次数，就像Python的Sequence对象，但是实际上可以认为是Python的List对象，Protobuf使用Repeated语法如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  repeated int32 demo_list &#x3D; 1;<br>&#125; <br><br>&#x2F;&#x2F; demo_list value like json<br>&#x2F;&#x2F; [1, 2, 3, 4, 5, 6] <br></code></pre></td></tr></table></figure>
 <p>该消息体定义了一个<code>demo_list</code>字段， 该字段是repeated且内部类型是int32，在Python中使用Repeated字段的方法跟使用List方法一样，但是它不是继承于List的，在部分库可能需要转换为List才能使用，比如<code>pymysql</code>。</p>
-</li>
-<li><p>Map：</p>
-<p>虽然我们大多数都是以明确的Key-Value来定义消息体， 但是Protobuf也提供了一个类似于dict的Map，Protobuf使用Map语法如下：</p>
+<h4 id="Map："><a href="#Map：" class="headerlink" title="Map："></a>Map：</h4><p>虽然我们大多数都是以明确的Key-Value来定义消息体， 但是Protobuf也提供了一个类似于dict的Map，Protobuf使用Map语法如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  map&lt;string, int32&gt; demo_map &#x3D; 1;<br>&#125; <br><br>&#x2F;&#x2F; demo_map value like json<br>&#x2F;&#x2F; &#123;<br>&#x2F;&#x2F;    &quot;aaa&quot;: 123,<br>&#x2F;&#x2F;    &quot;bbb&quot;: 456 <br>&#x2F;&#x2F; &#125;<br></code></pre></td></tr></table></figure>
 <p>该消息体定义了一个<code>demo_map</code>字段， 该字段是map类型且key类型为字符串，value类型为int32，在Python中使用Map的方法跟使用dict方法一样，但是它不是继承于dict的，在部分库可能需要转换为dict才能使用，比如<code>pymysql</code>。</p>
 <blockquote>
@@ -90,19 +87,12 @@
 <li>如果有重复的字段，则使用最后都有一个。</li>
 </ul>
 </blockquote>
-</li>
-</ul>
-<ul>
-<li><p>Empty：</p>
-<p>Empty是Protobuf中代表空的类型，跟Python中的None一样, 一般不用在消息体中， 而是用来标明某个rpc方法返回了空，Protobuf语法如下：</p>
+<h4 id="Empty："><a href="#Empty：" class="headerlink" title="Empty："></a>Empty：</h4><p>Empty是Protobuf中代表空的类型，跟Python中的None一样, 一般不用在消息体中， 而是用来标明某个rpc方法返回了空，Protobuf语法如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs proto">import &quot;google&#x2F;protobuf&#x2F;empty.proto&quot;;<br><br>service Demo &#123;<br>  rpc demo (DemoRequest) returns (google.protobuf.Empty);<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>在Python中可以通过<code>from google.protobuf.empty_pb2 import Empty</code>导入<code>Empty</code>对象并使用，不过在Python代码中最好不要把<code>Empty</code>转为Python的None对象, 因为<code>Empty</code>只是用来代表该请求点响应为空。</p>
-</li>
-<li><p>Enum：<br>在定义消息类型时， 可能希望其中一个字段只有一个预定义的值，这时就会用到枚举类型，Protobuf使用Enum语法如下：</p>
+<h4 id="Enum："><a href="#Enum：" class="headerlink" title="Enum："></a>Enum：</h4><p>在定义消息类型时， 可能希望其中一个字段只有一个预定义的值，这时就会用到枚举类型，Protobuf使用Enum语法如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  enum Status &#123;<br>    open &#x3D; 0;<br>    half_open &#x3D; 1;<br>    close &#x3D; 2;<br>  &#125;<br>  Status status &#x3D; 1;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>如语法所示， 首先在消息体创建一个名称为<code>Status</code>的枚举类型，然后定义类型为<code>Status</code>的字段<code>status</code>， 值得注意的是枚举定义都需要包含一个常量映射到0并且作为定义的首行，这是因为Protobuf要求定义的枚举值中必须有字段的值为0，当引用到这个类型的字段没有定义默认值时，它的默认值就是枚举类型中值为0的字段。</p>
-</li>
-</ul>
 <h3 id="2-2-Proto文件管理与使用规范"><a href="#2-2-Proto文件管理与使用规范" class="headerlink" title="2.2.Proto文件管理与使用规范"></a>2.2.Proto文件管理与使用规范</h3><p>实际使用gRPC来串联服务时，这些服务并不是只用一门编程语言，可能有的服务是用Python写的，有的服务是Java写的，有的服务则是用Go写的。<br>同时，我们在发布功能时也不是所有服务都需有更新，有的服务只需要用老接口就可以了， 比如一个服务端接口进行了更新， 这个服务端对应了很多个客户端，如果没有规范管理proto文件的话，就可能所有客户端都要进行升级，而不是只升级需要升级的客户端， 所以我们需要根据规范来管理proto文件，减少管理上带来的负担。</p>
 <h4 id="2-2-1-方案选择"><a href="#2-2-1-方案选择" class="headerlink" title="2.2.1.方案选择"></a>2.2.1.方案选择</h4><p>在一开始的时候，我选用的方案是最简单的文件拷贝，这也是大多数人入门时的使用方法，它使用起来非常简单，但是代码复用率很低，项目多了之后复制文件会成为负担， 有时还需要用diff工具去对比，十分麻烦。</p>
 <p>于是，在后续就开始考虑用版本管理工具来进行管理，由于proto文件是项目的子集，在选择方案的时候就会先联想到Git Submodul, 但是这种方案存在回滚故障点风险，同时需要为每个项目各自生产对应的proto，比较麻烦。</p>
