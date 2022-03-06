@@ -1,0 +1,498 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Pre-Worker服务模型问题的思考 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记目前TCP服务的工作模型有三种，但是开源的服务器基...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Pre-Worker服务模型问题的思考</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://cdn.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1646584864565Pre-Worker%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%80%83-%E6%94%B6%E9%93%B6%E5%8F%B0.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Pre-Worker服务模型问题的思考</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 07, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>13400</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>目前TCP服务的工作模型有三种，但是开源的服务器基本上都是使用<code>Pre-Worker</code>模型，比如<code>Nginx</code>和<code>Gunicorn</code>。在阅读<code>Gunicorn</code>源码后我对<code>Gunicorn</code>为啥要采用这个模型感兴趣，所以查阅了一番资料并了解常见TCP服务工作模型的优缺点。</p>
+<h2 id="1-TCP服务的请求处理模式"><a href="#1-TCP服务的请求处理模式" class="headerlink" title="1.TCP服务的请求处理模式"></a>1.TCP服务的请求处理模式</h2><p>大多数的TCP服务部署都是从单进程开始的，当请求数量逐渐变多后，单进程工作模型的服务就开始扛不住了， 这时就会想通过添加更多的进程来帮忙处理请求，于是就会诞生出另外两种基于多进程的工作模型， 这三种工作模型的特点如下（其中监听可以认为是调用<code>socket.listen</code>，处理可以认为调用<code>socket.accept</code>）：</p>
+<ul>
+<li><p>1.单个进程监听和处理<code>socket</code>。</p>
+<p>  这是最简单的工作模型， 只有单个进程同时监听和执行同一个<code>socket.accpet</code>调用来接受新连接以及处理请求。</p>
+</li>
+<li><p>2.单个进程监听<code>socket</code>，多个工作进程处理<code>socket</code>（<code>Nginx</code>和<code>Gunicorn</code>的工作模式）。</p>
+<p>  这是最常用的工作模式，整个进程组中有且只有一个<code>socket</code>，主进程负责监听<code>socket</code>，工作进程负责执行<code>socket.accept</code>调用来接受新连接和处理请求。（工作进程的负载均衡由系统决定）</p>
+</li>
+<li><p>3.多个工作进程，每个工作进程都有单独监听和处理的<code>socket</code>。</p>
+<p>  每个工作进程都有一个独立的<code>socket</code>，并且通过<code>SO_REUSEPORT</code>标记使这类<code>socket</code>都能监听和处理相同的ip端口的请求。(工作进程的负负载均衡是由每个请求的hash决定)</p>
+</li>
+</ul>
+<p>上面三种工作模式的主要不同点是监听和处理的方式不同，这是因为<code>Linux</code>采用<code>socket</code>对TCP， UDP进行了封装，并产生了一套独立的调用过程，而开发者在使用<code>socket</code>进行TCP的网络编程时一般有几个步骤：</p>
+<ul>
+<li><p>1.调用<code>socket.bind</code>，给该<code>socket</code>实例绑定一个IP和端口，这样后续内核会把收到该IP端口的网络流量转发给该<code>socket</code>。</p>
+</li>
+<li><p>2.调用<code>socket.listen</code>，该调用对应着TCP的<code>listen</code>状态，当调用这个函数后，服务端就会进入到这个状态，意味着可以开始处理客户端的请求了。</p>
+<p>  调用<code>socket.listen</code>函数后，内核为该<code>socket</code>维护两个队列，一个是已经建立连接的队列，代表客户端与服务端的连接已经三次握手完毕；另外一个是还没有完全建立连接的队列，代表客户端已经与服务端开始尝试连接，但三次握手还没完成。</p>
+</li>
+<li><p>3.调用<code>socket.accept</code>，从已经建立连接的队列获取连接来处理，如果获取不到连接，则会一直等待直到内核把建立的连接返回给该进程调用，需要注意的是这时候返回的是另外一个<code>socket</code>，也就是监听的是一个<code>socket</code>，<code>accept</code>后是另一个<code>socket</code>，然后服务端就会通过调用新返回的<code>socket</code>的<code>socket.read</code>和<code>socket.write</code>方法来与客户端进行交互。</p>
+</li>
+</ul>
+<p>其中第二第三交互步骤如图：<br><img  src="https://cdn.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1646586321755Pre-Worker%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%80%83-socket%E4%BA%A4%E4%BA%92.jpg"  ><span class="image-caption">Pre-Worker服务模型问题的思考-socket交互</span></p>
+<p>了解完了<code>socket</code>的交互步骤后再回顾上面的三种工作模式可以发现，第一种工作模式是一个进程包了3个调用步骤，第二种工作模式则是主进程包了前面两个调用，工作进程包了第三个调用。之所以这样区分是因为第二种工作模式一般都是采用主进程来管理工作进程，通过拓展多个工作进程来处理更多的请求数量，但是<code>socket.accept</code>是一个阻塞操作，而且每个请求进来的时候，服务端都会<code>accept</code>一次， 如果把<code>socket.accept</code>调用放在主进程，那么<code>socket.accept</code>的阻塞操作就会成为服务的处理请求瓶颈，拓展再多的工作进程也无法提升服务端的处理性能。</p>
+<p>但是第二种工作模式也无法一味的通过提升进程来提升服务端的处理性能，因为这种工作模式会出现惊群效应。</p>
+<h2 id="2-惊群效应"><a href="#2-惊群效应" class="headerlink" title="2.惊群效应"></a>2.惊群效应</h2><p>对于<code>Pre-Worker</code>模型， 有一个最典型的问题就是惊群效应，惊群效应产生的原因是由于系统不知道网络数据包是何时到来，所以系统中对于网络数据包的接收都是采用异步进行的。</p>
+<p>当服务端的<code>socket</code>处于listen状态之后就可以开始处理客户端的请求了，这时所有<code>Worker</code>进程都处于调用<code>socket.accept</code>后睡眠的状态中。而客户端发出的数据包会先抵达到网卡上，网卡就会通知内核数据包已经到了，内核就会开始将数据包填充到对应的<code>socket</code>队列并通知持有该<code>socket</code>的进程，由于目前没有进程来处理该请求，所以内核就会把所有持有该<code>socket</code>的进程全部都唤醒，但是最后只有一个进程能收到这个请求并执行后续的处理，其它的进程被唤醒后发现并没有数据可以接收则会继续睡眠。这些进程虽然被唤醒后没有执行任何操作，但是内核已经执行了对进程的调度和上下文的切换， 当并发量很大的时候，这几个步骤就会十分的影响服务性能，进而降低服务的并发能力。</p>
+<p>可以看出，惊群效应就是多个进程抢夺一个资源而产生的问题，要解决这个问题，就需要解决资源的竞争，所以<code>Linux</code>内核通过引入一个名为<code>WQ_FLAG_EXCLUSIVE</code>的标记位来解决这个问题，当<code>Worker</code>进程调用<code>socket.accept</code>时，内核会发现这个操作带有<code>WQ_FLAG_EXCLUSIVE</code>的标记，就把他加入到一个<code>accept</code>队列的尾部， 每当有一个请求进来的时候，内核只会从这个队列的头部取出一个进程来处理请求，进程处理完成后内核再把它加入到队列的尾部，等待下次的请求到达。通过这样的设计，<code>Pre-Worker</code>就能避免了一个请求唤醒一片进程的情况。</p>
+<h3 id="2-1-Event-Loop的惊群效应"><a href="#2-1-Event-Loop的惊群效应" class="headerlink" title="2.1.Event Loop的惊群效应"></a>2.1.Event Loop的惊群效应</h3><p>通过查阅资料发现<code>Linux</code>通过<code>WQ_FLAG_EXCLUSIVE</code>标记解决了<code>socket.accept</code>的惊群问题， 但是现在很多服务通过基于事件循环的方法来提供更高的并发能力。比如我线上运行的服务就是用到了<code>Gevent</code>，而<code>Gevent</code>用到的核心事件循环则是<code>Epoll</code>，它与<code>Select</code>, <code>Poll</code>并称为<code>Event Loop</code>。</p>
+<p>对于任何工作模式来说， 使用<code>Event Loop</code>后，进程调用<code>socket.accept</code>后的行为逻辑就不一样了，具体的逻辑步骤如下：</p>
+<ul>
+<li>1.进程在调用<code>socket.accept</code>时，<code>Event Loop</code>会把进程挂在<code>socket</code>对应的文件描述符的等待队列上。</li>
+<li>2.当<code>socket</code>的文件描述符有事件产生时，对应的驱动就会将等待队列上对应的进程进行唤醒。</li>
+<li>3.被唤醒的进程会通过<code>Event Loop</code>检查事件是否就绪，如果事件就绪就会返回对应的事件给刚才的进程。</li>
+<li>4.检查<code>accept</code>事件是否可调用， 如果可以就执行<code>accept</code>操作，并取得该四元组的对应<code>socket</code>。</li>
+</ul>
+<p>可以看到，之前进程是挂在网络驱动上等着被内核唤醒，而在使用<code>Event Loop</code>后进程是挂在对应文件描述符的等待队列上等待被<code>Event Loop</code>唤醒，对于<code>Pre-Worker</code>模型下的每个工作进程虽然都有自己专属的<code>Event Loop</code>，但是他们都是等待着同样的资源，于是当该文件描述符有事件产生时，就会唤醒所有工作进程对应的<code>Event Loop</code>来检查事件以及判断是否可以返回事件给工作进程, 而且由于是通过<code>Event Loop</code>的逻辑来执行<code>socket.accept</code>，这样会绕过上面所说的<code>WQ_FLAG_EXCLUSIVE</code>标记的限制，从而又产生了惊群效应。</p>
+<p>可以看到，<code>Event Loop</code>产生惊群效应的原因跟进程直接调用<code>sock.accept</code>十分的像，所以他们的解决思路也很像，首先是给<code>Event Loop</code>增加一个名为<code>EPOLLEXCLUSIVE</code>的标记， 然后开发者在编程时可以在<code>Event Loop</code>实例化后注册对应的标记,当进程在调用<code>sock.accept</code>且系统检到<code>Event Loop</code>带有该标记时，就会把进程挂在文件描述符的队列尾部，等到事件产生时，内核会只唤醒该队列的第一个进程来处理对应的事件。</p>
+<blockquote>
+<p>关于标记<code>EPOLLEXCLUSIVE</code>的具体内容可见:<a target="_blank" rel="noopener" href="https://lwn.net/Articles/632590/">Add epoll round robin wakeup mode</a>， 通过内容还可以知道还有一个标记<code>EPOLLROUNDROBIN</code>用来解决唤醒不均衡的情况，但是在<code>Python</code>中似乎没办法使用。</p>
+</blockquote>
+<h2 id="3-负载不均衡问题"><a href="#3-负载不均衡问题" class="headerlink" title="3.负载不均衡问题"></a>3.负载不均衡问题</h2><h3 id="3-1-一次线上日志的分析"><a href="#3-1-一次线上日志的分析" class="headerlink" title="3.1.一次线上日志的分析"></a>3.1.一次线上日志的分析</h3><p>目前线上其中一个服务的运行架构简化为下图：<br><img  src="https://cdn.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1646412224744Gunicorn%E8%BF%9B%E7%A8%8B%E9%A5%A5%E9%A5%BF%E7%9A%84%E6%80%9D%E8%80%83-%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B.jpg"  ><span class="image-caption">线上服务运行架构</span></p>
+<p>这个服务前置了一台<code>Nginx</code>，并由<code>Nginx</code>均衡地转发给后面的两个<code>Gunicorn</code>绑定的端口，这两个<code>Gunicorn</code>的<code>Worker</code>都采用<code>Gevent Worker</code>，同时<code>Worker</code>设置的数量是10个。<br>另外服务的应用程序每收到一条请求都会打印一条请求日志，该日志带有<code>Worker</code>的<code>Pid</code>，于是通过请求日志中<code>Pid</code>出现的次数就可以知道该<code>Worker</code>接受的请求数量有多少，在进行分析后得到的数据如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 数据经过简单的人为排序</span><br><span class="hljs-comment"># 两个字段分别是处理数量  PID</span><br> 311245 2042<br> 311909 2034<br>  77711 2025<br>  78707 2041<br>  25023 2001<br>  25062 2022<br>  10017 2019<br>   9546 2020<br>   4239 2009<br>   4475 2010<br>   2629 2005<br>   2544 2033<br>   1077 2006<br>   1174 2026<br>   1608 1974<br>   1705 2003<br>    238 1898<br>    249 1977<br>    262 1896<br>    296 1897<br>    329 1928<br>    333 1994<br>    342 1903<br>    371 1915<br>    373 1950<br>    386 1917<br>    458 1909<br>    467 1934<br>    485 1972<br>    516 1927<br>    599 1963<br>    679 1916<br>    917 2008<br>    923 2004<br></code></pre></td></tr></table></figure>
+<p>通过数据可以发现，每个<code>Worker</code>处理的请求数量都是不一致的，且每2个<code>Worker</code>处理的数量是接近的，在经过上面的服务运行架构可以发现有个数据特点：</p>
+<ul>
+<li>1.不同的实例下的<code>Worker</code>处理请求数量分布十分的接近。如PID 2042属于<code>Gunicorn</code>实例1的<code>Worker</code>, PID 2034属于<code>Gunicorn</code>实例2的<code>Worker</code>，他们处理的请求数量分别为311245和311909，相差不大，且远远超过了同实例下的其它<code>Worker</code>处理的请求数量。</li>
+<li>2.不同的<code>Worker</code>处理的请求数量差别很大，处理请求数量最多的<code>Worker</code>比其它<code>Worker</code>处理请求的数量还多(同一实例情况下)</li>
+</ul>
+<p>通过第一点可以发现<code>Nginx</code>的负载均衡是生效的，因为每个实例接收到请求是相近的，且每个实例的<code>Worker</code>接收请求数量的分布十分的接近。。通过第二点可以发现不同<code>Worker</code>的请求数量差别非常的大，它们之间相差的最大倍数达到了100倍，这极有可能是<code>Gunicorn</code>导致分发给<code>Worker</code>的请求不均衡。</p>
+<p>这样的数据标明了服务存在部分进程饿死的现象，即使加再多的<code>Worker</code>也很难去分担之前<code>Worker</code>的请求，反而会因为进程过多导致服务器上下文切换次数变多而性能下降。</p>
+<p>由于之前一直在使用<code>Asyncio</code>，所以我知道<code>Event Loop</code>在收到对应文件描述符的事件时，它不是以雨露均沾的方式去唤醒进程/线程/协程，而是会优先唤醒第一个注册的进程/线程/协程，只有第一个进程/线程/协程繁忙的情况下才会去唤醒后面的进程/线程/协程，造成了唤醒倾斜的问题，所以我猜测是这个规则引发了负载不均衡的问题。以下是一个验证<code>Event Loop</code>唤醒规则的demo代码以及注释如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br><br><br><span class="hljs-comment"># 统计是协程对应的消费次数</span><br>cnt: Counter = Counter()<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">consumer</span>(<span class="hljs-params">aid: <span class="hljs-built_in">int</span>, queue: asyncio.Queue</span>):</span><br>    <span class="hljs-comment"># 消费者，用于消费队列的数据</span><br>    print(aid, <span class="hljs-string">&quot;init&quot;</span>)<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        <span class="hljs-keyword">await</span> queue.get()<br>        cnt[aid] += <span class="hljs-number">1</span><br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sleep_consumer</span>(<span class="hljs-params">aid: <span class="hljs-built_in">int</span>, queue: asyncio.Queue</span>):</span><br>    <span class="hljs-comment"># 消费者，用于消费队列的数据</span><br>    print(aid, <span class="hljs-string">&quot;init&quot;</span>)<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        <span class="hljs-keyword">await</span> queue.get()<br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br>        cnt[aid] += <span class="hljs-number">1</span><br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>():</span><br>    <span class="hljs-comment"># 创建队列以及消费者协程</span><br>    a_queue: asyncio.Queue = asyncio.Queue()<br>    b_queue: asyncio.Queue = asyncio.Queue()<br>    <span class="hljs-keyword">for</span> a_id <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>        <span class="hljs-keyword">if</span> a_id // <span class="hljs-number">2</span> == a_id / <span class="hljs-number">2</span>:<br>            asyncio.ensure_future(consumer(a_id, a_queue))<br>        <span class="hljs-keyword">else</span>:<br>            asyncio.ensure_future(sleep_consumer(a_id, b_queue))<br><br>    <span class="hljs-comment"># 等待所有消费者协程创建完成</span><br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.01</span>)<br><br>    <span class="hljs-comment"># 推送数据到队列</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>        <span class="hljs-keyword">if</span> i // <span class="hljs-number">2</span> == i / <span class="hljs-number">2</span>:<br>            a_queue.put_nowait(i)<br>        <span class="hljs-keyword">else</span>:<br>            b_queue.put_nowait(i)<br><br>    <span class="hljs-comment"># 等待都消费了才退出</span><br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">1</span>)<br><br><br>asyncio.run(main())<br>print(cnt)<br></code></pre></td></tr></table></figure>
+<p>该程序的消费者注册到<code>Event Loop</code>的先后顺序与他们的ID有关，该程序中有两个队列，它们对应着两种类型的消费者， 第一种消费者只做消费（序号为偶数的消费者），第二种消费者除了消费外还休眠了0.1秒(序号为奇数的消费者)， 在运行程序后，程序的输出结果如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">0 init<br>1 init<br>2 init<br>3 init<br>4 init<br>5 init<br>6 init<br>7 init<br>8 init<br>9 init<br>Counter(&#123;0: 5, 1: 1, 3: 1, 5: 1, 7: 1, 9: 1&#125;)<br></code></pre></td></tr></table></figure>
+<p>通过输出结果可以发现，10个消费者协程已经创建了，<br>对于带有休眠的消费者(序号1,3,5,7,9)他们都消费了一条数据，但对于普通的消费者(0,2,4,6,8)，只有0号消费者有消费，这是因为在普通的消费者中，0号消费者是最早注册的，且这类型的消费者从队列获取数据所花费的CPU时间非常的少，所以0号消费者消费一次数据后又立即收到了<code>Event Loop</code>的调度继续消费，而带有休眠的消费者因为他们的休眠占用了一些时间，<code>Event Loop</code>调度了最先注册的消费者后想继续调度却发现它处于繁忙状态，这时就会调度下一个注册的消费者， 最终达到均匀的调度到每一个消费者。</p>
+<p>不过这个例子只是单进程下跑出来的结果， 为了更更贴生产服务，我把<code>Gunicorn</code>的<code>Sync Worker</code>和<code>Gevent Worker</code>抽象为下面两个简单的TCP模型，他们的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment">############################</span><br><span class="hljs-comment"># 模仿Sync Work工作模式的代码 #</span><br><span class="hljs-comment">############################</span><br><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> socket<br><span class="hljs-keyword">import</span> time<br><br><span class="hljs-comment"># 初始化sock</span><br>sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br>sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="hljs-number">1</span>)<br>sock.bind((<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">8000</span>))<br>sock.listen()<br><span class="hljs-keyword">try</span>:<br>    <span class="hljs-comment"># fork 出3个进程</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):<br>        pid = os.fork()<br>        <span class="hljs-keyword">if</span> pid == <span class="hljs-number">0</span>:<br>            <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>                <span class="hljs-comment"># 该循环是接收请求并把自己的pid发送给客户端</span><br>                cs_sock, _ = sock.accept()<br>                <span class="hljs-comment"># send方法不会阻塞</span><br>                cs_sock.send(<span class="hljs-built_in">str</span>(os.getpid()).encode())<br>                cs_sock.close()<br>                <span class="hljs-comment"># 模仿IO</span><br>                time.sleep(<span class="hljs-number">0.001</span>)<br>    os.wait()<br><span class="hljs-keyword">finally</span>:<br>    sock.close()<br><br><span class="hljs-comment">##############################</span><br><span class="hljs-comment"># 模仿Gevent Work工作模式的代码 #</span><br><span class="hljs-comment">##############################</span><br><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> select<br><span class="hljs-keyword">import</span> socket<br><br><span class="hljs-comment"># 用于模仿IO的文件描述符</span><br>r, _ = os.pipe()<br><br><span class="hljs-comment"># 初始化sock</span><br>sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br>sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="hljs-number">1</span>)<br>sock.bind((<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">8000</span>))<br>sock.listen()<br>sock.setblocking(<span class="hljs-literal">False</span>)<br><span class="hljs-keyword">try</span>:<br>    <span class="hljs-comment"># fork 出3个进程</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):<br>        pid = os.fork()<br>        <span class="hljs-keyword">if</span> pid == <span class="hljs-number">0</span>:<br>            <span class="hljs-comment"># 初始化两个epoll,一个用来处理请求一个用于模仿阻塞</span><br>            epoll = select.epoll()<br>            epoll.register(sock, select.EPOLLIN | select.EPOLLEXCLUSIVE)<br>            sleep_epoll = select.epoll()<br>            sleep_epoll.register(r, select.EPOLLIN | select.EPOLLEXCLUSIVE)<br>            <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>                <span class="hljs-keyword">try</span>:<br>                    <span class="hljs-comment"># 等待事件</span><br>                    epoll.poll()<br>                <span class="hljs-keyword">except</span> IOError:<br>                    <span class="hljs-keyword">continue</span><br><br>                <span class="hljs-comment"># 事件循环下调用`sock.accept`会报错</span><br>                <span class="hljs-keyword">try</span>:<br>                    cs_sock, _ = sock.accept()<br>                <span class="hljs-keyword">except</span> socket.error:<br>                    <span class="hljs-keyword">continue</span><br>                <span class="hljs-comment"># send方法不会阻塞</span><br>                cs_sock.send(<span class="hljs-built_in">str</span>(os.getpid()).encode())<br>                cs_sock.close()<br>                <span class="hljs-comment"># 模仿IO</span><br>                sleep_epoll.poll(timeout=<span class="hljs-number">0.001</span>)<br><br>    os.wait()<br><span class="hljs-keyword">finally</span>:<br>    sock.close()<br></code></pre></td></tr></table></figure>
+<p>服务端代码创建完成了， 接下来可以使用客户端代码来进行测试并统计， 代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter<br><br><br><span class="hljs-comment"># 统计pid</span><br>cnt = Counter()<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">tcp_echo_client</span>():</span><br>    <span class="hljs-string">&quot;&quot;&quot;从Asyncio文档复制过来的最小TCP Client代码&quot;&quot;&quot;</span><br>    reader, writer = <span class="hljs-keyword">await</span> asyncio.open_connection(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">8000</span>)<br>    data = <span class="hljs-keyword">await</span> reader.read(<span class="hljs-number">1024</span>)<br>    <span class="hljs-comment"># 获取服务端返回的Pid来统计数据</span><br>    cnt[data.decode()] += <span class="hljs-number">1</span><br>    writer.close()<br><br><span class="hljs-comment"># 模拟5000个并发</span><br>asyncio.get_event_loop().run_until_complete(<br>    asyncio.gather(*[tcp_echo_client() <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">5000</span>)])<br>)<br>print(cnt)<br></code></pre></td></tr></table></figure>
+<p>一切准备就绪，分别对两个模式的代码进行测试，结果如下:</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs 1c"><span class="hljs-meta"># Sync Worker模型下测试的结果</span><br>Counter(&#123;&#x27;<span class="hljs-number">2410</span>2&#x27;: <span class="hljs-number">1668</span>, &#x27;<span class="hljs-number">2410</span>1&#x27;: <span class="hljs-number">1667</span>, &#x27;<span class="hljs-number">2410</span>3&#x27;: <span class="hljs-number">1665</span>&#125;)<br><span class="hljs-meta"># Gevent Worker模型下测试的结果</span><br>Counter(&#123;&#x27;<span class="hljs-number">2440</span>3&#x27;: <span class="hljs-number">1774</span>, &#x27;<span class="hljs-number">2440</span>4&#x27;: <span class="hljs-number">1738</span>, &#x27;<span class="hljs-number">2441</span>0&#x27;: <span class="hljs-number">1488</span>&#125;)<br></code></pre></td></tr></table></figure>
+<p>通过结果可以看出<code>Sync Worker</code>的输出结果是三个工作进程得到请求的数量是相近的，而<code>Gevent Worker</code>的三个工作进程得到请求的数量是不均衡的，特别是第三个工作进程得到请求点数量比前两个还少（如果去掉模仿IO的代码，<code>Gevent Worker</code>模型下测试的结果只有一个工作进程得到了所有请求点数量）。</p>
+<h2 id="5-两种问题的共同解决方案–SO-REUSEPORT"><a href="#5-两种问题的共同解决方案–SO-REUSEPORT" class="headerlink" title="5.两种问题的共同解决方案–SO_REUSEPORT"></a>5.两种问题的共同解决方案–SO_REUSEPORT</h2><p>现在回顾下这两种问题，他们的核心都是围绕着对同一个资源（文件描述符/事件）进行争夺，如果能解决这一点，那么两个问题都能得到解决。而之所以需要对同一个资源进行争夺是因为<code>Pre-Worker</code>模型下是由<code>Master</code>进程创建了用户指定IP端口的<code>socket</code>并在调用监听操作后才分给工作进程的，如果这些<code>socket</code>都能由工作进程创建，那就能解决问题了。<br>可是在进行网络编程时，经常能发现端口被占用导致服务无法启动的情况，这就意味着工作进程不能创建监听相同IP端口的<code>socket</code>，这时就需要<code>SO_REUSEPORT</code>了。</p>
+<p>通过<code>SO_REUSEPORT</code>，操作系统允许多个工作进程的<code>socket</code>绑定到同一个端口，这时候服务的工作模式就变为上面所说的第三种，既多个工作进程，每个工作进程都有单独监听和处理的<code>socket</code>，这种工作模式下每个工作进程持有的文件描述符都是自己专有的，没人一起争夺,这样无论是<code>Synv Worker</code>调用<code>socket.accept</code>还是<code>Gevent Worker</code>调用的<code>socket.accept</code>,他们都不会出现争夺的问题而产生惊群效应，他们的交互变化如图:<br><img  src="https://cdn.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1646586327619Pre-Worker%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%80%83-%E4%B8%8D%E5%90%8C%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F%E4%BA%A4%E4%BA%92%E5%9B%BE.jpg"  ><span class="image-caption">Pre-Worker服务模型问题的思考-不同工作模式交互图</span><br>通过图可以看出，在使用<code>SO_REUSEPORT</code>后，对于同一个IP端口从单个Accept队列变为多个Accept队列，每个队列对于工作进程来说都是独有的，并且<code>Linux</code>会通过对四元组把请求hash到不同的Accept队列，最后使得每个<code>Worker</code>都能获得相同的连接数量，从而实现负载均衡。<br>为了验证<code>SO_REUSEPORT</code>是否发挥作用，现在基于上面<code>Gevent Workrt</code>模型的简易代码进行修改:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> select<br><span class="hljs-keyword">import</span> socket<br><br><span class="hljs-comment"># 用于模仿阻塞的文件描述符</span><br>r, w = os.pipe()<br><br><br><span class="hljs-keyword">try</span>:<br>    <span class="hljs-comment"># fork 出3个进程</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):<br>        pid = os.fork()<br>        <span class="hljs-keyword">if</span> pid == <span class="hljs-number">0</span>:<br>            <span class="hljs-comment"># 把初始化sock挪到fork之后</span><br>            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br>            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="hljs-number">1</span>)<br>            <span class="hljs-comment"># 设置端口复用</span><br>            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, <span class="hljs-number">1</span>)<br>            sock.bind((<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">8000</span>))<br>            sock.listen()<br>            sock.setblocking(<span class="hljs-literal">False</span>)<br>            <span class="hljs-comment"># 初始化两个epoll,一个用来处理请求一个用于模仿阻塞</span><br>            epoll = select.epoll()<br>            epoll.register(sock, select.EPOLLIN | select.EPOLLEXCLUSIVE)<br>            sleep_epoll = select.epoll()<br>            sleep_epoll.register(r, select.EPOLLIN | select.EPOLLEXCLUSIVE)<br>            <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>                <span class="hljs-keyword">try</span>:<br>                    epoll.poll()<br>                <span class="hljs-keyword">except</span> IOError:<br>                    <span class="hljs-keyword">continue</span><br><br>                <span class="hljs-comment"># 事件循环下调用`sock.accept`会报错</span><br>                <span class="hljs-keyword">try</span>:<br>                    cs_sock, _ = sock.accept()<br>                <span class="hljs-keyword">except</span> socket.error:<br>                    <span class="hljs-keyword">continue</span><br>                <span class="hljs-comment"># send方法不会阻塞</span><br>                cs_sock.send(<span class="hljs-built_in">str</span>(os.getpid()).encode())<br>                cs_sock.close()<br>                <span class="hljs-comment"># 模仿阻塞</span><br>                sleep_epoll.poll(timeout=<span class="hljs-number">0.001</span>)<br><br>    os.wait()<br><span class="hljs-keyword">finally</span>:<br>    sock.close()<br></code></pre></td></tr></table></figure>
+<p>修改完成后，再运行刚才的客户端测试脚本， 得到输出如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">Counter(&#123;<span class="hljs-string">&#x27;16070&#x27;</span>: <span class="hljs-number">1686</span>, <span class="hljs-string">&#x27;16069&#x27;</span>: <span class="hljs-number">1682</span>, <span class="hljs-string">&#x27;16071&#x27;</span>: <span class="hljs-number">1632</span>&#125;)<br></code></pre></td></tr></table></figure>
+<p>通过结果可以看出虽然第一个工作进程得到的数量还是最多的，但是三个工作进程之前的差距已经是非常的小了。</p>
+<blockquote>
+<p>Gunicorn虽然支持设置<code>SO_REUSEPORT</code>但是他自带的<code>Worker</code>类型仍然是以第二种工作模式运行着，所以我们需要去修改它的<code>Worker</code>，才能以第三种工作模式运行。</p>
+</blockquote>
+<p>不过，使用了<code>SO_REUSEPORT</code>后会带来两个新的问题，第一个也就是官方自己说的(如下)，如果绑定到同一个端口的<code>socket</code>数量发生变化时，hash就会有变动，这个时候如果有个请求处于三次握手期间，那么它将会被丢弃，这种情况下客户端会重置请求，但服务端仍然会留下一个孤独的请求结构。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://lwn.net/Articles/542629/">The SO_REUSEPORT socket option</a>:</p>
+<p>The other noteworthy point is that there is a defect in the current implementation of TCP SO_REUSEPORT. If the number of listening sockets bound to a port changes because new servers are started or existing servers terminate, it is possible that incoming connections can be dropped during the three-way handshake. The problem is that connection requests are tied to a specific listening socket when the initial SYN packet is received during the handshake. If the number of servers bound to the port changes, then the SO_REUSEPORT logic might not route the final ACK of the handshake to the correct listening socket. In this case, the client connection will be reset, and the server is left with an orphaned request structure. A solution to the problem is still being worked on, and may consist of implementing a connection request table that can be shared among multiple listening sockets.</p>
+</blockquote>
+<p>第二个问题则是请求延迟，在第二种工作模式下，所有请求都会进到同一个Accept队列，等待工作进程来从队列拉取数据，这种情况下所有请求都是先到先被处理；而在第三种工作模式下，请求会被hash到不同进程的Accept队列，等待被持有该队列的进程拉取数据，如果这时候有个进程发生了阻塞情况，那么该进程上的Accept队列的所有请求都会一直等待，直到进程阻塞结束，这种情况下该队列的请求可能比别的队列的请求先到，但是却比别的队列的请求晚处理， 这就是请求延迟到现象。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6.总结"></a>6.总结</h2><p>目前对于<code>Pre-Worker</code>问题都有了解决方案， 但是这些方案并不一定是完美的，他们可能存在着一些问题等待被解决，而我们可以根据自己的使用情况来选择不同的工作模型。</p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/03/07/Pre-Worker%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%80%83/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;03&#x2F;07&#x2F;Pre-Worker%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%80%83&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;03&#x2F;07&#x2F;Pre-Worker%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%80%83&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2022/02/22/gunicorn/">gunicorn源码分析<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-TCP%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.TCP服务的请求处理模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%83%8A%E7%BE%A4%E6%95%88%E5%BA%94"><span class="toc-text">2.惊群效应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Event-Loop%E7%9A%84%E6%83%8A%E7%BE%A4%E6%95%88%E5%BA%94"><span class="toc-text">2.1.Event Loop的惊群效应</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B4%9F%E8%BD%BD%E4%B8%8D%E5%9D%87%E8%A1%A1%E9%97%AE%E9%A2%98"><span class="toc-text">3.负载不均衡问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E6%97%A5%E5%BF%97%E7%9A%84%E5%88%86%E6%9E%90"><span class="toc-text">3.1.一次线上日志的分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%B8%A4%E7%A7%8D%E9%97%AE%E9%A2%98%E7%9A%84%E5%85%B1%E5%90%8C%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E2%80%93SO-REUSEPORT"><span class="toc-text">5.两种问题的共同解决方案–SO_REUSEPORT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%80%BB%E7%BB%93"><span class="toc-text">6.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-TCP%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.TCP服务的请求处理模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%83%8A%E7%BE%A4%E6%95%88%E5%BA%94"><span class="toc-text">2.惊群效应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Event-Loop%E7%9A%84%E6%83%8A%E7%BE%A4%E6%95%88%E5%BA%94"><span class="toc-text">2.1.Event Loop的惊群效应</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B4%9F%E8%BD%BD%E4%B8%8D%E5%9D%87%E8%A1%A1%E9%97%AE%E9%A2%98"><span class="toc-text">3.负载不均衡问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E6%97%A5%E5%BF%97%E7%9A%84%E5%88%86%E6%9E%90"><span class="toc-text">3.1.一次线上日志的分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%B8%A4%E7%A7%8D%E9%97%AE%E9%A2%98%E7%9A%84%E5%85%B1%E5%90%8C%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E2%80%93SO-REUSEPORT"><span class="toc-text">5.两种问题的共同解决方案–SO_REUSEPORT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%80%BB%E7%BB%93"><span class="toc-text">6.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

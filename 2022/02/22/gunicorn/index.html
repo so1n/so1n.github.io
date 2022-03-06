@@ -198,7 +198,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 22, 2022</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>26004</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>26008</span>
     </div>
   </div>
 </section>
@@ -214,7 +214,7 @@
 
 <h2 id="2-开始入手"><a href="#2-开始入手" class="headerlink" title="2.开始入手"></a>2.开始入手</h2><p>了解完代码结构后接着从官方文档的示例开始入手：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ pip install gunicorn<br>$ cat myapp.py<br>  def app(environ, start_response):<br>      data = b<span class="hljs-string">&quot;Hello, World!\n&quot;</span><br>      start_response(<span class="hljs-string">&quot;200 OK&quot;</span>, [<br>          (<span class="hljs-string">&quot;Content-Type&quot;</span>, <span class="hljs-string">&quot;text/plain&quot;</span>),<br>          (<span class="hljs-string">&quot;Content-Length&quot;</span>, str(len(data)))<br>      ])<br>      <span class="hljs-built_in">return</span> iter([data])<br>$ gunicorn -w 4 myapp:app<br>[2014-09-10 10:22:28 +0000] [30869] [INFO] Listening at: http://127.0.0.1:8000 (30869)<br>[2014-09-10 10:22:28 +0000] [30869] [INFO] Using worker: sync<br>[2014-09-10 10:22:28 +0000] [30874] [INFO] Booting worker with pid: 30874<br>[2014-09-10 10:22:28 +0000] [30875] [INFO] Booting worker with pid: 30875<br>[2014-09-10 10:22:28 +0000] [30876] [INFO] Booting worker with pid: 30876<br>[2014-09-10 10:22:28 +0000] [30877] [INFO] Booting worker with pid: 30877<br></code></pre></td></tr></table></figure>
-<p>这个示例演示了如何通过命令行来使<code>Gunicorn</code>来运行一个最小的<code>WSGI</code>Web应用，如果熟悉<code>Python</code>的打包规则的话，这个命令中的<code>gunicorn</code>实际上是在<code>setup.py</code>文件中定义好的， 重新打开仓库，找到<code>setup.py</code>:</p>
+<p>这个示例演示了如何通过命令行来使<code>Gunicorn</code>来运行一个最小的<code>WSGI</code>Web应用，如果熟悉<code>Python</code>的打包规则的话，可以知道这个命令中的<code>gunicorn</code>实际上是在<code>setup.py</code>文件中定义好的， 重新打开仓库，找到<code>setup.py</code>:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> setuptools <span class="hljs-keyword">import</span> setup, find_packages<br><br><br>setup(<br>    entry_points=<span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    [console_scripts]</span><br><span class="hljs-string">    gunicorn=gunicorn.app.wsgiapp:run</span><br><span class="hljs-string">    &quot;&quot;&quot;</span>,<br>)<br></code></pre></td></tr></table></figure>
 <p>这里移除了其它部分的代码，只保留了相关的代码，在这段代码中，指定了<code>gunicorn</code>的命令是命令<code>gunicorn.app.wsgiapp:run</code>的别名，所以这段代码实际上执行了<code>gunicorn.app.wsgiapp</code>文件中的<code>run</code>函数:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run</span>():</span><br>    <span class="hljs-keyword">from</span> gunicorn.app.wsgiapp <span class="hljs-keyword">import</span> WSGIApplication<br>    WSGIApplication(<span class="hljs-string">&quot;%(prog)s [OPTIONS] [APP_MODULE]&quot;</span>).run()<br></code></pre></td></tr></table></figure>
@@ -353,7 +353,7 @@
 
         
   <nav class="nav">
-    <a></a>
+    <a href="/2022/03/07/Pre-Worker%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%80%83/"><i class="iconfont iconleft"></i>Pre-Worker服务模型问题的思考</a>
     <a href="/2022/02/05/Python-gRPC%E5%AE%9E%E8%B7%B5(2)--Protocol%20buffer/">Python-gRPC实践（2）--Protocol Buffer<i class="iconfont iconright"></i></a>
   </nav>
 
