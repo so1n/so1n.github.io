@@ -17,9 +17,9 @@
       </tags>
   </entry>
   <entry>
-    <title>在Python运行时修改SQL</title>
+    <title>在Python运行时修改业务代码的SQL</title>
     <url>/2022/03/11/modify-sql-in-python-runtime/</url>
-    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在项目的演变过程中，有时可能会诞生一些需要奇怪的临时需求，这些需求会涉及到所有的SQL，但开发时间上却不允许整个项目的所有SQL进行重写，比如控制不同的人访问表的权限，或者是我面对的SASS化需求。</p>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在项目的演变过程中，有时可能会诞生一些需要奇怪的临时需求，这些需求会涉及到所有的SQL，但开发时间上却不允许整个项目的所有SQL进行重写，比如控制不同的人访问表的权限，或者是我面对的SASS化需求，这时就需要在运行时根据对应的条件来修改SQL语句。</p>
 <span id="more"></span>
 <h2 id="1-缘起"><a href="#1-缘起" class="headerlink" title="1.缘起"></a>1.缘起</h2><p>最近项目在准备搞SASS化，SASS化有一个特点就是多租户，且每个租户之间的数据都要隔离，对于数据库的隔离方案常见的有数据库隔离，表隔离，字段隔离，目前我只用到表隔离和字段隔离（数据库隔离的原理也是差不多）。<br>对于字段隔离比较简单，就是查询条件不同而已，比如像下面的SQL查询：</p>
 <figure class="highlight sql"><table><tr><td class="code"><pre><code class="hljs SQL"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> t_demo <span class="hljs-keyword">WHERE</span> tenant_id<span class="hljs-operator">=</span><span class="hljs-string">&#x27;xxx&#x27;</span> <span class="hljs-keyword">AND</span> is_del<span class="hljs-operator">=</span><span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
