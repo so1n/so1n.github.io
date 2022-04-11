@@ -195,10 +195,10 @@
   <div class="head-mask">
     <h1 class="head-title">Python的可等待对象在Asyncio的作用</h1>
     <div class="head-info">
-      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 08, 2021</span>
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 11, 2022</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>12298</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>12327</span>
     </div>
   </div>
 </section>
@@ -246,14 +246,14 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs Python"><br><span class="hljs-comment"># demo_task.py</span><br><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> time<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">mutli_task</span>():</span><br>    task_1 = asyncio.create_task(asyncio.sleep(<span class="hljs-number">1</span>))<br>    task_2 = asyncio.create_task(asyncio.sleep(<span class="hljs-number">2</span>))<br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>():</span><br>    mutli_task()<br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">1.5</span>) <br><br>s_t = time.time()<br>asyncio.run(main())<br>print(time.time() - s_t)<br><span class="hljs-comment"># // Output: 1.5027475357055664 </span><br></code></pre></td></tr></table></figure>
 <p>在这段代码中，main Task在执行到<code>mutli_task</code>时，会创建出两个task，但是在<code>__step</code>中的<code>coro.send(None)</code>调用得到的结果却是<code>await asyncio.sleep(1.5)</code>返回的Future，所以main Task只能调用到这个Future的<code>add_don_callback</code>来装载自己的<code>__wakeup</code>方法，最终导致到main Task只能托管到<code>await asyncio.sleep(1.5)</code>的Future，而<code>mutli_task</code>创建的task则逃逸了，成为另一条链的顶点Task。</p>
 <p>不过这个程序的事件循环只管理到了<code>main Task</code>所以事件循环会一直运行，直到<code>main Task</code>运行结束的时候才退出，这时程序会跟着一起退出，所以程序的运行时间只有1.5秒左右。<br>此外由于另外的Task也是注册到这个事件循环上面，所以事件循环会帮忙把task_1执行完毕，而task_2定义的休眠时间是2秒，程序退出之前事件循环会发现有个Task尚未执行完毕，于是会对这个Task进行清理并打印一条警报。</p>
-<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4.总结"></a>4.总结</h2><p>在深入了Task，Future的源码了解后，发现Task和Future都跟loop有一定的耦合，而loop也可以通过一定的方法来创建Task和Future，所以如果要真正的理解到Asyncio的调度原理，还需要更进入一步，通过Asyncio的源码来了解整个Asyncio的设计。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4.总结"></a>4.总结</h2><p>在深入了Task，Future的源码了解后，了解了Task和Future在<code>Asyncio</code>的作用，同时也发现Task和Future都跟loop有一定的耦合，而loop也可以通过一定的方法来创建Task和Future，所以如果要真正的理解到<code>Asyncio</code>的调度原理，还需要更进入一步，通过<code>Asyncio</code>的源码来了解整个<code>Asyncio</code>的设计。</p>
       </section>
       <section class="extra">
         
           <ul class="copyright">
   
     <li><strong>本文作者：</strong>So1n</li>
-    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/11/08/python's_waitable_objects_in_asyncio/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;08&#x2F;python&#39;s_waitable_objects_in_asyncio&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;08&#x2F;python&#39;s_waitable_objects_in_asyncio&#x2F;index.html</a></li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/04/11/python's_waitable_objects_in_asyncio/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;04&#x2F;11&#x2F;python&#39;s_waitable_objects_in_asyncio&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;04&#x2F;11&#x2F;python&#39;s_waitable_objects_in_asyncio&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
 </ul>
@@ -274,8 +274,8 @@
 
         
   <nav class="nav">
-    <a href="/2021/11/15/starlette_source_code_analysis/"><i class="iconfont iconleft"></i>starlette源码分析</a>
-    <a href="/2021/11/08/%E5%88%9D%E8%AF%86Python%20Async%E7%9A%84%E5%AE%9E%E7%8E%B0/">初识Python协程的实现<i class="iconfont iconright"></i></a>
+    <a></a>
+    <a href="/2022/04/07/Python-gRPC%E5%AE%9E%E8%B7%B5(3)--%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0gRPC%E6%9C%8D%E5%8A%A1/">Python-gRPC实践(3)--使用Python实现gRPC服务<i class="iconfont iconright"></i></a>
   </nav>
 
       </section>
