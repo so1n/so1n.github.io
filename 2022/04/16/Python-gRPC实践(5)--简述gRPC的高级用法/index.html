@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python-gRPC实践(5)--简述gRPC的高级用法 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前言Python-gRPC实践(3)–使用Python...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python-gRPC实践(5)--简述gRPC的高级用法</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a target="_blank" rel="noopener" href="http://so1nz.lofter.com/ " class="underline "> 时光</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2022/02/bd67e15aa8d46101.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python-gRPC实践(5)--简述gRPC的高级用法</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 16, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>11263</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="https://so1n.me/2022/04/07/Python-gRPC%E5%AE%9E%E8%B7%B5(3)--%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0gRPC%E6%9C%8D%E5%8A%A1/">Python-gRPC实践(3)–使用Python实现gRPC服务</a><br>讲述了如何编写和使用gRPC服务，而本文主要讲述一些业务之外的gRPC用法。</p>
+<h2 id="1-优雅的重启服务"><a href="#1-优雅的重启服务" class="headerlink" title="1.优雅的重启服务"></a>1.优雅的重启服务</h2><p>线上运行的服务永远都不会一尘不变的，特别是对于微服务，服务的更新频率越来越快，需要重启的次数也就变多了，而每次重启都会导致服务正在处理的请求被强行关闭，所以我们需要优雅的重启服务，确保在滚动更新服务的时候不会影响到客户端，好在gRPC自带了一个类似的功能，代码例子如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> signal <span class="hljs-keyword">import</span> signal, SIGTERM<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">serve</span>():</span><br>    <span class="hljs-comment"># 启动端口配置，默认为启用</span><br>    options = [(<span class="hljs-string">&quot;grpc.so_reuseport&quot;</span>, <span class="hljs-number">1</span>)]<br>    <span class="hljs-comment"># 正常的运行服务</span><br>    server = grpc.server(futures.ThreadPoolExecutor(max_workers=<span class="hljs-number">10</span>), options=options)<br>    ...<br>    server.add_insecure_port(<span class="hljs-string">&quot;0.0.0.0:9000&quot;</span>)<br>    server.start()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sig_handle</span>(<span class="hljs-params">*args</span>):</span><br>        <span class="hljs-comment"># 调用server.stop函数，调用stop(30)后，该服务会拒绝客户端新的请求，并返回一个threading.Event</span><br>        event = server.stop(<span class="hljs-number">30</span>)<br>        <span class="hljs-comment"># 调用event.wait()后，服务会一直等着，直到30秒后服务才会关闭，关闭之前服务还是能正常处理请求</span><br>        event.wait()<br>    <br>    <span class="hljs-comment"># 接收一个SIGTERM信号的注册</span><br>    signal(SIGTERM, sig_handle)<br>    <span class="hljs-comment"># 等待服务停止</span><br>    server.wait_for_termination()<br></code></pre></td></tr></table></figure>
+<p>这个代码假设gRPC服务以端口复用模式运行(默认启用), 代码通过加上<code>SIGTERM</code>信号的对应回调后，我们的更新服务的逻辑就可以进行一些调整。首先是运行一个全新的gRPC服务在9000端口，这时候请求会分流到新和旧的gRPC服务，然后我们主动向旧的服务进程发送<code>SIGTERM</code>信号，这时旧服务就能开始拒绝新的请求，请求只会流向新的gRPC服务，之后我们只需要等服务自动关闭即可。</p>
+<p>不过光这种方法还是不够，还需要注册中心等，具体实现逻辑可以通过<a href="https://so1n.me/2021/08/28/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E4%BC%98%E9%9B%85%E7%9A%84%E9%87%8D%E5%90%AF/">RPC框架编写实践–服务的优雅的重启</a>了解。</p>
+<blockquote>
+<p>代码中的options是用于配置gRPC服务的一些功能，可以从gRPC c源码中获悉<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/v1.38.x/include/grpc/impl/codegen/grpc_types.h">grpc_types.h</a>,也可以通过代码生成的页面获取比较容易看到的<a target="_blank" rel="noopener" href="https://grpc.github.io/grpc/core/group__grpc__arg__keys.html#gaa3f69f6e1e789e36d2d9c6083fec0257">说明文档</a>。此外还有一些配置是需要传入一个Dict对象，可以参考<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto">service_config.proto</a></p>
+</blockquote>
+<blockquote>
+<p>更多优雅的重启说明见<a target="_blank" rel="noopener" href="https://github.com/grpc/proposal/blob/master/L54-python-server-wait.md">gRPC Python Server Wait API</a></p>
+</blockquote>
+<h2 id="2-重试机制"><a href="#2-重试机制" class="headerlink" title="2.重试机制"></a>2.重试机制</h2><p>gRPC服务是通过网络来传输请求的，所以可能会因为网络波动等原因造成请求失败，这时候就需要重试机制来使请求能成功通信了，但是引入重试机制后可能会带来一些负面的问题：</p>
+<ul>
+<li>比如服务端已经扛不住了，而客户端还一直重试，造成持续的增加服务端压力</li>
+<li>接口不是幂等，某个请求实际上已经处理完了，但是由于网络问题导致客户端认为服务端返回了错误，从而客户端进行了重试，最后导致服务端又再次处理请求，导致对应的数据发生了改变。</li>
+</ul>
+<p>于是，gRPC抽象出一套重试机制，使用户可以灵活为自己想要的方法应用对应的重试机制，这个重试机制包括的最大重试次数，指数退避，可重试状态码等等，比如下面的代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BookGrpcService</span>(<span class="hljs-params">BookSocialGrpcServiceMixin, BookManagerGrpcServiceMixin</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, host: <span class="hljs-built_in">str</span>, port: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        service_config_json = json.dumps(&#123;<br>            <span class="hljs-string">&quot;methodConfig&quot;</span>: [&#123;<br>                <span class="hljs-string">&quot;name&quot;</span>: [<br>                    &#123;<br>                        <span class="hljs-string">&quot;service&quot;</span>: <span class="hljs-string">&quot;book_manager.BookManager&quot;</span>,<br>                        <span class="hljs-string">&quot;method&quot;</span>: <span class="hljs-string">&quot;create_book&quot;</span><br>                    &#125;,<br>                    &#123;<br>                        <span class="hljs-string">&quot;service&quot;</span>: <span class="hljs-string">&quot;book_manager.BookManager&quot;</span>,<br>                        <span class="hljs-string">&quot;method&quot;</span>: <span class="hljs-string">&quot;delete_book&quot;</span><br>                    &#125;,<br>                ],<br>                <span class="hljs-string">&quot;retryPolicy&quot;</span>: &#123;<br>                    <span class="hljs-string">&quot;maxAttempts&quot;</span>: <span class="hljs-number">5</span>,<br>                    <span class="hljs-string">&quot;initialBackoff&quot;</span>: <span class="hljs-string">&quot;0.1s&quot;</span>,<br>                    <span class="hljs-string">&quot;maxBackoff&quot;</span>: <span class="hljs-string">&quot;1s&quot;</span>,<br>                    <span class="hljs-string">&quot;backoffMultiplier&quot;</span>: <span class="hljs-number">2</span>,<br>                    <span class="hljs-string">&quot;retryableStatusCodes&quot;</span>: [<span class="hljs-string">&quot;UNAVAILABLE&quot;</span>],<br>                &#125;,<br>            &#125;]<br>        &#125;)<br>        options = []<br>        <span class="hljs-comment"># <span class="hljs-doctag">NOTE:</span> 启动重试模式， 默认在v1.40.0后自动启用</span><br>        options.append((<span class="hljs-string">&quot;grpc.enable_retries&quot;</span>, <span class="hljs-number">1</span>))<br>        <span class="hljs-comment"># 重试的一些参数配置</span><br>        options.append((<span class="hljs-string">&quot;grpc.service_config&quot;</span>, service_config_json))<br><br><br>        self.channel: grpc.Channel = grpc.intercept_channel(<br>            grpc.insecure_channel(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;host&#125;</span>:<span class="hljs-subst">&#123;port&#125;</span>&quot;</span>), CustomerTopInterceptor(), options=options<br>        )<br>        BookSocialGrpcServiceMixin.__init__(self, self.channel)<br>        BookManagerGrpcServiceMixin.__init__(self, self.channel)<br></code></pre></td></tr></table></figure>
+<p>该代码复制于<a target="_blank" rel="noopener" href="https://github.com/so1n/grpc-example-api-backend-service/blob/part-1/grpc_service/book_service.py#L68">grpc-example-api-backend-service</a>，并进行一点拓展，可以看到在调用<code>grpc.intercept_channel</code>进行初始化时，传入了一个options参数，这样在创建channel时会自动应用到对应的配置。</p>
+<p>这个配置中，<code>grpc.enable_retries</code>为1代表启用了重试，而<code>grpc.service_config</code>接收到的是一个服务配置方法，具体可以访问<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc-proto/blob/ec886024c2f7b7f597ba89d5b7d60c3f94627b17/grpc/service_config/service_config.proto#L38">service_config.proto</a>了解，不过需要注意的是，在传入<code>grpc.service_config</code>时，传的是一个Dict的对应json序列化字符串。</p>
+<p>接下来就在<code>grpc.service_config</code>的<code>methodConfig</code>中，我们传入了一个数组，这个数组里面只有一个Dict，这个Dict通过<code>name</code>指定了只有<code>book_manager.BookManager</code>的<code>create_book</code>方法和<code>delete_book</code>方法会应用到重试的规则，如果这个配置为:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;methodConfig&quot;</span>: [&#123;<br>        <span class="hljs-attr">&quot;name&quot;</span>: [&#123;&#125;],<br>        <span class="hljs-attr">&quot;retryPolicy&quot;</span>: &#123;<br>            <span class="hljs-attr">&quot;maxAttempts&quot;</span>: <span class="hljs-number">5</span>,<br>            <span class="hljs-attr">&quot;initialBackoff&quot;</span>: <span class="hljs-string">&quot;0.1s&quot;</span>,<br>            <span class="hljs-attr">&quot;maxBackoff&quot;</span>: <span class="hljs-string">&quot;1s&quot;</span>,<br>            <span class="hljs-attr">&quot;backoffMultiplier&quot;</span>: <span class="hljs-number">2</span>,<br>            <span class="hljs-attr">&quot;retryableStatusCodes&quot;</span>: [<span class="hljs-string">&quot;UNAVAILABLE&quot;</span>],<br>        &#125;,<br>    &#125;]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>则会应用到所有的方法中。<br>在这个配置中，<code>name</code>负责指定应用范围，而<code>retryPolicy</code>负责指定应用规则，方便用户调整重试逻辑，他们的含义如下:</p>
+<ul>
+<li>maxAttempts: 最大的重试次数，必须大于，如果大于5则他的值为5</li>
+<li>Backoff系列: 指数退避参数，第一次重试是在random(0, initalBackoff)秒后进行的，而后续的重试间隔计算为min(initial_backoff*backoff_multiplier**(n-1), max_backoff)).</li>
+<li>retryableStatusCodes: 指定什么样的响应状态码才需要重试，具体参照gRPC状态码文档。</li>
+</ul>
+<p>开发者只要合理的进行配置，那么就能简单的应用重试机制，但是光看这点配置还是没办法解决重试导致机器过载的问题，所以gRPC还包含另外一组参数重试限流策略–<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc-proto/blob/ec886024c2f7b7f597ba89d5b7d60c3f94627b17/grpc/service_config/service_config.proto#L436">retryThrottling</a>来解决这个问题，这个配置的含义是当客户端的失败和成功超过某个阈值时，gRPC会通过金庸重试策略来防止由于重试导致服务器过载，使用方法如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BookGrpcService</span>(<span class="hljs-params">BookSocialGrpcServiceMixin, BookManagerGrpcServiceMixin</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, host: <span class="hljs-built_in">str</span>, port: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        service_config_json = json.dumps(&#123;<br>            <span class="hljs-string">&quot;methodConfig&quot;</span>: [&#123;<br>                <span class="hljs-string">&quot;name&quot;</span>: [<br>                    &#123;<br>                        <span class="hljs-string">&quot;service&quot;</span>: <span class="hljs-string">&quot;book_manager.BookManager&quot;</span>,<br>                        <span class="hljs-string">&quot;method&quot;</span>: <span class="hljs-string">&quot;create_book&quot;</span><br>                    &#125;,<br>                    &#123;<br>                        <span class="hljs-string">&quot;service&quot;</span>: <span class="hljs-string">&quot;book_manager.BookManager&quot;</span>,<br>                        <span class="hljs-string">&quot;method&quot;</span>: <span class="hljs-string">&quot;delete_book&quot;</span><br>                    &#125;,<br>                ],<br>                <span class="hljs-string">&quot;retryPolicy&quot;</span>: &#123;<br>                    <span class="hljs-string">&quot;maxAttempts&quot;</span>: <span class="hljs-number">5</span>,<br>                    <span class="hljs-string">&quot;initialBackoff&quot;</span>: <span class="hljs-string">&quot;0.1s&quot;</span>,<br>                    <span class="hljs-string">&quot;maxBackoff&quot;</span>: <span class="hljs-string">&quot;1s&quot;</span>,<br>                    <span class="hljs-string">&quot;backoffMultiplier&quot;</span>: <span class="hljs-number">2</span>,<br>                    <span class="hljs-string">&quot;retryableStatusCodes&quot;</span>: [<span class="hljs-string">&quot;UNAVAILABLE&quot;</span>],<br>                &#125;,<br>            &#125;],<br>            <span class="hljs-string">&quot;retryThrottling&quot;</span>: &#123;<br>                <span class="hljs-string">&quot;maxTokens&quot;</span>: <span class="hljs-number">10</span>,<br>                <span class="hljs-string">&quot;tokenRatio&quot;</span>: <span class="hljs-number">0.1</span><br>            &#125;<br>        &#125;)<br>        options = []<br>        <span class="hljs-comment"># <span class="hljs-doctag">NOTE:</span> 启动重试模式， 默认在v1.40.0后自动启用</span><br>        options.append((<span class="hljs-string">&quot;grpc.enable_retries&quot;</span>, <span class="hljs-number">1</span>))<br>        <span class="hljs-comment"># 重试的一些参数配置</span><br>        options.append((<span class="hljs-string">&quot;grpc.service_config&quot;</span>, service_config_json))<br><br><br>        self.channel: grpc.Channel = grpc.intercept_channel(<br>            grpc.insecure_channel(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;host&#125;</span>:<span class="hljs-subst">&#123;port&#125;</span>&quot;</span>), CustomerTopInterceptor(), options=options<br>        )<br>        BookSocialGrpcServiceMixin.__init__(self, self.channel)<br>        BookManagerGrpcServiceMixin.__init__(self, self.channel)<br></code></pre></td></tr></table></figure>
+<p>在这段代码中，通过引入与<code>methodConfig</code>同级的<code>retryThrottling</code>配置，之后gRPC客户端会维护一个tokenCount的变量，它的初始值为maxToken,值得范围在0-maxToken波动，之后每一次请求成功时，tokenCount都会递增<code>tokenRatio</code>的值，每次请求失败时，tokenCount都会递减1，之后在重试之前如果发现tokaneCount小于或等于maxToken/2时，gRPC客户端不会进行重试且不会进行对冲。需要注意的是<code>tokenRatio</code>的设定范围只能在0-1之间，且只支持小数点后3位，如0.5466将为视为0.546，而MmaxTOkens的取值范围为0-1000的整数值。</p>
+<blockquote>
+<p>目前Python gRPC不支持对冲，更多gRPC重试内容和设计见<a target="_blank" rel="noopener" href="https://github.com/grpc/proposal/blob/master/A6-client-retries.md">A6-client-retries</a></p>
+</blockquote>
+<h2 id="3-调用时参数"><a href="#3-调用时参数" class="headerlink" title="3.调用时参数"></a>3.调用时参数</h2><h2 id="3-1-超时"><a href="#3-1-超时" class="headerlink" title="3.1.超时"></a>3.1.超时</h2><p>超时机制， 是一个简单又方便的控制网络请求异常的一种方法， 它可以保证服务稳定(本质是快速失败)， 良好的超时控制策略可以尽快的释放高延迟的请求，避免请求堆积。对于一般的HTTP请求，只需要在客户端添加一个超时参数，然后客户端检查在超时时间范围内还没收到对应的网络请求时，就会单方面关闭请求，这种处理方法在大多数情况下是没问题的，但在遇到阻塞性调用等情况时，客户端单方面关闭了请求，但服务端还在继续处理请求，并做出响应，不过客户端已经关闭了连接了，它无法收到该响应，这样就造成了服务端都性能浪费了。要解决这个问题，就需要引入一个超时传递的机制，使服务端能获取到本次请求的指定超时时间，并做出响应的操作。</p>
+<p>好在gRPC已经自带了超时和超时传递的功能了，只需要在调用时添加timeout参数即可，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserGrpcServiceMixin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, channel: grpc.Channel</span>):</span><br>        self.user_stub: user_service.UserStub = user_service.UserStub(channel)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_user</span>(<span class="hljs-params">self, *, uid: <span class="hljs-built_in">str</span>, user_name: <span class="hljs-built_in">str</span>, password: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.user_stub.create_user(user_message.CreateUserRequest(uid=uid, user_name=user_name, password=password), timeout=<span class="hljs-number">10</span>)<br></code></pre></td></tr></table></figure>
+<p>这样一来，客户端在调用的时候，就会进行倒计时，如果10秒内任然没有收到响应，那么它就会抛出超时异常，而服务端可以通过<code>context.time_remaining()</code>获取到还有多少剩余时间，并在主要逻辑代码使用，如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span>(<span class="hljs-params">user_service.UserServicer</span>):</span><br><span class="hljs-meta">    @conn_proxy()</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_user</span>(<span class="hljs-params">self, request: user_message.CreateUserRequest, context: grpc.ServicerContext</span>) -&gt; Empty:</span><br>        <span class="hljs-keyword">with</span> TimeoutContext(context.time_remaining()):<br>            user_dal.create_user(uid=request.uid, user_name=request.user_name, password=request.password)<br>        <span class="hljs-keyword">return</span> Empty()<br></code></pre></td></tr></table></figure>
+<p>该代码引入一个TimeoutContext对象，这个对象会托管该作用域，如果该作用域的运行时长超多指定的时间，则会直接抛出错误，具体见<a href="https://so1n.me/2021/10/22/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E8%B6%85%E6%97%B6%E4%B8%8E%E8%B6%85%E6%97%B6%E4%BC%A0%E9%80%92">RPC框架编写实践–超时与超时传递</a></p>
+<h2 id="3-2-等待服务就绪"><a href="#3-2-等待服务就绪" class="headerlink" title="3.2.等待服务就绪"></a>3.2.等待服务就绪</h2><p>一般的gRPC客户端在请求服务端都时候，如果发现服务端无法及时传输数据，比如channel处于<code>TRANSIENT_FAILURE</code>或<code>SHUTDOWN</code>状态时，客户端应该马上响应失败，这种方法被称为快速失败，但是服务端还有其它的状态如<code>CONNECTING</code>、<code>READY</code>或<code>IDLE</code>，这时候channel处于准备状态，还无法提供服务，但是在稍后将可以提供服务，比如客户端服务端同时启动，但因为短暂的网络故障导致服务端不可用等场景。这时候就可以使用<code>wait-for-ready</code>功能，使用<code>wait-for-ready</code>的调用将自动等待，直到服务器准备好接受请求时再发送，如下例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserGrpcServiceMixin</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, channel: grpc.Channel</span>):</span><br>        self.user_stub: user_service.UserStub = user_service.UserStub(channel)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_user</span>(<span class="hljs-params">self, *, uid: <span class="hljs-built_in">str</span>, user_name: <span class="hljs-built_in">str</span>, password: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self.user_stub.create_user(user_message.CreateUserRequest(uid=uid, user_name=user_name, password=password), wait_for_ready=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+<p>这样一来在调用<code>create_user</code>时，如果服务端还处于准备阶段，那么他会一直等待，直到服务端处于运行状态，需要注意的是，等待时间不会超过timeout指定的时间。</p>
+<h2 id="4-数据类型的转换"><a href="#4-数据类型的转换" class="headerlink" title="4.数据类型的转换"></a>4.数据类型的转换</h2><p>在演示的代码<a target="_blank" rel="noopener" href="https://github.com/so1n/grpc-example-common/blob/part-1/grpc_example_common/helper/field.py">grpc_example_common.helper.field</a>中，我编写了几个参数，用于做Protobuf文件的数据类型转换，这些实现是非常简陋的，有些类型并没有考虑到，不过官方提供好了数据类型的转换，这些功能都位于<a target="_blank" rel="noopener" href="https://googleapis.dev/python/protobuf/latest/google/protobuf/json_format.html">google.protobuf.json_format</a>之中，大多数我们只要用<code>json_format.ParseDict</code>或者是<code>json_format.MessageToDict</code>即可，不过有些时候我们需要进行一些定制化，但是json_format并没有开放出对应的接口，我们只能使用一些奇怪的方法来定制化，比如<code>json_format.ParseDict</code>，我们只要重置<code>json_format._ConvertScalarFieldValue</code>方法即可，用法如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> decimal <span class="hljs-keyword">import</span> Decimal<br><span class="hljs-keyword">from</span> google.protobuf <span class="hljs-keyword">import</span> json_format<br><span class="hljs-keyword">from</span> grpc_example_common.protos.book.social_pb2 <span class="hljs-keyword">import</span> GetBookLikesResult<br><br><br><span class="hljs-comment"># 获取到原来的用法</span><br>_ConvertScalarFieldValue = json_format._ConvertScalarFieldValue<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ConvertScalarFieldValue</span>(<span class="hljs-params">value, field, path, require_str=<span class="hljs-literal">False</span></span>):</span><br>    <span class="hljs-comment"># 制定我们的规则</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">str</span>):<br>        <span class="hljs-comment"># 字符串添加一个faker</span><br>        value = <span class="hljs-string">&quot;faker&quot;</span> + value<br>    <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(value, Decimal):<br>        <span class="hljs-comment"># Decimal就+10</span><br>        value = <span class="hljs-built_in">int</span>(value) + <span class="hljs-number">10</span><br>    <span class="hljs-comment"># 最后再交给原来的方法处理</span><br>    <span class="hljs-keyword">return</span> _ConvertScalarFieldValue(value, field, path, require_str)<br><br><span class="hljs-built_in">setattr</span>(json_format, <span class="hljs-string">&#x27;_ConvertScalarFieldValue&#x27;</span>, ConvertScalarFieldValue)<br><br><br>parse_message = json_format.ParseDict(&#123;<span class="hljs-string">&quot;isbn&quot;</span>: <span class="hljs-string">&quot;xxx&quot;</span>, <span class="hljs-string">&quot;book_like&quot;</span>: Decimal(<span class="hljs-string">&quot;2.0&quot;</span>)&#125;, GetBookLikesResult)<br><span class="hljs-comment"># 输出符合我们的预期</span><br>print(parse_message.book_like)<br><span class="hljs-comment"># --&gt; 12</span><br>print(parse_message.isbn)<br><span class="hljs-comment"># --&gt; fakerxxx</span><br></code></pre></td></tr></table></figure>
+<p>可以看到输出与符合我们定义的规则，而对于<code>json_format.MessageToDict</code>，可以直接修改它使用的<code>_Printer</code>中的<code>_FieldToJsonObject</code>方法，并创建一个全新的<code>MessageToDict</code>来调用到我们编写的<code>Printer</code>的类，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> google.protobuf <span class="hljs-keyword">import</span> json_format<br><span class="hljs-keyword">from</span> grpc_example_common.protos.book.social_pb2 <span class="hljs-keyword">import</span> GetBookLikesResult<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Printer</span>(<span class="hljs-params">json_format._Printer</span>):</span>  <span class="hljs-comment"># noqa</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_FieldToJsonObject</span>(<span class="hljs-params">self, field, value</span>):</span><br>        <span class="hljs-comment"># 如果是int类型，就加10</span><br>        <span class="hljs-keyword">if</span> field.cpp_type <span class="hljs-keyword">in</span> json_format._INT_TYPES:<br>            <span class="hljs-keyword">return</span> value+<span class="hljs-number">10</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>()._FieldToJsonObject(field, value)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">MessageToDict</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">    message,</span></span><br><span class="hljs-function"><span class="hljs-params">    including_default_value_fields=<span class="hljs-literal">False</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    preserving_proto_field_name=<span class="hljs-literal">False</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    use_integers_for_enums=<span class="hljs-literal">False</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    descriptor_pool=<span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    float_precision=<span class="hljs-literal">None</span></span>):</span><br>    printer = Printer(<br>        including_default_value_fields,<br>        preserving_proto_field_name,<br>        use_integers_for_enums,<br>        descriptor_pool,<br>        float_precision=float_precision)<br>    <span class="hljs-comment"># pylint: disable=protected-access</span><br>    <span class="hljs-keyword">return</span> printer._MessageToJsonObject(message)<br><br><br>print(MessageToDict(GetBookLikesResult(book_like=<span class="hljs-number">10</span>)))<br><span class="hljs-comment"># --&gt; 20</span><br></code></pre></td></tr></table></figure>
+<p>通过输出后可以发现，输出的结果是20，符合我们的定义的规则。</p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/04/16/Python-gRPC%E5%AE%9E%E8%B7%B5(5)--%E7%AE%80%E8%BF%B0gRPC%E7%9A%84%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;04&#x2F;16&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(5)--%E7%AE%80%E8%BF%B0gRPC%E7%9A%84%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;04&#x2F;16&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(5)--%E7%AE%80%E8%BF%B0gRPC%E7%9A%84%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/4d2ebf32586d8799ee2e75333d6f5d2.jpg?raw=true">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2022/04/13/Python-gRPC%E5%AE%9E%E8%B7%B5(4)--gRPC%E6%8B%A6%E6%88%AA%E5%99%A8/">Python-gRPC实践(4)--简述gRPC拦截器<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BC%98%E9%9B%85%E7%9A%84%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1"><span class="toc-text">1.优雅的重启服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%87%8D%E8%AF%95%E6%9C%BA%E5%88%B6"><span class="toc-text">2.重试机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B0%83%E7%94%A8%E6%97%B6%E5%8F%82%E6%95%B0"><span class="toc-text">3.调用时参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E8%B6%85%E6%97%B6"><span class="toc-text">3.1.超时</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E7%AD%89%E5%BE%85%E6%9C%8D%E5%8A%A1%E5%B0%B1%E7%BB%AA"><span class="toc-text">3.2.等待服务就绪</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="toc-text">4.数据类型的转换</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BC%98%E9%9B%85%E7%9A%84%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1"><span class="toc-text">1.优雅的重启服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%87%8D%E8%AF%95%E6%9C%BA%E5%88%B6"><span class="toc-text">2.重试机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B0%83%E7%94%A8%E6%97%B6%E5%8F%82%E6%95%B0"><span class="toc-text">3.调用时参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E8%B6%85%E6%97%B6"><span class="toc-text">3.1.超时</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E7%AD%89%E5%BE%85%E6%9C%8D%E5%8A%A1%E5%B0%B1%E7%BB%AA"><span class="toc-text">3.2.等待服务就绪</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="toc-text">4.数据类型的转换</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
