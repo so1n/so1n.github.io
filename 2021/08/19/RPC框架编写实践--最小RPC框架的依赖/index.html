@@ -196,7 +196,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 19, 2021</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7571</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7622</span>
     </div>
   </div>
 </section>
@@ -211,7 +211,7 @@
 <h2 id="1-RPC框架需要什么"><a href="#1-RPC框架需要什么" class="headerlink" title="1.RPC框架需要什么"></a>1.RPC框架需要什么</h2><p>毫无疑问， RPC框架最重要的部分就是RPC, RPC的全称为远程过程调用, 它的本质是客户端把用户的本地调用转化成一个消息， 通过一个连接发送到服务端, 而服务端根据收到的消息进行解析, 并根据消息调用函数再计算结果， 最后把结果返回给客户端， 并由客户端返回给用户的过程。</p>
 <p>而RPC框架则是上述调用过程的封装， 使得调用者可以通过RPC框架像调用本地函数一样调用远程的函数， 从而无须关注底层细节。<br>那这个调用过程需要什么呢？ 我先设想了一个最简单的业务–用户调用一个<code>foo</code>函数:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">foo</span>(<span class="hljs-params">a: <span class="hljs-built_in">int</span>, b: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
-<p>然后再把这个业务的调用转换为一个设想的RPC请求流程， 便是如下图：<br><img src="https://i.loli.net/2021/08/20/nFvkjBZrUIXRoe3.png" alt="image.png"><br>可以看出RPC框架需要先把调用的函数签名根据应用层协议进行转换， 通过连接把数据传输到服务端； 服务端在收到请求后根据应用层协议提取信息， 并根据信息查找对应的函数再进行调用， 最后把生成的结果返回给客户端， 由客户端处理后返回给用户。此外， 由于要传输信息， 序列化和反序列化是必不可少的。<br>从整个流程可以发现， 一个RPC框架起码要拥有应用层协议， 序列化与反序列化， 以及网络传输, 完成了这几点， 就能编写出一个最简单的RPC框架。</p>
+<p>然后再把这个业务的调用转换为一个设想的RPC请求流程， 便是如下图：<br><img  src="https://i.loli.net/2021/08/20/nFvkjBZrUIXRoe3.png"  ><span class="image-caption">image.png</span><br>可以看出RPC框架需要先把调用的函数签名根据应用层协议进行转换， 通过连接把数据传输到服务端； 服务端在收到请求后根据应用层协议提取信息， 并根据信息查找对应的函数再进行调用， 最后把生成的结果返回给客户端， 由客户端处理后返回给用户。此外， 由于要传输信息， 序列化和反序列化是必不可少的。<br>从整个流程可以发现， 一个RPC框架起码要拥有应用层协议， 序列化与反序列化， 以及网络传输, 完成了这几点， 就能编写出一个最简单的RPC框架。</p>
 <h2 id="2-传输层协议"><a href="#2-传输层协议" class="headerlink" title="2.传输层协议"></a>2.传输层协议</h2><p>目前RPC框架的协议一般都是多种协议组合在一起的， 有传输层协议， 应用层协议等等（采用OSI模型分层， 下同）。<br>目前传输层协议有两种， 一种是TCP, 它传输稳定可靠，能尽量的保障信息不丢包。 而另一种是UDP， 它的可定制性很强， 传输的性能开销小， 但跨网络时会有可能丢包。<br>而RPC框架要做到适用性和可用性都比较强， 所以目前的RPC框架的传输层协议都是选用了TCP协议(只有用在内网网络的才会去考虑UDP)， 而我也选择了TCP作为了我的传输协议。</p>
 <h2 id="3-应用层协议"><a href="#3-应用层协议" class="headerlink" title="3.应用层协议"></a>3.应用层协议</h2><p>通过调研发现， 目前是开源RPC框架要不就是基于TCP协议来开发自己的应用层协议， 要不就是直接使用HTTP来作为自己的应用层协议。这两种方式都各有各的优势， 选用HTTP作为应用层协议， 就能拥有成熟的生态，可以使用<code>Nginx</code>等中间件， 但是HTTP请求会传输很多字段， 有些字段可能是永远都用不到了，会浪费传输性能， 而选择了自己定制应用层协议， 则不能使用一些成熟的中间件， 但能尽量的使请求体保持简单， 在经过综合考虑后， 我选择了自己定制应用层协议。</p>
 <p>在定制应用层协议之前， 需要先想清楚需要基于应用层协议来实现哪些功能，在查阅了一些RPC框架后， 我确定了几个基本的功能：</p>
@@ -266,14 +266,14 @@
 <li>空间占用： 如果序列化后占用的空间还是比较多， 会增加网络的传输压力， 减少响应时间。</li>
 <li>时间占用： 如果序列化协议比较复杂， 那解析时间就会比较久， 占用更多的CPU时间， 由于我使用<code>Python asyncio</code>生态进行开发， 复杂的协议会导致占用CPU时间比较多, 会降低QPS， 所以这类协议不能挑选。<br>除此之外还有一个是可读性， 人们容易阅读可读性高的序列化协议， 这样的话调试会十分方便， 但增加可读性必定会导致空间占用大， CPU解析时间久， 所以这一特性不纳入我的考虑范围内。</li>
 </ul>
-<p>在经过寻找后， 我发现了<code>msgpack</code>这个序列化协议， 它是一个二进制的Json序列化协议， 与Json很像， 但是还是有一些区别, 如下图：<br><img src="https://i.loli.net/2021/08/20/3NjxH86bgmGh9uo.png" alt="uTools_1629389662645.png"><br>这是官网的一个截图， 它介绍一个数据结构序列化后Json和<code>msgpack</code>的占用空间大小和结果， 可以看出它针对网络传输进行了设计， 序列化的结果本身非常的紧凑， 体积减小了很多， 这样可以减少网络传输的流量， 提高了传输的性能， 同时通过它的文档了解到它的使用方法跟Json差不多， 对使用者而言它的使用方法跟Json差不多， 没多少学习成本, 对于我的需要来说简直是完美搭配的。</p>
+<p>在经过寻找后， 我发现了<code>msgpack</code>这个序列化协议， 它是一个二进制的Json序列化协议， 与Json很像， 但是还是有一些区别, 如下图：<br><img  src="https://i.loli.net/2021/08/20/3NjxH86bgmGh9uo.png"  ><span class="image-caption">uTools_1629389662645.png</span><br>这是官网的一个截图， 它介绍一个数据结构序列化后Json和<code>msgpack</code>的占用空间大小和结果， 可以看出它针对网络传输进行了设计， 序列化的结果本身非常的紧凑， 体积减小了很多， 这样可以减少网络传输的流量， 提高了传输的性能， 同时通过它的文档了解到它的使用方法跟Json差不多， 对使用者而言它的使用方法跟Json差不多， 没多少学习成本, 对于我的需要来说简直是完美搭配的。</p>
 <blockquote>
 <p>对于序列化的一些见解， 以及一些序列化的对比可见<a target="_blank" rel="noopener" href="https://tech.meituan.com/2015/02/26/serialization-vs-deserialization.html">序列化和反序列化</a></p>
 </blockquote>
 <blockquote>
 <p><code>maspcak</code>基准测试可以见：<a target="_blank" rel="noopener" href="https://github.com/alecthomas/go_serialization_benchmarks">https://github.com/alecthomas/go_serialization_benchmarks</a> 或者是：<a target="_blank" rel="noopener" href="https://github.com/endel/msgpack-benchmark">https://github.com/endel/msgpack-benchmark</a></p>
 </blockquote>
-<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5.总结"></a>5.总结</h2><p>调研完了传输协议， 序列化协议， 以及定制好了自己的传输协议后， 就可以开始写一个最简单的RPC框架了, 但是展示所有代码会占用大量篇幅， 所以这里会以图展示一个简单的请求流程， 首先是连接的生命周期流程：<br><img src="https://i.loli.net/2021/08/21/ZTOr8FhIecp7GEt.png" alt="image.png"><br>然后是每个请求的流程（与一开始构想的流程很像）：<br><img src="https://i.loli.net/2021/08/21/Ej3dvTzMVRycZ1t.png" alt="image.png"></p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5.总结"></a>5.总结</h2><p>调研完了传输协议， 序列化协议， 以及定制好了自己的传输协议后， 就可以开始写一个最简单的RPC框架了, 但是展示所有代码会占用大量篇幅， 所以这里会以图展示一个简单的请求流程， 首先是连接的生命周期流程：<br><img  src="https://i.loli.net/2021/08/21/ZTOr8FhIecp7GEt.png"  ><span class="image-caption">image.png</span><br>然后是每个请求的流程（与一开始构想的流程很像）：<br><img  src="https://i.loli.net/2021/08/21/Ej3dvTzMVRycZ1t.png"  ><span class="image-caption">image.png</span></p>
 <p>从图里可以看出， 图里除了上面描述的东西外， 还多了一些钩子， 这是因为图里所示只是完成一个最基本的RPC框架， 它只满足了最简单的远程过程调用功能。 但是RPC涉及到了网络传输， 有了很多不确定的因素， 所以框架还需要一些服务治理的相关功能, 而这些功能大部分将通过钩子进行拓展， 后面将慢慢介绍这些服务治理的相关功能， 有些是单独出现， 有些是组合出现。</p>
       </section>
       <section class="extra">

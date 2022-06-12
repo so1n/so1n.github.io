@@ -196,7 +196,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 22, 2022</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>25979</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>26008</span>
     </div>
   </div>
 </section>
@@ -293,7 +293,7 @@
 <p>由于我在分析<code>Gunicorn</code>时，我是抱着使用<code>Gunicorn</code>来托管我的TCP服务的，所以我是着重了解<code>Worker</code>与<code>Arbiter</code>的交互，对于自带的其它<code>Worker</code>,则不多做说明(通过了解<code>WSGI</code>协议也能了解它们的执行逻辑)。</p>
 </blockquote>
 <p><code>Worker</code>与<code>Arbiter</code>的交互可以简化为如下图:</p>
-<p><img src="https://s2.loli.net/2022/03/01/arnM8u2DIfjxHU7.jpg" alt="Gunicorn源码分析-Worker与Arbiter交互"></p>
+<p><img  src="https://s2.loli.net/2022/03/01/arnM8u2DIfjxHU7.jpg"  ><span class="image-caption">Gunicorn源码分析-Worker与Arbiter交互</span></p>
 <p>图中蓝色和绿色线条代表两种类型的信号交互，黑色代表其它的<code>Master</code>进程与<code>Worker</code>进程的交互。</p>
 <h3 id="6-1-基于信号的交互"><a href="#6-1-基于信号的交互" class="headerlink" title="6.1.基于信号的交互"></a>6.1.基于信号的交互</h3><p>在图中见到了已经在<code>4.2.管理worker数量--manager-workers</code>说过的<code>manage_workers</code>，它除了在<code>Arbiter</code>中会调用<code>manage_workers</code>进行<code>Worker</code>初始化，之后会在接收到用户发起信号的时候调用<code>manage_worker</code>来进行增减。这类型信号更改<code>Worker</code>数量有两种， 一种是修改配置的<code>Worker</code>数量， 然后通过信号<code>HUP</code>重载配置:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">handle_hup</span>(<span class="hljs-params">self</span>):</span><br>    self.log.info(<span class="hljs-string">&quot;Hang up: %s&quot;</span>, self.master_name)<br>    self.reload()<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">reload</span>(<span class="hljs-params">self</span>):</span><br>    ...<br>    <span class="hljs-comment"># 省略其它代码</span><br><br>    <span class="hljs-comment"># spawn new workers</span><br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(self.cfg.workers):<br>        self.spawn_worker()<br><br>    <span class="hljs-comment"># manage workers</span><br>    self.manage_workers()<br></code></pre></td></tr></table></figure>

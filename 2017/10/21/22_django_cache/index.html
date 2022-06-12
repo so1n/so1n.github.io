@@ -199,7 +199,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 21, 2017</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>9348</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>9352</span>
     </div>
   </div>
 </section>
@@ -345,9 +345,9 @@
 </blockquote>
 <p>注意<br>incr()/decr()方法不是原子操作。 在支持原子增减的缓存后端上（最著名的是memcached），增减操作才是原子的。 然而，如果后端并不原生支持增减操作，也可以通过取值/更新两步操作来实现。</p>
 <h2 id="3-BACKEND缓存设置"><a href="#3-BACKEND缓存设置" class="headerlink" title="3 BACKEND缓存设置"></a>3 BACKEND缓存设置</h2><p>除了在服务器与浏览器设置缓存外，还可以在BACKEND设置缓存。<br>比如收藏数量，用户每点击一次收藏时，收藏量就+1.如果每次都写会数据库，不免数据量太大(而且存在单一行数据时，写锁优先于读锁，那么碰巧在写数据时，服务器要先等写完才可以进行读)，而且数据库还要求一致性。<br>而同时，浏览数并不要求保证一致性，只要大概准确就行了。<br>所以这时候，我们可以先将收藏数写入 redis，满足一定条件后，再回写数据库。每次都是+1,+1。当满足于10条或者100条时，就可以一起写入数据库。</p>
-<h2 id="4-1使用示例"><a href="#4-1使用示例" class="headerlink" title="4.1使用示例"></a>4.1使用示例</h2><h3 id="模板碎片缓存"><a href="#模板碎片缓存" class="headerlink" title="模板碎片缓存"></a>模板碎片缓存</h3><p>在搭建一个项目时，打算使用缓存，会发现网页是酱子的<br><img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django%E4%B8%8E%E7%BC%93%E5%AD%98.jpeg?raw=true" alt="示例"><br>页面中有3个组件<br>组件1数据更新量最低，只要新加入的机构是以上城市或是类别外，这个组件的数据才会更新。<br>组件3的数据更新量第二低，由于都是通过统计点击量或者学习人数在进行排名，可能会半天或者一天才更新一次。<br>组件3由于有课程更新或者学习变化就要更新，所以更新周期可能在小时级别。<br>所以我们在设置缓存时不能整页统一缓存，而是要分开缓存。<br>如果这时候我们是通过一个view放回整个页面的话，就需要使用模板碎片缓存，为每个组件设置不同的缓存时间。</p>
+<h2 id="4-1使用示例"><a href="#4-1使用示例" class="headerlink" title="4.1使用示例"></a>4.1使用示例</h2><h3 id="模板碎片缓存"><a href="#模板碎片缓存" class="headerlink" title="模板碎片缓存"></a>模板碎片缓存</h3><p>在搭建一个项目时，打算使用缓存，会发现网页是酱子的<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django%E4%B8%8E%E7%BC%93%E5%AD%98.jpeg?raw=true"  ><span class="image-caption">示例</span><br>页面中有3个组件<br>组件1数据更新量最低，只要新加入的机构是以上城市或是类别外，这个组件的数据才会更新。<br>组件3的数据更新量第二低，由于都是通过统计点击量或者学习人数在进行排名，可能会半天或者一天才更新一次。<br>组件3由于有课程更新或者学习变化就要更新，所以更新周期可能在小时级别。<br>所以我们在设置缓存时不能整页统一缓存，而是要分开缓存。<br>如果这时候我们是通过一个view放回整个页面的话，就需要使用模板碎片缓存，为每个组件设置不同的缓存时间。</p>
 <p>如果每个组件使用ajax控制的话，可以使用view级别的缓存，为每个view设置对应的缓存时间。</p>
-<h3 id="被动过期缓存"><a href="#被动过期缓存" class="headerlink" title="被动过期缓存"></a>被动过期缓存</h3><p>上面的是使用主动过期缓存，除了主动过期缓存外，还可以使用被动过期缓存<br><img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django%E7%BC%93%E5%AD%982.png?raw=true" alt="示例"><br>图中是整个html一起加载的(未用ajax)。可以看出章节部分是短时间内改动比较少的，而评论是会经常改动的，如果这个资源不算热门的话(或者发布比较久，现在访问的比较少了)，评论的变动周期就会比较长，评论如果是用富文本或者markdowm渲染的话却会花费一些资源，这时候可以使用被动过去缓存。可以考虑在评论的models加上一个统计数量，取出评论时，向BACKEND缓存评论数量和评论的内容，每当有用户访问时，比较BACKEND缓存的评论数量和models的统计数量，如果一致则返回缓存内容，不一致则从Model重新生成数据并返回。</p>
+<h3 id="被动过期缓存"><a href="#被动过期缓存" class="headerlink" title="被动过期缓存"></a>被动过期缓存</h3><p>上面的是使用主动过期缓存，除了主动过期缓存外，还可以使用被动过期缓存<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/django%E7%BC%93%E5%AD%982.png?raw=true"  ><span class="image-caption">示例</span><br>图中是整个html一起加载的(未用ajax)。可以看出章节部分是短时间内改动比较少的，而评论是会经常改动的，如果这个资源不算热门的话(或者发布比较久，现在访问的比较少了)，评论的变动周期就会比较长，评论如果是用富文本或者markdowm渲染的话却会花费一些资源，这时候可以使用被动过去缓存。可以考虑在评论的models加上一个统计数量，取出评论时，向BACKEND缓存评论数量和评论的内容，每当有用户访问时，比较BACKEND缓存的评论数量和models的统计数量，如果一致则返回缓存内容，不一致则从Model重新生成数据并返回。</p>
 <h2 id="附-http协议的缓存"><a href="#附-http协议的缓存" class="headerlink" title="附:http协议的缓存"></a><a target="_blank" rel="noopener" href="http://www.cnblogs.com/TankXiao/archive/2012/11/28/2793365.html">附:http协议的缓存</a></h2>
       </section>
       <section class="extra">

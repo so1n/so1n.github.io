@@ -196,7 +196,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 04, 2021</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3636</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3640</span>
     </div>
   </div>
 </section>
@@ -212,7 +212,7 @@
 <blockquote>
 <p>NOTE: 目前所说的<code>async</code>语法都是支持网络io， 而文件系统的异步io还不是非常的完善， 所以文件系统的异步读写是通过封装交给多线程去处理， 而不是协程。<br>具体可见: <a target="_blank" rel="noopener" href="https://github.com/python/asyncio/wiki/ThirdParty#filesystem">https://github.com/python/asyncio/wiki/ThirdParty#filesystem</a></p>
 </blockquote>
-<h2 id="2-一个io的例子"><a href="#2-一个io的例子" class="headerlink" title="2.一个io的例子"></a>2.一个io的例子</h2><p>为了了解<code>async</code>在io场景下的运行优势， 先假定有一个io场景–Web后台服务通常需要处理许多请求， 所有请求都是从不同的客户端发出的， 示例如图：<br><img src="https://ftp.bmp.ovh/imgs/2021/11/42b835643bb64c94.png" alt="io场景"></p>
+<h2 id="2-一个io的例子"><a href="#2-一个io的例子" class="headerlink" title="2.一个io的例子"></a>2.一个io的例子</h2><p>为了了解<code>async</code>在io场景下的运行优势， 先假定有一个io场景–Web后台服务通常需要处理许多请求， 所有请求都是从不同的客户端发出的， 示例如图：<br><img  src="https://ftp.bmp.ovh/imgs/2021/11/42b835643bb64c94.png"  ><span class="image-caption">io场景</span></p>
 <p>在这种场景下， 客户端请求都是在短时间内发出的。 而服务端为了能够在短时间内处理大量的请求， 防止处理延迟， 都会以某种方式来支持并发或者并行。 </p>
 <blockquote>
 <p>NOTE: 并发，在操作系统中，是指一个时间段中有几个程序都处于已启动运行到运行完毕之间，且这几个程序都是在同一个处理机上运行，但任一个时刻点上只有一个程序在处理机上运行。<br>并行是计算机系统中能同时执行两个或多个处理的一种计算方法。 </p>

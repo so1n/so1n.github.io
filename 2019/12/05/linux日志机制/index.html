@@ -196,7 +196,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 05, 2019</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>32901</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>32904</span>
     </div>
   </div>
 </section>
@@ -210,7 +210,7 @@
 <blockquote>
 <p>注:操作系统为debain7, 该流程图以本地发送, 本地接受为例。</p>
 </blockquote>
-<p><img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/Linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6%E7%BB%93%E6%9E%84.png?raw=true" alt="img"></p>
+<p><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/Linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6%E7%BB%93%E6%9E%84.png?raw=true"  ><span class="image-caption">img</span></p>
 <p>在这个流程图中， 第一步是应用程序把日志根据<a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc5424">syslog协议</a>进行封装， 比如用户指定的日志等级， 系统log渠道等等, 然后把封装好的数据发送到指定socket – <code>/dev/log</code>。<br><code>/dev/log</code>是一个UNIX域套接字，它负责接受在本地机器上运行的进程所产生的消息。</p>
 <blockquote>
 <p>除此之外还有一个与它十分相似的<code>/dev/klog</code>, <code>/dev/klog</code>是一个从UNIX内核接受消息的设备的socket, 如果看到syslog记录了kern的日志,却没记录普通日志,那就是<code>/dev/log</code>这个socket缓冲区满了, 而<code>/dev/klog</code>缓存区还有空间， 还可以正常运行， 这时候可以尝试通过kern.ipc.maxsockbuf改变缓冲区大小,但并不能完全解决问题。</p>

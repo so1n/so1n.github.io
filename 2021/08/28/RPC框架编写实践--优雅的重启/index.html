@@ -196,7 +196,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 28, 2021</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>4239</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>4335</span>
     </div>
   </div>
 </section>
@@ -209,7 +209,7 @@
 <p><a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写框架<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>的想法和总结。</p>
 </blockquote>
 <h2 id="1-API服务的实现"><a href="#1-API服务的实现" class="headerlink" title="1.API服务的实现"></a>1.API服务的实现</h2><p>我的实现逻辑是通过参考<a target="_blank" rel="noopener" href="https://www.uvicorn.org/">uvicorn</a>而来的， 它用于Python的异步API服务， 所以这里也以一个常见的API服务发布流程来介绍, 常见的API服务架构如下：</p>
-<p><img src="https://i.loli.net/2021/08/28/Sdm7MxNkpo8bqDh.png" alt="uTools_1630140082901.png"></p>
+<p><img  src="https://i.loli.net/2021/08/28/Sdm7MxNkpo8bqDh.png"  ><span class="image-caption">uTools_1630140082901.png</span></p>
 <p>这个服务十分的简单， 就是用户通过客户端访问到客户端指定的<code>Nginx</code>服务器，然后<code>Nginx</code>根据<code>UpStream</code>的配置， 把数据转发到对应的<code>Api Server 1</code>或者<code>Api Server 2</code>, 他们的提供的服务是一样的。</p>
 <p>如果在某段时间， 我们在对服务端程序<code>Api Server 1</code>或者<code>Api Server 2</code>进行更新或重启时，如果我们直接使用<code>kill -9</code>杀掉旧进程并启动新进程， 则会有以下几个问题：</p>
 <ul>
@@ -244,10 +244,10 @@
 <li>2.调用关闭连接的方法（该方法不会马上关闭连接， 而是逐渐等请求完成）</li>
 <li>3.等待所有请求完成响应</li>
 </ul>
-<p>最后整个流程整合如下图：<br><img src="https://i.loli.net/2021/08/28/zaZuXC9OHbvn6Yk.png" alt="uTools_1630145321990.png"></p>
-<h2 id="2-如何实现"><a href="#2-如何实现" class="headerlink" title="2.如何实现"></a>2.如何实现</h2><p>上面说的逻辑可以整合成下图， 后台控制是CI/CD， 当提交代码后合并到<code>master</code>分支时， 就按照CI/CD脚本去控制配置中心更改配置以及重启对应的服务进程：<br><img src="https://i.loli.net/2021/08/28/wSO83bQmt2CLWB9.png" alt="uTools_1630140104665.png"></p>
+<p>最后整个流程整合如下图：<br><img  src="https://i.loli.net/2021/08/28/zaZuXC9OHbvn6Yk.png"  ><span class="image-caption">uTools_1630145321990.png</span></p>
+<h2 id="2-如何实现"><a href="#2-如何实现" class="headerlink" title="2.如何实现"></a>2.如何实现</h2><p>上面说的逻辑可以整合成下图， 后台控制是CI/CD， 当提交代码后合并到<code>master</code>分支时， 就按照CI/CD脚本去控制配置中心更改配置以及重启对应的服务进程：<br><img  src="https://i.loli.net/2021/08/28/wSO83bQmt2CLWB9.png"  ><span class="image-caption">uTools_1630140104665.png</span></p>
 <p>但是我在实现RPC框架时， 想到的场景是多个服务互相调用的情况， 而他们只依赖于配置中心一个第三方的系统， 于是我需要对上面的逻辑进行更改， 逻辑图如下：</p>
-<p><img src="https://i.loli.net/2021/08/28/tJvKNbnLITB938R.png" alt="uTools_1630164548242.png"></p>
+<p><img  src="https://i.loli.net/2021/08/28/tJvKNbnLITB938R.png"  ><span class="image-caption">uTools_1630164548242.png</span></p>
 <p>首先对于客户端， 客户端会提供一个连接选择器，可以把它认为是一个简化版的网关， 它会从配置中心同步对应的服务信息。客户端发送请求时， 会先生成请求， 然后根据连接选择器， 从中挑选有用的连接(也就是自适应负载均衡)，并通过该连接把请求发送到对应的服务器。</p>
 <p>而对于服务端， 会在启动的时候注册一个退出通知事件、注册一个信号通知回调以及向配置中心注册自己的连接信息， 并提供服务， 这时客户端的连接选择器就能同步到服务端的信息， 然后与服务端建立连接。</p>
 <p>当服务端进程收到<code>SIGINT</code>或者是<code>SIGTERM</code>的信号时， 会触发回调， 服务端监听的socket会停止接收小心的请求， 同时向所有客户端连接广播自己即将关闭的消息（兼容没有使用配置中心的客户端）， 然后一直等待所有连接的请求已经处理完毕或超时，再调用退出事件， 使服务退出。至此， 整个优雅的重启逻辑搞定了。（代码比较分散， 且与<code>uvicorn</code>一样， 就不贴出来了）</p>
