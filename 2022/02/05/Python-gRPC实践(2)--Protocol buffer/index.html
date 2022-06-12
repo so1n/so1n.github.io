@@ -1,0 +1,503 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python-gRPC实践（2）--Protocol Buffer - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前言在上一文Python-gRPC实践（1）–gRPC...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python-gRPC实践（2）--Protocol Buffer</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2022/02/bd67e15aa8d46101.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python-gRPC实践（2）--Protocol Buffer</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 05, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>9338</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在上一文<a href="https://so1n.me/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/">Python-gRPC实践（1）–gRPC简介</a>简单的介绍了<code>gRPC</code>采用了<code>HTTP2</code>作为它的传输协议，以及<code>gRPC</code>是如何通过<code>HTTP2</code>传输数据的，而本文则着重介绍<code>gRPC</code>所采用的序列化协议–<code>Protocol Buffer</code>。</p>
+        <h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1.介绍"></a>1.介绍</h2><h3 id="1-1-什么是Protocol-Buffer"><a href="#1-1-什么是Protocol-Buffer" class="headerlink" title="1.1.什么是Protocol Buffer"></a>1.1.什么是Protocol Buffer</h3><p>Protobuf(Google Protocol Buffers)是Google开发的跨语言，跨平台，可扩展，用于序列化结构化数据的数据传输协议，目前已经被广泛用于服务端和客户端间的数据传输，要在项目中把<code>gRPC</code>用得好就必须先清晰理解Protocol Buffer的使用以及语法。</p>
+<blockquote>
+<p>NOTE: Protobuf就像Json一样可以独立使用,不局限于<code>gRPC</code>这个场景之中，我们可以基于Protobuf实现自己的数据序列化/反序列化。</p>
+</blockquote>
+<h3 id="1-2-gRPC为什么要采用Protocol-Buffer做序列化协议"><a href="#1-2-gRPC为什么要采用Protocol-Buffer做序列化协议" class="headerlink" title="1.2.gRPC为什么要采用Protocol Buffer做序列化协议"></a>1.2.gRPC为什么要采用Protocol Buffer做序列化协议</h3><p><code>gRPC</code>早期只支持Protobuf，最新的版本已经开始支持Json了，但是没有多少人使用。为什么<code>gRPC</code>一开始要选择Protobuf呢，有一个很重要的原因是Protobuf同样也是谷歌自己的产品，这样<code>gRPC</code>在进行功能升级的时候，Protobuf也能及时的迭代， 目前Protobuf的版本已经迭代到第3版，但是大家能接触到的只有第二版和第三版，因为第一版是谷歌之前内部使用的。<br>不过<code>gRPC</code>采用Protobuf的重要的原因是在常见的场景下，<code>gRPC</code>的效率要比现在大家用到的Json高一些，Protobuf的效率为什么会高呢？天下是没有免费的午餐的，有得既有失，在理解Protobuf之前我们先来看一段Json数据:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs Json">&#123;<br>  <span class="hljs-attr">&quot;project&quot;</span>: <span class="hljs-string">&quot;Test&quot;</span>, <br>  <span class="hljs-attr">&quot;timestamp&quot;</span>: <span class="hljs-number">1600000000</span>, <br>  <span class="hljs-attr">&quot;status&quot;</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">&quot;data&quot;</span>: [<br>    &#123;<br>      <span class="hljs-attr">&quot;demo_key&quot;</span>: <span class="hljs-string">&quot;fake_value&quot;</span>,<br>    &#125;,<br>    &#123;<br>      <span class="hljs-attr">&quot;demo_key&quot;</span>: <span class="hljs-string">&quot;fake_value&quot;</span>,<br>    &#125;,<br>    &#123;<br>      <span class="hljs-attr">&quot;demo_key&quot;</span>: <span class="hljs-string">&quot;fake_value&quot;</span>,<br>    &#125;<br>  ]<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这段Json数据是一段文本， 这就是Json效率低下的第一个点–编码低效。比如字段<code>status</code>对应的值<code>true</code>在内存中只占用1个字节，但在这个数据中却占用了4个字节, 再比如字段<code>timestamp</code>的值是int类型，int类型在内存中占用的空间并不大，但是在Json数据中却是以字符串呈现会占用更多的空间。<br>此外我们可以很快的通过这段数据看得出里面有什么内容，这是Json的一个优点，但也带来了另一个缺点–信息冗余。比如字段<code>data</code>的数据是一个数组，但是里面的结构是一致的，这样就会重复多传了n次的字段名。</p>
+<p>Protobuf为了解决这些问题，首先引进了一些带有优化的编码方案，解决了编码低效的问题， 比如针对数字引入了VarInts对数字进行编码解码， 这个方案能节省数字的空间占用，同时使用的是位运算来编码解码，效率非常的高，具体可以通过<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000020500985">详解varint编码原理</a>进行了解。<br>而另一方面的改进则是去掉字段名了，改用字段编号代替，传输的时候只传输编号，这样就可以解决了冗余问题，但是这时候需要双方有一个记录编号的翻译本从而可以通过字段编号来得到真实的字段名，就像莫斯电码通信一样，而在Protobuf中proto文件就是这样的一个密码本，它记录了字段和编号的关系以及这个请求是属于哪个调用的接口和服务。<br>以上文<a href="https://so1n.me/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/">Python-gRPC实践（1）–gRPC简介</a>中的捉包结果<img src="https://ftp.bmp.ovh/imgs/2022/01/0adf7176d3f129a9.png" alt="images"><br>为例子，图中展示的是与proto文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs proto">syntax &#x3D; &quot;proto3&quot;;<br>package user;<br>import &quot;google&#x2F;protobuf&#x2F;empty.proto&quot;;<br><br>&#x2F;&#x2F; delete user<br>message DeleteUserRequest &#123;<br>  string uid &#x3D; 1;<br>&#125;<br><br><br>service User &#123;<br>  rpc delete_user(DeleteUserRequest) returns (google.protobuf.Empty);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>有关的请求，请求中表明<code>Field</code>为1，值为999, 接受端收到请求后就会先从proto文件查数据， 通过URL得出这个请求是service为<code>User</code>， rpc为<code>delete_user</code>的请求， 那么请求的message就是<code>DeleteUserRequest</code>，接下来就能知道<code>Field</code>为1实际的字段名是<code>uid</code>。</p>
+<h2 id="2-使用Protocol-Buffer"><a href="#2-使用Protocol-Buffer" class="headerlink" title="2.使用Protocol Buffer"></a>2.使用Protocol Buffer</h2><p>Protobuf的编码原理是值得一看的，目前网上资料有很多，这里就先略过直接到如何使用Protobuf(实际上我目前对Protobuf的编码了解的也不是很多- -)。</p>
+<p>从上面的示例可以看出<code>gRPC</code>在运行的时候需要proto文件来反查得出真正的字段数据，而<code>gRPC</code>是支持多语言的，那么每个语言的<code>gRPC</code>是如何通过proto文件来查出数据呢。</p>
+<p>我们在编写项目时，大多都会通过一份接口代码就来生成对应的OpenAPI文件，然后其它工具如Swagger就能通过读取该文件渲染出一个API文档。而proto文件的作用也跟OpenAPI文件类似，只不过不是代码生成，而是由开发者编写的，然后开发者再通过不同的工具来根据proto文件生成不同语言的代码并放到项目工程中使用，所以要用好<code>gRPC</code>需要先知道如何编写proto文件(通常在使用gRPC时，也是基于Protobuf文件生成对应的调用代码)。</p>
+<h3 id="2-1-Protobuf语法"><a href="#2-1-Protobuf语法" class="headerlink" title="2.1.Protobuf语法"></a>2.1.Protobuf语法</h3><p>在介绍语法之前，先看看proto文件都内容有什么，首先我们再回头看一看上面说的proto文件:</p>
+<figure class="highlight plain"><figcaption><span>Buffer</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs Protocol">syntax &#x3D; &quot;proto3&quot;;<br>package user;<br>import &quot;google&#x2F;protobuf&#x2F;empty.proto&quot;;<br><br>&#x2F;&#x2F; delete user<br>message DeleteUserRequest &#123;<br>  string uid &#x3D; 1;<br>&#125;<br><br><br>service User &#123;<br>  rpc delete_user(DeleteUserRequest) returns (google.protobuf.Empty);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>标准的proto文件就像这份示例文件一样可以分为三部分， 第一部分是前三行，这部分是proto文件的声明区，其中第一行标明当前proto文件的语法是proto3(没有特别说明，本文所介绍的语法都是proto3)，第二行表示该文件的包名为user，这样会方便别的文件引入这个文件的定义，第三行表示导入<code>empty.proto</code>文件，接下来在这个文件都可以使用<code>empty.proto</code>文件定义的东西。</p>
+<p>第二部分是5-8行， 这部分是消息体区， 这里定义了一个名为<code>DeleteUserRequest</code>的消息体，这个消息体中定义了一个名为uid的字段，且它的类型是<code>string</code>，字段排序是1。在实际开发中，大部分的变动都是在这一部分中发生， 且需要关注的点比较多。</p>
+<p>第三部分是11-13行，这部分是服务定义区， 这里定义了一个名为<code>User</code>的服务，该服务中有一个名为<code>delete_user</code>的方法，且该方法接受的请求是<code>DeleteUserRequest</code>消息体，响应的是<code>Empty</code>消息体。可以简单的理解为这部分是定义一个类， 同时为每个类定义一些方法，而这些方法只拥有函数签名，没有具体实现。</p>
+<p>了解完了Proto文件结构后，可以开始了解Protobuf语法。</p>
+<h4 id="2-1-1-字段编号"><a href="#2-1-1-字段编号" class="headerlink" title="2.1.1.字段编号"></a>2.1.1.字段编号</h4><p>在编写消息体时， 最重要的一点就是字段编号， 从前面的说明可以看出， Protobuf的序列化是通过字段编号进行翻译的，所以我们要保证字段编号和字段是一一对应的， 一般的情况下我们都要遵循字段编号从1开始逐渐递增， 比如下面这个消息体:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  string uid &#x3D; 1;<br>  string mobile &#x3D; 2;<br>  int32 age &#x3D; 3;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>它的字段编号都是逐渐递增的，后面在新增字段时也要按照递增的方法指定字段编号，绝不能复用之前曾经存在的字段编号，即使是把某个字段进行重构，比如把上述的消息体进行更改:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs proto">&#x2F;&#x2F; 通常不删除已经使用的字段， 这里只做演示<br>message DemoRequest &#123;<br>  string uid &#x3D; 1;<br>  string mobile &#x3D; 2;<br>  int32 brithday &#x3D; 4; &#x2F;&#x2F; 统一使用时间戳表示日期<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>虽然更改后的消息体里面的age字段被brithday替换了， 但是brithday的字段编号还是递增了1，这样做是可以防止旧版本客户端在没更随服务端变动时造成数据解析异常。</p>
+<p>不过使用字段编号递增的方法可以让开发者知道之前的编号用到哪里，但这些都是需要依赖团队的规范去实现才不会出现问题，为此Protobuf提供了<code>reserved</code>字段，供我们来屏蔽一些后续不能再使用的字段编号，使用例子如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  string uid &#x3D; 1;<br>  string mobile &#x3D; 2;<br>  reserved 3;<br>  int32 brithday &#x3D; 4; &#x2F;&#x2F; 统一使用时间戳表示日期<br>  reserved 5, 6, 10 to 15 &#x2F;&#x2F; reserved也可以一下子限制多个字段编号，他们以&#96;,&#96;分开， 也可以使用&#96;xx to xx&#96;来限制一段连续的字段编号。<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>该例子可以避免后续的字段用到了字段编号3, 即使用到了Protobuf编译器也会报错，在源头防止问题的发生。</p>
+<blockquote>
+<p>NOTE<br>之所以要求字段编号从1开始递增是因为Protobuf从message编码成二进制消息体时，字段编号1-15将会占用1个字节，16-2047将占用两个字节，优先使用1-15的字段编号将会减少数据的传输， 如果在一开始消息体的字段就比较多时， 则需要把常用的字段的字段编号安排在1-15之间。此外，19000到19999是给protocol buffers实现保留的字段标号，定义message时不能使用，如果使用了这些编号，Protobuf编译器将会报错。</p>
+</blockquote>
+<h4 id="2-1-2-如何使用"><a href="#2-1-2-如何使用" class="headerlink" title="2.1.2.如何使用"></a>2.1.2.如何使用</h4><p>在Protobuf的消息体中，每个字段的类型都是固定的， 因为传输固定的类型才能减少传输资源的占用，所以我们在定义消息体的字段时，一定要结合业务需求来定义字段的类型， 以下是一个常见的Protobuf基础字段类型与Python类型的对照表:<br>|Protobuf类型|Python类型|Protobuf类型说明|<br>|–|–|–|<br>|double|float||<br>|float|float||<br>|int32|int|使用变长编码,该类型不擅长处理负值的数字，需要使用sint32代替|<br>|int64|int|使用变长编码,该类型不擅长处理负值的数字，需要使用sint64代替|<br>|unit32|int|使用变长编码|<br>|unit64|int|使用变长编码|<br>|snit32|int|擅长处理负值的数字，当该字段可能出现负值数字时，需要把int32改为该类型|<br>|snit64|int|擅长处理负值的数字，当该字段可能出现负值数字时，需要把int64改为该类型|<br>|fixed32|int|总是4个字节，如果数值总是比总是比228大的话，这个类型会比uint32高效，它等于int32,uint32,float的并集|<br>|fixed64|int|总是8个字节，如果数值总是比总是比256大的话，这个类型会比uint64高效，它等于int64,uint64,double的并集|<br>|bool|bool||<br>|string|str||<br>|bytes|bytes|</p>
+<p>需要注意的是，我们虽然声明的字段没有标明他的值是多少，但是他们都有默认值：</p>
+<ul>
+<li>字符串类型：空字符串</li>
+<li>字节类型：空字节</li>
+<li>数字类型： 0</li>
+<li>enum: 默认值的第一个元素，且值必须为0</li>
+</ul>
+<p>同时，定义的消息体也是Protobuf中的一个类型，这种类型称为<code>Message</code>，它可以嵌套在别的<code>Message</code>中， Protobuf语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs proto">message DemoSubRequest &#123;<br>  string a &#x3D; 1;<br>  int32 b &#x3D; 2;<br>&#125;<br>message DemoRequest &#123;<br>  DemoRequest result &#x3D; 1;<br>&#125; <br></code></pre></td></tr></table></figure>
+<p>它也可以通过import的语法，从a文件引入消息体到b文件，并被b文件使用， 比如在文件夹下<code>project</code>有a文件和b文件， 其中a文件如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs proto">&#x2F;&#x2F; 声明包名为demo_a<br>package demo_a;<br><br>&#x2F;&#x2F; 定义一个消息体<br>message DemoRequest &#123;<br>  DemoRequest result &#x3D; 1;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>而b文件引用了a文件的消息体，具体代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs proto">&#x2F;&#x2F; 声明包名为demo_b<br>package demo_b<br>import &quot;project&#x2F;demo_a.proto&quot;;<br><br>message DemoRequest &#123;<br>  &#x2F;&#x2F; 引用a文件的消息体<br>  project.demo_a.DemoRequest result &#x3D; 1;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>此外， Protobuf还支持定义其它类型，这些类型具有跟Python等价类型的用法，但是在使用的时候还是有些区别：</p>
+<h4 id="Timestamp"><a href="#Timestamp" class="headerlink" title="Timestamp:"></a>Timestamp:</h4><p>Timestamp是Protobuf中的时间类型，Protobuf使用语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs proto">import &quot;google&#x2F;protobuf&#x2F;timestamp.proto&quot;;<br><br>message DemoRequest &#123;<br>  google.protobuf.Timestamp timestamp &#x3D; 1;<br>&#125; <br></code></pre></td></tr></table></figure>
+<p>该类型实际上是timestamp的封装，它的默认值是timestamp=0（对应到的日期是1970-01-01），在Python代码中，可以通过语法<code>ToDatetime</code>转为datetime，也可以通过语法<code>FormDatetime</code>把datetime转为Protobuf的Timestamp:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> google.protobuf.timestamp_pb2 <span class="hljs-keyword">import</span> Timestamp<br><br>Timestamp().ToDatetime()<br><br><span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime<br><br>Timestamp().FormDatetime(datetime.now())<br></code></pre></td></tr></table></figure>
+
+<h4 id="Repeated："><a href="#Repeated：" class="headerlink" title="Repeated："></a>Repeated：</h4><p>Repeated 可以使该字段表重复任意次数，就像Python的Sequence对象，但是实际上可以认为是Python的List对象，Protobuf使用Repeated语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  repeated int32 demo_list &#x3D; 1;<br>&#125; <br><br>&#x2F;&#x2F; demo_list value like json<br>&#x2F;&#x2F; [1, 2, 3, 4, 5, 6] <br></code></pre></td></tr></table></figure>
+<p>该消息体定义了一个<code>demo_list</code>字段， 该字段是repeated且内部类型是int32，在Python中使用Repeated字段的方法跟使用List方法一样，但是它不是继承于List的，在部分库可能需要转换为List才能使用，比如<code>pymysql</code>。</p>
+<h4 id="Map："><a href="#Map：" class="headerlink" title="Map："></a>Map：</h4><p>虽然我们大多数都是以明确的Key-Value来定义消息体， 但是Protobuf也提供了一个类似于dict的Map，Protobuf使用Map语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  map&lt;string, int32&gt; demo_map &#x3D; 1;<br>&#125; <br><br>&#x2F;&#x2F; demo_map value like json<br>&#x2F;&#x2F; &#123;<br>&#x2F;&#x2F;    &quot;aaa&quot;: 123,<br>&#x2F;&#x2F;    &quot;bbb&quot;: 456 <br>&#x2F;&#x2F; &#125;<br></code></pre></td></tr></table></figure>
+<p>该消息体定义了一个<code>demo_map</code>字段， 该字段是map类型且key类型为字符串，value类型为int32，在Python中使用Map的方法跟使用dict方法一样，但是它不是继承于dict的，在部分库可能需要转换为dict才能使用，比如<code>pymysql</code>。</p>
+<blockquote>
+<p>NOTE: </p>
+<ul>
+<li>Map类型的字段不能是Repeated， 因为Repeated是可变的，就像Python中Dict的Key不能是List一样。</li>
+<li>Map的字段是无序的。</li>
+<li>如果有重复的字段，则使用最后都有一个。</li>
+</ul>
+</blockquote>
+<h4 id="Empty："><a href="#Empty：" class="headerlink" title="Empty："></a>Empty：</h4><p>Empty是Protobuf中代表空的类型，跟Python中的None一样, 一般不用在消息体中， 而是用来标明某个rpc方法返回了空，Protobuf语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs proto">import &quot;google&#x2F;protobuf&#x2F;empty.proto&quot;;<br><br>service Demo &#123;<br>  rpc demo (DemoRequest) returns (google.protobuf.Empty);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>在Python中可以通过<code>from google.protobuf.empty_pb2 import Empty</code>导入<code>Empty</code>对象并使用，不过在Python代码中最好不要把<code>Empty</code>转为Python的None对象, 因为<code>Empty</code>只是用来代表该请求点响应为空。</p>
+<h4 id="Enum："><a href="#Enum：" class="headerlink" title="Enum："></a>Enum：</h4><p>在定义消息类型时， 可能希望其中一个字段只有一个预定义的值，这时就会用到枚举类型，Protobuf使用Enum语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs proto">message DemoRequest &#123;<br>  enum Status &#123;<br>    open &#x3D; 0;<br>    half_open &#x3D; 1;<br>    close &#x3D; 2;<br>  &#125;<br>  Status status &#x3D; 1;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如语法所示， 首先在消息体创建一个名称为<code>Status</code>的枚举类型，然后定义类型为<code>Status</code>的字段<code>status</code>， 值得注意的是枚举定义都需要包含一个常量映射到0并且作为定义的首行，这是因为Protobuf要求定义的枚举值中必须有字段的值为0，当引用到这个类型的字段没有定义默认值时，它的默认值就是枚举类型中值为0的字段。</p>
+<h3 id="2-2-Proto文件管理与使用规范"><a href="#2-2-Proto文件管理与使用规范" class="headerlink" title="2.2.Proto文件管理与使用规范"></a>2.2.Proto文件管理与使用规范</h3><p>实际使用gRPC来串联服务时，这些服务并不是只用一门编程语言，可能有的服务是用Python写的，有的服务是Java写的，有的服务则是用Go写的。<br>同时，我们在发布功能时也不是所有服务都需有更新，有的服务只需要用老接口就可以了， 比如一个服务端接口进行了更新， 这个服务端对应了很多个客户端，如果没有规范管理proto文件的话，就可能所有客户端都要进行升级，而不是只升级需要升级的客户端， 所以我们需要根据规范来管理proto文件，减少管理上带来的负担。</p>
+<h4 id="2-2-1-方案选择"><a href="#2-2-1-方案选择" class="headerlink" title="2.2.1.方案选择"></a>2.2.1.方案选择</h4><p>在一开始的时候，我选用的方案是最简单的文件拷贝，这也是大多数人入门时的使用方法，它使用起来非常简单，但是代码复用率很低，项目多了之后复制文件会成为负担， 有时还需要用diff工具去对比，十分麻烦。</p>
+<p>于是，在后续就开始考虑用版本管理工具来进行管理，由于proto文件是项目的子集，在选择方案的时候就会先联想到Git Submodul, 但是这种方案存在回滚故障点风险，同时需要为每个项目各自生产对应的proto，比较麻烦。</p>
+<p>最后确定的方案是新建一个git仓库来存放proto文件，并以tag来区分不同的版本。<br>使用git仓库还有一个优势就可以利用CI/CD来自动根据proto文件生成对应语言的代码以及打包，省去的一些手动的步骤。</p>
+<h4 id="2-2-2-使用"><a href="#2-2-2-使用" class="headerlink" title="2.2.2.使用"></a>2.2.2.使用</h4><p>首先我们需要创建一个Git仓库，把每个服务端项目的Proto文件移出来独立成一个仓库，接着就根据<a target="_blank" rel="noopener" href="https://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html">git flow</a>流程来更新proto文件，不过在更新Proto文件时需要遵循下面几条规范：</p>
+<ul>
+<li>proto文件只增不减</li>
+<li>proto文件的接口只增不减</li>
+<li>proto文件的message字段只增不减</li>
+<li>proto文件中的message字段类型和序号不得修改</li>
+</ul>
+<p>这几条规范的共性就是不对源文件进行删除，每次都只做到新增，从而保证即使proto文件发生了更改， 旧的服务在不更新的情况下也还能正常的使用。</p>
+<p>更新完后就可以给其它项目使用了， 比如这个库当前的版本为1.0.0，我们根据<a target="_blank" rel="noopener" href="https://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html">git flow</a>流程来更新proto文件并生成对应语言的代码或者release包，最后打上了对应的tag标签， 对于Python可以使用该方法来安装或更新依赖：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install https://gitlab.xxx.com/proto/aaa@v1.0.0<br></code></pre></td></tr></table></figure>
+<p>而对于Java这类的则可以使用打包成一个release版本交给maven使用。</p>
+<h2 id="3-最后"><a href="#3-最后" class="headerlink" title="3.最后"></a>3.最后</h2><p>现在已经初步的了解了<code>gRPC</code>以及Protobuf的使用方法，接下来将通过一个简单的项目来演示如何使用<code>gRPC</code></p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/02/05/Python-gRPC%E5%AE%9E%E8%B7%B5(2)--Protocol%20buffer/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;02&#x2F;05&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(2)--Protocol%20buffer&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;02&#x2F;05&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(2)--Protocol%20buffer&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2022/02/22/gunicorn/"><i class="iconfont iconleft"></i>gunicorn源码分析</a>
+    <a href="/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/">Python-gRPC实践（1）--gRPC简介<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%8B%E7%BB%8D"><span class="toc-text">1.介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AFProtocol-Buffer"><span class="toc-text">1.1.什么是Protocol Buffer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-gRPC%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%87%87%E7%94%A8Protocol-Buffer%E5%81%9A%E5%BA%8F%E5%88%97%E5%8C%96%E5%8D%8F%E8%AE%AE"><span class="toc-text">1.2.gRPC为什么要采用Protocol Buffer做序列化协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8Protocol-Buffer"><span class="toc-text">2.使用Protocol Buffer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Protobuf%E8%AF%AD%E6%B3%95"><span class="toc-text">2.1.Protobuf语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Proto%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83"><span class="toc-text">2.2.Proto文件管理与使用规范</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%9C%80%E5%90%8E"><span class="toc-text">3.最后</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%8B%E7%BB%8D"><span class="toc-text">1.介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AFProtocol-Buffer"><span class="toc-text">1.1.什么是Protocol Buffer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-gRPC%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%87%87%E7%94%A8Protocol-Buffer%E5%81%9A%E5%BA%8F%E5%88%97%E5%8C%96%E5%8D%8F%E8%AE%AE"><span class="toc-text">1.2.gRPC为什么要采用Protocol Buffer做序列化协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8Protocol-Buffer"><span class="toc-text">2.使用Protocol Buffer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Protobuf%E8%AF%AD%E6%B3%95"><span class="toc-text">2.1.Protobuf语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Proto%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83"><span class="toc-text">2.2.Proto文件管理与使用规范</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%9C%80%E5%90%8E"><span class="toc-text">3.最后</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>设计RESTful(flask) - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记当前很多WEB框架都有一些库来支持RESTful了...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">设计RESTful(flask)</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">设计RESTful(flask)</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 26, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>14791</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>当前很多WEB框架都有一些库来支持RESTful了，但是不了解的话还是会用得一头雾水。在找了一些资料后，找了RESTful设计的规范，并用falsk框架尝试写出RESTful 的api</p>
+        <h2 id="编写一个应用"><a href="#编写一个应用" class="headerlink" title="编写一个应用"></a>编写一个应用</h2><p>在未使用RESTful之前，简单的web应用可能是这样的(我全部都使用了get)<br>这个应用目前记录的书的isbn，书的名字，还有书的数据(以时间来记录)<br>忽略&lt;后的\</p>
+<blockquote>
+<p>url:/post/&lt;\int:isbn&gt;/&lt;\title&gt; 建立一本书的信息<br>url:/get/&lt;\int:isbn&gt;/ 获取一本书的信息<br>url:/put/&lt;\int:isbn&gt;/&lt;\data&gt; 更新书的日期<br>url:/delete/&lt;\int:isbn&gt; 删除书的信息</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask<br>app = Flask(__name__)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Book</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        self.book_dict = &#123;&#125;<br><br><br>book = Book()<br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Index</span>():</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Index Page&#x27;</span><br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/get/&lt;int:isbn&gt;/&#x27;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span>(<span class="hljs-params">isbn</span>):</span><br>    get_book = book.book_dict[isbn] <br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;isbn:%d title:%s data:%s&quot;</span> %(isbn,get_book[<span class="hljs-string">&#x27;title&#x27;</span>],get_book[<span class="hljs-string">&#x27;data&#x27;</span>])<br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/post/&lt;int:isbn&gt;/&lt;title&gt;&#x27;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">post</span>(<span class="hljs-params">isbn,title</span>):</span><br>    data = time.strftime(<span class="hljs-string">&#x27;%Y-%m-%d %H:%M&#x27;</span>,time.localtime(time.time()))<br>    book.book_dict[isbn] = <span class="hljs-built_in">dict</span>(title=title,data=data)<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;The new book title:%s,isbn:%d,data:%s&quot;</span> %(title,isbn,data)<br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/put/&lt;int:isbn&gt;&#x27;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">put</span>(<span class="hljs-params">isbn</span>):</span><br>    put_book = book.book_dict[isbn]<br>    data_temp = put_book[<span class="hljs-string">&#x27;data&#x27;</span>]<br>    put_book[<span class="hljs-string">&#x27;data&#x27;</span>] = time.strftime(<span class="hljs-string">&#x27;%Y-%m-%d %H:%M&#x27;</span>,time.localtime(time.time()))<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Updata data: %s to %s&#x27;</span> % (data_temp,put_book[<span class="hljs-string">&#x27;data&#x27;</span>])<br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/delete/&lt;int:isbn&gt;&#x27;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete</span>(<span class="hljs-params">isbn</span>):</span><br>    book.book_dict[isbn]=<span class="hljs-literal">None</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;isbn:%d delete!&#x27;</span> % isbn<br><br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    app.run(debug=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="url设计"><a href="#url设计" class="headerlink" title="url设计"></a>url设计</h2><h3 id="统一的url"><a href="#统一的url" class="headerlink" title="统一的url"></a>统一的url</h3><p>在RESTful设计中，统一接口，使用不同的http方法表达不同的行为：</p>
+<ul>
+<li>GET：从服务器获出资源（一项或多项）</li>
+<li>POST：在服务器新建一个资源</li>
+<li>PUT：在服务器更新资源（用户提供完整数据）</li>
+<li>PATCH：在服务器更新资源（用户供需要修改的资源数据）</li>
+<li>DELETE：从服务器删除资源</li>
+</ul>
+<h3 id="其他URL设计"><a href="#其他URL设计" class="headerlink" title="其他URL设计"></a>其他URL设计</h3><ul>
+<li><p>版本<br>RESTful给出的方法是使用HTTPheader中的accept来传递版本信息，但也有一些是在url中添加版本信息，如：</p>
+<blockquote>
+<p>/api/v1/     #v1就是指版本1</p>
+</blockquote>
+</li>
+<li><p>使用名词<br>设计url时，应使用名词而非动词</p>
+</li>
+<li><p>资源合集<br>获取资源合集时，有两种设计方法，一种是把要获取的资源当成一个子合集，另外一种是把需要的资源当成从总资源中过滤出来的。如书的例子，假设data有年，月，日三个值，我们要获取17年的十月的书时，url可以按照以下设计:</p>
+<ul>
+<li>子合集<blockquote>
+<p>url: book/data/17/10</p>
+</blockquote>
+</li>
+<li>过滤出来的资源<blockquote>
+<p>url: book/data/?y=17&amp;m=10</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>url区分大小写</p>
+</li>
+<li><p>api/demo和api/demo/不一样<br>如果设计为：api/demo/时，用户输入api/demo会重定向到api/demo/。但是设计为api/demo时，用户输入api/demo/只能404 not found。</p>
+</li>
+<li><p>使用-而不使用_<br>由于网页的超链接会有下划线，所以_可能会让别人误会为空格</p>
+</li>
+</ul>
+<h4 id="带有RESTful设计规范url的应用"><a href="#带有RESTful设计规范url的应用" class="headerlink" title="带有RESTful设计规范url的应用"></a>带有RESTful设计规范url的应用</h4><p>按照之前的应用，HTTP方法也只使用了’POST’, ‘GET’,’PUT’,’DELETE’。(PUT是模拟出用户提供了日期时间，实际代码中是自己获取了- -。)，可以把代码改为下面这样（其他URL设计中的资源合集并没有在这个例子体现出来）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask, request<br>app = Flask(__name__)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Book</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        self.book_dict = &#123;&#125;<br><br><br>book = Book()<br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/api/v1/book/&lt;int:isbn&gt;/&#x27;</span>, methods=[<span class="hljs-string">&#x27;POST&#x27;</span>, <span class="hljs-string">&#x27;GET&#x27;</span>,<span class="hljs-string">&#x27;PUT&#x27;</span>,<span class="hljs-string">&#x27;DELETE&#x27;</span>]</span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">api</span>(<span class="hljs-params">isbn</span>):</span><br>    error = <span class="hljs-literal">None</span><br>    <span class="hljs-keyword">elif</span> request.method == <span class="hljs-string">&#x27;POST&#x27;</span>:<br>        title = request.args.get(<span class="hljs-string">&#x27;title&#x27;</span>)<br>        book.book_dict[isbn] = <span class="hljs-built_in">dict</span>(title=title,data=time.strftime(<span class="hljs-string">&#x27;%Y-%m-%d %H:%M&#x27;</span>,time.localtime(time.time())))<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;The new book title:%s,isbn:%d&quot;</span> %(title,isbn)<br>    <span class="hljs-keyword">elif</span> request.method == <span class="hljs-string">&#x27;GET&#x27;</span>:<br>        get_book = book.book_dict[isbn] <br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;isbn:%d title:%s data:%s&quot;</span> %(isbn,get_book[<span class="hljs-string">&#x27;title&#x27;</span>],get_book[<span class="hljs-string">&#x27;data&#x27;</span>])<br>    <span class="hljs-keyword">elif</span> request.method == <span class="hljs-string">&#x27;PUT&#x27;</span>:<br>        data = time.strftime(<span class="hljs-string">&#x27;%Y-%m-%d %H:%M&#x27;</span>,time.localtime(time.time()))<br>        put_book = book.book_dict[isbn]<br>        data_temp = put_book[<span class="hljs-string">&#x27;data&#x27;</span>]<br>        put_book[<span class="hljs-string">&#x27;data&#x27;</span>] = data<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Updata data: %s to %s&#x27;</span> % (data_temp,put_book[<span class="hljs-string">&#x27;data&#x27;</span>])<br>    <span class="hljs-keyword">elif</span> request.method == <span class="hljs-string">&#x27;DELETE&#x27;</span>:<br>        book.book_dict[isbn]=<span class="hljs-literal">None</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;isbn:%d delete!&#x27;</span> % isbn<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;methods not found&#x27;</span><br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    app.run(debug=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+
+<p>PS:测试RESTful如果也是CHROME浏览器的话可以使用postman REST client<br>输入以下url测试,并选择好对应的按钮，再点击send:</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://127.0.0.1:5000/api/v1/book/123/?title=abc">http://127.0.0.1:5000/api/v1/book/123/?title=abc</a>            POST<br><a target="_blank" rel="noopener" href="http://127.0.0.1:5000/api/v1/book/123/">http://127.0.0.1:5000/api/v1/book/123/</a>                      GET<br><a target="_blank" rel="noopener" href="http://127.0.0.1:5000/api/v1/book/123/">http://127.0.0.1:5000/api/v1/book/123/</a>                      PUT<br><a target="_blank" rel="noopener" href="http://127.0.0.1:5000/api/v1/book/123/">http://127.0.0.1:5000/api/v1/book/123/</a>                      DELETE</p>
+</blockquote>
+<h2 id="后端返回的内容"><a href="#后端返回的内容" class="headerlink" title="后端返回的内容"></a>后端返回的内容</h2><h3 id="返回的数据类型"><a href="#返回的数据类型" class="headerlink" title="返回的数据类型"></a>返回的数据类型</h3><p>RESTful API规范统一的数据格式json或xml(一般都是json),如果API响应客户端请求后，<br>返回json，需要在header中添加Content-Type=application/json<br>返回xml，需要在header中添加Content-Type=application/atom+xml<br>在falsk中们可以使用json.jsonify返回json数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment">#导入</span><br><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> json<br><span class="hljs-comment">#使用</span><br><span class="hljs-keyword">return</span> json.jsonify<br></code></pre></td></tr></table></figure>
+
+<h3 id="返回的状态码"><a href="#返回的状态码" class="headerlink" title="返回的状态码"></a>返回的状态码</h3><p>在客户端发送请求给服务器后，服务器也会返回信息给用户</p>
+<ul>
+<li>当GET, PUT和PATCH请求成功时，返回对应的数据，及状态码200</li>
+<li>当POST创建数据成功时，返回创建的数据，及状态码201</li>
+<li>当DELETE删除数据成功时，不返回数据，返回状态码204</li>
+<li>当GET 不到数据时，返回状态码404</li>
+<li>当验请求数据时发现错误，返回状态码 400</li>
+<li>当API 请求需要用户认证时，如果request中的认证信息不正确，返回状态码 401</li>
+<li>当API 请求需要验证用户权限时，如果当前用户无相应权限，返回状态码 403</li>
+</ul>
+<p>Flask的路由函数可以选择额外返回两个值，这两个值将被分别设为HTTP状态码和自定义的HTTP响应标头<br>也就是使用</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">return</span> <span class="hljs-string">&quot;abc&quot;</span> ,<span class="hljs-number">200</span> ,&#123;<span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>&#125;<br></code></pre></td></tr></table></figure>
+<p>就能返回文本，状态码，和http响应头，但是使用json.jsonify的话自带{‘Content-Type’: ‘application/json’}。</p>
+<p>但如果要自己定义返回的错误信息的话，可以通过修改abort(状态码)和修饰器@app.errorhandler(状态码)来定义，不过比较繁琐,冗余比较多，可以自己定义一个类来自定义返回错误信息（<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b569f6f7f181">原出处</a>）：<br>编写一个处理错误类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomFlaskErr</span>(<span class="hljs-params">Exception</span>):</span><br><br>    <span class="hljs-comment"># 默认的返回码</span><br>    status_code = <span class="hljs-number">400</span><br><br>    <span class="hljs-comment"># 自己定义了一个 return_code，作为更细颗粒度的错误代码</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, return_code=<span class="hljs-literal">None</span>, status_code=<span class="hljs-literal">None</span>, payload=<span class="hljs-literal">None</span></span>):</span><br>        Exception.__init__(self)<br>        self.return_code = return_code<br>        <span class="hljs-keyword">if</span> status_code <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            self.status_code = status_code<br>        self.payload = payload<br><br>    <span class="hljs-comment"># 构造要返回的错误代码和错误信息的 dict</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">to_dict</span>(<span class="hljs-params">self</span>):</span><br>        rv = <span class="hljs-built_in">dict</span>(self.payload <span class="hljs-keyword">or</span> ())<br>        <br>        <span class="hljs-comment"># 增加 dict key: return code</span><br>        rv[<span class="hljs-string">&#x27;return_code&#x27;</span>] = self.return_code<br>        <br>        <span class="hljs-comment"># 增加 dict key: message, 具体内容由常量定义文件中通过 return_code 转化而来</span><br>        rv[<span class="hljs-string">&#x27;message&#x27;</span>] = J_MSG[self.return_code]<br>        <br>        <span class="hljs-comment"># 日志打印</span><br>        logger.warning(J_MSG[self.return_code])<br>        <br>        <span class="hljs-keyword">return</span> rv<br></code></pre></td></tr></table></figure>
+<p>利用@app.errorhandler定义一个可以返回信息和状态码的函数，继承于我们编写的处理错误类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-meta">@app.errorhandler(<span class="hljs-params">CustomFlaskErr</span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">handle_flask_error</span>(<span class="hljs-params">error</span>):</span><br><br>    <span class="hljs-comment"># response 的 json 内容为自定义错误代码和错误信息</span><br>    response = jsonify(error.to_dict())<br>    <br>    <span class="hljs-comment"># response 返回 error 发生时定义的标准错误代码</span><br>    response.status_code = error.status_code<br>    <br>    <span class="hljs-keyword">return</span> response<br></code></pre></td></tr></table></figure>
+<p>调用示例:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">if</span> user_name <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>    <span class="hljs-keyword">raise</span> CustomFlaskErr(USER_NAME_ILLEGAL, status_code=<span class="hljs-number">400</span>)<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="提供分页url"><a href="#提供分页url" class="headerlink" title="提供分页url"></a>提供分页url</h3><p>由于使用RESTful后是无状态的，所以要提供类似与分页的url,如上一页和下一页</p>
+<blockquote>
+<p>如果服务器记录了应用的状态（stateful），那么你只要向服务询问『我要看下一页』，那么服务器自然就会返回第二页。类似的，如果你当前在第二页，想服务器请求『我要看下一页』，那就会得到第三页。但是REST的服务器恰恰是无状态的（stateless），服务器并没有保持你当前处于第几页，也就无法响应『下一页』这种具有状态性质的请求。因此客户端需要去维护当前应用的状态（application state），也就是『如何获取下一页资源』。当然，『下一页资源』的业务逻辑必然是由服务端来提供。服务器在文章列表的atom表征中加入一个URI超链接（hyper link），指向下一页文章列表对应的资源。客户端就可以使用统一接口（Uniform Interface）的方式，从这个URI中获取到他想要的下一页文章列表资源。上面的『能够进入下一页』就是应用的状态（State）。服务器把『能够进入下一页』这个状态以atom表征形式传输（Transfer）给客户端就是表征状态传输（REpresentational State Transfer）这个概念。<br>作者：季文昊<br>链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/28557115/answer/48120528">https://www.zhihu.com/question/28557115/answer/48120528</a><br>来源：知乎</p>
+</blockquote>
+<p>假设应用里的书可以给别人查看一页一页的查看，那返回的数据需要这些(例如现在处于第二页):<br>xml返回的格式(忽略\link中的\):</p>
+<blockquote>
+<p>&lt;\link href=”http://***/book/page？pn=2” rel=”self” /&gt;<br>&lt;\link href=”http://***/book/page？pn=3” rel=”next” /&gt;<br>&lt;\link href=”http://***/book/page？pn=1” rel=”prev” /&gt;</p>
+</blockquote>
+<p>json返回的数据要包含:</p>
+<blockquote>
+<p>{“link”: {<br>  “rel”:   “http://<strong><em>/book/page？pn=2”,<br>  “next”:  “http://</em></strong>/book/page？pn=3”,<br>  “prev”： “http://***/book/page？pn=1”<br>  “title”: “book.title”,<br>  “type”:  “application/vnd.yourformat+json”<br>}}</p>
+</blockquote>
+<p>或者</p>
+<blockquote>
+<p>{<br>  “page”: 2,            # 当前是第几页<br>  “pages”: 3,           # 总共多少页<br>  “per_page”: 20,       # 每页多少数据<br>  “has_next”: true,     # 是否有下一页数据<br>  “has_prev”: true,    # 是否有前一页数据<br>  “total”: 59             # 总共多少数据<br>}</p>
+</blockquote>
+<p>按照以上规范进行修改，就可以得出一段代码不太好看的应用了- -(没有从数据库抽取数据，数据都是post生成的，很多判断都叠加在一起了)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask, request, json<br>app = Flask(__name__)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Book</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        self.book_dict = &#123;&#125;<br><br><br>book = Book()<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">check</span>(<span class="hljs-params">isbn</span>):</span><br>    <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    第一个布尔量代表book_dict有没有资源，第二个代表isbn是否存在</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> book.book_dict:<br>        <span class="hljs-keyword">return</span> [<span class="hljs-literal">False</span>,<span class="hljs-literal">False</span>]<br><br>    <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">in</span> book.book_dict.items():<br>        <span class="hljs-keyword">if</span> isbn == k:<br>            <span class="hljs-keyword">return</span> [<span class="hljs-literal">True</span>,<span class="hljs-literal">True</span>,v]<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> [<span class="hljs-literal">True</span>,<span class="hljs-literal">False</span>,<span class="hljs-number">404</span>]<br><br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Index</span>():</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Index Page&#x27;</span><br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/api/v1/book/&lt;int:isbn&gt;/&#x27;</span>, methods=[<span class="hljs-string">&#x27;POST&#x27;</span>, <span class="hljs-string">&#x27;GET&#x27;</span>,<span class="hljs-string">&#x27;PUT&#x27;</span>,<span class="hljs-string">&#x27;DELETE&#x27;</span>]</span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">api</span>(<span class="hljs-params">isbn</span>):</span><br>    <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&#x27;POST&#x27;</span>:<br>        <span class="hljs-keyword">if</span> check(isbn)[<span class="hljs-number">0</span>]:<br>            message = <span class="hljs-built_in">dict</span>(message=<span class="hljs-string">&quot;isbn:%d Has been created&quot;</span> % isbn)<br>            <span class="hljs-keyword">return</span> json.jsonify(message), <span class="hljs-number">422</span><br>        title = request.args.get(<span class="hljs-string">&#x27;title&#x27;</span>)<br>        page_info = [<span class="hljs-string">&#x27;page1&#x27;</span>,<span class="hljs-string">&#x27;page2&#x27;</span>,<span class="hljs-string">&#x27;page3&#x27;</span>]       <span class="hljs-comment">#为书添加分页功能</span><br>        book.book_dict[isbn] = <span class="hljs-built_in">dict</span>(title=title,page=page_info,data=time.strftime(<span class="hljs-string">&#x27;%Y-%m-%d %H:%M&#x27;</span>,time.localtime(time.time())))<br>        data_json = <span class="hljs-built_in">dict</span>(isbn=isbn,data=book.book_dict[isbn])<br>        <span class="hljs-keyword">return</span> json.jsonify(data_json), <span class="hljs-number">201</span><br><br><br>    <span class="hljs-keyword">elif</span> request.method == <span class="hljs-string">&#x27;GET&#x27;</span>:<br>        page_data =<span class="hljs-literal">None</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> check(isbn)[<span class="hljs-number">1</span>]:<br>            message = <span class="hljs-built_in">dict</span>(message=<span class="hljs-string">&quot;isbn:%d not found!&quot;</span> % isbn)<br>            <span class="hljs-keyword">return</span> json.jsonify(message), check(isbn)[<span class="hljs-number">2</span>]<br>        <span class="hljs-keyword">elif</span> request.args.get(<span class="hljs-string">&#x27;page&#x27;</span>):<br>            page = <span class="hljs-built_in">int</span>(request.args.get(<span class="hljs-string">&#x27;page&#x27;</span>))<br>            page_info = book.book_dict[isbn][<span class="hljs-string">&#x27;page&#x27;</span>]<br>            <span class="hljs-keyword">if</span> page &gt; <span class="hljs-built_in">len</span>(page_info):<br>                message = <span class="hljs-built_in">dict</span>(message=<span class="hljs-string">&quot;isbn:%d,page%d not found!&quot;</span> % (isbn,page))<br>                <span class="hljs-keyword">return</span> json.jsonify(message), check(isbn)[<span class="hljs-number">2</span>]<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">if</span> page_info[page]:<br>                    has_next = <span class="hljs-literal">True</span><br>                <span class="hljs-keyword">else</span>:<br>                    has_next = <span class="hljs-literal">False</span><br>                <span class="hljs-keyword">if</span> page_info[page-<span class="hljs-number">2</span>]:<br>                    has_prev = <span class="hljs-literal">True</span><br>                <span class="hljs-keyword">else</span>:<br>                    has_prev = <span class="hljs-literal">False</span><br>                page_data = <span class="hljs-built_in">dict</span>(page=page,<br>                                 pages=<span class="hljs-built_in">len</span>(page_info),<br>                                 per_page=<span class="hljs-number">20</span>,<br>                                 has_next=has_next,<br>                                 has_prev=has_prev,<br>                                 total=<span class="hljs-built_in">len</span>(page_info)*<span class="hljs-number">20</span><br>                                 )<br>        <span class="hljs-keyword">else</span>:<br>            page_data = book.book_dict[isbn][<span class="hljs-string">&#x27;page&#x27;</span>]<br><br>        get_book = check(isbn)[<span class="hljs-number">2</span>]<br>        data_json = <span class="hljs-built_in">dict</span>(isbn=isbn,data=get_book,page_data=page_data)<br>        <span class="hljs-keyword">return</span> json.jsonify(data_json), <span class="hljs-number">200</span><br><br><br>    <span class="hljs-keyword">elif</span> request.method == <span class="hljs-string">&#x27;PUT&#x27;</span>:<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> check(isbn)[<span class="hljs-number">1</span>]:<br>            message = <span class="hljs-built_in">dict</span>(message=<span class="hljs-string">&quot;isbn:%d not found!&quot;</span> % isbn)<br>            <span class="hljs-keyword">return</span> json.jsonify(message), check(isbn)[<span class="hljs-number">2</span>]<br>        data = time.strftime(<span class="hljs-string">&#x27;%Y-%m-%d %H:%M&#x27;</span>,time.localtime(time.time()))<br>        put_book = book.book_dict[isbn]<br>        data_temp = put_book[<span class="hljs-string">&#x27;data&#x27;</span>]<br>        put_book[<span class="hljs-string">&#x27;data&#x27;</span>] = data<br>        data_json = <span class="hljs-built_in">dict</span>(data=book.book_dict[isbn],change_data=<span class="hljs-built_in">dict</span>(old_data=data_temp,new_data=data))<br>        <span class="hljs-keyword">return</span> json.jsonify(data_json), <span class="hljs-number">200</span><br><br><br>    <span class="hljs-keyword">elif</span> request.method == <span class="hljs-string">&#x27;DELETE&#x27;</span>:<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> check(isbn)[<span class="hljs-number">0</span>]:<br>            message = <span class="hljs-built_in">dict</span>(message=<span class="hljs-string">&quot;not isbn：%d&quot;</span> % isbn)<br>            <span class="hljs-keyword">return</span> json.jsonify(message), <span class="hljs-number">410</span><br><br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> book.book_dict[isbn]:<br>            message = <span class="hljs-built_in">dict</span>(message=<span class="hljs-string">&quot;isbn:%d not found!&quot;</span> % isbn)<br>            <span class="hljs-keyword">return</span> json.jsonify(message), <span class="hljs-number">404</span><br><br>        book.book_dict[isbn]=<span class="hljs-literal">None</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-number">204</span><br><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;methods not found&#x27;</span><br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    app.run(debug=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+<p>如果返回的是要有url的话,如查看的是书的第二页，但书还有第三页，需要返回第三页的url，这个url可以使用url_for()来构造,在这个例子中的api是<br>api/v1/book/isbn/page<br>也就是调用api时能直接显示到书的对应页数的内容<br>用到的url_for()要引用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> url_for<br></code></pre></td></tr></table></figure>
+<p>api_url调用的函数是这样</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/api/v1/book/&lt;int:isbn&gt;/&lt;int:id&gt;/&#x27;</span>, methods=[<span class="hljs-string">&#x27;POST&#x27;</span>, <span class="hljs-string">&#x27;GET&#x27;</span>,<span class="hljs-string">&#x27;PUT&#x27;</span>,<span class="hljs-string">&#x27;DELETE&#x27;</span>]</span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">new_api</span>(<span class="hljs-params">isbn</span>):</span><br></code></pre></td></tr></table></figure>
+<p>构造URL的函数：<br>注意的是url_for中的’new_api’这样url_for()才知道要构建的是哪个URL</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">make_url</span>(<span class="hljs-params">page</span>):</span><br>    page = <span class="hljs-built_in">int</span>(page)<br>    page_info = book.book_dict[isbn][<span class="hljs-string">&#x27;page&#x27;</span>]<br>    <span class="hljs-keyword">if</span> page_info[page]:<br>        url_next = url_for(<span class="hljs-string">&#x27;new_api&#x27;</span>, page_info[page], _external=<span class="hljs-literal">True</span>)<br>    <span class="hljs-keyword">else</span>:<br>        url_next = <span class="hljs-literal">None</span><br>    <span class="hljs-keyword">if</span> page_info[page-<span class="hljs-number">2</span>]:<br>        url_prev = url_for(<span class="hljs-string">&#x27;new_api&#x27;</span>, page_info[page-<span class="hljs-number">2</span>], _external=<span class="hljs-literal">True</span>)<br>    <span class="hljs-keyword">else</span>:<br>        url_prev = <span class="hljs-literal">None</span><br>    page_data = <span class="hljs-built_in">dict</span>(page=page,<br>                     pages=<span class="hljs-built_in">len</span>(page_info),<br>                     per_page=<span class="hljs-number">20</span>,<br>                     has_next=url_next,<br>                     has_prev=url_prev,<br>                     total=<span class="hljs-built_in">len</span>(page_info)*<span class="hljs-number">20</span><br>                     )<br>    <span class="hljs-keyword">return</span> page_data<br></code></pre></td></tr></table></figure>
+<p>当输入:api/v1/book/123/2/时，就会返回url</p>
+<blockquote>
+<p>api/v1/book/123/1/<br>api/v1/book/123/3/</p>
+</blockquote>
+<h2 id="验证与限制"><a href="#验证与限制" class="headerlink" title="验证与限制"></a>验证与限制</h2><h3 id="数据检验"><a href="#数据检验" class="headerlink" title="数据检验"></a>数据检验</h3><p>数据校验，有些是在前端进行校验，但是如果是给其他用户使用(如开发者API)时，数据校验需要放在后端进行，如果提交的字段不符合时，则需要返回对应的错误。虽然数据检验是RESTful设计中的一个可选项，但它对API的安全、服务器的开销和交互的友好性而言都具有重要意义。常见的数据类型校验如下：</p>
+<ul>
+<li>数据类型校验，如规定的字段类型是int或者str</li>
+<li>数据格式校验，如字段需要满足相应的正则表达式</li>
+<li>数据逻辑校验，如数据包含出生日期和年龄两个字段，如果这两个字段的数据不一致，则数据校验失败</li>
+</ul>
+<p>上面那段代码的check()函数就数据数据校验了</p>
+<h3 id="速度限制"><a href="#速度限制" class="headerlink" title="速度限制"></a>速度限制</h3><p>为了避免请求泛滥，给API设置速度限制很重要。为此 RFC 6585 引入了HTTP状态码429（too many requests）。加入速度设置之后，应该提示用户，至于如何提示标准上没有说明，不过流行的方法是使用HTTP的返回头。<br>下面是几个必须的返回头（依照twitter的命名规则）：</p>
+<p>X-Rate-Limit-Limit :当前时间段允许的并发请求数<br>X-Rate-Limit-Remaining:当前时间段保留的请求数。<br>X-Rate-Limit-Reset:当前时间段剩余秒数<br>为什么使用当前时间段剩余秒数而不是时间戳？</p>
+<p>时间戳保存的信息很多，但是也包含了很多不必要的信息，用户只需要知道还剩几秒就可以再发请求了这样也避免了clock skew问题。</p>
+<p>在flask中有个拓展提供了类似的功能<a target="_blank" rel="noopener" href="https://github.com/alisaifee/flask-limiter">传送门</a></p>
+<h3 id="用户认证与权限机制"><a href="#用户认证与权限机制" class="headerlink" title="用户认证与权限机制"></a>用户认证与权限机制</h3><p>一般都使用OAuth认证授权。Oauth认证会生成一个令牌，可以授权用户或者第三方系统在一定的时间内获取特定的资源。目前使用的几乎是Oauth 2.0。由于Oauth比较安全，现在Oauth已成为RESTful设计中最常用的认证机制。<br>关于使用RESTFUL认证，这里有篇文章写得不错——<a target="_blank" rel="noopener" href="http://www.pythondoc.com/flask-restful/third.html">传送门</a></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>到了这里，就已经能写出一个初步成形RESTful规范的后台应用了，为了更加深入RESTful和减少开发时间，可以使用一些RESTful库。</p>
+<h3 id="python中web框架的RESTful库："><a href="#python中web框架的RESTful库：" class="headerlink" title="python中web框架的RESTful库："></a>python中web框架的RESTful库：</h3><ul>
+<li>Django</li>
+<li><a target="_blank" rel="noopener" href="http://www.django-rest-framework.org/">django-rest-framework</a>：一个强大灵活的工具，用来构建 web API。</li>
+<li><a target="_blank" rel="noopener" href="http://tastypieapi.org/">django-tastypie</a>：为Django 应用开发API。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/5monkeys/django-formapi">django-formapi</a>：为 Django 的表单验证，创建 JSON APIs 。</li>
+<li>Flask</li>
+<li><a target="_blank" rel="noopener" href="http://www.flaskapi.org/">flask-api</a>：为 flask 开发的，可浏览 Web APIs 。</li>
+<li><a target="_blank" rel="noopener" href="http://flask-restful.readthedocs.org/en/latest/">flask-restful</a>：为 flask 快速创建REST APIs 。</li>
+<li><a target="_blank" rel="noopener" href="https://flask-restless.readthedocs.org/en/latest/">flask-restless</a>：为 SQLAlchemy 定义的数据库模型创建 RESTful APIs 。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/marselester/flask-api-utils">flask-api-utils</a>：为 Flask 处理 API 表示和验证。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nicolaiarocci/eve">eve</a>：REST API 框架，由 Flask, MongoDB 等驱动。</li>
+<li>Pyramid</li>
+<li><a target="_blank" rel="noopener" href="https://cornice.readthedocs.org/en/latest/">cornice</a>：一个Pyramid 的 REST 框架 。</li>
+<li>与框架无关的</li>
+<li><a target="_blank" rel="noopener" href="http://falconframework.org/">falcon</a>：一个用来建立云 API 和 web app 后端的高性能框架。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/jeffknupp/sandman">sandman</a>：为现存的数据库驱动系统自动创建 REST APIs 。</li>
+<li><a target="_blank" rel="noopener" href="http://restless.readthedocs.org/en/latest/">restless</a>：框架无关的 REST 框架 ，基于从 Tastypie 学到的知识。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vertical-knowledge/ripozo">ripozo</a>：快速创建 REST/HATEOAS/Hypermedia APIs。</li>
+</ul>
+<h3 id="HTTP状态码"><a href="#HTTP状态码" class="headerlink" title="HTTP状态码"></a>HTTP状态码</h3><p>HTTP定义了很多有意义的状态码，你可以在你的API中使用。这些状态码可以帮助API消费者用来路由它们获取到的响应内容。整理了一个你肯定会用到的状态码列表：</p>
+<p>200 OK - 对成功的GET、PUT、PATCH或DELETE操作进行响应。也可以被用在不创建新资源的POST操作上<br>201 Created - 对创建新资源的POST操作进行响应。应该带着指向新资源地址的Location header)<br>204 No Content - 对不会返回响应体的成功请求进行响应（比如DELETE请求）<br>304 Not Modified - HTTP缓存header生效的时候用<br>400 Bad Request - 请求异常，比如请求中的body无法解析<br>401 Unauthorized - 没有进行认证或者认证非法。当API通过浏览器访问的时候，可以用来弹出一个认证对话框<br>403 Forbidden - 当认证成功，但是认证过的用户没有访问资源的权限<br>404 Not Found - 当一个不存在的资源被请求<br>405 Method Not Allowed - 所请求的HTTP方法不允许当前认证用户访问<br>410 Gone - 表示当前请求的资源不再可用。当调用老版本API的时候很有用<br>415 Unsupported Media Type - 如果请求中的内容类型是错误的<br>422 Unprocessable Entity - 用来表示校验错误<br>429 Too Many Requests - 由于请求频次达到上限而被拒绝访问</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/12/26/25_how_to_design_RESTurl/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;12&#x2F;26&#x2F;25_how_to_design_RESTurl&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;12&#x2F;26&#x2F;25_how_to_design_RESTurl&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/RESTful/" rel="tag">RESTful</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/" rel="tag">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/" rel="tag">web</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/12/29/26_tr_aiohttp/"><i class="iconfont iconleft"></i>aiohttp文档翻译</a>
+    <a href="/2017/12/13/20_web/">WEB<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E5%BA%94%E7%94%A8"><span class="toc-text">编写一个应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#url%E8%AE%BE%E8%AE%A1"><span class="toc-text">url设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%9F%E4%B8%80%E7%9A%84url"><span class="toc-text">统一的url</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96URL%E8%AE%BE%E8%AE%A1"><span class="toc-text">其他URL设计</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E8%BF%94%E5%9B%9E%E7%9A%84%E5%86%85%E5%AE%B9"><span class="toc-text">后端返回的内容</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">返回的数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E7%9A%84%E7%8A%B6%E6%80%81%E7%A0%81"><span class="toc-text">返回的状态码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E4%BE%9B%E5%88%86%E9%A1%B5url"><span class="toc-text">提供分页url</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E4%B8%8E%E9%99%90%E5%88%B6"><span class="toc-text">验证与限制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A3%80%E9%AA%8C"><span class="toc-text">数据检验</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9F%E5%BA%A6%E9%99%90%E5%88%B6"><span class="toc-text">速度限制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E8%AE%A4%E8%AF%81%E4%B8%8E%E6%9D%83%E9%99%90%E6%9C%BA%E5%88%B6"><span class="toc-text">用户认证与权限机制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-text">其他</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#python%E4%B8%ADweb%E6%A1%86%E6%9E%B6%E7%9A%84RESTful%E5%BA%93%EF%BC%9A"><span class="toc-text">python中web框架的RESTful库：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP%E7%8A%B6%E6%80%81%E7%A0%81"><span class="toc-text">HTTP状态码</span></a></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E5%BA%94%E7%94%A8"><span class="toc-text">编写一个应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#url%E8%AE%BE%E8%AE%A1"><span class="toc-text">url设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%9F%E4%B8%80%E7%9A%84url"><span class="toc-text">统一的url</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96URL%E8%AE%BE%E8%AE%A1"><span class="toc-text">其他URL设计</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E8%BF%94%E5%9B%9E%E7%9A%84%E5%86%85%E5%AE%B9"><span class="toc-text">后端返回的内容</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">返回的数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E7%9A%84%E7%8A%B6%E6%80%81%E7%A0%81"><span class="toc-text">返回的状态码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E4%BE%9B%E5%88%86%E9%A1%B5url"><span class="toc-text">提供分页url</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E4%B8%8E%E9%99%90%E5%88%B6"><span class="toc-text">验证与限制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A3%80%E9%AA%8C"><span class="toc-text">数据检验</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9F%E5%BA%A6%E9%99%90%E5%88%B6"><span class="toc-text">速度限制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E8%AE%A4%E8%AF%81%E4%B8%8E%E6%9D%83%E9%99%90%E6%9C%BA%E5%88%B6"><span class="toc-text">用户认证与权限机制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-text">其他</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#python%E4%B8%ADweb%E6%A1%86%E6%9E%B6%E7%9A%84RESTful%E5%BA%93%EF%BC%9A"><span class="toc-text">python中web框架的RESTful库：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP%E7%8A%B6%E6%80%81%E7%A0%81"><span class="toc-text">HTTP状态码</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

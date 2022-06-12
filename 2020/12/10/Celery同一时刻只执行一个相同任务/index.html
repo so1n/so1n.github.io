@@ -1,0 +1,456 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Celery同一时刻只执行一个相同任务 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记最近由于业务原因在接触Celery,Celery的...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Celery同一时刻只执行一个相同任务</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Celery同一时刻只执行一个相同任务</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 10, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7797</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近由于业务原因在接触<code>Celery</code>,<code>Celery</code>的理念挺不错的,但是只从文档很难去知道改去怎么订制<code>Celery</code>,希望我过段时间会有一篇<code>Celery</code>的源码分析文章. </p>
+<p>最近在用<code>Celery</code>调用任务时,发现无法实现同一时刻,只有一个相同的任务运行,但是光看文档不知道需要怎么去处理,只能通过源码去分析运行流程,并在对应的流程加上自己的逻辑.</p>
+        <p>Ps: 我那时候的业务场景除了确保任务在同一时刻唯一,还有另外一个需求,就是同样的任务执行时,新的任务需要上个任务执行完成后才能执行.</p>
+<h2 id="1-如何确保任务在同一时刻唯一"><a href="#1-如何确保任务在同一时刻唯一" class="headerlink" title="1.如何确保任务在同一时刻唯一"></a>1.如何确保任务在同一时刻唯一</h2><p>一般情况下,都是通过一个锁实现在同一时刻内只有一个任务在跑,如下伪代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 一个封装良好的锁对象可以被这样使用</span><br>lock = Lock()<br><br><span class="hljs-keyword">with</span> lock <span class="hljs-keyword">as</span> l:<br>    <span class="hljs-comment"># run code</span><br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>我们只要在伪代码中执行我们的代码就可以了,如果只是一两个任务需要锁,那直接在任务里更改代码就可以了,但是如果要做到<code>Celery</code>通用,那就要设计一下.</p>
+<h2 id="2-需要做什么"><a href="#2-需要做什么" class="headerlink" title="2.需要做什么"></a>2.需要做什么</h2><p>由于要做到通用,那应该做到:</p>
+<ul>
+<li>1.结合<code>Celery</code>的任务事件功能, 做到任务脚本对锁无感知</li>
+<li>2.调用方可以通过参数来确定任务需要执行什么锁逻辑</li>
+<li>3.由于<code>Celery</code>的存储结果用到了<code>Redis</code>,那可以直接使用<code>Redis</code>锁</li>
+</ul>
+<h3 id="2-1-结合Celery的任务事件功能-做到任务脚本对锁无感知"><a href="#2-1-结合Celery的任务事件功能-做到任务脚本对锁无感知" class="headerlink" title="2.1.结合Celery的任务事件功能, 做到任务脚本对锁无感知"></a>2.1.结合<code>Celery</code>的任务事件功能, 做到任务脚本对锁无感知</h3><p>在<code>Celery</code>中,我们可以继承他的Task对象来让每个任务拥有<code>Celery</code>的任务事件功能:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyTask</span>(<span class="hljs-params">celery.Task</span>):</span><br>    <span class="hljs-comment"># 任务失败时执行</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_failure</span>(<span class="hljs-params">self, exc, task_id, args, kwargs, einfo</span>):</span><br>        <span class="hljs-keyword">pass</span><br><br>    <span class="hljs-comment"># 任务成功时执行</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_success</span>(<span class="hljs-params">self, retval, task_id, args, kwargs</span>):</span><br>        <span class="hljs-keyword">pass</span><br><br>    <span class="hljs-comment"># 任务重试时执行</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_retry</span>(<span class="hljs-params">self, exc, task_id, args, kwargs, einfo</span>):</span><br>        <span class="hljs-keyword">pass</span><br><br>    <span class="hljs-comment"># 当任务执行完毕</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">def</span> <span class="hljs-title">after_return</span>(<span class="hljs-params">self, status, retval, task_id, args, kwargs, einfo</span>):</span><br>        <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>然后在任务设置base参数,使任务应用该对象的事件.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">celery.task(name=<span class="hljs-string">&#x27;xxx&#x27;</span>, base=<span class="hljs-string">&#x27;MyTask&#x27;</span>)<br></code></pre></td></tr></table></figure>
+<p>从Task对象中我们可以看到有个<code>after_return</code>的方法,我们可以在任务结束的时候通过该方法,释放锁,但是我们缺少一个入口, <code>Celery</code>的Task入口在哪呢?</p>
+<p>我们知道,<code>Celery</code>可以直接通过调用<code>Task.apply()</code>来调用任务,那任务的入口就可以从这里入手,通过查看源码发现,<code>Celery</code>在调用任务时,是通过<code>Celery.app.trece.py</code>的build_tracer方法来执行任务的,在build_tracer刚开始就有一句代码,指明调用入口</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">fun = task <span class="hljs-keyword">if</span> task_has_custom(task, <span class="hljs-string">&#x27;__call__&#x27;</span>) <span class="hljs-keyword">else</span> task.run<br></code></pre></td></tr></table></figure>
+<p>以及在下面有一句代码, 执行fun,也就是执行任务,执行完再把他标记为成功</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">try</span>:<br>    R = retval = fun(*args, **kwargs)<br>    state = SUCCESS<br><span class="hljs-keyword">except</span> Reject <span class="hljs-keyword">as</span> exc:<br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>看来<code>Celery</code>的入口就是Task的<code>__call__</code>或者<code>run</code>方法了,而且可以发现,我们可以在<code>__call__</code>中写我们的锁逻辑,只要拿到锁的才可以去调用<code>super().__call__</code>去执行任务,否则就直接return,所以我们可以把Task对象改造为:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyTask</span>(<span class="hljs-params">celery.Task</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span>(<span class="hljs-params">self, *args, **kwargs</span>):</span><br>        <span class="hljs-comment"># 伪代码</span><br>        <span class="hljs-keyword">with</span> lock <span class="hljs-keyword">as</span> l:<br>            <span class="hljs-built_in">super</span>().__call__(*args, **kwargs)<br></code></pre></td></tr></table></figure>
+<h3 id="2-调用方可以通过参数来确定任务需要执行什么锁逻辑"><a href="#2-调用方可以通过参数来确定任务需要执行什么锁逻辑" class="headerlink" title="2.调用方可以通过参数来确定任务需要执行什么锁逻辑"></a>2.调用方可以通过参数来确定任务需要执行什么锁逻辑</h3><p>在通过了解<code>Celery.app.trece.py</code>的build_tracer方法可以发现,调用方的参数是通过<code>*args</code>,<code>**kwargs</code>来传给任务的,我们只要对<code>**kwargs</code>进行改造即可,如果获取到<code>celery_once_key</code>,那key为对应的值,如果获取不到则为任务名,这里之所以这样设计而不直接使用任务名是可以把key的定义规则交给调用方,调用方可能会根据不同参数来让任务类型更细化的划分.</p>
+<p>需要知道的是这里需要用pop而不是用get, 因为不pop的话,对应的值就会传到任务那边了.<br>后面如果有更多的参数,也可以通过这样拓展.:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyTask</span>(<span class="hljs-params">celery.Task</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_key</span>(<span class="hljs-params">self, args, kwargs</span>) -&gt; key:</span><br>        key: Optional[<span class="hljs-built_in">str</span>] = kwargs.pop(<span class="hljs-string">&#x27;celery_once_key&#x27;</span>, <span class="hljs-literal">None</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> once_key:<br>            key = self.name + <span class="hljs-string">&#x27;:&#x27;</span>.join(args)<br>        <span class="hljs-keyword">return</span> key<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span>(<span class="hljs-params">self, *args, **kwargs</span>):</span><br>        <span class="hljs-comment"># 伪代码</span><br>        <span class="hljs-keyword">with</span> lock <span class="hljs-keyword">as</span> l:<br>            <span class="hljs-built_in">super</span>().__call__(*args, **kwargs)<br></code></pre></td></tr></table></figure>
+<h3 id="2-3-使用Redis锁"><a href="#2-3-使用Redis锁" class="headerlink" title="2.3.使用Redis锁"></a>2.3.使用<code>Redis</code>锁</h3><p>由于大部分都是使用<code>Redis</code>来做<code>Celery</code>的结果存储,所以我们可以直接调用<code>Celery</code>的redis的lock对象来实现锁,并且通过参数拓展更多的功能.</p>
+<p>首先先说明下<code>Redis</code>中Lock参数的意义</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">lock(key, timeout=<span class="hljs-literal">None</span>, blocking_timeout=<span class="hljs-literal">None</span>, sleep=<span class="hljs-number">0.1</span>)<br></code></pre></td></tr></table></figure>
+<ul>
+<li>key就是锁的名</li>
+<li>timeout为锁的过期时间,None则代表一直持有锁</li>
+<li>blocking_timeout为尝试等待获取锁的时间,如果在该时间内没获取锁就报错,None为一直在等待</li>
+<li>sleep为在等待获取锁的循环间隙时间</li>
+</ul>
+<p>接下来就开始更改下我们的<code>MyTask</code>(说明见代码注释):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyTask</span>(<span class="hljs-params">celery.Task</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_lock</span>(<span class="hljs-params">self, args, kwargs</span>) -&gt; Lock:</span><br>        <span class="hljs-string">&quot;&quot;&quot;通过kwargs来获取redis.lock所需要的参数&quot;&quot;&quot;</span><br>        once_key: Optional[<span class="hljs-built_in">str</span>] = kwargs.pop(<span class="hljs-string">&#x27;celery_once_key&#x27;</span>, <span class="hljs-literal">None</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> once_key:<br>            once_key = self.name + <span class="hljs-string">&#x27;:&#x27;</span>.join(args)<br>        timeout: <span class="hljs-built_in">int</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_timeout&#x27;</span>, <span class="hljs-literal">None</span>)<br>        blocking_timeout: <span class="hljs-built_in">int</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_blocking_timeout&#x27;</span>, <span class="hljs-literal">None</span>)<br>        sleep: <span class="hljs-built_in">float</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_sleep&#x27;</span>, <span class="hljs-number">0.1</span>)<br>        redis: Redis = self.backend.client<br>        <span class="hljs-keyword">return</span> redis.lock(once_key, timeout=timeout, blocking_timeout=blocking_timeout, sleep=sleep)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span>(<span class="hljs-params">self, *args, **kwargs</span>):</span><br>        lock = self.get_lock(args, kwargs)<br>        <span class="hljs-comment"># 根据build_tracer逻辑,这里如果执行超时,会抛错并执行Task的失败event</span><br>        <span class="hljs-keyword">with</span> lock <span class="hljs-keyword">as</span> _lock:<br>            <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>().__call__(*args, **kwargs)<br></code></pre></td></tr></table></figure>
+<p>这样就完成啦, 不过,如果设置timeout=None, blocking_timeout=None时,收到另外一个相同的任务后会一直卡在执行中,直到上一个任务完成后,他才会继续执行,这样有点不符合我们的逻辑.收到的另外一个任务应该是要被放弃掉,好像在我们上面看的build_tracer代码中,他有会Reject的异常进行处理,如果是Reject异常,那任务会直接完成,且不会把结果记录下来.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">try</span>:<br>    R = retval = fun(*args, **kwargs)<br>    state = SUCCESS<br><span class="hljs-keyword">except</span> Reject <span class="hljs-keyword">as</span> exc:<br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+<p>所以经过最后的修改,完整的代码就像下面这样啦 </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyTask</span>(<span class="hljs-params">Task</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_lock</span>(<span class="hljs-params">self, args, kwargs</span>) -&gt; Lock:</span><br>        once_key: Optional[<span class="hljs-built_in">str</span>] = kwargs.pop(<span class="hljs-string">&#x27;celery_once_key&#x27;</span>, <span class="hljs-literal">None</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> once_key:<br>            once_key = self.name + <span class="hljs-string">&#x27;:&#x27;</span>.join(args)<br>        timeout: <span class="hljs-built_in">int</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_timeout&#x27;</span>, <span class="hljs-literal">None</span>)<br>        blocking_timeout: <span class="hljs-built_in">int</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_blocking_timeout&#x27;</span>, <span class="hljs-literal">None</span>)<br>        sleep: <span class="hljs-built_in">float</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_sleep&#x27;</span>, <span class="hljs-number">0.1</span>)<br>        redis: Redis = self.backend.client<br>        <span class="hljs-keyword">return</span> redis.lock(once_key, timeout=timeout, blocking_timeout=blocking_timeout, sleep=sleep)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span>(<span class="hljs-params">self, *args, **kwargs</span>):</span><br>        lock = self.get_lock(args, kwargs)<br>        enable_wait: <span class="hljs-built_in">bool</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_enable_wait&#x27;</span>, <span class="hljs-literal">False</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> enable_wait <span class="hljs-keyword">and</span> lock.locker():<br>            <span class="hljs-comment"># 如果任务不需要等待且获取不到锁,则需要被标记为Reject并放弃执行</span><br>            logger.info(<br>                <span class="hljs-string">f&#x27;lock:<span class="hljs-subst">&#123;lock.name&#125;</span> not release and not eanble retry, task ignore, args <span class="hljs-subst">&#123;args&#125;</span>, kwargs <span class="hljs-subst">&#123;kwargs&#125;</span>&#x27;</span><br>            )<br>            <span class="hljs-keyword">raise</span> Reject<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">with</span> lock <span class="hljs-keyword">as</span> _lock:<br>                <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>().__call__(*args, **kwargs)<br></code></pre></td></tr></table></figure>
+<h2 id="3-附录"><a href="#3-附录" class="headerlink" title="3.附录"></a>3.附录</h2><h3 id="3-1完整代码"><a href="#3-1完整代码" class="headerlink" title="3.1完整代码:"></a>3.1完整代码:</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Optional<br><br><span class="hljs-keyword">import</span> Celery<br><span class="hljs-keyword">from</span> celery <span class="hljs-keyword">import</span> Task<br><span class="hljs-keyword">from</span> celery.exceptions <span class="hljs-keyword">import</span> Reject<br><span class="hljs-keyword">from</span> celery.utils.log <span class="hljs-keyword">import</span> get_task_logger<br><span class="hljs-keyword">from</span> redis.client <span class="hljs-keyword">import</span> Redis<br><span class="hljs-keyword">from</span> redis.lock <span class="hljs-keyword">import</span> Lock<br><br>logger = get_task_logger(__name__)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OnceTask</span>(<span class="hljs-params">Task</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    OnceTask需要在调用任务时从kwargs传入如下参数(非必选)</span><br><span class="hljs-string">    celery_once_key: 锁的key,为空时以task_name + args为key</span><br><span class="hljs-string">    celery_once_timeout: 锁的持有时间,默认为None, 也就是等到任务主动调用release之前,锁一直存在</span><br><span class="hljs-string">    celery_once_enable_retry: 如果检查到锁存在, 是否需要尝试获取锁</span><br><span class="hljs-string">    celery_once_blocking_timeout: 尝试获取锁的时间, 默认为None, 也就是一直在尝试</span><br><span class="hljs-string">    celery_once_sleep: 每次尝试获取锁的睡眠时间, 默认为0.1, 也就是锁的隔多久尝试一次</span><br><span class="hljs-string">    timeout=None, sleep=0.1, blocking_timeout=None,</span><br><span class="hljs-string"></span><br><span class="hljs-string">    举例子:</span><br><span class="hljs-string">        如果要确保只能只有一个任务运行,其他任务运行会被忽略则:</span><br><span class="hljs-string">         celery_once_timeout: None, celery_once_enable_retry: False</span><br><span class="hljs-string">        如果要确保一个任务运行时,其他任务排队,并在上一个任务运行完再运行则:</span><br><span class="hljs-string">        celery_once_timeout: None, celery_once_enable_retry: True</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_lock</span>(<span class="hljs-params">self, args, kwargs</span>) -&gt; Lock:</span><br>        once_key: Optional[<span class="hljs-built_in">str</span>] = kwargs.pop(<span class="hljs-string">&#x27;celery_once_key&#x27;</span>, <span class="hljs-literal">None</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> once_key:<br>            once_key = self.name + <span class="hljs-string">&#x27;:&#x27;</span>.join(args)<br>        timeout: <span class="hljs-built_in">int</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_timeout&#x27;</span>, <span class="hljs-literal">None</span>)<br>        blocking_timeout: <span class="hljs-built_in">int</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_blocking_timeout&#x27;</span>, <span class="hljs-literal">None</span>)<br>        sleep: <span class="hljs-built_in">float</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_sleep&#x27;</span>, <span class="hljs-number">0.1</span>)<br>        redis: Redis = self.backend.client<br>        <span class="hljs-keyword">return</span> redis.lock(once_key, timeout=timeout, blocking_timeout=blocking_timeout, sleep=sleep)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span>(<span class="hljs-params">self, *args, **kwargs</span>):</span><br>        lock = self.get_lock(args, kwargs)<br>        enable_wait: <span class="hljs-built_in">bool</span> = kwargs.pop(<span class="hljs-string">&#x27;celery_once_enable_wait&#x27;</span>, <span class="hljs-literal">False</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> enable_wait <span class="hljs-keyword">and</span> lock.locker():<br>            <span class="hljs-comment"># 如果任务不需要等待且获取不到锁,则需要被标记为Reject并放弃执行</span><br>            logger.info(<br>                <span class="hljs-string">f&#x27;lock:<span class="hljs-subst">&#123;self.lock.name&#125;</span> not release and not eanble retry, task ignore, args <span class="hljs-subst">&#123;args&#125;</span>, kwargs <span class="hljs-subst">&#123;kwargs&#125;</span>&#x27;</span><br>            )<br>            <span class="hljs-keyword">raise</span> Reject<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">with</span> lock <span class="hljs-keyword">as</span> _lock:<br>                <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>().__call__(*args, **kwargs)<br>             <br>             <br>app: <span class="hljs-string">&#x27;Celery&#x27;</span> = Celery()<br><br><span class="hljs-meta">@celery.task(<span class="hljs-params">name=<span class="hljs-string">&quot;tasks1&quot;</span>, base=OnceTask</span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test</span>(<span class="hljs-params">*args, **kwargs</span>):</span><br>    time.sleep(<span class="hljs-number">60</span>)<br>   <br>test.apply()<br>test.apply() <span class="hljs-comment"># 这个任务会被Reject</span><br>test.apply(kwargs=&#123;<span class="hljs-string">&#x27;celery_once_enable_retry&#x27;</span>: <span class="hljs-literal">True</span>, <span class="hljs-string">&#x27;celery_once_sleep&#x27;</span>: <span class="hljs-number">1</span>&#125;) <span class="hljs-comment"># 这个任务会等第一个任务执行完了再执行</span><br></code></pre></td></tr></table></figure>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/12/10/Celery%E5%90%8C%E4%B8%80%E6%97%B6%E5%88%BB%E5%8F%AA%E6%89%A7%E8%A1%8C%E4%B8%80%E4%B8%AA%E7%9B%B8%E5%90%8C%E4%BB%BB%E5%8A%A1/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;12&#x2F;10&#x2F;Celery%E5%90%8C%E4%B8%80%E6%97%B6%E5%88%BB%E5%8F%AA%E6%89%A7%E8%A1%8C%E4%B8%80%E4%B8%AA%E7%9B%B8%E5%90%8C%E4%BB%BB%E5%8A%A1&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;12&#x2F;10&#x2F;Celery%E5%90%8C%E4%B8%80%E6%97%B6%E5%88%BB%E5%8F%AA%E6%89%A7%E8%A1%8C%E4%B8%80%E4%B8%AA%E7%9B%B8%E5%90%8C%E4%BB%BB%E5%8A%A1&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Celery/" rel="tag">Celery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/12/10/Celery%E8%B0%83%E7%94%A8%E4%B8%8D%E5%90%8C%E9%A1%B9%E7%9B%AE%E7%9A%84%E4%BB%BB%E5%8A%A1/"><i class="iconfont iconleft"></i>Celery调用不同项目的任务</a>
+    <a href="/2020/11/18/%E5%9F%BA%E4%BA%8EPython%E6%8E%A2%E9%92%88%E5%AE%8C%E6%88%90%E8%B0%83%E7%94%A8%E5%BA%93%E7%9A%84%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/">基于Python探针完成调用库的数据提取<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%A6%82%E4%BD%95%E7%A1%AE%E4%BF%9D%E4%BB%BB%E5%8A%A1%E5%9C%A8%E5%90%8C%E4%B8%80%E6%97%B6%E5%88%BB%E5%94%AF%E4%B8%80"><span class="toc-text">1.如何确保任务在同一时刻唯一</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%9C%80%E8%A6%81%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-text">2.需要做什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%BB%93%E5%90%88Celery%E7%9A%84%E4%BB%BB%E5%8A%A1%E4%BA%8B%E4%BB%B6%E5%8A%9F%E8%83%BD-%E5%81%9A%E5%88%B0%E4%BB%BB%E5%8A%A1%E8%84%9A%E6%9C%AC%E5%AF%B9%E9%94%81%E6%97%A0%E6%84%9F%E7%9F%A5"><span class="toc-text">2.1.结合Celery的任务事件功能, 做到任务脚本对锁无感知</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%B0%83%E7%94%A8%E6%96%B9%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87%E5%8F%82%E6%95%B0%E6%9D%A5%E7%A1%AE%E5%AE%9A%E4%BB%BB%E5%8A%A1%E9%9C%80%E8%A6%81%E6%89%A7%E8%A1%8C%E4%BB%80%E4%B9%88%E9%94%81%E9%80%BB%E8%BE%91"><span class="toc-text">2.调用方可以通过参数来确定任务需要执行什么锁逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%BD%BF%E7%94%A8Redis%E9%94%81"><span class="toc-text">2.3.使用Redis锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%99%84%E5%BD%95"><span class="toc-text">3.附录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="toc-text">3.1完整代码:</span></a></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%A6%82%E4%BD%95%E7%A1%AE%E4%BF%9D%E4%BB%BB%E5%8A%A1%E5%9C%A8%E5%90%8C%E4%B8%80%E6%97%B6%E5%88%BB%E5%94%AF%E4%B8%80"><span class="toc-text">1.如何确保任务在同一时刻唯一</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%9C%80%E8%A6%81%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-text">2.需要做什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%BB%93%E5%90%88Celery%E7%9A%84%E4%BB%BB%E5%8A%A1%E4%BA%8B%E4%BB%B6%E5%8A%9F%E8%83%BD-%E5%81%9A%E5%88%B0%E4%BB%BB%E5%8A%A1%E8%84%9A%E6%9C%AC%E5%AF%B9%E9%94%81%E6%97%A0%E6%84%9F%E7%9F%A5"><span class="toc-text">2.1.结合Celery的任务事件功能, 做到任务脚本对锁无感知</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%B0%83%E7%94%A8%E6%96%B9%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87%E5%8F%82%E6%95%B0%E6%9D%A5%E7%A1%AE%E5%AE%9A%E4%BB%BB%E5%8A%A1%E9%9C%80%E8%A6%81%E6%89%A7%E8%A1%8C%E4%BB%80%E4%B9%88%E9%94%81%E9%80%BB%E8%BE%91"><span class="toc-text">2.调用方可以通过参数来确定任务需要执行什么锁逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%BD%BF%E7%94%A8Redis%E9%94%81"><span class="toc-text">2.3.使用Redis锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%99%84%E5%BD%95"><span class="toc-text">3.附录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="toc-text">3.1完整代码:</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

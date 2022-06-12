@@ -1,0 +1,770 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vim命令 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="vim常用命令
+
+
+vim命令1.vim模式以下介绍内...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">vim命令</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">vim命令</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 17, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3037</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <p>vim常用命令</p>
+        <h2 id="vim命令"><a href="#vim命令" class="headerlink" title="vim命令"></a>vim命令</h2><h3 id="1-vim模式"><a href="#1-vim模式" class="headerlink" title="1.vim模式"></a>1.vim模式</h3><p>以下介绍内容来自维基百科Vim</p>
+<p>从vi演生出来的Vim具有多种模式，这种独特的设计容易使初学者产生混淆。几乎所有的编辑器都会有插入和执行命令两种模式，并且大多数的编辑器使用了与Vim截然不同的方式：命令目录（鼠标或者键盘驱动），组合键（通常通过control键（CTRL）和alt键（ALT）组成）或者鼠标输入。Vim和vi一样，仅仅通过键盘来在这些模式之中切换。这就使得Vim可以不用进行菜单或者鼠标操作，并且最小化组合键的操作。对文字录入员或者程序员可以大大增强速度和效率。</p>
+<p>Vim具有6种基本模式和5种派生模式，我们这里只简单介绍下6种基本模式：</p>
+<ul>
+<li><p>普通模式(Normal mode)<br>在普通模式中，用的编辑器命令，比如移动光标，删除文本等等。这也是Vim启动后的默认模式。这正好和许多新用户期待的操作方式相反（大多数编辑器默认模式为插入模式）。<br>Vim强大的编辑能来自于其普通模式命令。普通模式命令往往需要一个操作符结尾。例如普通模式命令dd删除当前行，但是第一个”d”的后面可以跟另外的移动命令来代替第二个d，比如用移动到下一行的”j”键就可以删除当前行和下一行。另外还可以指定命令重复次数，2dd（重复dd两次），和dj的效果是一样的。用户学习了各种各样的文本间移动／跳转的命令和其他的普通模式的编辑命令，并且能够灵活组合使用的话，能够比那些没有模式的编辑器更加高效的进行文本编辑。<br>在普通模式中，有很多方法可以进入插入模式。比较普通的方式是按a（append／追加）键或者i（insert／插入）键。</p>
+</li>
+<li><p>插入模式(Insert mode)<br>在这个模式中，大多数按键都会向文本缓冲中插入文本。大多数新用户希望文本编辑器编辑过程中一直保持这个模式。<br>在插入模式中，可以按ESC键回到普通模式。</p>
+</li>
+<li><p>可视模式(Visual mode)<br>这个模式与普通模式比较相似。但是移动命令会扩大高亮的文本区域。高亮区域可以是字符、行或者是一块文本。当执行一个非移动命令时，命令会被执行到这块高亮的区域上。Vim的”文本对象”也能和移动命令一样用在这个模式中。</p>
+</li>
+<li><p>选择模式(Select mode)<br>这个模式和无模式编辑器的行为比较相似（Windows标准文本控件的方式）。这个模式中，可以用鼠标或者光标键高亮选择文本，不过输入任何字符的话，Vim会用这个字符替换选择的高亮文本块，并且自动进入插入模式。</p>
+</li>
+<li><p>命令行模式(Command line mode)<br>在命令行模式中可以输入会被解释成并执行的文本。例如执行命令（:键），搜索（/和?键）或者过滤命令（!键）。在命令执行之后，Vim返回到命令行模式之前的模式，通常是普通模式。</p>
+</li>
+<li><p>Ex模式(Ex mode)<br>这和命令行模式比较相似，在使用:visual命令离开Ex模式前，可以一次执行多条命令。</p>
+</li>
+</ul>
+<p>这其中我们常用到就是普通模式、插入模式和命令行模式。vim启动进入普通模式，处于插入模式或命令行模式时只需要按Esc或者Ctrl+[(这在vim课程环境中不管用)即可进入普通模式。普通模式中按i（插入）或a（附加）键都可以进入插入模式，普通模式中按:进入命令行模式。命令行模式中输入wq回车后保存并退出vim。</p>
+<h3 id="2-普通模式按键说明"><a href="#2-普通模式按键说明" class="headerlink" title="2.普通模式按键说明"></a>2.普通模式按键说明</h3><p>1.移动光标</p>
+<table>
+<thead>
+<tr>
+<th>按键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>h</td>
+<td>左</td>
+</tr>
+<tr>
+<td>l</td>
+<td>右</td>
+</tr>
+<tr>
+<td>j</td>
+<td>下</td>
+</tr>
+<tr>
+<td>k</td>
+<td>上</td>
+</tr>
+<tr>
+<td>w</td>
+<td>移动到下一个单词</td>
+</tr>
+<tr>
+<td>b</td>
+<td>移动到上一个单词</td>
+</tr>
+</tbody></table>
+<p>2.进入插入模式</p>
+<table>
+<thead>
+<tr>
+<th>按键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>i</td>
+<td>在当前光标除进行编辑</td>
+</tr>
+<tr>
+<td>I(大写)</td>
+<td>在行首插入</td>
+</tr>
+<tr>
+<td>A</td>
+<td>在行末插入</td>
+</tr>
+<tr>
+<td>a</td>
+<td>在光标后插入编辑</td>
+</tr>
+<tr>
+<td>o</td>
+<td>在当前行后插入一个新行</td>
+</tr>
+<tr>
+<td>O(大写)</td>
+<td>在当前行前插入一个新行</td>
+</tr>
+<tr>
+<td>cw</td>
+<td>替换从光标所在位置后到一个单词结尾的字符</td>
+</tr>
+</tbody></table>
+<p>3.删除文本信息</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>x</td>
+<td>删除游标所在的字符</td>
+</tr>
+<tr>
+<td>X（大写）</td>
+<td>删除游标所在前一个字符</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>同x（小写）</td>
+</tr>
+<tr>
+<td>dd</td>
+<td>删除整行</td>
+</tr>
+<tr>
+<td>dw</td>
+<td>删除一个单词（不可用于中文）</td>
+</tr>
+<tr>
+<td>d$或D</td>
+<td>删除至行尾</td>
+</tr>
+<tr>
+<td>d^</td>
+<td>删除至行首</td>
+</tr>
+<tr>
+<td>dG</td>
+<td>删除到文档结尾处</td>
+</tr>
+<tr>
+<td>d1G</td>
+<td></td>
+</tr>
+<tr>
+<td>ndd</td>
+<td>删除n行</td>
+</tr>
+</tbody></table>
+<p>4.重复命令<br>输入.可以重复上一次的操作<br>还有10x可以删除10个怜恤字符<br>3dd删除3行<br>daw删除一个单词<br>dnw（n为数字）删除n个单词</p>
+<p>4.行间跳转</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>nG,n shift+g</td>
+<td>游标移动到第n行</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>游标移动到第一行</td>
+</tr>
+<tr>
+<td>G,Shift+g</td>
+<td>游标移动到最后一行</td>
+</tr>
+</tbody></table>
+<p>5.行内跳转</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>w</td>
+<td>到下一个单词的开头</td>
+</tr>
+<tr>
+<td>e</td>
+<td>到下一个单词的结尾</td>
+</tr>
+<tr>
+<td>b</td>
+<td>到前一个单词的开头</td>
+</tr>
+<tr>
+<td>ge</td>
+<td>到前一个单词的结尾</td>
+</tr>
+<tr>
+<td>0或^</td>
+<td>到行头</td>
+</tr>
+<tr>
+<td>$</td>
+<td>到行尾</td>
+</tr>
+<tr>
+<td>f&lt;字母&gt;</td>
+<td>向后搜索&lt;字母&gt;并跳转到第一个匹配的位置（非常实用）</td>
+</tr>
+<tr>
+<td>F&lt;字母&gt;</td>
+<td>向前搜索&lt;字母&gt;并跳转到第一个匹配的位置</td>
+</tr>
+<tr>
+<td>T&lt;字母&gt;</td>
+<td>向后搜索&lt;字母&gt;并跳转到第一个匹配位置之前的一个字母（不常用）</td>
+</tr>
+<tr>
+<td>t&lt;字母&gt;</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>6.复制粘贴</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3yy</td>
+<td>复制游标所在的下3行</td>
+</tr>
+<tr>
+<td>yy</td>
+<td>复制游标所在的整行</td>
+</tr>
+<tr>
+<td>y^</td>
+<td>复制到行首，不行光标所在处字符（y0也可以）</td>
+</tr>
+<tr>
+<td>y$</td>
+<td>复制到行尾，包含光标所在处的字符</td>
+</tr>
+<tr>
+<td>yw</td>
+<td>复制一个单词</td>
+</tr>
+<tr>
+<td>y2w</td>
+<td>复制2个</td>
+</tr>
+<tr>
+<td>yG</td>
+<td>复制到文本末</td>
+</tr>
+<tr>
+<td>y1G</td>
+<td>复制到文本开头</td>
+</tr>
+<tr>
+<td>p(小写)</td>
+<td>粘贴在光标后或者下</td>
+</tr>
+<tr>
+<td>p(大写)</td>
+<td>粘贴在光标前或者上</td>
+</tr>
+</tbody></table>
+<p>ps:dd其实为剪切，每次dd后都可以用p来粘贴</p>
+<p>7.替换和撤销</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>r&lt;待替换字母&gt;</td>
+<td>将游标所在字母替换为指定字母</td>
+</tr>
+<tr>
+<td>R</td>
+<td>怜恤替换，直到按下Esc</td>
+</tr>
+<tr>
+<td>cc</td>
+<td>替换整行</td>
+</tr>
+<tr>
+<td>cw</td>
+<td>替换一个单词</td>
+</tr>
+<tr>
+<td>C(大写)</td>
+<td>替换游标以后到行末</td>
+</tr>
+<tr>
+<td>~</td>
+<td>反转游标所在字母大小写</td>
+</tr>
+<tr>
+<td>u{n}</td>
+<td>撤销一个或n次操作</td>
+</tr>
+<tr>
+<td>U(大写)</td>
+<td>撤销当前行的所有修改</td>
+</tr>
+<tr>
+<td>Ctrl+r</td>
+<td>撤销undo的操作</td>
+</tr>
+</tbody></table>
+<p>其他：<br>输入&gt;&gt;整行向有缩进，&lt;&lt;整行向左回退。在命令模式下对shiftwidh进行设置可以达到控制字符数目的<br>普通模式下输入/然后键入需要查找的字符串 按回车后就会进行查找。<br>？与/功能相同，只不过？是向上而/是向下查找。<br>进入查找之后，输入n和N可以继续查找<br>n表示继续查找，N反向查找</p>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs taggerscript">普通模式下输入<span class="hljs-symbol">\*</span>寻找游标所在处的单词<br>普通模式下输入<span class="hljs-symbol">\#</span>同上，但 <span class="hljs-symbol">\#</span> 是向前（上）找，<span class="hljs-symbol">\*</span>则是向后（下）找<br>普通模式下输入g<span class="hljs-symbol">\*</span>同<span class="hljs-symbol">\*</span> ，但部分符合该单词即可<br>普通模式下输入g<span class="hljs-symbol">\#</span>同<span class="hljs-symbol">\#</span> ，但部分符合该单词即可<br></code></pre></td></tr></table></figure>
+<h3 id="3-命令模式快捷命令"><a href="#3-命令模式快捷命令" class="headerlink" title="3.命令模式快捷命令"></a>3.命令模式快捷命令</h3><p>1.退出vim</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>:q!</td>
+<td>强制退出，不保存</td>
+</tr>
+<tr>
+<td>:q</td>
+<td>退出</td>
+</tr>
+<tr>
+<td>:wq!</td>
+<td>强制保存并退出</td>
+</tr>
+<tr>
+<td>:w&lt;文件路径&gt;</td>
+<td>另存为</td>
+</tr>
+<tr>
+<td>:saveas 文件路径</td>
+<td>另存为</td>
+</tr>
+<tr>
+<td>:x</td>
+<td>保存并退出</td>
+</tr>
+<tr>
+<td>:wq</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>2.显示行号</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim">:<span class="hljs-keyword">set</span> <span class="hljs-keyword">nu</span><br></code></pre></td></tr></table></figure>
+
+<p>3.控制缩进和回退字符数</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">:<span class="hljs-builtin-name">set</span> <span class="hljs-attribute">shiftwidth</span>=10<br></code></pre></td></tr></table></figure>
+
+<p>4.调整文本位置</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-symbol">:ce</span>    <span class="hljs-comment">#居中</span><br><span class="hljs-symbol">:ri</span>     <span class="hljs-comment">#靠右</span><br><span class="hljs-symbol">:le</span>    <span class="hljs-comment">#靠左</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-其他"><a href="#4-其他" class="headerlink" title="4.其他"></a>4.其他</h3><p>命令摘取自实验楼的vim编辑器模块教程,墨迹功能<a target="_blank" rel="noopener" href="https://www.shiyanlou.com/courses/2/labs/19/document">戳这里</a><br>如何搭配vim呢，<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/19655689">见这里（python部分）</a></p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/08/17/11-vim/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;17&#x2F;11-vim&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;17&#x2F;11-vim&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4/" rel="tag">命令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/08/22/12-scrapy/"><i class="iconfont iconleft"></i>scrapy学习笔记(有示例版）</a>
+    <a href="/2017/08/17/10-Django-learn/">Django入门的笔记<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#vim%E5%91%BD%E4%BB%A4"><span class="toc-text">vim命令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-vim%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.vim模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%99%AE%E9%80%9A%E6%A8%A1%E5%BC%8F%E6%8C%89%E9%94%AE%E8%AF%B4%E6%98%8E"><span class="toc-text">2.普通模式按键说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E5%BF%AB%E6%8D%B7%E5%91%BD%E4%BB%A4"><span class="toc-text">3.命令模式快捷命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B6%E4%BB%96"><span class="toc-text">4.其他</span></a></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#vim%E5%91%BD%E4%BB%A4"><span class="toc-text">vim命令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-vim%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.vim模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%99%AE%E9%80%9A%E6%A8%A1%E5%BC%8F%E6%8C%89%E9%94%AE%E8%AF%B4%E6%98%8E"><span class="toc-text">2.普通模式按键说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E5%BF%AB%E6%8D%B7%E5%91%BD%E4%BB%A4"><span class="toc-text">3.命令模式快捷命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B6%E4%BB%96"><span class="toc-text">4.其他</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

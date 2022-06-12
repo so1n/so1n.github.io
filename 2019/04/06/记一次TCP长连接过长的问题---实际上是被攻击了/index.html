@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>记一次TCP长连接过多的问题--实际上是被攻击了 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记在接手了公司的SIP项目后的不久，发现服务器时不时...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">记一次TCP长连接过多的问题--实际上是被攻击了</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">记一次TCP长连接过多的问题--实际上是被攻击了</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 06, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7436</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在接手了公司的SIP项目后的不久，发现服务器时不时就遇到了kamailio进程(用于处理sip协议)占用了过多的文件描述符,直接超过限制的情况，造成kamailio进程无法接收新的请求,影响线上用户使用。</p>
+<p>这个问题有个两个难点,一个是只有发生问题才能进行排查,而发生问题时需要快速重启进程,不然影响用户使用;另一个问题由于发生时间充满随机性，而且时隔半个月到一个月才发生一次，所以整个解决流程用了快3个月，其中共发生了4次。</p>
+<p>不过从发现问题到解决问题倒是收获了很多,只是到了后来才发现造成该问题的根本原因是客户端由于觉得接口加密逻辑有bug就跟API接口的商量一起下线加密逻辑,而我又不知道,加密逻辑下线后导致sip服务器的ip被暴露出来,引发SIP服务器被攻击…</p>
+        <h2 id="1-SIP连接的特性"><a href="#1-SIP连接的特性" class="headerlink" title="1.SIP连接的特性"></a>1.SIP连接的特性</h2><p>SIP服务器不像http服务器一样一个请求一个链接,而是用户在使用时就是一条长链接,并且一直存活着.一开始客户端的设计时只有客户端打开期间才有长链接，之后客户端改为后台常驻长链接也能存活，变成了用户只要不强制杀死客户端，服务器就会为之保留一个长链接。服务器的长链接数量发生了6倍的提升.</p>
+<h2 id="2-更改文件描述符限制"><a href="#2-更改文件描述符限制" class="headerlink" title="2.更改文件描述符限制"></a>2.更改文件描述符限制</h2><p>由于链接量的提升,导致了服务器更容易触发文件描述符过多的问题,由于刚接触对kamailio以及Linux不熟悉，在整理了一些资料后,就去咨询大佬，询问是不是由于服务器被攻击导致的，大佬说可能性不大，主要是用户链接数量增长了，而Linux限制的文件描述符造成了该问题的发生，在查阅资料后发现Linux的文件描述符限制在1024，修改即可。</p>
+<h3 id="2-1更改默认文件描述符限制值"><a href="#2-1更改默认文件描述符限制值" class="headerlink" title="2.1更改默认文件描述符限制值"></a>2.1更改默认文件描述符限制值</h3><p>更改文件描述符这个比较简单，通常可以通过ulimit -n查看默认限制值，以下是修改命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">vi /etc/security/limits.conf<br><span class="hljs-comment"># 追加内容</span><br>* soft nofile 10240<br>* hard nofile 10240<br><br>vi /etc/sysctl.conf<br><span class="hljs-comment"># 追加内容</span><br>fs.file-max=1024<br><span class="hljs-comment"># 应用配置</span><br>sysctl -p<br></code></pre></td></tr></table></figure>
+<p>一般来说完成上述命令就可以了，然而kamailio运行在自己的用户组下, 同时是被Systemd托管的(守护)，还需要改Systemd的默认配 /etc/systemd/system.conf 的 DefaultLimitNOFILE 和 DefaultLimitNPROC的值才能更改成功。</p>
+<h2 id="3-iptables限制和TCP调优双管齐下"><a href="#3-iptables限制和TCP调优双管齐下" class="headerlink" title="3.iptables限制和TCP调优双管齐下"></a>3.iptables限制和TCP调优双管齐下</h2><p>改进了文件描述符后问题并没有解决（只是解决了客户端启用常驻功能后用户连接数量的限制），通过使用Tcpdump捉包分析后发现,根本原因还是由于一些恶意请求，造成了服务器启用了大量的半开链接（TCP握手后就不再发送请求），而这些恶意请求根本还没到kamailio层，光查看kamailio数据和日志是看不出问题的原因。之后通过iptables限制请求和TCP调优(主要是尽早关闭半开链接)可以从跟本上解决该问题.</p>
+<p>注:这个问题解决时间比较长的原因是 发生异常的情况间隔比较久,需要等到异常才能捉取数据,同时跟大佬还猜测可能由于客户端异常造成的原因.</p>
+<h3 id="3-1误打误撞的找到问题"><a href="#3-1误打误撞的找到问题" class="headerlink" title="3.1误打误撞的找到问题"></a>3.1误打误撞的找到问题</h3><p>由于之前要写个定时程序来检测SIP服务器接口的可用性，本着能不造轮子就不造轮子的原则查了很多开源库，但查遍了python的开源库,要不就实现太完美了，接听电话都实现了也引用了很多其他的东西，要不就是要引用Twisted和zope,觉得这两个库太重了,要是出现问题再排查的话就很麻烦了。所以最后自己手撸了一个简单的SIP协议和利用sockets发送报文来模拟ping，检测SIP服务器接口的可用性。</p>
+<p>然后很碰巧，在上线这个程序后不久，SIP服务器就会发生这个问题，凭着一直认为自己很渣，写的程序有问题的态度后，开始排查这个程序是不是有忘记关闭socket等问题，然后在进行第一步输入ss -a查看所有socket时（见下图有个185.104..。。），发现有个ip在这个输出列表里出现了很多次，通过命令:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 如果是线上运行,该用ss命令性能更高</span><br>netstat -nat|grep ESTABLISHED|awk <span class="hljs-string">&#x27;&#123;split($5,ip_port,&quot;:&quot;);print ip_port[1]&#125;&#x27;</span> | sort | uniq -c | sort -rn<br></code></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/blob/master/blog_photo/ip%E5%8D%A0%E7%94%A8%E7%AB%AF%E5%8F%A3.png" alt="ip占用端口"><br>发现该ip已经占用了684个链接了，而且之后利用tcpdump捉包发现该ip发的都是空包，并且在发送一段时间后自动转为半开链接,到此该问题的症状已经找到了—该ip发送大量的非法请求,导致占用了kamailio进程的可用文件描述符数量,导致kamailio进程无法再去处理正常链接而无法响应服务为止. </p>
+<p>到了找出问题时，监控服务器也上线了，对每台服务器的文件描述符都进行了监控，通过监控数据可以看到，都是数据量突然上升，两小时后才下降(这个两小时也是一个重点，后来TCP调优后再看此图时才发现，linux默认在创建链接的两小时后tcp发送keep_alive发现对方没回包，服务器主动关闭了该sockets)</p>
+<p><img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6.png" alt="img"></p>
+<h3 id="2-2使用iptables限制请求"><a href="#2-2使用iptables限制请求" class="headerlink" title="2.2使用iptables限制请求"></a>2.2使用iptables限制请求</h3><p>找出问题后解决起来就容易多了，由于是短时间内有大量相同ip的请求，那只要不再响应或接受这部分请求就可以了，而iptables的recent模块就是实现这一功能的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># iptables配置</span><br><span class="hljs-comment"># 触发条件就记录日志(确保没问题时可以去掉记录日志)</span><br>-A INPUT -p tcp -m tcp --dport 5061 --tcp-flags FIN,SYN,RST,ACK SYN -m recent --rcheck --seconds 600 --hitcount 128 --name 5061webpool --mask 255.255.255.255 --rsource -j LOG --log-prefix <span class="hljs-string">&quot;Iptable-p5061-recent:&quot;</span> --log-ip-options<br><span class="hljs-comment"># 触发条件就把该连接drop掉</span><br>-A INPUT -p tcp -m tcp --dport 5061 --tcp-flags FIN,SYN,RST,ACK SYN -m recent --rcheck --seconds 600 --hitcount 128 --name 5061webpool --mask 255.255.255.255 --rsource -j DROP<br><span class="hljs-comment"># 把ip加入对应的set，以及记录连接次数，以便上面可以判断是否触发条件</span><br>-A INPUT -p tcp -m tcp --dport 5061 --tcp-flags FIN,SYN,RST,ACK SYN -m recent --name 5061webpool --<span class="hljs-built_in">set</span> -j ACCEPT<br></code></pre></td></tr></table></figure>
+
+<p>通过iptables的recent模块的配置，目前可以防止请求，但是recent模块默认只记录100条记录，需要通过修改配置文件才可以去修改限制，而此时部分服务器长链接是数量基本都在2000,3000以上,后面预计长链接数可能会达到10000以上,靠这种方式效率还是太低了,而且占用了太多机器内存。</p>
+<p><strong>注:</strong><br><strong>如何修改记录条数限制见：<a target="_blank" rel="noopener" href="https://linux.die.net/man/8/iptables">https://linux.die.net/man/8/iptables</a>的recent模块部分。</strong><br><strong>每个系统的iptables配置都不太一样，这里就不贴出来了<a target="_blank" rel="noopener" href="https://wiki.debian.org/iptables">debian见这里</a></strong></p>
+<h3 id="2-3动态限制请求"><a href="#2-3动态限制请求" class="headerlink" title="2.3动态限制请求"></a>2.3动态限制请求</h3><p>为了解决上面使用iptables recent方案的问题，重新梳理了一下问题。发现该问题的触发时间是随机的，而且触发间隔非常久,如果能得知服务器开始被攻击就马上限制请求,而不要实时运行,那效果就会非常不错了.</p>
+<p>通过上面的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">netstat -nat|grep ESTABLISHED|awk <span class="hljs-string">&#x27;&#123;split($5,ip_port,&quot;:&quot;);print ip_port[1]&#125;&#x27;</span> | sort | uniq -c | sort -rn<br></code></pre></td></tr></table></figure>
+<p>可以得知目前系统同一ip请求最多的是连接数据库的请求（因为那个ip是数据库ip）,而且从来不会超过43(kamailio配置最多就43个子进程)，而恶意请求通常的ip都是从0开始的，而且是以200个请求/半分钟的频率增长，那我只要通过脚本定时运行判断哪个ip是数量多过，然后就加入iptables的限制，当数量少时把他移除就可以了。但是，每有一个ip就往iptables加入一条规则，如果规则多了，那每个包都要遍历一遍规则去判断，O(n)的时间复杂度太影响性能了，所以引用到了ipset模块，把复杂度从O(n)变为O(1)，同时由于ipset带有timeout的功能，移除规则的工作也可以去掉了，方便了许多。</p>
+<p>脚本示例代码如下(如果要提高性能,可以把netstat改为ss)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-comment"># ipset name</span><br>ipset_name=<span class="hljs-string">&#x27;ip_conn_limit_ipset&#x27;</span><br>conn_limit=60<br><span class="hljs-comment"># remove ip from ipset after 270(5min - 30s) seconds</span><br>timeout=270<br><span class="hljs-comment"># The number of TCP connections in which an ip is in the ESTABLISHED state. e.g(cnt,ip): 10 1.1.1.1</span><br>ip_conn=`netstat -nat | grep ESTABLISHED | awk <span class="hljs-string">&#x27;&#123;split($5,ip_port,&quot;:&quot;);print ip_port[1]&#125;&#x27;</span> | sort | uniq -c | sort -rn`<br><span class="hljs-comment"># 让for循环以换行分割，而不是默认的按空格分割</span><br><br>SAVEIFS=<span class="hljs-variable">$IFS</span><br>IFS=$(<span class="hljs-built_in">echo</span> -en <span class="hljs-string">&quot;\n\b&quot;</span>)<br><span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> <span class="hljs-variable">$ip_conn</span><br><span class="hljs-keyword">do</span><br>    cnt=`<span class="hljs-built_in">echo</span> <span class="hljs-variable">$line</span> | awk <span class="hljs-string">&#x27;&#123;print $1&#125;&#x27;</span>`<br>    ip=`<span class="hljs-built_in">echo</span> <span class="hljs-variable">$line</span> | awk <span class="hljs-string">&#x27;&#123;print $2&#125;&#x27;</span>`<br>    <span class="hljs-keyword">if</span> [ <span class="hljs-variable">$cnt</span> -lt <span class="hljs-variable">$conn_limit</span> ];<span class="hljs-keyword">then</span><br>        <span class="hljs-built_in">break</span><br>    <span class="hljs-keyword">fi</span><br>    <span class="hljs-comment"># echo cnt=$cnt ip=$ip</span><br>    /sbin/ipset -! add <span class="hljs-variable">$ipset_name</span> <span class="hljs-variable">$ip</span> timeout <span class="hljs-variable">$timeout</span> comment <span class="hljs-string">&quot;Conn Cnt: <span class="hljs-variable">$cnt</span> is greater than limit:<span class="hljs-variable">$conn_limit</span>&quot;</span><br><span class="hljs-keyword">done</span><br>IFS=<span class="hljs-variable">$SAVEIFS</span><br></code></pre></td></tr></table></figure>
+
+<p>创建ipset和iptables规则如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建一个名为ip_conn_limit_ipset的ipset, 以ip为key 最大65536，默认timeout时间为300，可以使用comment功能(打日志可以分辨是哪个ip)</span><br><br>ipset create ip_conn_limit_ipset <span class="hljs-built_in">hash</span>:ip family inet hashsize 1024 maxelem 65536 timeout 300 comment<br><br><span class="hljs-comment"># 把iptables的规则改为如下规则</span><br>-A INPUT -m <span class="hljs-built_in">set</span> --match-set ip_conn_limit_ipset src -p tcp -j LOG --log-prefix <span class="hljs-string">&quot;ip-conn-limit-ipset:&quot;</span> --log-ip-options<br>-A INPUT -m <span class="hljs-built_in">set</span> --match-set ip_conn_limit_ipset src -p tcp -j DROP<br></code></pre></td></tr></table></figure>
+<p>之后利用crontab 定时运行脚本即可,由于需要频繁读取日志,所以定时的间隔也需要考虑在内,不过后面通过日志解耦系统逻辑,所以也不用再跑脚本了,详情可以看我另一篇文章</p>
+<h2 id="3-TCP调优"><a href="#3-TCP调优" class="headerlink" title="3.TCP调优"></a>3.TCP调优</h2><p>通过这个问题,也发现了服务器启用了长链接，有很多问题需要处理的，不然会加重服务器的负担，影响性能，如果客户端那边因为网络问题而掉线，但是并没有关闭链接，而此时服务器还是维持链接的打开，直到keep_alive机制在两小时后启动，并判断客户端没有在使用时才断开链接（部分来自于网络).至于为什么是两小时以及不怎么建议随便修改,那可以重新看一看TCP协议卷1.</p>
+<ul>
+<li><p>1.尽早关闭半开放链接</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 探测包间隔</span><br>net.ipv4.tcp_keepalive_intvl = 75<br><span class="hljs-comment"># 探测失败次数</span><br>net.ipv4.tcp_keepalive_probes = 3<br><span class="hljs-comment"># 建立链接后的多长时间开始发送探测包</span><br>net.ipv4.tcp_keepalive_time = 1200<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>2.尽早关闭关闭失败的链接链接。<br>由于手机网络不是很稳定，会经常出现网络闪断的情况，当server端发现client端很久没有心跳，那我就得将该链接回收。由于Client端已经不可达，那server端链接会处在FIN-WAIT-1。这个时候该tcp链接已经是一个孤儿链接，也就是说它已经不属于任何一个进程。在不可达的情况下，它会默认发送9次，重试8次。由于该状态是非常占用资源的最大可占用64KB。所以我们得尽快让这个链接从FIN-WAIT-1中解放出来：</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_orphan_retries=1<br></code></pre></td></tr></table></figure>
+<ul>
+<li>3.快速释放FIN-WAIT-2，虽然该状态没有FIN-WAIT-1那么耗资源。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_fin_timeout=30<br></code></pre></td></tr></table></figure></li>
+<li>4.开启TCP syncookies，防止DDOS攻击<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_syncookies = 1<br></code></pre></td></tr></table></figure></li>
+<li>5.syn报文（每个报文都需要排队）队列长度，超过该长度，请求就被丢弃，内存大于128M的默认为1024<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_max_syn_backlog = 65536<br></code></pre></td></tr></table></figure></li>
+<li>6.每个网络接口接收数据包的速率比内核处理这些包的速率快时，允许送到队列的数据包的最大数目<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.core.netdev_max_backlog = 32768<br></code></pre></td></tr></table></figure></li>
+<li>7.定义了系统中每一个端口最大的监听队列的长度,这是个全局的参数<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.core.somaxconn = 32768  <br></code></pre></td></tr></table></figure></li>
+<li>8.是否启用时间戳选项，该选项会影响net.ipv4.tcp_tw_reuse，默认开启<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_timestamps = 1<br></code></pre></td></tr></table></figure></li>
+<li>9.是否快速回收处于TIME_WAIT状态下的socket，由于手机网络时间戳会出现乱跳，所以必须关闭，这个默认关闭。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_tw_recycle = 0<br></code></pre></td></tr></table></figure></li>
+<li>10.被动接受tcp链接时，第二次握手发送SYNACKs的次数，默认为5，对应的时间大概为180秒，官方说法。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_synack_retries = 3<br></code></pre></td></tr></table></figure></li>
+<li>11.跟上面刚好相反，是主动发起tcp链接，发送SYNs的次数，默认为5，对应的时间大概为180秒，官方时间。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_syn_retries = 3<br></code></pre></td></tr></table></figure></li>
+<li>12.我们关闭了TIME_WAIT快速回收，我们通过tcp_tw_reuse和tcp_max_tw_buckets来控制TIME_WAIT避免吃光机器，该值默认180000.<br>如果服务器是作为客户端存在的，因为客户端连接受本地端口数限制，所以最好通过tcp_max_tw_buckets控制一下；如果服务器是作为服务端存在的，那么没有端口数的限制，只要情况允许，最好把tcp_max_tw_buckets设置大一些。纯粹就是防御dos攻击的，最好别认为降低该值。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_max_tw_buckets=180000<br></code></pre></td></tr></table></figure></li>
+<li>13.开启处于TIME_WAIT态的socket重用，默认关闭。这个重用的是TIME_WAIT的端口，不是内存等，这个对客户端有意义。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_tw_reuse=1<br></code></pre></td></tr></table></figure></li>
+<li>14.确定TCP栈如何使用内存，当大于上限是报文将丢弃。一般按照缺省值分配，上面的例子就是读写均为8KB，共16KB</li>
+</ul>
+<p>1.6GB TCP内存能容纳的连接数，约为  1600MB/16KB = 100K = 10万<br>4.0GB TCP内存能容纳的连接数，约为  4000MB/16KB = 250K = 25万</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_mem = 786432 2097152 3145728<br></code></pre></td></tr></table></figure>
+<ul>
+<li>15.表示如果套接字由本端要求关闭，这个参数决定了它保持在FIN-WAIT-2状态的时间，2.2中默认180秒，之后默认为60秒  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_fin_timeout=30<br></code></pre></td></tr></table></figure></li>
+<li>16.丢弃已经建立的tcp链接之前，需要多少次重试，默认15次，根据RTO的值，大概13-30分钟<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_retries2=5<br></code></pre></td></tr></table></figure></li>
+<li>17.放弃回应一个tcp连接请求之前，需要多少次重试，默认为3<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_retries1=3<br></code></pre></td></tr></table></figure></li>
+<li>18.收包速度大于内核处理包的速度时，输入队列最大报文数<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.core.netdev_max_backlog =  32768<br></code></pre></td></tr></table></figure></li>
+<li>19.listen系统调用，最大的accept队列长度，超过该值时，后续请求被丢弃<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.core.somaxconn=32768<br></code></pre></td></tr></table></figure></li>
+<li>20.针对孤立的socket（已经从进程上下文中删除，可是还有些清理工作没有完成），我们重试的最大次数。也就是server端close之后发[F.]的次数-1（0会重试一次），重负载服务器建议调小，默认为7。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">net.ipv4.tcp_orphan_retries=1<br></code></pre></td></tr></table></figure></li>
+</ul>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/04/06/%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;06&#x2F;%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;06&#x2F;%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2019/04/15/iptables/"><i class="iconfont iconleft"></i>iptables</a>
+    <a href="/2019/03/27/%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93/">使用Graphite小结<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-SIP%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%89%B9%E6%80%A7"><span class="toc-text">1.SIP连接的特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9B%B4%E6%94%B9%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E9%99%90%E5%88%B6"><span class="toc-text">2.更改文件描述符限制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E6%9B%B4%E6%94%B9%E9%BB%98%E8%AE%A4%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E9%99%90%E5%88%B6%E5%80%BC"><span class="toc-text">2.1更改默认文件描述符限制值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-iptables%E9%99%90%E5%88%B6%E5%92%8CTCP%E8%B0%83%E4%BC%98%E5%8F%8C%E7%AE%A1%E9%BD%90%E4%B8%8B"><span class="toc-text">3.iptables限制和TCP调优双管齐下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E8%AF%AF%E6%89%93%E8%AF%AF%E6%92%9E%E7%9A%84%E6%89%BE%E5%88%B0%E9%97%AE%E9%A2%98"><span class="toc-text">3.1误打误撞的找到问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E4%BD%BF%E7%94%A8iptables%E9%99%90%E5%88%B6%E8%AF%B7%E6%B1%82"><span class="toc-text">2.2使用iptables限制请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E5%8A%A8%E6%80%81%E9%99%90%E5%88%B6%E8%AF%B7%E6%B1%82"><span class="toc-text">2.3动态限制请求</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-TCP%E8%B0%83%E4%BC%98"><span class="toc-text">3.TCP调优</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-SIP%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%89%B9%E6%80%A7"><span class="toc-text">1.SIP连接的特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9B%B4%E6%94%B9%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E9%99%90%E5%88%B6"><span class="toc-text">2.更改文件描述符限制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E6%9B%B4%E6%94%B9%E9%BB%98%E8%AE%A4%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E9%99%90%E5%88%B6%E5%80%BC"><span class="toc-text">2.1更改默认文件描述符限制值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-iptables%E9%99%90%E5%88%B6%E5%92%8CTCP%E8%B0%83%E4%BC%98%E5%8F%8C%E7%AE%A1%E9%BD%90%E4%B8%8B"><span class="toc-text">3.iptables限制和TCP调优双管齐下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E8%AF%AF%E6%89%93%E8%AF%AF%E6%92%9E%E7%9A%84%E6%89%BE%E5%88%B0%E9%97%AE%E9%A2%98"><span class="toc-text">3.1误打误撞的找到问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E4%BD%BF%E7%94%A8iptables%E9%99%90%E5%88%B6%E8%AF%B7%E6%B1%82"><span class="toc-text">2.2使用iptables限制请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E5%8A%A8%E6%80%81%E9%99%90%E5%88%B6%E8%AF%B7%E6%B1%82"><span class="toc-text">2.3动态限制请求</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-TCP%E8%B0%83%E4%BC%98"><span class="toc-text">3.TCP调优</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

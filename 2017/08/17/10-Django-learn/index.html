@@ -1,0 +1,505 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Django入门的笔记 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="python文档入门的笔记，也就是创建一个投票应用那个...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Django入门的笔记</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Django入门的笔记</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 17, 2017</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5971</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <p>python文档入门的笔记，也就是创建一个投票应用那个，后面的文档就只看，没记了</p>
+        <h1 id="Django学习笔记"><a href="#Django学习笔记" class="headerlink" title="Django学习笔记"></a>Django学习笔记</h1><h2 id="1-前期准备"><a href="#1-前期准备" class="headerlink" title="1. 前期准备"></a>1. 前期准备</h2><ul>
+<li>使用虚拟环境Virtualenv<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> pip install Virtualenv    <span class="hljs-comment">#安装Virtualenv</span></span><br><span class="hljs-meta">#</span><span class="bash">在要运行Django的目录创建 虚拟环境</span><br><span class="hljs-meta">   $</span><span class="bash"> virtualenv  djangoproject_env      <span class="hljs-comment">#运行后在当前目录生成djangoproject_env</span></span><br><span class="hljs-meta">   $</span><span class="bash"> <span class="hljs-built_in">source</span> djangoproject_env/bin/activate   <span class="hljs-comment">#启动虚拟环境</span></span><br><span class="hljs-meta">$</span><span class="bash"> django-admin startproject testproject    <span class="hljs-comment">#创建Django工程</span></span><br><span class="hljs-meta">$</span><span class="bash"> python manage.py runserver  <span class="hljs-comment">#进行测试</span></span><br><span class="hljs-meta">$</span><span class="bash"> python manage.py startapp testapp <span class="hljs-comment">#创建Django应用</span></span><br></code></pre></td></tr></table></figure>
+Django 默认的语言是英语，所以显示给我们的欢迎页面是英文的。我们在 Django 的配置文件里稍作修改，让它支持中文。用任何一个文本编辑器打开 settings.py 文件，找到如下的两行代码：<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs vala">blogproject/blogproject/settings.py<br><br><span class="hljs-meta">## 其它配置代码...</span><br><br>LANGUAGE_CODE = <span class="hljs-string">&#x27;en-us&#x27;</span><br>TIME_ZONE = <span class="hljs-string">&#x27;UTC&#x27;</span><br><br><span class="hljs-meta">## 其它配置代码...</span><br></code></pre></td></tr></table></figure>
+把 LANGUAGE_CODE 的值改为 zh-hans，TIME_ZONE 的值改为 Asia/Shanghai：<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs vala">blogproject/blogproject/settings.py<br><br><span class="hljs-meta">## 其它配置代码...</span><br><br><span class="hljs-meta"># 把英文改为中文</span><br>LANGUAGE_CODE = <span class="hljs-string">&#x27;zh-hans&#x27;</span><br><br><span class="hljs-meta"># 把国际时区改为中国时区</span><br>TIME_ZONE = <span class="hljs-string">&#x27;Asia/Shanghai&#x27;</span><br><br><span class="hljs-meta">## 其它配置代码...</span><br></code></pre></td></tr></table></figure>
+寻找一个学习文章，英文有点渣，我就找中文的，英文看不懂的就切中文看<br><a target="_blank" rel="noopener" href="http://python.usyiyi.cn/translate/django_182/index.html">中文文档</a>  <a target="_blank" rel="noopener" href="https://docs.djangoproject.com/en/1.11/">原版英本文档</a></li>
+</ul>
+<h2 id="2-笔记（按目录分）"><a href="#2-笔记（按目录分）" class="headerlink" title="2.笔记（按目录分）"></a>2.笔记（按目录分）</h2><h3 id="1-编写你的第一个Django应用，第1部分"><a href="#1-编写你的第一个Django应用，第1部分" class="headerlink" title="1.编写你的第一个Django应用，第1部分"></a>1.编写你的第一个Django应用，第1部分</h3><p>运行django-admin startproject mysite后会生成如下文件夹或文件</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-tag">mysite</span>/<br>    <span class="hljs-selector-tag">manage</span><span class="hljs-selector-class">.py</span><br>    <span class="hljs-selector-tag">mysite</span>/<br>        __<span class="hljs-selector-tag">init__</span><span class="hljs-selector-class">.py</span><br>        <span class="hljs-selector-tag">settings</span><span class="hljs-selector-class">.py</span><br>        <span class="hljs-selector-tag">urls</span><span class="hljs-selector-class">.py</span><br>        <span class="hljs-selector-tag">wsgi</span><span class="hljs-selector-class">.py</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li>外层的mysite/根目录仅仅是项目的一个容器。它的命名对Django无关紧要；</li>
+<li>manage.py：一个命令行工具，可以使你用多种方式对Django项目进行交互。</li>
+<li>内层的mysite/目录是你的项目的真正的Python包。它是你导入任何东西时将需要使用的Python包的名字（例如 mysite.urls）。</li>
+<li>mysite/<strong>init</strong>.py：一个空文件，它告诉Python这个目录应该被看做一个Python包。</li>
+<li>mysite/settings.py：该Django 项目的设置/配置。</li>
+<li>mysite/urls.py：该Django项目的URL声明；你的Django站点的“目录”。</li>
+<li>mysite/wsgi.py：用于你的项目的与WSGI兼容的Web服务器入口。</li>
+</ul>
+<blockquote>
+<p>项目 vs. 应用<br>项目和应用之间有什么不同？ 应用是一个Web应用程序，它完成具体的事项 —— 比如一个博客系统、一个存储公共档案的数据库或者一个简单的投票应用。 项目是一个特定网站中相关配置和应用的集合。一个项目可以包含多个应用。一个应用可以运用到多个项目中去。<br>如上面所创建的mysite就是一个项目</p>
+</blockquote>
+<p>运行： python manage.py startapp polls<br>生成如下结构：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-tag">polls</span>/<br>    __<span class="hljs-selector-tag">init__</span><span class="hljs-selector-class">.py</span><br>    <span class="hljs-selector-tag">admin</span><span class="hljs-selector-class">.py</span><br>    <span class="hljs-selector-tag">migrations</span>/<br>        __<span class="hljs-selector-tag">init__</span><span class="hljs-selector-class">.py</span><br>    <span class="hljs-selector-tag">models</span><span class="hljs-selector-class">.py</span><br>    <span class="hljs-selector-tag">tests</span><span class="hljs-selector-class">.py</span><br>    <span class="hljs-selector-tag">views</span><span class="hljs-selector-class">.py</span><br></code></pre></td></tr></table></figure>
+<p>这样的结构就是我们的polls应用，这个应用可以放在任何python path里</p>
+<p>总结：实现模型变更的步骤</p>
+<ul>
+<li>修改你的模型（在models.py文件中）。 </li>
+<li>激活模型<br> 编辑mysite/settings.py文件，并修改INSTALLED_APPS设置以包含字符串’polls’<br> 现在Django知道要包含polls应用。 让我们运行另外一个命令：$ python manage.py makemigrations polls</li>
+<li>运行python manage.py makemigrations ，为这些修改创建迁移文件</li>
+<li>运行python manage.py migrate ，将这些改变更新到数据库中。</li>
+</ul>
+<h3 id="2-编写你的第一个Django应用，第2部分"><a href="#2-编写你的第一个Django应用，第2部分" class="headerlink" title="2.编写你的第一个Django应用，第2部分"></a>2.编写你的第一个Django应用，第2部分</h3><p>创建一个管理员用户¶</p>
+<blockquote>
+<p>首先，我们需要创建一个能够登录管理站点的用户。 运行如下命令：<br>$ python manage.py createsuperuser<br>键入你想要使用的用户名，然后按下回车键：<br>Username: admin<br>然后提示你输入想要使用的邮件地址：<br>Email address: <a href="mailto:&#x61;&#100;&#x6d;&#x69;&#110;&#x40;&#x65;&#120;&#x61;&#x6d;&#x70;&#x6c;&#x65;&#x2e;&#99;&#111;&#x6d;">&#x61;&#100;&#x6d;&#x69;&#110;&#x40;&#x65;&#120;&#x61;&#x6d;&#x70;&#x6c;&#x65;&#x2e;&#99;&#111;&#x6d;</a><br>你需要输入两次密码，第二次输入是确认密码<br>Password:<br>Password (again):<br>Superuser created successfully.</p>
+</blockquote>
+<p>其中，django会自动检测密码，密码跟邮箱或者用户名太像也不会通过。。。</p>
+<p>在polls/admin.py中，代码示例如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> django.contrib <span class="hljs-keyword">import</span> admin<br><br><span class="hljs-keyword">from</span> .models <span class="hljs-keyword">import</span> Choice, Question<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ChoiceInline</span>(<span class="hljs-params">admin.StackedInline</span>):</span>   <span class="hljs-comment">#若是使用：admin.TabularInline则选项是紧凑型</span><br>    model = Choice            <br>    extra = <span class="hljs-number">3</span>        <span class="hljs-comment">#默认3个选项，可以自己增加，但最小为3个可以填写</span><br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">QuestionAdmin</span>(<span class="hljs-params">admin.ModelAdmin</span>):</span><br>    fields = [<span class="hljs-string">&#x27;pub_date&#x27;</span>, <span class="hljs-string">&#x27;question_text&#x27;</span>]    <span class="hljs-comment">#再同一个框</span><br>    fieldsets = [                                      <span class="hljs-comment">#非同一个框，且可以用classed方法来操作这个框</span><br>        (<span class="hljs-literal">None</span>,               &#123;<span class="hljs-string">&#x27;fields&#x27;</span>: [<span class="hljs-string">&#x27;question_text&#x27;</span>]&#125;),<br>        (<span class="hljs-string">&#x27;Date information&#x27;</span>, &#123;<span class="hljs-string">&#x27;fields&#x27;</span>: [<span class="hljs-string">&#x27;pub_date&#x27;</span>], <span class="hljs-string">&#x27;classes&#x27;</span>: [<span class="hljs-string">&#x27;collapse&#x27;</span>]&#125;),<br>    ]<br>    inlines = [ChoiceInline]            <span class="hljs-comment">#在创建Question对象的同时可以直接添加一组Choice将会更好</span><br>   list_display = (<span class="hljs-string">&#x27;question_text&#x27;</span>, <span class="hljs-string">&#x27;pub_date&#x27;</span>, <span class="hljs-string">&#x27;was_published_recently&#x27;</span>)    <span class="hljs-comment">#表可以分类显示</span><br>   list_filter = [<span class="hljs-string">&#x27;pub_date&#x27;</span>]    <span class="hljs-comment">#右边增加一个选项栏可以来操作</span><br>   <br>admin.site.register(Question, QuestionAdmin)                 <span class="hljs-comment">#注册question到QuestionAdmin</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-编写你的第一个Django应用，第3部分"><a href="#3-编写你的第一个Django应用，第3部分" class="headerlink" title="3.编写你的第一个Django应用，第3部分"></a>3.编写你的第一个Django应用，第3部分</h3><ul>
+<li>创建视图<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#polls/views.py</span><br><span class="hljs-keyword">from</span> django.http <span class="hljs-keyword">import</span> HttpResponse<br></code></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<pre><code>def index(request):
+    return HttpResponse(&quot;Hello, world. You&#39;re at the polls index.&quot;)
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python">这就是一个视图，然而我们需要将这个视图映射到URL上 —— 利用一个URLconf。<br>要在polls目录中创建一个URLconf，创建一个名为urls.py的文件<br>```python<br><span class="hljs-comment">#polls/urls.py</span><br><span class="hljs-keyword">from</span> django.conf.urls <span class="hljs-keyword">import</span> url<br><br><span class="hljs-keyword">from</span> . <span class="hljs-keyword">import</span> views<br><br>urlpatterns = [<br>url(<span class="hljs-string">r&#x27;^$&#x27;</span>, views.index, name=<span class="hljs-string">&#x27;index&#x27;</span>),<br>    ]<br></code></pre></td></tr></table></figure>
+下一步，让主URLconf可以链接到polls.urls模块。在mysite/urls.py中插入一个include()：
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#mysite/urls.py</span><br><span class="hljs-keyword">from</span> django.conf.urls <span class="hljs-keyword">import</span> include, url<br><span class="hljs-keyword">from</span> django.contrib <span class="hljs-keyword">import</span> admin<br><br>urlpatterns = [<br>    url(<span class="hljs-string">r&#x27;^polls/&#x27;</span>, include(<span class="hljs-string">&#x27;polls.urls&#x27;</span>)),<br>    url(<span class="hljs-string">r&#x27;^admin/&#x27;</span>, include(admin.site.urls)),<br>]<br></code></pre></td></tr></table></figure>
+这样处理后就能在输入对应网址时跳转到对应的视图（[关于URL的更多参数][3]）
+</code></pre>
+<ul>
+<li><p>模板编辑<br>模板应该位于 polls/templates/polls/index.html。由于app_directories 模板加载器按照上面描述的方式工作，在Django中你可以简单地用polls/index.html引用这个模板,不这样做Python会引用到别的模板。<br>因为django将选择它找到的名字匹配的第一个模板文件，如果你在不同 的应用有相同名字的模板文件，Django将不能区分它们。我们需要将Django指向正确的模板，最简单的方式是使用命名空间。具体实现方式是，将这些模板文件放在以应用的名字来命名的另一个目录下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment">#polls/views.py</span><br><span class="hljs-keyword">from</span> django.http <span class="hljs-keyword">import</span> HttpResponse<br><span class="hljs-keyword">from</span> django.template <span class="hljs-keyword">import</span> RequestContext, loader<br><br><span class="hljs-keyword">from</span> .models <span class="hljs-keyword">import</span> Question<br></code></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<pre><code>def index(request):
+    latest_question_list = Question.objects.order_by(&#39;-pub_date&#39;)[:5]
+    template = loader.get_template(&#39;polls/index.html&#39;)
+    context = RequestContext(request, &#123;
+        &#39;latest_question_list&#39;: latest_question_list,
+    &#125;)
+    return HttpResponse(template.render(context))
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><br>在这个栗子中，中文版的原文已经做了如下阐述：<br>&gt; 以上的代码载入polls<span class="hljs-regexp">/index.html模板，并传给它一个context。Context是一个字典，将模板变量的名字映射到Python 对象。将你的浏览器指向“/</span>polls/”来加载这个页面，你应该看到一个列表，包含来自教程<span class="hljs-number">1</span>中<span class="hljs-string">&quot;What&#x27;s up&quot;</span> Question。其链接指向Question的detail页面。<br>然而还是遇到了这个错误提示：<br></code></pre></td></tr></table></figure>
+TypeError: context must be a dict rather than RequestContext.
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs awk">    https:<span class="hljs-regexp">//</span>stackoverflow.com<span class="hljs-regexp">/questions/</span><span class="hljs-number">43787700</span>/django-<span class="hljs-number">1</span>-<span class="hljs-number">11</span>-typeerror-context-must-be-a-dict-rather-than-context<br>也说了是Django1.<span class="hljs-number">8</span>+后更改的问题<br>但是<span class="hljs-number">1.11</span>版教程是这样的：<br></code></pre></td></tr></table></figure>
+from django.http import HttpResponse
+from django.template import loader
+
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by(&#39;-pub_date&#39;)[:5]
+    template = loader.get_template(&#39;polls/index.html&#39;)
+    context = &#123;
+        &#39;latest_question_list&#39;: latest_question_list,
+    &#125;
+    return HttpResponse(template.render(context, request))
+```
+也就是，改为字典传入就好了，至于为什么，等学完看源代码再说了～
+</code></pre>
+<ul>
+<li>快捷方式以及404<a target="_blank" rel="noopener" href="http://python.usyiyi.cn/documents/django_182/intro/tutorial03.html#a-shortcut-render">跳转查看</a></li>
+</ul>
+<h3 id="4-编写你的第一个Django应用，第4，5-6部分"><a href="#4-编写你的第一个Django应用，第4，5-6部分" class="headerlink" title="4.编写你的第一个Django应用，第4，5,6部分"></a>4.编写你的第一个Django应用，第4，5,6部分</h3><p>看后觉得有点不知所以然- -，好像也没什么重地，笔记略过</p>
+<p>之后就开始撸文档了。。。。Django的文档好多啊    :(</p>
+<p>这是一张在网上找的图～<br><img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/1005320-20161029114328812-2116791249.png?raw=true" alt="enter description here"></p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2017/08/17/10-Django-learn/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;17&#x2F;10-Django-learn&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2017&#x2F;08&#x2F;17&#x2F;10-Django-learn&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2017/08/17/11-vim/"><i class="iconfont iconleft"></i>vim命令</a>
+    <a href="/2017/08/12/9_spider_by_weibo/">微博爬虫-发布微博以及获取微博资料<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Django%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0"><span class="toc-text">Django学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%89%8D%E6%9C%9F%E5%87%86%E5%A4%87"><span class="toc-text">1. 前期准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AC%94%E8%AE%B0%EF%BC%88%E6%8C%89%E7%9B%AE%E5%BD%95%E5%88%86%EF%BC%89"><span class="toc-text">2.笔记（按目录分）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC1%E9%83%A8%E5%88%86"><span class="toc-text">1.编写你的第一个Django应用，第1部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC2%E9%83%A8%E5%88%86"><span class="toc-text">2.编写你的第一个Django应用，第2部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC3%E9%83%A8%E5%88%86"><span class="toc-text">3.编写你的第一个Django应用，第3部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC4%EF%BC%8C5-6%E9%83%A8%E5%88%86"><span class="toc-text">4.编写你的第一个Django应用，第4，5,6部分</span></a></li></ol></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Django%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0"><span class="toc-text">Django学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%89%8D%E6%9C%9F%E5%87%86%E5%A4%87"><span class="toc-text">1. 前期准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AC%94%E8%AE%B0%EF%BC%88%E6%8C%89%E7%9B%AE%E5%BD%95%E5%88%86%EF%BC%89"><span class="toc-text">2.笔记（按目录分）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC1%E9%83%A8%E5%88%86"><span class="toc-text">1.编写你的第一个Django应用，第1部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC2%E9%83%A8%E5%88%86"><span class="toc-text">2.编写你的第一个Django应用，第2部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC3%E9%83%A8%E5%88%86"><span class="toc-text">3.编写你的第一个Django应用，第3部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%BC%96%E5%86%99%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AADjango%E5%BA%94%E7%94%A8%EF%BC%8C%E7%AC%AC4%EF%BC%8C5-6%E9%83%A8%E5%88%86"><span class="toc-text">4.编写你的第一个Django应用，第4，5,6部分</span></a></li></ol></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

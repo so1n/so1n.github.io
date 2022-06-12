@@ -1,0 +1,450 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>lgostash Pipeline - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="1.Logstash Pipelinepipeline...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">lgostash Pipeline</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">lgostash Pipeline</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 10, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7186</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="1-Logstash-Pipeline"><a href="#1-Logstash-Pipeline" class="headerlink" title="1.Logstash Pipeline"></a>1.Logstash Pipeline</h2><p>pipeline在logstash6.0后加入,有了pipeline这个机制后,我们可以只通过配置pipeline来控制logstash的input, filter, output</p>
+        <h3 id="1-1-logstash所在位置"><a href="#1-1-logstash所在位置" class="headerlink" title="1.1.logstash所在位置"></a>1.1.logstash所在位置</h3><p>目前很多都是使用beats收集各个项目的数据,并经过类似kafka等缓冲层,再由logstash接受处理数据再发到elastic(如下)<br>beats -&gt; [缓冲] -&gt;logstash -&gt; elasticsearch</p>
+<h3 id="1-2为何需要Pipeling"><a href="#1-2为何需要Pipeling" class="headerlink" title="1.2为何需要Pipeling"></a>1.2为何需要Pipeling</h3><ul>
+<li>条件地狱<br>在没有出现pipeline的时候,只能在input,filter,output配置多个if,else非常麻烦.<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">input &#123;<br>  beats &#123; port =&gt; 2333  tag =&gt; apache   &#125;<br>  beats &#123; port =&gt; 2233  tag =&gt; so1n   &#125;<br>&#125;<br>filter &#123;<br>   <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;apache&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    dissect &#123; ... &#125;<br>   &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;so1n&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    grok &#123; ... &#125;<br>   &#125;  <br>&#125;<br><span class="hljs-comment"># elasticsearch需要分别定义index等导致需要拆分</span><br>output &#123;<br>   <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;apache&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    elasticsearch &#123; ... &#125;<br>   &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;so1n&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    elasticsearch &#123; ... &#125;<br>   &#125;  <br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li>缺乏拥塞隔离<br>在logstash在同一段事件只能处理一件事情,效率比较低,当apache拥塞时,tag为so1n的数据无法被处理,会导致tag为 so1n的输入端压力也增加</li>
+</ul>
+<p>在pipeline没出现前可以通过在同一台机器上运行多个 Logstash 实例来解决，然后可以独立地管理这些实例。但是即使这样的解决方案也会产生其他问题,如:需要管理多个实例,每个 Logstash 的实例就会多出一个JVM,需要监视每个 Logstash 实例,而pipeline的出现就可以解决了这些问题</p>
+<h2 id="2-Pipeline使用场景"><a href="#2-Pipeline使用场景" class="headerlink" title="2.Pipeline使用场景"></a>2.Pipeline使用场景</h2><h3 id="2-1-Distributor-Pattern-分发者模式"><a href="#2-1-Distributor-Pattern-分发者模式" class="headerlink" title="2.1.Distributor Pattern 分发者模式"></a>2.1.Distributor Pattern 分发者模式</h3><p>在一个 pipeline 处理输入，然后根据不同的数据类型再分发到对应的 Pipeline 去处理。这种模式的好处在于统一输入端口，隔离不同类型的处理配置文件，减少由于配置文件混合在一起带来的维护成本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># /etc/logstash/pipelines.yml</span><br>- pipeline.id: main<br>  config.string: |<br>    input &#123; beats &#123; port =&gt; 2333 &#125; &#125;<br>    output &#123;<br>        <span class="hljs-keyword">if</span> [<span class="hljs-built_in">type</span>] == apache &#123;<br>          pipeline &#123; send_to =&gt; apache &#125;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> [<span class="hljs-built_in">type</span>] == system &#123;<br>          pipeline &#123; send_to =&gt; syslog &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          pipeline &#123; send_to =&gt; so1n &#125;<br>        &#125;<br>    &#125;<br>- pipeline.id: apache-processing<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; apache &#125; &#125;<br>    filter &#123;<br>       <span class="hljs-comment"># ...</span><br>    &#125;<br>    output &#123;<br>      elasticsearch &#123; hosts =&gt; [es] &#125;<br>    &#125;<br>- pipeline.id: syslog-processing<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; syslog &#125; &#125;<br>    filter &#123;<br>       <span class="hljs-comment"># ...</span><br>    &#125;<br>    output &#123;<br>      pipeline &#123; send_to =&gt; es &#125;<br>    &#125;<br>- pipeline.id: so1n-processing<br>    config.string: |<br>    input &#123; pipeline &#123; address =&gt; so1n &#125; &#125;<br>    output &#123; <br>      pipeline &#123; send_to =&gt; es &#125;<br>    &#125;<br>- pipeline.id: es<br>    config.string: |<br>    input &#123; pipeline &#123;address =&gt; es &#125; &#125;<br>    output &#123;<br>      elasticsearch &#123; ... &#125;<br>    &#125;<br></code></pre></td></tr></table></figure>
+<h3 id="2-2-Output-Isolator-Pattern-输出隔离模式"><a href="#2-2-Output-Isolator-Pattern-输出隔离模式" class="headerlink" title="2.2.Output Isolator Pattern 输出隔离模式"></a>2.2.Output Isolator Pattern 输出隔离模式</h3><p> Logstash 的一个 pipeline 可以配置多个 output，但是一旦某一个 output 出问题，会导致另一个 output 也无法处理新数据。而通过输出隔离模式可以完美解决这个问题。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># /etc/logstash/pipelines.yml</span><br>- pipeline.id: main<br>  config.string: |<br>    input &#123; beats &#123; port =&gt; 2333 &#125; &#125;<br>    output &#123; pipeline &#123; send_to =&gt; [es1, es2] &#125; &#125;<br>- pipeline.id: es1<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; es1 &#125; &#125;<br>    output &#123; elasticsearch &#123; &#125; &#125;<br>- pipeline.id: es2<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; es2 &#125; &#125;<br>    output &#123; elasticsearch &#123; &#125; &#125;<br></code></pre></td></tr></table></figure>
+<p>通过输出到两个独立的 pipeline，解除es1和es2的相互的影响，比如 es1 出问题的时候，es2 依然可以正常处理数据，而且两个 pipeline 可以配置独立的队列来保障数据的完备性.</p>
+<p>此外,如果把上面的输出改为filter,那么就可以把同一分输入数据克隆成两份,并分发给不通的filter进行处理输出.</p>
+<h3 id="2-3Collector-Pattern-收集者模式"><a href="#2-3Collector-Pattern-收集者模式" class="headerlink" title="2.3Collector Pattern 收集者模式"></a>2.3Collector Pattern 收集者模式</h3><p>这个模式很简单,就是把不同地方的数据收集过来,并一起解析输出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># /etc/logstash/pipelines.yml</span><br>- pipeline.id: beats<br>  config.string: |<br>    input &#123; beats &#123; port =&gt; 2333 &#125; &#125;<br>    output &#123; pipeline &#123; send_to =&gt; [so1n] &#125; &#125;<br>- pipeline.id: kafka<br>  config.string: |<br>    input &#123; kafka &#123; ... &#125; &#125;<br>    output &#123; pipeline &#123; send_to =&gt; [so1n] &#125; &#125;<br>- pipeline.id: so1n<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; so1n &#125; &#125;<br>    filter &#123;<br>      <span class="hljs-comment"># ...</span><br>    &#125;<br>    output &#123; elasticsearch &#123; &#125; &#125;<br></code></pre></td></tr></table></figure>
+<h2 id="3-如何更好的搭配使用"><a href="#3-如何更好的搭配使用" class="headerlink" title="3.如何更好的搭配使用"></a>3.如何更好的搭配使用</h2><p>上面多种模式其实都很简单,官方定义了这些模式也就是跟大家说 可以灵活的编写配置文件,通过pipeline可以更好的解耦和复用,如何使用还是看实际的使用场景<br>目前很多人用了beats -&gt; [缓冲] -&gt;logstash -&gt; elasticsearch这种结构,那我们可以利用beats中的metadate特性来创建es的index,让所有的输出都可以输出到同一个es,其他的只要编辑filter就可以了,如果 公司里大部分业务数据命名是差不多的,可能只有一点点不太一样,那也可以合并到一个filter,不必去写更多的filter</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs bash">- pipeline.id: beats-server<br>  config.string: |<br>    input &#123; beats &#123; port =&gt; 5044 &#125; &#125;<br>    output &#123;<br>      <span class="hljs-keyword">if</span> [fields][custom_field] == <span class="hljs-string">&quot;so1n1&quot;</span> &#123;<br>        pipeline &#123; send_to =&gt; so1n &#125;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> [fields][custom_field] == <span class="hljs-string">&quot;so1n2&quot;</span> &#123;<br>        pipeline &#123; send_to =&gt; so1n &#125;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> [fields][custom_field] == <span class="hljs-string">&quot;other&quot;</span> &#123;<br>        pipeline &#123; send_to =&gt; other &#125;<br>      &#125;<br>    &#125;<br><br>- pipeline.id : so1n<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; so1n &#125; &#125; <br>    filter &#123;<br>      json &#123;<br>        <span class="hljs-built_in">source</span> =&gt; <span class="hljs-string">&quot;json_dumps&quot;</span><br>      &#125;<br>      geoip &#123;<br>        <span class="hljs-built_in">source</span> =&gt; <span class="hljs-string">&quot;clientip&quot;</span><br>      &#125; <br>    &#125;<br>    output &#123; pipeline &#123; send_to =&gt; es &#125;&#125;<br><br>- pipeline.id : other<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; other &#125; &#125; <br>    filter &#123;<br>      <span class="hljs-comment"># ....</span><br>    &#125;<br>    output &#123; pipeline &#123; send_to =&gt; es &#125;&#125;<br><br>- pipeline.id: es<br>  config.string: |<br>    input &#123; pipeline &#123; address =&gt; es &#125;&#125;<br>    output &#123;<br>      elasticsearch &#123;<br>        hosts =&gt; [....]<br>        index =&gt; <span class="hljs-string">&quot;%&#123;[@metadata][beat]&#125;-%&#123;+YYYY.MM.dd&#125;&quot;</span><br>      &#125;<br>    &#125;<br><br></code></pre></td></tr></table></figure>
+<h2 id="4-queue-让logstash优雅关闭"><a href="#4-queue-让logstash优雅关闭" class="headerlink" title="4.queue 让logstash优雅关闭"></a>4.queue 让logstash优雅关闭</h2><p>默认情况下logstash会将在处在pipeline各个stage的event buffer在内存中, 这种buffer方式,在logstash意外down掉的情况下会丢失数据,因此引入了Persisted queue这个用来持久化数据,防止logstash  down掉时数据丢失.</p>
+<h3 id="4-1queue位置"><a href="#4-1queue位置" class="headerlink" title="4.1queue位置"></a>4.1queue位置</h3><p>queue的位置示意: input → queue → filter + output</p>
+<p>当event从input写到queue成功后, 会发送ack给给数据源,会把数据写入本地文件, 当对应的filter和output都处理完event后,该event才会被标记为acknowleged/ACKed,并把对应数据从本地文件删除, 比如, 当grok完后,并发送个ES收到成功响应后, event才会被标记为成功处理.如果logstash意外down机, 那些未被标记为ACKed的事件会被重新处理.</p>
+<h3 id="4-2-queue参数"><a href="#4-2-queue参数" class="headerlink" title="4.2 queue参数"></a>4.2 queue参数</h3><ul>
+<li><strong>queue.type: persisted</strong>  persisted为持久化数据,默认是写入到内存</li>
+<li><strong>path.queue: /usr/share/logstash/data</strong>  队列存储路径；如果队列类型为persisted时生效</li>
+<li><strong>queue.page_capacity: 250mb</strong> 队列为持久化，单个队列大小</li>
+<li><strong>queue.max_events: 0</strong>  当启用持久化队列时，队列中未读事件的最大数量，0为不限制</li>
+<li>**queue.max_bytes: 1024mb **队列最大容量</li>
+<li>**queue.checkpoint.writes: 1024 **在启用持久队列时强制执行检查点之前的最大数量的写入事件，0为不限制</li>
+<li>**queue.checkpoint.interval: 1000 **当启用持久队列时，在头页面上强制一个检查点的时间间隔</li>
+<li><strong>queue.drain:</strong>  指示logstash在关闭之前是否需要将queue中的数据处理. 一般queue不大且堆积的event数量不大的情况下可以开启, 不然耗时时间会太长</li>
+</ul>
+<h2 id="5-pipeline吞吐量优化"><a href="#5-pipeline吞吐量优化" class="headerlink" title="5.pipeline吞吐量优化"></a>5.pipeline吞吐量优化</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">pipeline.workers: 8        <span class="hljs-comment"># pipeline线程数，官方建议是等于CPU内核数,命令行参数为-w</span><br>pipeline.output.workers: 8 <span class="hljs-comment"># 实际output时的线程数</span><br>pipeline.batch.size: 3000  <span class="hljs-comment"># 默认为125,当存入的事件数大于该值时则发送数据</span><br>pipeline.batch.delay: 5    <span class="hljs-comment"># 每隔一段时间,发送数据</span><br></code></pre></td></tr></table></figure>
+<p>pipeline的配置没有queue那么多,同时上面两个线程数的基本可以不用配置,只关注后两个pipeline.batch*相关的参数即可.这两个参数只要其中一个满足就调用es的api接口发送数据到es.<br>根据自己的实时性去调节两个数字的大小,如果发现es写入有瓶颈,可以调大两个参数.<br>其中发现是否写入瓶颈可以如下操作:</p>
+<ul>
+<li>查看logstash是否有retrying failed action with response code: 429字样的日志</li>
+<li>查看es, 可以在kibanan的控制台输入<code>GET _nodes/stats/thread_pool?pretty</code>,看node -&gt; thread_pool -&gt; bulk 查看threads和active,active越接近threads则证明越接近写入瓶颈</li>
+</ul>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/02/10/logstash%20Pipeline/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;02&#x2F;10&#x2F;logstash%20Pipeline&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;02&#x2F;10&#x2F;logstash%20Pipeline&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logstash/" rel="tag">Logstash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag">中间件</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/02/26/2020plan/"><i class="iconfont iconleft"></i>2020plan</a>
+    <a href="/2019/12/16/Python%E7%9A%84Dict%E5%AE%9E%E7%8E%B0/">Python的Dict实现<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Logstash-Pipeline"><span class="toc-text">1.Logstash Pipeline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-logstash%E6%89%80%E5%9C%A8%E4%BD%8D%E7%BD%AE"><span class="toc-text">1.1.logstash所在位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81Pipeling"><span class="toc-text">1.2为何需要Pipeling</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Pipeline%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">2.Pipeline使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Distributor-Pattern-%E5%88%86%E5%8F%91%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.1.Distributor Pattern 分发者模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Output-Isolator-Pattern-%E8%BE%93%E5%87%BA%E9%9A%94%E7%A6%BB%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.2.Output Isolator Pattern 输出隔离模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3Collector-Pattern-%E6%94%B6%E9%9B%86%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.3Collector Pattern 收集者模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%A6%82%E4%BD%95%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%90%AD%E9%85%8D%E4%BD%BF%E7%94%A8"><span class="toc-text">3.如何更好的搭配使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-queue-%E8%AE%A9logstash%E4%BC%98%E9%9B%85%E5%85%B3%E9%97%AD"><span class="toc-text">4.queue 让logstash优雅关闭</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1queue%E4%BD%8D%E7%BD%AE"><span class="toc-text">4.1queue位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-queue%E5%8F%82%E6%95%B0"><span class="toc-text">4.2 queue参数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-pipeline%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%8C%96"><span class="toc-text">5.pipeline吞吐量优化</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Logstash-Pipeline"><span class="toc-text">1.Logstash Pipeline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-logstash%E6%89%80%E5%9C%A8%E4%BD%8D%E7%BD%AE"><span class="toc-text">1.1.logstash所在位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81Pipeling"><span class="toc-text">1.2为何需要Pipeling</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Pipeline%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">2.Pipeline使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Distributor-Pattern-%E5%88%86%E5%8F%91%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.1.Distributor Pattern 分发者模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Output-Isolator-Pattern-%E8%BE%93%E5%87%BA%E9%9A%94%E7%A6%BB%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.2.Output Isolator Pattern 输出隔离模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3Collector-Pattern-%E6%94%B6%E9%9B%86%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="toc-text">2.3Collector Pattern 收集者模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%A6%82%E4%BD%95%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%90%AD%E9%85%8D%E4%BD%BF%E7%94%A8"><span class="toc-text">3.如何更好的搭配使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-queue-%E8%AE%A9logstash%E4%BC%98%E9%9B%85%E5%85%B3%E9%97%AD"><span class="toc-text">4.queue 让logstash优雅关闭</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1queue%E4%BD%8D%E7%BD%AE"><span class="toc-text">4.1queue位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-queue%E5%8F%82%E6%95%B0"><span class="toc-text">4.2 queue参数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-pipeline%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%8C%96"><span class="toc-text">5.pipeline吞吐量优化</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

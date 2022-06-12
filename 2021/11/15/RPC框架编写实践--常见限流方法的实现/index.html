@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>RPC框架编写实践-RPC常见限流方法的实现 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记在微服务中， 虽然服务间的调用都是可信的， 但是服...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">RPC框架编写实践-RPC常见限流方法的实现</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2021/12/ca851690f268cb53.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">RPC框架编写实践-RPC常见限流方法的实现</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 15, 2021</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>15808</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在微服务中， 虽然服务间的调用都是可信的， 但是服务端也需要堤防一些流量， 防止被意外的流量击垮， 而通过限流可以防止问题的发生。此外， 使用不同的限流规则还能根据系统间不同服务的请求进行限制， 解决某个函数被频繁调用而拖垮整个系统的问题。</p>
+<blockquote>
+<p>NOTE: 虽然本文是在编写RPC框架有感而发， 但是也适用于常见的Web服务等有流量进出的场景。</p>
+</blockquote>
+<h2 id="1-限流的简介"><a href="#1-限流的简介" class="headerlink" title="1 限流的简介"></a>1 限流的简介</h2><h3 id="1-1-限流的作用和场景"><a href="#1-1-限流的作用和场景" class="headerlink" title="1.1 限流的作用和场景"></a>1.1 限流的作用和场景</h3><p>对于后端服务来说， 他们提供的服务都有一个极限的QPS(除代码逻辑外，也跟机器配置有关)， 当服务端的压力超过这个极限值的时候， 服务端的响应性能就会快速的下降, 然后无法提供服务， 所以服务端需要一个类似于可以限制请求数的功能， 使服务端能牺牲掉部分请求， 保证还能处理一定量的请求， 防止服务端出现压力瓶颈，无法处理所有请求。 </p>
+<p>不过这个功能还需要尽量的智能， 在设计时可以根据流量场景不同来做有差别的限制， 使其在不影响其它请求的情况下， 实现部分请求的网络流量整形， 达到减少系统资源消耗的效果， 常见的几种需要做差别限制的场景如下：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>可能造成的影响</th>
+<th>限流的作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>总体的API有大量的并发调用， 导致系统QPS超过设计值</td>
+<td>机器可能会扛不住， 造成系统崩溃</td>
+<td>减少进入业务的流量， 保证QPS被限制在某个合理值， 其它请求会被丢弃</td>
+</tr>
+<tr>
+<td>某个API耗时比较长， 其它API的QPS位于合理范围内</td>
+<td>由于API耗时较长， 该API的调用次数变多的情况下， 会明显消耗系统资源， 同时也可能造成数据竞争的情况</td>
+<td>针对性的限制耗时API， 防止该API引起系统崩溃</td>
+</tr>
+<tr>
+<td>总体API的QPS位于合理范围内， 但是有部分参数会引起较大的系统资源消耗</td>
+<td>比如某个筛选参数造成查全表的情况， 此时可能造成数据库处理能力下降，进而造成后端服务无响应</td>
+<td>针对性的根据耗时API的参数进行限制限制， 防止该API引起系统崩溃</td>
+</tr>
+<tr>
+<td>总体API的QPS位于合理范围内， 但某个API的某个参数被大多数人调用， 导致整个API无法提供服务， 比如微博的话题功能， 如果有个爆炸性话题， 这个话题就会成为热点参数</td>
+<td>造成整个API无法使用， 严重时会造成整个服务不可用</td>
+<td>通过对热点参数的限制， 保证其它功能能正常使用</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-限流的组件"><a href="#1-2-限流的组件" class="headerlink" title="1.2 限流的组件"></a>1.2 限流的组件</h3><p>通过上述场景可以看到， 在这些场景中限流的作用是差不多的, 一般只涉及到两个维度：</p>
+<ul>
+<li>时间： 对某个时间窗口进行限流</li>
+<li>资源： 针对某个API或者某个API的参数进行限流，达到保护后方对应的资源。</li>
+</ul>
+<p>限流可以保证在某段时间内的某个资源的请求数量不会超过设计值， 达到保护系统的作用， 不过不同场景主要差别是限制的资源维度不一样， 资源维度的变化从总体服务到某个API到某个API的某个参数, 资源维度越来越细， 而这个资源维度区分也就是我们要实现限流的第一步–流量匹配， 只要流量匹配了， 限流系统就可以开始工作了， 一般的限流系统流程图如下(其中他服务核心代表微服务核心)：</p>
+<p><img src="https://ftp.bmp.ovh/imgs/2021/12/ca851690f268cb53.png" alt="限流"></p>
+<p>流程图中第一步是规则匹配， 它会通过一个函数把流量提取出来， 当做Key， 这个Key等于某个资源, 然后判断这个Key是否匹配到规则， 如果命中规则就开始执行规则并结合这段规则和限流算法来判断该流量是否限流， 如果限流就丢弃或者等待， 如果没被限流， 就直接放行。</p>
+<p>此外， 流程图的最下层有一个很大的Backend， 它可以用来存储规则以及存储一些限流相关的计算变量。<br>其中，限流相关的计算变量都是跟时间相关的, 且每次都要进行读写， 最好的情况是放在内存之中，不过它不能跟请求绑定在一起， 因为跟当前请求的生命周期不一样， 不能在发送请求结束后就把变量回收了， 这些变量也需要有个容器可以存储, 供不同的请求读写， 但是在一个集群服务中， 每个机器都只存储自己的计算变量则会导致多台机器没办法共享数据而造成限流失败。</p>
+<p>比如针对某个用户可以调用某个API的规则是一秒内可以请求十次， 目前有十台机器， 他们不会互相共享自己的限流计算变量， 那么在最坏的情况下， 用户可以在1秒内访问100次请求而不被限流， 这样是达不了限流的效果的， 所以限流必定是一个中心化的应用。<br>目前两个比较主流的限流方案分别是网关限流和中间件限流， 网关限流场景下所有入站流量都会经过网关这个单体， 然后由网关决定是否放行;而中间件限流则是把计算变量都存在某个中间件存储中， 然后每个服务的限流组件都可以从中间件实时写入和读取数据, 其中最常用的中间件是<code>Redis</code>, 因为<code>Redis</code>的速度快， 能让限流组件很快的判断是否需要限流， 对机器的性能开销占比也不是很多， 同时<code>Redis</code>支持的数据结构和功能非常的多， 我们可以很容易的基于它来实现不同的限流算法。</p>
+<p>至于限流的规则， 由于它只要写入一次， 后面都是以读为主， 所以在网关场景下都存在于内存之中， 但在中间件场景下规则都是存在一个集中式存储中， 如<code>Etcd</code>， 然后每个服务会同步集中式存储的规则， 并写入到自己的内存中。</p>
+<p>在实际的落地要选择网关限流还是中间件限流主要还是取决于是服务的应用场景， 比如接口外层都有加一层网关， 那采用网关限流即可， 如果是内部服务或者该服务的通信协议是自定义的， 则采用中间件方式， 有比较强的自定义性。</p>
+<blockquote>
+<p>在使用<code>Redis</code>下的某些情况下(取决于搭建方式)， 有可能造成数据不准的情况， 但是限流的频率是允许有些许误差的， 比如限流的规则是1秒可以访问100次， 但在某些时候只实现了1秒访问110次也是没太大关系的。</p>
+</blockquote>
+<h3 id="1-3-限流算法"><a href="#1-3-限流算法" class="headerlink" title="1.3 限流算法"></a>1.3 限流算法</h3><p>上面所说的都是一些简单的概念， 而限流的核心是在于限流算法的实现， 常见的限流算法有以下几种(由于大多数都限流backend默认是<code>Redis</code>， 所以以可以在<code>Redis</code>运行的lua代码示例):</p>
+<h4 id="1-3-1-固定窗口"><a href="#1-3-1-固定窗口" class="headerlink" title="1.3.1 固定窗口"></a>1.3.1 固定窗口</h4><p>固定窗口的原理比较简单，就是将时间切分成若干个时间片，每个时间片内固定处理若干个请求。比如限流规则是10秒内最多处理5个请求， 那么就会有一个容器来统计这10秒内的请求数， 如果容器的统计数量大于5, 那么后续的请求都会被拒绝， 然后每隔10秒重置这个容器的统计。<br>这种实现非常简单， 但不是非常严谨， 假如限制规则是1秒限制100个， 但在最坏的情况下， 在第一个窗口的0.5秒后到第二个窗口的0.5秒前的这个时间点共计会放行200个请求， 所以固定窗口只适用于一些要求不严格的场景, 通过下图的左图可以看到限流的流程， 通过下图的右图可以看到整个限流曲线不平滑。</p>
+<p><img src="https://ftp.bmp.ovh/imgs/2021/12/56af316f141b421e.jpg" alt="固定窗口"></p>
+<p>固定窗口的实现很简单， 在<code>Redis</code>中的lua代码如下:</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs lua"><span class="hljs-comment">-- keys为传入的命令， 其中keys[1]为限流的key </span><br><span class="hljs-comment">-- argv为传入的参数, ARGV[1]为窗口限制量， ARGV[2]为窗口时间 </span><br><span class="hljs-keyword">local</span> count<br><span class="hljs-keyword">local</span> limit ＝ ARGV[<span class="hljs-number">1</span>]<br>count = redis.call(<span class="hljs-string">&quot;incr&quot;</span>,KEYS[<span class="hljs-number">1</span>])<br><span class="hljs-keyword">if</span> <span class="hljs-built_in">tonumber</span>(count) == <span class="hljs-number">1</span> <span class="hljs-keyword">then</span><br>    <span class="hljs-comment">-- 返回1代表是第一个， 该key刚被创建， 需要设置过期时间</span><br>    redis.call(<span class="hljs-string">&quot;expire&quot;</span>,KEYS[<span class="hljs-number">1</span>], ARGV[<span class="hljs-number">2</span>]])<br><span class="hljs-keyword">end</span><br><span class="hljs-keyword">return</span> count＜limit <br></code></pre></td></tr></table></figure>
+<h4 id="1-3-2-滑动窗口"><a href="#1-3-2-滑动窗口" class="headerlink" title="1.3.2 滑动窗口"></a>1.3.2 滑动窗口</h4><p>滑动窗口是固定窗口的改进方法, 他是通过增加窗口数量使限流算法更顺滑, 本身从一个窗口变为一个先进先出的队列， 队列的内容是更加精细的窗口，比如原来是10秒一个窗口， 现在会改为1秒一个窗口， 然后每隔一秒钟滑动一个窗口。 只写入最新的窗口而读取判断时都是取最近10个窗口， 这样就可以通过减小粒度来让限流算法更加精细， 可以看到波动幅度会变小(取决于精细程度)：<br><img src="https://ftp.bmp.ovh/imgs/2021/12/903fd7f707c3e735.jpg" alt="滑动窗口"><br>滑动窗口的实现也是很简单的， 具体见:<a href="https://so1n.me/2021/08/24/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86%E7%9A%84%E5%9F%BA%E7%9F%B3/">RPC框架编写实践–服务治理的基石</a>, 在<code>Redis</code>可以采用<code>Zset</code>数据结构进行实现, 这里就不做代码示例了。 滑动窗口是牺牲一定的内存来让限流变得平滑，窗口数量越多, 限流速率越精细， 占用的内存就越大， 同时获取数据时都是获取一批窗口的数据， 相比于固定窗口来说，它的时间复杂度也会跟着变多(O(k))。</p>
+<h4 id="1-3-3-漏桶"><a href="#1-3-3-漏桶" class="headerlink" title="1.3.3 漏桶"></a>1.3.3 漏桶</h4><p>漏桶的出现可以完美的解决参差不齐的速率限制问题, 漏桶算法的核心原理是进入漏桶的请求量不限制， 但能漏出去的速率请求是恒定的， 这样就能完美的控制请求的速率， 如果桶满了， 在漏桶里的请求就会溢出去, 达到丢弃请求的目的， 如下图， 整个请求的速率都是很平滑的， 没有多少毛尖：<br><img src="https://ftp.bmp.ovh/imgs/2021/12/a3d92cf918c189a5.jpg" alt="漏桶"></p>
+<p>从图中可以看到， 漏桶的原理很像一个FIFO队列， 然后有个定时器会以恒定的速率把请求取出来， 使用<code>Python</code>代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><br><span class="hljs-comment"># 假设容量只有10</span><br><span class="hljs-keyword">import</span> time<br><br>leaky_bucket: asyncio.Queue = asyncio.Queue(<span class="hljs-number">10</span>)<br>loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_request</span>(<span class="hljs-params">cnt: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;模仿请求&quot;&quot;&quot;</span><br>    msg: <span class="hljs-built_in">str</span> = <span class="hljs-string">f&quot;I&#x27;m mock request:<span class="hljs-subst">&#123;cnt&#125;</span>&quot;</span><br>    future: asyncio.Future = asyncio.Future()<br>    <span class="hljs-keyword">try</span>:<br>        leaky_bucket.put_nowait(future)<br>    <span class="hljs-keyword">except</span> asyncio.QueueFull:<br>        <span class="hljs-comment"># 代表桶满了， 溢出来， 该请求要提前抛弃</span><br>        print(<span class="hljs-string">f&quot;Fail Request:<span class="hljs-subst">&#123;msg&#125;</span>&quot;</span>)<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-comment"># 等待放行</span><br>        <span class="hljs-keyword">await</span> future<br>        print(time.time(), msg)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">timer</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;定时放行请求&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-comment"># 放行该请求</span><br>        future: asyncio.Future = leaky_bucket.get_nowait()<br>        future.set_result(<span class="hljs-literal">True</span>)<br>    <span class="hljs-keyword">except</span> asyncio.QueueEmpty:<br>        <span class="hljs-keyword">pass</span><br>    <span class="hljs-comment"># 一秒执行一次</span><br>    loop.call_later(<span class="hljs-number">1</span>, timer)<br><br>timer()<br><span class="hljs-comment"># 模拟并发12个请求</span><br>loop.run_until_complete(asyncio.gather(*[demo_request(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">12</span>)]))<br></code></pre></td></tr></table></figure>
+<p>但是， 这样实现的漏桶算法依然需要占用一些空间用来存储等待放行的请求， 直到放行才被释放。 为了解决空间占用的问题， 可以采用GCRA算法， 它从另外一个角度看起来跟漏桶算法很像（GRRA应该被认为是计量器实现的漏桶版本， 而不是上面所说的队列形漏桶）, 但很省空间占用， 因为无论漏桶多大， 它的空间占用都是恒定的, 只需要存漏水速率（可以认为是该时间段可以放行的请求量）以及桶目前的容量即可。 </p>
+<p>使用GCRA算法之所以能这样省空间， 主要还是它是基于虚拟调度实现的， 它只需要存一个漏水速率，然后每次有请求进来时判断现在可否可以漏水， 如果可以就放行， 如果不可以则判断桶是否满， 满则抛弃请求， 没满则让请求等待， 直到可以放行为止。<br>常见的GCRA限流实现一般都考虑使用<a target="_blank" rel="noopener" href="https://github.com/brandur/redis-cell">redis-cell</a>, 它的使用方法如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 第一个参数为命令， 第二个参数是要限流的key, 第三个参数是桶容量， 第四第五综合起来为漏桶速率， 第五个为每次漏多少</span><br><br><span class="hljs-comment"># 第一次请求放行， 可以发现容量变多了一个</span><br>127.0.0.1:6379&gt; CL.THROTTLE demo_leaky_bucket 2 1 10 1<br>1) <span class="hljs-string">&quot;0&quot;</span>     <span class="hljs-comment"># 0表示允许， 1表示拒绝</span><br>2) <span class="hljs-string">&quot;3&quot;</span>     <span class="hljs-comment"># 漏桶容量(会比输入的多1)</span><br>3) <span class="hljs-string">&quot;2&quot;</span>     <span class="hljs-comment"># 漏斗剩余空间</span><br>4) <span class="hljs-string">&quot;-1&quot;</span>    <span class="hljs-comment"># 如果拒绝， 需要多长时间后重试, 单位秒</span><br>5) <span class="hljs-string">&quot;10&quot;</span>    <span class="hljs-comment"># 多少时间后，漏桶完全空了, 单位秒</span><br><br><span class="hljs-comment"># 第二次请求被放行， 但是漏斗已经被占了一个空位</span><br>127.0.0.1:6379&gt; CL.THROTTLE demo_leaky_bucket 2 1 10 1<br>1) <span class="hljs-string">&quot;0&quot;</span><br>2) <span class="hljs-string">&quot;3&quot;</span><br>3) <span class="hljs-string">&quot;1&quot;</span><br>4) <span class="hljs-string">&quot;-1&quot;</span><br>5) <span class="hljs-string">&quot;18&quot;</span><br><span class="hljs-comment"># 第三次请求被放行， 但是漏斗已经被占了两个个空位</span><br>127.0.0.1:6379&gt; CL.THROTTLE demo_leaky_bucket 2 1 10 1<br>1) <span class="hljs-string">&quot;0&quot;</span><br>2) <span class="hljs-string">&quot;3&quot;</span><br>3) <span class="hljs-string">&quot;0&quot;</span><br>4) <span class="hljs-string">&quot;-1&quot;</span><br>5) <span class="hljs-string">&quot;27&quot;</span><br><span class="hljs-comment"># 第四次请求不被放行， 但是漏斗没有空位了</span><br>127.0.0.1:6379&gt; CL.THROTTLE demo_leaky_bucket 2 1 10 1<br>1) <span class="hljs-string">&quot;1&quot;</span><br>2) <span class="hljs-string">&quot;3&quot;</span><br>3) <span class="hljs-string">&quot;0&quot;</span><br>4) <span class="hljs-string">&quot;6&quot;</span><br>5) <span class="hljs-string">&quot;26&quot;</span><br></code></pre></td></tr></table></figure>
+<p>从命令可以看出, 即使漏斗中还有数据没漏出去， 返回值得第一个也还是0， 表示放行， 这样并不是一个完善的GCRA。 为了实现一个完备的GCRA， 我们需要额外的在代码判断漏桶是否全空， 如果放行且桶不是全空， 则需要在代码判断多久后才能会为空， 这个时间也就是请求的等待放行时间, 在等待这段时间后才能放行请求， 如果不是放行， 则直接丢弃请求即可。</p>
+<p>不过， 如果不做任何判断， 直接使用返回值的第一个值来判断是否放行请求， 那这个实现就很像下面所说的令牌桶的实现。 </p>
+<h4 id="1-3-4-令牌桶"><a href="#1-3-4-令牌桶" class="headerlink" title="1.3.4 令牌桶"></a>1.3.4 令牌桶</h4><p>漏桶能很好的控制速率， 使其变得平滑， 但是它没办法应对突发流量， 比如我们把规则定义为10秒内可以请求10次， 对于漏桶来说， 它会控制为1秒放行一个请求， 如果同时收到10个请求时它则会分开10秒放行每个请求。 然而10秒内可以请求10次的含义是10秒内总共可以请求10次， 也就是允许在这10秒内的某个瞬间同时放行10个请求, 对于这个问题可以使用令牌桶来解决, 令牌桶和漏桶很像， 只是漏桶控制的是请求， 令牌桶控制的是令牌发放速度。 </p>
+<p>令牌桶算法规定每个请求需要从桶里拿到并消耗一个令牌才可以放行， 拿不到则会被抛弃， 同时令牌桶本身会以恒定的速率产生令牌， 直到桶满为止， 这样就可以保证限流的平缓， 同时又能应对突发请求， 令牌桶的原理图和限流曲线图如下， 其中限流曲线图表示初始时桶里面放满了令牌， 所以放行的请求很多， 随着令牌被逐渐消耗并消耗光了， 限流的曲率会稳定在一条线上, 也就是令牌的生产速率：<br><img src="https://ftp.bmp.ovh/imgs/2021/12/6717929962afbe1d.jpg" alt="令牌桶"></p>
+<p>同样的， 在实现令牌桶时为了减少空间的占用， 也会使用虚拟调度方法， 只存一个时间和容量到内存中， 每次收到请求时都会根据请求的时间和在内存中的时间差值再乘以速率计算这段时间应该产生的令牌数量并存到内存中， 然后再判断是否有足够的令牌来判断是否放行请求， 具体的<code>Redis</code> lua代码实现如下：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs lua"><span class="hljs-keyword">local</span> key = KEYS[<span class="hljs-number">1</span>] <span class="hljs-comment">-- key</span><br><span class="hljs-keyword">local</span> current_time = redis.call(<span class="hljs-string">&#x27;TIME&#x27;</span>)[<span class="hljs-number">1</span>] <span class="hljs-comment">-- redis时间戳</span><br><span class="hljs-keyword">local</span> interval_per_token = <span class="hljs-built_in">tonumber</span>(ARGV[<span class="hljs-number">1</span>]) <span class="hljs-comment">--每个单位产生多少个token</span><br><span class="hljs-keyword">local</span> max_token = <span class="hljs-built_in">tonumber</span>(ARGV[<span class="hljs-number">2</span>]) <span class="hljs-comment">-- 桶最大的量</span><br><span class="hljs-keyword">local</span> init_token = <span class="hljs-built_in">tonumber</span>(ARGV[<span class="hljs-number">3</span>]) <span class="hljs-comment">-- 桶初始量</span><br><span class="hljs-keyword">local</span> tokens<br><span class="hljs-comment">-- 上次请求时保留的桶数据</span><br><span class="hljs-keyword">local</span> bucket = redis.call(<span class="hljs-string">&quot;hmget&quot;</span>, key, <span class="hljs-string">&quot;last_time&quot;</span>, <span class="hljs-string">&quot;last_token&quot;</span>)<br><span class="hljs-keyword">local</span> last_time= bucket[<span class="hljs-number">1</span>]<br><span class="hljs-keyword">local</span> last_token = bucket[<span class="hljs-number">2</span>]<br><span class="hljs-keyword">if</span> last_time == <span class="hljs-literal">false</span> <span class="hljs-keyword">or</span> last_token == <span class="hljs-literal">false</span> <span class="hljs-keyword">then</span><br>    <span class="hljs-comment">-- 如果没数据， 则代表该资源是第一次访问， 进行初始化</span><br>    tokens = init_token<br>    redis.call(<span class="hljs-string">&#x27;hset&#x27;</span>, key, <span class="hljs-string">&#x27;last_time&#x27;</span>, current_time)<br><span class="hljs-keyword">else</span><br>    <span class="hljs-comment">-- 算出间隔时间</span><br>    <span class="hljs-keyword">local</span> this_interval = current_time - <span class="hljs-built_in">tonumber</span>(last_time)<br>    <span class="hljs-keyword">if</span> this_interval &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">then</span><br>        <span class="hljs-comment">-- 算出该时间应该产生的令牌</span><br>        <span class="hljs-keyword">local</span> tokens_to_add = <span class="hljs-built_in">math</span>.<span class="hljs-built_in">floor</span>(this_interval * interval_per_token)<br>        <span class="hljs-comment">-- 算出真实可以拥有的令牌</span><br>        tokens = <span class="hljs-built_in">math</span>.<span class="hljs-built_in">min</span>(last_token + tokens_to_add, max_token)<br>        <span class="hljs-comment">-- 保存数据</span><br>        redis.call(<span class="hljs-string">&#x27;hset&#x27;</span>, key, <span class="hljs-string">&#x27;last_time&#x27;</span>, current_time)<br>    <span class="hljs-keyword">else</span><br>        tokens = <span class="hljs-built_in">tonumber</span>(last_token)<br>    <span class="hljs-keyword">end</span><br><span class="hljs-keyword">end</span><br><span class="hljs-keyword">if</span> tokens &lt; <span class="hljs-number">1</span> <span class="hljs-keyword">then</span><br>    <span class="hljs-comment">-- 令牌不够消费</span><br>    redis.call(<span class="hljs-string">&#x27;hset&#x27;</span>, key, <span class="hljs-string">&#x27;last_token&#x27;</span>, tokens)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span><br><span class="hljs-keyword">else</span><br>    <span class="hljs-comment">-- 消费令牌并返回令牌数, 代表可以消费</span><br>    tokens = tokens - <span class="hljs-number">1</span><br>    redis.call(<span class="hljs-string">&#x27;hset&#x27;</span>, key, <span class="hljs-string">&#x27;last_token&#x27;</span>, tokens)<br>    <span class="hljs-keyword">return</span> tokens<br><span class="hljs-keyword">end</span><br></code></pre></td></tr></table></figure>
+<h2 id="2-具体实现"><a href="#2-具体实现" class="headerlink" title="2.具体实现"></a>2.具体实现</h2><p>上面说完了算法实现后， 接下来来看看该如何结合算法进行实现， 由于代码会随时更新，具体源码更新见： <a target="_blank" rel="noopener" href="https://github.com/so1n/rap/tree/master/rap/server/plugin/processor/limit">https://github.com/so1n/rap/tree/master/rap/server/plugin/processor/limit</a></p>
+<p>项目的代码结构如下, 在常见的后端服务中需要占用空间少， 然后速度尽量快点限流组件， 所以一般只用漏桶或者令牌桶且基于<code>Redis</code>的实现, 这里就不会去实现窗口相关的限流了:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">├── backend  <span class="hljs-comment"># 算法</span><br>│   ├── base.py  <span class="hljs-comment"># 封装的协议</span><br>│   └── redis.py  <span class="hljs-comment"># 基于redis当做banckend的算法实现</span><br>├── core.py  <span class="hljs-comment"># 核心判断代码， 实际上是一个中间流量处理</span><br>├── rule.py  <span class="hljs-comment"># 规则声明</span><br>└── util.py  <span class="hljs-comment"># 其它小代码</span><br></code></pre></td></tr></table></figure>
+<p>首先是<code>rule.py</code>里的规则类, 它主要是声明了限流速率， 初始化token数量， 最多的tokens数量以及停用时间， 其中停用时间是用来防止恶意用户频繁刷新， 它的逻辑是当漏桶已经满了或者令牌桶没有令牌的时候， 限流组件会在停用时间内不再提供服务。</p>
+<p>然后就是<code>backend.base.py</code>, 它是一个限流算法的统一封装， 代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, Coroutine, Union<br><br><span class="hljs-keyword">from</span> rap.server.plugin.processor.limit.rule <span class="hljs-keyword">import</span> Rule<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BaseLimitBackend</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">can_requests</span>(<span class="hljs-params">self, key: <span class="hljs-built_in">str</span>, rule: Rule, token_num: <span class="hljs-built_in">int</span> = <span class="hljs-number">1</span></span>) -&gt; Union[bool, Coroutine[Any, Any, bool]]:</span><br>        <span class="hljs-keyword">raise</span> NotImplementedError<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">expected_time</span>(<span class="hljs-params">self, key: <span class="hljs-built_in">str</span>, rule: Rule</span>) -&gt; Union[float, Coroutine[Any, Any, float]]:</span><br>        <span class="hljs-keyword">raise</span> NotImplementedError<br></code></pre></td></tr></table></figure>
+<p>这个类它声明了两个方法， 一个是<code>can_request</code>, 它会根据算法来判断是否放行， 如果需要等待， 则会在这个方法里进行等待， 直到到时间后才返回放行标记, 其中<code>can_request</code>还内嵌了一个<code>block_time</code>的逻辑； 另外一个是<code>expected_time</code>， 用来获取下次可用的时间, 具体的实现以<code>RedisCellBackend</code>为例子， 它是一个子类。</p>
+<p>它的最上层实现是<code>BaseLimitBackend</code>, 然后就是继承于<code>BaseLimitBackend</code>的<code>BaseRedisBackend</code>, 这个组件<code>Redis</code>限流算法的基础实现， 主要是实现了一个停用时间的逻辑， 当发现不放行请求的时候， 会启用停用逻辑， 以停用后续相同key的请求：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BaseRedisBackend</span>(<span class="hljs-params">BaseLimitBackend, ABC</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, redis: Union[StrictRedis, StrictRedisCluster]</span>):</span><br>        <span class="hljs-comment"># 初始化Redis模块</span><br>        self._redis: <span class="hljs-string">&quot;Union[StrictRedis, StrictRedisCluster]&quot;</span> = redis<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_block_time_handle</span>(<span class="hljs-params">self, key: <span class="hljs-built_in">str</span>, rule: Rule, func: Callable[..., Awaitable[<span class="hljs-built_in">bool</span>]]</span>) -&gt; bool:</span><br>        <span class="hljs-string">&quot;&quot;&quot;处理block_time逻辑&quot;&quot;&quot;</span><br>        block_time_key: <span class="hljs-built_in">str</span> = <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;key&#125;</span>:block_time&quot;</span><br>        bucket_block_time: Optional[<span class="hljs-built_in">int</span>] = rule.block_time<br><br>        <span class="hljs-keyword">if</span> bucket_block_time <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">await</span> self._redis.exists(block_time_key):<br>            <span class="hljs-comment"># 启用block_time逻辑， 且key已经存在， 那么直接返回False告诉该请求应该被拒绝 </span><br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>        <span class="hljs-comment"># 执行正真的判断是否限流逻辑</span><br>        can_requests: <span class="hljs-built_in">bool</span> = <span class="hljs-keyword">await</span> func()<br><br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> can_requests <span class="hljs-keyword">and</span> bucket_block_time <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-comment"># 启用block_time逻辑且被限流时, 正式启用block time逻辑 </span><br>            <span class="hljs-keyword">await</span> self._redis.<span class="hljs-built_in">set</span>(block_time_key, bucket_block_time, ex=bucket_block_time)<br><br>        <span class="hljs-keyword">return</span> can_requests<br></code></pre></td></tr></table></figure>
+<p>接着就是继承于<code>BaseRedisBackend</code>的<code>BaseRedisCellBackend</code>, 它主要是提供一个命令调用的封装以及获取还有多久后才能请求的封装：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BaseRedisCellBackend</span>(<span class="hljs-params">BaseRedisBackend</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    use redis-cell module</span><br><span class="hljs-string">    learn more:https://github.com/brandur/redis-cell</span><br><span class="hljs-string"></span><br><span class="hljs-string">    input: CL.THROTTLE user123 15 30 60 1</span><br><span class="hljs-string">        # param  |  desc</span><br><span class="hljs-string">        # user123 key</span><br><span class="hljs-string">        # 15 maxburst</span><br><span class="hljs-string">        # 30 token</span><br><span class="hljs-string">        # 60 seconds</span><br><span class="hljs-string">        # 1 apply 1token</span><br><span class="hljs-string">    output:</span><br><span class="hljs-string">        1) (integer) 0        # is allowed</span><br><span class="hljs-string">        2) (integer) 16       # total bucket num</span><br><span class="hljs-string">        3) (integer) 15       # the remaining limit of the key.</span><br><span class="hljs-string">        4) (integer) -1       # the number of seconds until the user should retry,</span><br><span class="hljs-string">                              #   and always -1 if the action was allowed.</span><br><span class="hljs-string">        5) (integer) 2        # The number of seconds until the limit will reset to its maximum capacity</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_call_cell</span>(<span class="hljs-params">self, key: <span class="hljs-built_in">str</span>, rule: Rule, token_num: <span class="hljs-built_in">int</span> = <span class="hljs-number">1</span></span>) -&gt; List[int]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;调用redis_cell&quot;&quot;&quot;</span><br>        result: List[<span class="hljs-built_in">int</span>] = <span class="hljs-keyword">await</span> self._redis.execute_command(<br>            <span class="hljs-string">&quot;CL.THROTTLE&quot;</span>, key, rule.max_token - <span class="hljs-number">1</span>, rule.gen_token, <span class="hljs-built_in">int</span>(rule.total_second), token_num<br>        )<br>        <span class="hljs-keyword">return</span> result<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">expected_time</span>(<span class="hljs-params">self, key: <span class="hljs-built_in">str</span>, rule: Rule</span>) -&gt; Union[float, Coroutine[Any, Any, float]]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;获取下次可请求时间&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_expected_time</span>() -&gt; float:</span><br>            block_time_key: <span class="hljs-built_in">str</span> = key + <span class="hljs-string">&quot;:block_time&quot;</span><br>            block_time = <span class="hljs-keyword">await</span> self._redis.get(block_time_key)<br>            <span class="hljs-keyword">if</span> block_time:<br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> self._redis.ttl(block_time_key)<br><br>            result: List[<span class="hljs-built_in">int</span>] = <span class="hljs-keyword">await</span> self._call_cell(key, rule, <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-built_in">float</span>(<span class="hljs-built_in">max</span>(result[<span class="hljs-number">3</span>], <span class="hljs-number">0</span>))<br><br>        <span class="hljs-keyword">return</span> _expected_time()<br></code></pre></td></tr></table></figure>
+<p>最后就是真正的对外使用的限流组件实现， 这个实现是基于漏桶算法的， 它继承于<code>BaseRedisCellBackend</code>（另外一个继承于<code>BaseRedisCellBackend</code>的实现是基于令牌桶算法的， 可以通过源码了解）, 可以看到非常的简单， 本质上是基于<code>redis-cell</code>的返回判断是否放行。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RedisCellBackend</span>(<span class="hljs-params">BaseRedisCellBackend</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">can_requests</span>(<span class="hljs-params">self, key: <span class="hljs-built_in">str</span>, rule: Rule, token_num: <span class="hljs-built_in">int</span> = <span class="hljs-number">1</span></span>) -&gt; Union[bool, Coroutine[Any, Any, bool]]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;通过redis-cell判断是否可以请求，以及是否需要休眠等待， 如果需要则休眠固定的时间后再放行&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_can_requests</span>() -&gt; bool:</span><br>            result: List[<span class="hljs-built_in">int</span>] = <span class="hljs-keyword">await</span> self._call_cell(key, rule, token_num)<br>            can_requests: <span class="hljs-built_in">bool</span> = result[<span class="hljs-number">0</span>] == <span class="hljs-number">0</span><br>            <span class="hljs-keyword">if</span> can_requests <span class="hljs-keyword">and</span> result[<span class="hljs-number">4</span>]:<br>                <span class="hljs-keyword">await</span> asyncio.sleep(result[<span class="hljs-number">4</span>])<br>            <span class="hljs-keyword">return</span> can_requests<br><br>        <span class="hljs-keyword">return</span> self._block_time_handle(key, rule, _can_requests)<br></code></pre></td></tr></table></figure>
+<p>了解完算法的实现后， 接下来就是核心的判断逻辑, 具体见注释:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LimitProcessor</span>(<span class="hljs-params">BaseProcessor</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, backend: BaseLimitBackend, rule_list: List[Tuple[RULE_FUNC_TYPE, Rule]]</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;初始化规则和算法逻辑， 这里的规则之所以是使用传参的方式是仅供参考， 后续整个框架的配置都会抽离成一个config， 供其它组件调用&quot;&quot;&quot;</span><br>        self._backend: BaseLimitBackend = backend<br>        self._rule_list: List[Tuple[RULE_FUNC_TYPE, Rule]] = rule_list<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process_request</span>(<span class="hljs-params">self, request: Request</span>) -&gt; Request:</span><br>        <span class="hljs-comment"># not limit client event</span><br>        <span class="hljs-keyword">if</span> request.msg_type == constant.CLIENT_EVENT:<br>            <span class="hljs-comment"># 屏蔽event请求</span><br>            <span class="hljs-keyword">return</span> request<br><br>        <span class="hljs-keyword">for</span> func, rule <span class="hljs-keyword">in</span> self._rule_list:<br>            <span class="hljs-comment"># 获取该请求的key</span><br>            <span class="hljs-keyword">if</span> inspect.iscoroutinefunction(func):<br>                key, is_ignore_limit = <span class="hljs-keyword">await</span> func(request)  <span class="hljs-comment"># type: ignore</span><br>            <span class="hljs-keyword">else</span>:<br>                key, is_ignore_limit = func(request)<br>            <span class="hljs-keyword">if</span> is_ignore_limit:<br>                <span class="hljs-comment"># 如果该请求不应该限流， 直接跳过限流逻辑</span><br>                <span class="hljs-keyword">return</span> request<br>            <span class="hljs-keyword">if</span> key:<br>                <span class="hljs-comment"># 匹配到key， 进入限流逻辑</span><br>                <span class="hljs-keyword">break</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">raise</span> TooManyRequest()<br><br>        <span class="hljs-comment"># 通过backend判断是否限流</span><br>        key = <span class="hljs-string">f&quot;rap:processor:<span class="hljs-subst">&#123;self.__class__.__name__&#125;</span>:<span class="hljs-subst">&#123;key&#125;</span>&quot;</span><br>        can_requests: Union[<span class="hljs-built_in">bool</span>, Awaitable[<span class="hljs-built_in">bool</span>]] = self._backend.can_requests(key, rule)<br>        <span class="hljs-keyword">if</span> inspect.isawaitable(can_requests):<br>            can_requests = <span class="hljs-keyword">await</span> can_requests  <span class="hljs-comment"># type: ignore</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> can_requests:<br>            <span class="hljs-comment"># 如果被限流， 返回异常， 并告知要何时后才可以再次请求</span><br>            expected_time: Union[<span class="hljs-built_in">float</span>, Awaitable[<span class="hljs-built_in">float</span>]] = self._backend.expected_time(key, rule)<br>            <span class="hljs-keyword">if</span> inspect.isawaitable(expected_time):<br>                expected_time = <span class="hljs-keyword">await</span> expected_time  <span class="hljs-comment"># type: ignore</span><br>            <span class="hljs-keyword">raise</span> TooManyRequest(extra_msg=<span class="hljs-string">f&quot;expected time: <span class="hljs-subst">&#123;expected_time&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">return</span> request<br></code></pre></td></tr></table></figure>
+<p>至此， 整个限流逻辑实现完毕, 本章内容完。</p>
+<h2 id="3-其它碎碎念"><a href="#3-其它碎碎念" class="headerlink" title="3.其它碎碎念"></a>3.其它碎碎念</h2><h3 id="3-1-热点参数实现"><a href="#3-1-热点参数实现" class="headerlink" title="3.1.热点参数实现"></a>3.1.热点参数实现</h3><p>由于大部分的限流实现的backend都只要依赖于<code>Redis</code>, 所以代码仓里面只有<code>Redis</code>一种类型的backend，但是有一些限流实现需要依赖于一些特殊的backend，比如热点参数限流, 还有蜜罐之类的场景。</p>
+<p>以热点参数限流场景为例子， 热点参数是一个写大于读的应用场景， 而且跟时间强相关， 所以选用时序数据库做backend，之前选用过<code>Graphite</code>当做backend, 具体实现如图后端服务会把每次请求参数都记录到时序数据库中， 并使用一个定时脚本每隔一段时间把最近的热点参数数据拉取到缓存中， 供后端服务的限流组件判断是否该放行。 其中， 这个间隔一般控制在1秒左右， 所以这是一个近实时的实现, 具体的实现图如下：<br><img src="https://ftp.bmp.ovh/imgs/2022/01/4ec83cd3eaff271f.jpg"><br>当请求进来的时候， 限流中间件会通过异步的方法把数据记录到时序数据库中， 比如一个请求为<code>http://127.0.0.1:80?q=1&amp;b=2</code>，中间件就会发送一个以<code>&#123;prefix&#125;.hot_param.b=2&amp;b=2</code>为key, value为1的标准<code>Statsd</code>的count类型数据到<code>Statsd</code>组件中。</p>
+<blockquote>
+<p>这个Key采用标准的<code>Statsd</code>命令, 以<code>.</code>分割有三个值， 第一个是前缀它与业务相关, 如业务名， 函数名，namespace等等; 第二个是代表是热点参数的业务； 第三个是参数Key, 这里以<code>&amp;</code>为分割号， 然后按Key顺序排序，重新拼接为一个字符串， 这样即使请求时顺序不一致也能识别到时同种请求。</p>
+</blockquote>
+<p><code>Statsd</code>组件收到了数据后会自行进行统计， 统计一个时间区间都数据并写入到<code>Graphite</code>中， 然后通过定时脚本使用<code>Graphite API</code>拉取统计次数大于条件的数据写入到<code>Redis</code>缓存中， 其中<code>Statsd</code>组件的时间区间和定时脚本的定时时间都会控制在一秒左右， 所以这是一个近实时的实现， 在计算性能消耗和实现效果直接做取舍。</p>
+<p>数据写入到<code>Redis</code>后， 这个写入数据和统计的异步流程就结束了， 中间件在记录数据后， 会通过<code>Redis</code>判断是否是热点参数， 并根据规则判断是否放行， 到了这里就跟上面的限流流程差不多了。</p>
+<h3 id="3-2-限流算法拓展"><a href="#3-2-限流算法拓展" class="headerlink" title="3.2.限流算法拓展"></a>3.2.限流算法拓展</h3><p>限流算法不止是用于算法， 也可以用于别的地方，比如有一些游戏活动，体力值满时为5, 然后玩家每次出发活动会减少1个体力值, 然后可以使用限流算法每隔一个固定时间则增加一个体力值等等。 在遇到业务需求有跟时间相关且像上述所说的体力值会恢复的情况时， 可以往限流算法思考。</p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/11/15/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E5%B8%B8%E8%A7%81%E9%99%90%E6%B5%81%E6%96%B9%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;15&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E5%B8%B8%E8%A7%81%E9%99%90%E6%B5%81%E6%96%B9%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;15&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E5%B8%B8%E8%A7%81%E9%99%90%E6%B5%81%E6%96%B9%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/"><i class="iconfont iconleft"></i>Python-gRPC实践（1）--gRPC简介</a>
+    <a href="/2021/11/15/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E9%99%90%E6%B5%81/">RPC框架编写实践--简介注册与发现的<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%99%90%E6%B5%81%E7%9A%84%E7%AE%80%E4%BB%8B"><span class="toc-text">1 限流的简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E9%99%90%E6%B5%81%E7%9A%84%E4%BD%9C%E7%94%A8%E5%92%8C%E5%9C%BA%E6%99%AF"><span class="toc-text">1.1 限流的作用和场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E9%99%90%E6%B5%81%E7%9A%84%E7%BB%84%E4%BB%B6"><span class="toc-text">1.2 限流的组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95"><span class="toc-text">1.3 限流算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.具体实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%B6%E5%AE%83%E7%A2%8E%E7%A2%8E%E5%BF%B5"><span class="toc-text">3.其它碎碎念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E7%83%AD%E7%82%B9%E5%8F%82%E6%95%B0%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.1.热点参数实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95%E6%8B%93%E5%B1%95"><span class="toc-text">3.2.限流算法拓展</span></a></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%99%90%E6%B5%81%E7%9A%84%E7%AE%80%E4%BB%8B"><span class="toc-text">1 限流的简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E9%99%90%E6%B5%81%E7%9A%84%E4%BD%9C%E7%94%A8%E5%92%8C%E5%9C%BA%E6%99%AF"><span class="toc-text">1.1 限流的作用和场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E9%99%90%E6%B5%81%E7%9A%84%E7%BB%84%E4%BB%B6"><span class="toc-text">1.2 限流的组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95"><span class="toc-text">1.3 限流算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.具体实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%B6%E5%AE%83%E7%A2%8E%E7%A2%8E%E5%BF%B5"><span class="toc-text">3.其它碎碎念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E7%83%AD%E7%82%B9%E5%8F%82%E6%95%B0%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.1.热点参数实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95%E6%8B%93%E5%B1%95"><span class="toc-text">3.2.限流算法拓展</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

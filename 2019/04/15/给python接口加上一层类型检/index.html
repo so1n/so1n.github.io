@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>给Python Web框架接口加上类型检查 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记给接口加上类型检查的想法源于我实习时写接口的灵感,...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">给Python Web框架接口加上类型检查</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://i.loli.net/2021/06/20/s73qnjTLrP2BQpy.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">给Python Web框架接口加上类型检查</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 15, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>24474</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>给接口加上类型检查的想法源于我实习时写接口的灵感, 那时候就是一个crud boy,一直在写接口,但每次都要在接口写一些参数校验或参数类型转换, 觉得很繁琐,总觉得这个是可以自己封装一个,减少大量代码. 在实现的过程中发现自己慢慢的接受了代码即文档的实现, 并且慢慢迭代, 使之越来越完善, 最终蜕变成一个开源项目<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a></p>
+        <hr>
+<p><strong>注</strong>:<br>第一版是18年实习的时候,基 于一个叫sanic的web框架以及Python3.5写的.</p>
+<p>19/03 更新: 为了代码统一,这里的示例是把sanic的接口代码迁移到starlette, Python3.7了.</p>
+<p>19/04 更新: 增加Pydantic的使用</p>
+<p>20/07 更新: 根据几个版本迭代出了项目<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>,功能更多,并且支持接口文档导出, 以及支持swagger和redoc页面展示.</p>
+<p>21/01 更新: 更新每个版本的完整代码<a target="_blank" rel="noopener" href="https://github.com/so1n/example/tree/master/example_python/example_python/api_param_check">跳转链接</a></p>
+<h2 id="1-为何要加上给接口加上一层类型校验"><a href="#1-为何要加上给接口加上一层类型校验" class="headerlink" title="1.为何要加上给接口加上一层类型校验"></a>1.为何要加上给接口加上一层类型校验</h2><h3 id="1-1-示例接口"><a href="#1-1-示例接口" class="headerlink" title="1.1.示例接口"></a>1.1.示例接口</h3><p>先看看一个普通的示例接口:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> uvicorn<br><span class="hljs-keyword">from</span> starlette.applications <span class="hljs-keyword">import</span> Starlette<br><span class="hljs-keyword">from</span> starlette.responses <span class="hljs-keyword">import</span> JSONResponse<br><span class="hljs-keyword">from</span> starlette.routing <span class="hljs-keyword">import</span> Route, Router<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_post</span>(<span class="hljs-params">request</span>):</span><br>    json_data = <span class="hljs-keyword">await</span> request.json()<br>    uid = request_data.get(<span class="hljs-string">&#x27;uid&#x27;</span>, <span class="hljs-number">0</span>)<br>    timestamp = request_data.get(<span class="hljs-string">&#x27;timestamp&#x27;</span>, <span class="hljs-number">0</span>)<br>    user_info = request_data.get(<span class="hljs-string">&#x27;user_info&#x27;</span>, &#123;&#125;)<br>    user_name = request_data.get(<span class="hljs-string">&#x27;user_name&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>)<br>    <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;hello&#x27;</span>: <span class="hljs-string">&#x27;world&#x27;</span>&#125;)<br><br><br>app = Starlette(<br>    routes=[<br>        Route(<span class="hljs-string">&#x27;/api&#x27;</span>, demo_post, methods=[<span class="hljs-string">&#x27;POST&#x27;</span>]),<br>    ]<br>)<br>uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+
+<p>可以看到, 这个接口接收POST请求, 路由函数获取了4个参数<code>uid</code>,<code>timestamp</code>,<code>user_info</code>,<code>user_name</code>.在正常的接口中需要对参数进行处理和转换,比如uid这里只接受int类型,那么就需要多写一个判断或者转换, 如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 示例代码, 实际上通过封装会更优美</span><br><span class="hljs-keyword">try</span><br>    uid = <span class="hljs-built_in">int</span>(uid)<br><span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>    <span class="hljs-keyword">raise</span> e<br><span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(uid) != <span class="hljs-built_in">int</span>:<br>    <span class="hljs-keyword">raise</span> Exception<br></code></pre></td></tr></table></figure>
+<p>可以看到平时写这种参数校验或类型转换会比较繁琐,同时接口的所有参数都需要参数校验,非常麻烦.一般像这些又繁琐又简单的东西都可以给程序自动化处理的,减轻自己的负担.</p>
+<h2 id="2-接口类型校验加在哪里"><a href="#2-接口类型校验加在哪里" class="headerlink" title="2.接口类型校验加在哪里?"></a>2.接口类型校验加在哪里?</h2><p>从上面的例子来看,加上一层接口类型自动校验和转换是非常有用且利于我们写接口的,也能减少很多工作量,那么这一层得怎么加,加在哪呢?</p>
+<p>这一层主要工作是拿到请求信息, 并进行转换和处理, 再把结果传递给路由函数, 那么, 我们这一层必须处于在框架拿到请求信息之后, 在进入路由函数之前.<br>而在框架中,只有中间件和给路由函数套上装饰器才可以比较优雅的增加接口类型校验. 但考虑到每个接口的参数都不一致,所以只能把接口类型校验这一层封装在一个装饰器里面,并在对应的路由函数套上该装饰器.</p>
+<p>既然决定了只能把接口类型校验放在装饰器,那只能通过传递参数和编写装饰器来共同完成接口类型校验功能,其中装饰器的逻辑是绝对不会变的, 应传递的参数决定了该路由函数接受了什么样的参数,那最好就是传递的参数是一个model(也就是python的类型),如果有新加功能,就是给类添加一个方法,再由装饰器的逻辑去调用.</p>
+<p>好了思路已经想好了,开始实现吧.</p>
+<h3 id="2-1-第一版-使用python基本类型校验"><a href="#2-1-第一版-使用python基本类型校验" class="headerlink" title="2.1 第一版,使用python基本类型校验"></a>2.1 第一版,使用python基本类型校验</h3><p><a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/api_param_check/version1.py">第一版代码</a></p>
+<p>第一版是整个代码的核心部分,之后也是围绕第一版代码进行修改,这里先贴所有代码<br>相对于示例接口, 主要改动是:</p>
+<ul>
+<li>1.增加一个Model类,用户通过继承可以简单快速的创建自己想要的Mode</li>
+<li>2.增加一个装饰器,用户可以把要检验的函数套上装饰器,并传入自己定义的Model.</li>
+<li>3.增加一个``request.state.param_dict`的方法, 路由函数可以直接从该方法获得已经被转换好的数据</li>
+</ul>
+<p>其他说明见代码里面的注释:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> ast<br><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> wraps<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Callable, Type<br><br><br><span class="hljs-keyword">import</span> uvicorn<br><span class="hljs-keyword">from</span> starlette.applications <span class="hljs-keyword">import</span> Starlette<br><span class="hljs-keyword">from</span> starlette.requests <span class="hljs-keyword">import</span> Request<br><span class="hljs-keyword">from</span> starlette.responses <span class="hljs-keyword">import</span> JSONResponse<br><span class="hljs-keyword">from</span> starlette.routing <span class="hljs-keyword">import</span> Route<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Model</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;创建一个Model类, 类属性是&#123;参数&#125;=&#123;参数类型&#125;&quot;&quot;&quot;</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;这里把类属性的值设置到__dict__&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> self.__dir__():<br>            <span class="hljs-comment"># 屏蔽自带方法,或其他私有方法</span><br>            <span class="hljs-keyword">if</span> key.startswith(<span class="hljs-string">&#x27;_&#x27;</span>):<br>                <span class="hljs-keyword">continue</span><br>            value = <span class="hljs-built_in">getattr</span>(self, key, <span class="hljs-literal">None</span>)<br>            <span class="hljs-comment"># 值不是python type的也是错的</span><br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">type</span>):<br>                <span class="hljs-keyword">continue</span><br>            self.__dict__[key] = value<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">to_dict</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;把&#123;参数&#125;=&#123;类型&#125;转为dict&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">return</span> self.__dict__<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomModel</span>(<span class="hljs-params">Model</span>):</span><br>    <span class="hljs-comment"># 这个是实际使用的Model, 看得出需要的uid参数类型是int</span><br>    uid = <span class="hljs-built_in">int</span><br>    timestamp = <span class="hljs-built_in">int</span><br>    user_info = <span class="hljs-built_in">dict</span><br>    user_name = <span class="hljs-built_in">str</span><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">params_verify</span>(<span class="hljs-params">model: Type[Model]</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;装饰器&quot;&quot;&quot;</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wrapper</span>(<span class="hljs-params">func: Callable</span>):</span><br><span class="hljs-meta">        @wraps(<span class="hljs-params">func</span>)</span><br>        <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request_param</span>(<span class="hljs-params">request: Request, *args, **kwargs</span>):</span><br>            <span class="hljs-comment"># 获取参数, 这里只做简单演示, 只获取url和json请求的数据</span><br>            param_dict: <span class="hljs-built_in">dict</span> = <span class="hljs-built_in">dict</span>(request.query_params)<br>            <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;POST&quot;</span>:<br>                param_dict.update(<span class="hljs-keyword">await</span> request.json())<br>            instance_model: Model = model()<br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-comment"># 通过model了解到了需要获取什么参数, 参数的类型是什么</span><br>                <span class="hljs-keyword">for</span> key, key_type <span class="hljs-keyword">in</span> instance_model.to_dict().items():<br>                    <span class="hljs-keyword">if</span> key <span class="hljs-keyword">in</span> param_dict:<br>                        <span class="hljs-comment"># 通过ast进行安全的类型转换</span><br>                        value = ast.literal_eval(param_dict[key])<br>                        param_dict[key] = key_type(value)<br>                <span class="hljs-comment"># 把转化好的参数放到&#x27;param_dict&#x27;</span><br>                request.state.param_dict = param_dict<br>                <span class="hljs-comment"># 处理响应</span><br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> func(request, *args, **kwargs)<br>            <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>                <span class="hljs-comment"># 这里为了示范,把错误抛出来</span><br>                <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;error&#x27;</span>: <span class="hljs-built_in">str</span>(e)&#125;)<br>        <span class="hljs-keyword">return</span> request_param<br>    <span class="hljs-keyword">return</span> wrapper<br><br><br><span class="hljs-meta">@params_verify(<span class="hljs-params">CustomModel</span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_post</span>(<span class="hljs-params">request</span>):</span><br>    <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;result&#x27;</span>: request.state.param_dict&#125;)<br><br><br><span class="hljs-meta">@params_verify(<span class="hljs-params">CustomModel</span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_get</span>(<span class="hljs-params">request</span>):</span><br>    <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;result&#x27;</span>: request.state.param_dict&#125;)<br><br><br>app = Starlette(<br>    routes=[<br>        Route(<span class="hljs-string">&#x27;/api&#x27;</span>, demo_post, methods=[<span class="hljs-string">&#x27;POST&#x27;</span>]),<br>        Route(<span class="hljs-string">&#x27;/api&#x27;</span>, demo_get, methods=[<span class="hljs-string">&#x27;GET&#x27;</span>]),<br>    ]<br>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+<p>代码编写好后开始运行代码,测试<code>GET:/api</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&quot;</span><br>&#123;<span class="hljs-string">&quot;result&quot;</span>:&#123;<span class="hljs-string">&quot;uid&quot;</span>:123&#125;&#125;<br>&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=abc&quot;</span><br>&#123;<span class="hljs-string">&quot;error&quot;</span>:<span class="hljs-string">&quot;malformed node or string: &lt;_ast.Name object at 0x7f3b2c5c3c10&gt;&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
+<p>可以看到当uid=123时,程序会自动把123转换为int类型, 而uid=abc则无法进行转换,并由ast模块抛错.<br>看得出第一版还是挺不错的,但是使用上有些麻烦,接下来进入第二版,添加更多常用的功能.</p>
+<h3 id="2-2-第二版-添加其他常用的功能"><a href="#2-2-第二版-添加其他常用的功能" class="headerlink" title="2.2 第二版,添加其他常用的功能"></a>2.2 第二版,添加其他常用的功能</h3><p><a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/api_param_check/version2.py">第二版代码</a></p>
+<p>在做接口检验时, 除了做类型识别外, 我们还会有一些常见的需求:</p>
+<ul>
+<li>字符串长度的最大/小长值</li>
+<li>数字最大/最小值</li>
+<li>该参数是否是必填</li>
+</ul>
+<p>但是由于我们设计Model时,采用’{参数}={类型}’的方法,已经填不了更多的值了,如果传一个dict或者list 限制又比较多,同时会让人很迷惑,同时,装饰器函数只是个函数,功能尽量的单一,要方便拓展.所以在第二版,我结合Python的描述器协议,对Model进行改版.</p>
+<p>首先创建一个<code>MISS_OBJECT</code>空对象, 用来判断用户有没有设置默认值, 和<code>CustomValueError</code>异常</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomValueError</span>(<span class="hljs-params">ValueError</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;异常&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">pass</span><br><br><br>MISS_OBJECT: <span class="hljs-string">&#x27;object()&#x27;</span> = <span class="hljs-built_in">object</span>()  <span class="hljs-comment"># 用于判空且非None</span><br></code></pre></td></tr></table></figure>
+
+<p>接下来就是一个创建Field,我们可以通过Field来实现拓展功能,Field是一个Python描述器,用于托管Model类属性的<code>__get__</code>,<code>__set__</code>,<code>__delete__</code>方法,本次修改的主要功能都在<code>Field</code>的<code>__set__</code>方法里面(目前简单就都写在同一个函数里)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Field</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        _type: Type,</span></span><br><span class="hljs-function"><span class="hljs-params">        default: Any = MISS_OBJECT,</span></span><br><span class="hljs-function"><span class="hljs-params">        max_length: Optional[<span class="hljs-built_in">int</span>] = <span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">        max_value: Optional[<span class="hljs-built_in">int</span>] = <span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">        min_value: Optional[<span class="hljs-built_in">int</span>] = <span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>):</span><br>        self._type: Type = _type<br>        self._default: Any = default<br>        self._max_length: Optional[<span class="hljs-built_in">int</span>] = max_length<br>        self._max: Optional[<span class="hljs-built_in">int</span>] = max_value<br>        self._min: Optional[<span class="hljs-built_in">int</span>] = min_value<br>        self._dict: Dict[<span class="hljs-built_in">str</span>, Any] = &#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__get__</span>(<span class="hljs-params">self, instance: <span class="hljs-string">&#x27;object()&#x27;</span>, owner: Type</span>) -&gt; Any:</span><br>        <span class="hljs-comment"># 获取已经处理好的数据</span><br>        <span class="hljs-keyword">try</span>:<br>            value = self._dict[instance]<br>        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>            <span class="hljs-keyword">raise</span> CustomValueError(<span class="hljs-string">&#x27;value must not empty&#x27;</span>) <span class="hljs-keyword">from</span> e<br>        <span class="hljs-keyword">return</span> value<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__set__</span>(<span class="hljs-params">self, instance: <span class="hljs-string">&#x27;object()&#x27;</span>, value: Union[<span class="hljs-built_in">str</span>, Any]</span>):</span><br>        <span class="hljs-comment"># 获取到请求的数据, 开始写入数据</span><br>        <span class="hljs-keyword">if</span> value <span class="hljs-keyword">is</span> MISS_OBJECT:<br>            <span class="hljs-comment"># 如果是空数据,且没设置默认值,则抛错</span><br>            <span class="hljs-keyword">if</span> self._default <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> MISS_OBJECT:<br>                value = self._default<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&#x27;value must not empty&#x27;</span>)<br><br>        <span class="hljs-keyword">if</span> value <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-comment"># 类型转换</span><br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(value) != self._type:<br>                value = ast.literal_eval(value)<br>                value = self._type(value)<br><br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">str</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">list</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">tuple</span>):<br>                <span class="hljs-comment"># 限制字符,list串长度</span><br>                <span class="hljs-keyword">if</span> self._max_length <span class="hljs-keyword">and</span> <span class="hljs-built_in">len</span>(value) &gt; self._max_length:<br>                    <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&#x27;value length:<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(value)&#125;</span> &gt; <span class="hljs-subst">&#123;self._max_length&#125;</span>&#x27;</span>)<br>            <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">int</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">float</span>):<br>                <span class="hljs-comment"># 限制数字范围</span><br>                <span class="hljs-keyword">if</span> self._max <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> value &gt; self._max:<br>                    value = self._max<br>                <span class="hljs-keyword">elif</span> self._min <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> value &lt; self._min:<br>                    value = self._min<br>        self._dict[instance] = value<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__delete__</span>(<span class="hljs-params">self, instance</span>):</span><br>        <span class="hljs-keyword">del</span> self._dict[instance]<br></code></pre></td></tr></table></figure>
+
+<p>编写完了描述器,那么我们可以根据描述器来更改Model了, <code>__init__</code>的初始化方法进行更改,把用到Field的属性加入到<code>field_list</code>中,方便参数校验装饰器调用.在<code>CustomModel</code>中我们赋值Field,并使用FIeld中的功能约束属性.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Model</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;这里把类属性的值设置到field_dict&quot;&quot;&quot;</span><br>        self.field_list: List[<span class="hljs-built_in">str</span>] = []<br>        <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> self.__dir__():<br>            <span class="hljs-comment"># 屏蔽自带方法,或其他私有方法</span><br>            <span class="hljs-keyword">if</span> key.startswith(<span class="hljs-string">&#x27;_&#x27;</span>):<br>                <span class="hljs-keyword">continue</span><br>            <span class="hljs-keyword">if</span> key <span class="hljs-keyword">in</span> self.__dict__:<br>                <span class="hljs-keyword">continue</span><br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-built_in">getattr</span>(self, key)<br>            <span class="hljs-keyword">except</span> CustomValueError:<br>                <span class="hljs-comment"># Field 还没初始化数据,所以会抛出CustpmValueError错误</span><br>                self.field_list.append(key)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">to_dict</span>(<span class="hljs-params">self</span>) -&gt; Dict[str, Any]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;把&#123;参数&#125;=&#123;类型&#125;转为dict&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">return</span> &#123;<br>            key: <span class="hljs-built_in">getattr</span>(self, key)<br>            <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> self.field_list<br>        &#125;<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomModel</span>(<span class="hljs-params">Model</span>):</span><br>    <span class="hljs-comment"># 现在可以结合Field编写我们自己的Model, 可以看到声明了类型, 条件</span><br>    uid = Field(<span class="hljs-built_in">int</span>, min_value=<span class="hljs-number">10</span>, max_value=<span class="hljs-number">100</span>)<br>    timestamp = Field(<span class="hljs-built_in">int</span>, default=<span class="hljs-literal">None</span>)<br>    user_info = Field(<span class="hljs-built_in">dict</span>, default=<span class="hljs-literal">None</span>)<br>    user_name = Field(<span class="hljs-built_in">str</span>, max_length=<span class="hljs-number">4</span>)<br><br></code></pre></td></tr></table></figure>
+
+<p>Model改造好了,可以把原来的装饰器进行修改:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">params_verify</span>(<span class="hljs-params">model: Type[Model]</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;装饰器&quot;&quot;&quot;</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wrapper</span>(<span class="hljs-params">func: Callable</span>):</span><br><span class="hljs-meta">        @wraps(<span class="hljs-params">func</span>)</span><br>        <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request_param</span>(<span class="hljs-params">request: Request, *args, **kwargs</span>):</span><br>            <span class="hljs-comment"># 获取参数, 这里只做简单演示, 只获取url和json请求的数据</span><br>            param_dict: <span class="hljs-built_in">dict</span> = <span class="hljs-built_in">dict</span>(request.query_params)<br>            <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;POST&quot;</span>:<br>                param_dict.update(<span class="hljs-keyword">await</span> request.json())<br>            instance_model: Model = model()<br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> instance_model.field_list:<br>                    value = param_dict.get(key, MISS_OBJECT)<br>                    <span class="hljs-built_in">setattr</span>(instance_model, key, value)<br>                <span class="hljs-comment"># 把model设置到request.stat里面,方便调用</span><br>                request.state.model = instance_model<br>                <span class="hljs-comment"># 处理响应</span><br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> func(request, *args, **kwargs)<br>            <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>                <span class="hljs-comment"># 这里为了示范,把错误抛出来</span><br>                <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;error&#x27;</span>: <span class="hljs-built_in">str</span>(e)&#125;)<br>        <span class="hljs-keyword">return</span> request_param<br>    <span class="hljs-keyword">return</span> wrapper<br><br><br><span class="hljs-meta">@params_verify(<span class="hljs-params">CustomModel</span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_post</span>(<span class="hljs-params">request</span>):</span><br>    <span class="hljs-comment"># 适配修改</span><br>    <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;result&#x27;</span>: request.state.model.to_dict()&#125;)<br><br><br><span class="hljs-meta">@params_verify(<span class="hljs-params">CustomModel</span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_get</span>(<span class="hljs-params">request</span>):</span><br>    <span class="hljs-comment"># 适配修改</span><br>    <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;result&#x27;</span>: request.state.model.to_dict()&#125;)<br><br></code></pre></td></tr></table></figure>
+
+<p>改写完了,继续跑下测试,看看结果怎么样(由于还没完善异常处理,所以只抛出简单的异常信息)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 由于我们没给use_name设置了default值, 所以抛错,需要填值</span><br>&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&quot;</span><br>&#123;<span class="hljs-string">&quot;error&quot;</span>:<span class="hljs-string">&quot;value must not empty&quot;</span>&#125;<br><span class="hljs-comment"># 由于user_name的最大长度限制为4, 而apple的长度为5,所以抛错</span><br>&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&amp;user_name=apple&quot;</span><br>&#123;<span class="hljs-string">&quot;error&quot;</span>:<span class="hljs-string">&quot;value length:5 &gt; 4&quot;</span>&#125;<br><span class="hljs-comment"># 响应正常,但是uid大于100,所以自动设置为100(正常来说这里uid的值不能被更改再使用,这里只是做测试)</span><br>&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&amp;user_name=appl&quot;</span> <br>&#123;<span class="hljs-string">&quot;result&quot;</span>:&#123;<span class="hljs-string">&quot;uid&quot;</span>:100,<span class="hljs-string">&quot;timestamp&quot;</span>:null,<span class="hljs-string">&quot;user_info&quot;</span>:null,<span class="hljs-string">&quot;user_name&quot;</span>:<span class="hljs-string">&quot;appl&quot;</span>&#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到这一版本还有一些细节还没敲定好, 但是基本功能都是完备的, 也可以很方便的进行校验功能拓展.</p>
+<h3 id="2-3-第三版-使用Type-Hints"><a href="#2-3-第三版-使用Type-Hints" class="headerlink" title="2.3 第三版,使用Type Hints"></a>2.3 第三版,使用Type Hints</h3><p><a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/api_param_check/version3.py">第三版代码</a></p>
+<p>在Python 3.5之后开始出现了一个叫TypeHints的东西, TypeHints可以通过类似于</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test</span>(<span class="hljs-params">a: <span class="hljs-built_in">int</span>, b: <span class="hljs-built_in">str</span></span>) -&gt; list</span><br><span class="hljs-function">	return [a, b]</span><br></code></pre></td></tr></table></figure>
+
+<p>来告诉 IDE或者代码检查工具,查看用户写代码的类型是否准确(但是会让你感觉在写静态语言- -), 但不会影响运行时的性能. 在3.5时, TypeHints非常简单, 如今到了3.7TypeHint已经越来越完善了, 我们可以把Field的type转移到annotation中, 这样在写路由函数时, IDE可以帮我们更好的分析, 防止我们写错代码.<br>这一版本中, 由于使用了Python的TypeHint, 所以Field不用传入type了, 把类型写在annotation中.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Field</span>:</span><br>    ...<br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">type_handle</span>(<span class="hljs-params">self, value: Any, key_type: Union[Type, _GenericAlias]</span>) -&gt; Any:</span><br>        <span class="hljs-string">&quot;&quot;&quot;兼容TyepHint和python基础类型转换的handle</span><br><span class="hljs-string">        目前只支持typing的Union,Option和所有Python的基础类型</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">hasattr</span>(key_type, <span class="hljs-string">&#x27;__origin__&#x27;</span>) <span class="hljs-keyword">and</span> key_type.__origin__ <span class="hljs-keyword">is</span> Union:<br>            <span class="hljs-comment"># get typing.type from Union</span><br>            key_type = key_type.__args__<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-built_in">isinstance</span>(value, key_type):<br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(key_type, <span class="hljs-built_in">tuple</span>):<br>                    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> key_type:<br>                        <span class="hljs-keyword">try</span>:<br>                            value = self._python_type_conversion(i, value)<br>                            <span class="hljs-keyword">break</span><br>                        <span class="hljs-keyword">except</span> TypeError:<br>                            value = <span class="hljs-literal">None</span><br>                    <span class="hljs-keyword">else</span>:<br>                        <span class="hljs-keyword">raise</span> TypeError<br>                <span class="hljs-keyword">else</span>:<br>                    value = self._python_type_conversion(key_type, value)<br>            <span class="hljs-keyword">except</span> Exception:<br>                <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&quot;The type should be <span class="hljs-subst">&#123;key_type&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">return</span> value<br><br><span class="hljs-meta">    @staticmethod</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_python_type_conversion</span>(<span class="hljs-params">key_type: Type, value: <span class="hljs-built_in">str</span></span>) -&gt; Any:</span><br>        <span class="hljs-string">&quot;&quot;&quot;Python基础类型转换&quot;&quot;&quot;</span><br>        value = ast.literal_eval(value)<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(value) == key_type:<br>            <span class="hljs-keyword">return</span> value<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-keyword">return</span> key_type(value)<br>        <span class="hljs-keyword">except</span> Exception:<br>            <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&quot;Value type:<span class="hljs-subst">&#123;<span class="hljs-built_in">type</span>(value)&#125;</span> is not <span class="hljs-subst">&#123;key_type&#125;</span>&quot;</span>)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__set__</span>(<span class="hljs-params">self, instance: <span class="hljs-string">&#x27;object()&#x27;</span>, value_tuple: Tuple[Any, Union[Type, _GenericAlias]]</span>):</span><br>        <span class="hljs-comment"># 写入数据</span><br>        value, key_type = value_tuple<br>        <span class="hljs-keyword">if</span> value <span class="hljs-keyword">is</span> MISS_OBJECT:<br>            <span class="hljs-comment"># 如果是空数据,且没设置默认值,则抛错</span><br>            <span class="hljs-keyword">if</span> self._default <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> MISS_OBJECT:<br>                value = self._default<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&#x27;value must not empty&#x27;</span>)<br>        <span class="hljs-keyword">if</span> value <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-comment"># 类型转换</span><br>            value = self.type_handle(value, key_type)<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">str</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">list</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">tuple</span>):<br>                <span class="hljs-comment"># 限制字符,list串长度</span><br>                <span class="hljs-keyword">if</span> self._max_length <span class="hljs-keyword">and</span> <span class="hljs-built_in">len</span>(value) &gt; self._max_length:<br>                    <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&#x27;value length:<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(value)&#125;</span> &gt; <span class="hljs-subst">&#123;self._max_length&#125;</span>&#x27;</span>)<br>            <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">int</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(value, <span class="hljs-built_in">float</span>):<br>                <span class="hljs-comment"># 限制数字范围</span><br>                <span class="hljs-keyword">if</span> self._max <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> value &gt; self._max:<br>                    value = self._max<br>                <span class="hljs-keyword">elif</span> self._min <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> value &lt; self._min:<br>                    value = self._min<br>        self._dict[instance] = value<br></code></pre></td></tr></table></figure>
+
+<p>使用TypeHint后,类型信息存放点从Field改为Model,所以Model也要做适配性改造</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Model</span>:</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;这里把类属性的值设置到field_dict&quot;&quot;&quot;</span><br>        self.field_dict = &#123;&#125;<br>        <span class="hljs-comment"># 这里调用的是self.__annotations__,里面存着类属性的key, type</span><br>        <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> self.__annotations__:<br>            <span class="hljs-comment"># 屏蔽自带方法,或其他私有方法</span><br>            <span class="hljs-keyword">if</span> key.startswith(<span class="hljs-string">&#x27;_&#x27;</span>):<br>                <span class="hljs-keyword">continue</span><br>            <span class="hljs-keyword">if</span> key <span class="hljs-keyword">in</span> self.__dict__:<br>                <span class="hljs-keyword">continue</span><br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-built_in">getattr</span>(self, key)<br>            <span class="hljs-keyword">except</span> CustomValueError:<br>                <span class="hljs-comment"># 还没初始化数据,所以会抛出CustpmValueError错误</span><br>                self.field_dict[key] = self.__annotations__[key]<br>                <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">to_dict</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;把&#123;参数&#125;=&#123;类型&#125;转为dict&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">return</span> &#123;<br>            key: <span class="hljs-built_in">getattr</span>(self, key)<br>            <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> self.field_dict<br>        &#125;<br></code></pre></td></tr></table></figure>
+
+<p>装饰器函数同样针对Model和Field的改动进行适配</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">params_verify</span>(<span class="hljs-params">model: Type[Model]</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;装饰器&quot;&quot;&quot;</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wrapper</span>(<span class="hljs-params">func: Callable</span>):</span><br><span class="hljs-meta">        @wraps(<span class="hljs-params">func</span>)</span><br>        <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request_param</span>(<span class="hljs-params">request: Request, *args, **kwargs</span>):</span><br>            <span class="hljs-comment"># 获取参数, 这里只做简单演示, 只获取url和json请求的数据</span><br>            param_dict: <span class="hljs-built_in">dict</span> = <span class="hljs-built_in">dict</span>(request.query_params)<br>            <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;POST&quot;</span>:<br>                param_dict.update(<span class="hljs-keyword">await</span> request.json())<br><br>            instance_model: Model = model()<br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-keyword">for</span> key, key_type <span class="hljs-keyword">in</span> instance_model.field_dict.items():<br>                    value = param_dict.get(key, MISS_OBJECT)<br>                    <span class="hljs-comment"># 现在传入的是value和value的type</span><br>                    <span class="hljs-built_in">setattr</span>(instance_model, key, (value, key_type))<br>                <span class="hljs-comment"># 把model设置到request.stat里面,方便调用</span><br>                request.state.model = instance_model<br>                <span class="hljs-comment"># 处理响应</span><br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> func(request, *args, **kwargs)<br>            <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>                <span class="hljs-comment"># 这里为了示范,把错误抛出来</span><br>                <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;error&#x27;</span>: <span class="hljs-built_in">str</span>(e)&#125;)<br>        <span class="hljs-keyword">return</span> request_param<br>    <span class="hljs-keyword">return</span> wrapper<br><br></code></pre></td></tr></table></figure>
+
+<p>进行修改后,CustomModel就可以支持TyepHint功能了, 可以重点关注uid的类型,现在可以同时支持str和int了.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomModel</span>(<span class="hljs-params">Model</span>):</span><br>    uid: Union[<span class="hljs-built_in">str</span>, <span class="hljs-built_in">int</span>] = Field(min_value=<span class="hljs-number">10</span>, max_value=<span class="hljs-number">100</span>)<br>    timestamp: <span class="hljs-built_in">int</span> = Field(default=<span class="hljs-literal">None</span>)<br>    user_info: <span class="hljs-built_in">dict</span> = Field(default=<span class="hljs-literal">None</span>)<br>    user_name: <span class="hljs-built_in">str</span> = Field(max_length=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
+
+<p>接下来看以下测试,,由于Field的逻辑,第一个类型检查转换完毕后,就不会继续检查和转换.所以uid会优先被转换为str,并不受min和max的影响.可以看到下面返回的uid的值是<code>“123”</code>,并不会受到max的限制</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&amp;user_name=appl&quot;</span><br>&#123;<span class="hljs-string">&quot;result&quot;</span>:&#123;<span class="hljs-string">&quot;uid&quot;</span>:<span class="hljs-string">&quot;123&quot;</span>,<span class="hljs-string">&quot;timestamp&quot;</span>:null,<span class="hljs-string">&quot;user_info&quot;</span>:null,<span class="hljs-string">&quot;user_name&quot;</span>:<span class="hljs-string">&quot;appl&quot;</span>&#125;&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-4-第四版-使用inspect"><a href="#2-4-第四版-使用inspect" class="headerlink" title="2.4 第四版,使用inspect"></a>2.4 第四版,使用inspect</h3><p><a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/api_param_check/version4.py">第四版代码</a></p>
+<p>在TypeHint出现后,inspect可以解析函数的参数以及参数对应的值,同时也能解析我们标注函数返回的类型,这样我们就可以做2个改造了:</p>
+<ul>
+<li>1.把model从装饰器传入改为从函数传入,从函数传入有多个优点:<ul>
+<li>调用者简单明了,知道这就是他自己想要的参数</li>
+<li>支持多个model,用户可以重复利用多个model.</li>
+<li>支持param: type = value的形式(这里没实现,可以见项目<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>)</li>
+</ul>
+</li>
+<li>2.对返回类型进行标注,同时进行检查和抛错</li>
+</ul>
+<p>一般来说第一点比较重要,可能有人觉得第二点导致他无法返回其他状态码响应,解决办法是从装饰器转入状态码即可.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomModel</span>(<span class="hljs-params">Model</span>):</span><br>    <span class="hljs-comment"># 旧的Model</span><br>    uid: Union[<span class="hljs-built_in">str</span>, <span class="hljs-built_in">int</span>] = Field(<span class="hljs-built_in">min</span>=<span class="hljs-number">10</span>, <span class="hljs-built_in">max</span>=<span class="hljs-number">100</span>)<br>    timestamp: <span class="hljs-built_in">int</span> = Field(default=<span class="hljs-literal">None</span>)<br>    user_info: <span class="hljs-built_in">dict</span> = Field(default=<span class="hljs-literal">None</span>)<br>    user_name: <span class="hljs-built_in">str</span> = Field(max_length=<span class="hljs-number">4</span>)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomOtherModel</span>(<span class="hljs-params">Model</span>):</span><br>    <span class="hljs-comment"># 新的Model</span><br>    age: <span class="hljs-built_in">int</span> = Field(<span class="hljs-built_in">min</span>=<span class="hljs-number">1</span>, <span class="hljs-built_in">max</span>=<span class="hljs-number">100</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">params_verify</span>():</span><br>    <span class="hljs-string">&quot;&quot;&quot;装饰器&quot;&quot;&quot;</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wrapper</span>(<span class="hljs-params">func: Callable</span>):</span><br><span class="hljs-meta">        @wraps(<span class="hljs-params">func</span>)</span><br>        <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request_param</span>(<span class="hljs-params">request: Request, *args, **kwargs</span>):</span><br>            <span class="hljs-comment"># 获取参数, 这里只做简单演示, 只获取url和json请求的数据</span><br>            param_dict: <span class="hljs-built_in">dict</span> = <span class="hljs-built_in">dict</span>(request.query_params)<br>            <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;POST&quot;</span>:<br>                param_dict.update(<span class="hljs-keyword">await</span> request.json())<br>            <span class="hljs-comment"># 通过inspect解析参数</span><br>            sig: <span class="hljs-string">&#x27;inspect.Signature&#x27;</span> = inspect.signature(func)<br>            fun_param_dict: Dict[<span class="hljs-built_in">str</span>, inspect.Parameter] = &#123;<br>                key: sig.parameters[key]<br>                <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> sig.parameters<br>                <span class="hljs-keyword">if</span> sig.parameters[key].annotation != inspect._empty<br>            &#125;<br>            return_param: Type = sig.return_annotation<br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-comment"># 对参数进行转换,并返回给函数</span><br>                func_args = []<br>                <span class="hljs-keyword">for</span> param <span class="hljs-keyword">in</span> fun_param_dict.values():<br>                    model: Model = param.annotation()<br>                    <span class="hljs-keyword">for</span> key, key_type <span class="hljs-keyword">in</span> model.field_dict.items():<br>                        value: Any = param_dict.get(key, MISS_OBJECT)<br>                        <span class="hljs-built_in">setattr</span>(model, key, (value, key_type))<br>                    func_args.append(model)<br>                <span class="hljs-comment"># 处理响应</span><br>                response = <span class="hljs-keyword">await</span> func(request, *func_args, **kwargs)<br>                <span class="hljs-comment"># 响应检查</span><br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(response) != return_param:<br>                    <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&#x27;response type != <span class="hljs-subst">&#123;return_param&#125;</span>&#x27;</span>)<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">dict</span> <span class="hljs-keyword">is</span> return_param:<br>                    <span class="hljs-keyword">return</span> JSONResponse(response)<br>                <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&#x27;<span class="hljs-subst">&#123;<span class="hljs-built_in">type</span>(response)&#125;</span> not support&#x27;</span>)<br>            <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>                <span class="hljs-comment"># 这里为了示范,把错误抛出来</span><br>                <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;error&#x27;</span>: <span class="hljs-built_in">str</span>(e)&#125;)<br>        <span class="hljs-keyword">return</span> request_param<br>    <span class="hljs-keyword">return</span> wrapper<br><br><br><span class="hljs-comment"># 装饰器移除了参数, 改为从函数参数传入</span><br><span class="hljs-meta">@params_verify()</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_get</span>(<span class="hljs-params">request, model: CustomModel, other_model: CustomOtherModel</span>) -&gt; dict:</span><br>    return_dict = model.to_dict()<br>    return_dict.update(other_model.to_dict())<br>    <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&#x27;result&#x27;</span>: return_dict&#125;<br></code></pre></td></tr></table></figure>
+
+<p>修改完成后,进行测试,可以发现age被转为min=1的值.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">&gt;&gt;&gt;curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&amp;user_name=appl&amp;age=-1&quot;</span><br>&#123;<span class="hljs-string">&quot;result&quot;</span>:&#123;<span class="hljs-string">&quot;uid&quot;</span>:<span class="hljs-string">&quot;123&quot;</span>,<span class="hljs-string">&quot;timestamp&quot;</span>:null,<span class="hljs-string">&quot;user_info&quot;</span>:null,<span class="hljs-string">&quot;user_name&quot;</span>:<span class="hljs-string">&quot;appl&quot;</span>,<span class="hljs-string">&quot;age&quot;</span>:1&#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-5-第五版-使用Pydantic"><a href="#2-5-第五版-使用Pydantic" class="headerlink" title="2.5 第五版,使用Pydantic"></a>2.5 第五版,使用Pydantic</h3><p><a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/api_param_check/version5.py">第五版代码</a></p>
+<p>其实到了第四版,就开始投入使用,并运行很长的时间了,因为对类型嵌套没有比较大需求,所以也没打算有什么改进.</p>
+<p>直到有一天看到fastapi同时又发现自己其实是有类型嵌套的需求, 所以就开始了解Pydantic并使用他(毕竟功能类似,功能还能更多,何乐而不为呢).</p>
+<p>Pydantic功能非常多,远远大于上面的Model和Field, 支持多种校验, 支持Orm, 支持openapi schema生成等等,需要什么功能,从<a target="_blank" rel="noopener" href="https://pydantic-docs.helpmanual.io/">文档</a>里查找就可以了.</p>
+<p>由于之前实现Model的逻辑跟Pydantic的BaseModel逻辑很像, 所以基于第四版代码修改并使用Pydantic十分简单,只要把自己的Model,Field删除掉,并且引入Pydantic即可(如下),并在装饰器那里使用dict的方式传入并把调用model的to_dict改为dict即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> inspect<br><br><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> wraps<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, Dict, List, Type<br><br><span class="hljs-keyword">import</span> uvicorn<br><span class="hljs-keyword">from</span> starlette.applications <span class="hljs-keyword">import</span> Starlette<br><span class="hljs-keyword">from</span> starlette.requests <span class="hljs-keyword">import</span> Request<br><span class="hljs-keyword">from</span> starlette.responses <span class="hljs-keyword">import</span> JSONResponse<br><span class="hljs-keyword">from</span> starlette.routing <span class="hljs-keyword">import</span> Route<br><span class="hljs-keyword">from</span> pydantic <span class="hljs-keyword">import</span> (<br>    BaseModel,<br>    conint,<br>    constr,<br>)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PydanticModel</span>(<span class="hljs-params">BaseModel</span>):</span><br>    <span class="hljs-comment"># 改为Pydantic的Model</span><br>    uid: conint(gt=<span class="hljs-number">10</span>, lt=<span class="hljs-number">1000</span>)<br>    user_name: constr(min_length=<span class="hljs-number">2</span>, max_length=<span class="hljs-number">4</span>)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PydanticOtherModel</span>(<span class="hljs-params">BaseModel</span>):</span><br>    age: conint(gt=<span class="hljs-number">1</span>, lt=<span class="hljs-number">100</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">params_verify</span>():</span><br>    <span class="hljs-string">&quot;&quot;&quot;装饰器&quot;&quot;&quot;</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wrapper</span>(<span class="hljs-params">func</span>):</span><br><span class="hljs-meta">        @wraps(<span class="hljs-params">func</span>)</span><br>        <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">request_param</span>(<span class="hljs-params">request: Request, *args, **kwargs</span>):</span><br>            <span class="hljs-comment"># 获取参数, 这里只做简单演示, 只获取url和json请求的数据</span><br>            param_dict: <span class="hljs-built_in">dict</span> = <span class="hljs-built_in">dict</span>(request.query_params)<br>            <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;POST&quot;</span>:<br>                param_dict.update(<span class="hljs-keyword">await</span> request.json())<br><br>            sig: <span class="hljs-string">&#x27;inspect.Signature&#x27;</span> = inspect.signature(func)<br>            fun_param_dict: Dict[<span class="hljs-built_in">str</span>, inspect.Parameter] = &#123;<br>                key: sig.parameters[key]<br>                <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> sig.parameters<br>                <span class="hljs-keyword">if</span> sig.parameters[key].annotation != inspect._empty<br>            &#125;<br>            return_param: Any = sig.return_annotation<br>            <span class="hljs-keyword">try</span>:<br>                func_args: List[BaseModel] = []<br>                <span class="hljs-keyword">for</span> param <span class="hljs-keyword">in</span> fun_param_dict.values():<br>                    <span class="hljs-keyword">if</span> param.annotation <span class="hljs-keyword">is</span> Request:<br>                        <span class="hljs-keyword">continue</span><br>                    model: BaseModel = param.annotation(**param_dict)<br>                    func_args.append(model)<br>                <span class="hljs-comment"># 处理响应</span><br>                response: Any = <span class="hljs-keyword">await</span> func(request, *func_args, **kwargs)<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(response) != return_param:<br>                    <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&#x27;response type != <span class="hljs-subst">&#123;return_param&#125;</span>&#x27;</span>)<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">dict</span> <span class="hljs-keyword">is</span> return_param:<br>                    <span class="hljs-keyword">return</span> JSONResponse(response)<br>                <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">f&#x27;<span class="hljs-subst">&#123;<span class="hljs-built_in">type</span>(response)&#125;</span> not support&#x27;</span>)<br>            <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>                <span class="hljs-comment"># 这里为了示范,把错误抛出来,这里改为e.json,错误信息会更详细的</span><br>                <span class="hljs-keyword">return</span> JSONResponse(&#123;<span class="hljs-string">&#x27;error&#x27;</span>: <span class="hljs-built_in">str</span>(e)&#125;)<br>        <span class="hljs-keyword">return</span> request_param<br>    <span class="hljs-keyword">return</span> wrapper<br><br><br><span class="hljs-meta">@params_verify()</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_get</span>(<span class="hljs-params">request: Request, model: PydanticModel, other_model: PydanticOtherModel</span>) -&gt; dict:</span><br>    return_dict = model.<span class="hljs-built_in">dict</span>()<br>    return_dict.update(other_model.<span class="hljs-built_in">dict</span>())<br>    <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&#x27;result&#x27;</span>: return_dict&#125;<br><br><br>app = Starlette(<br>    routes=[<br>        Route(<span class="hljs-string">&#x27;/api&#x27;</span>, demo_get, methods=[<span class="hljs-string">&#x27;GET&#x27;</span>]),<br>    ]<br>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+
+<p>继续跑刚才的测试,由于逻辑有点不同,Pydantic不会进行自动转换,但是抛错信息挺详细的(改为e.json报错会更详细)…</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&amp;user_name=apple&amp;age=-1&quot;</span><br>&#123;<span class="hljs-string">&quot;error&quot;</span>:<span class="hljs-string">&quot;1 validation error for PydanticModel\nuser_name\n  ensure this value has at most 4 characters (type=value_error.any_str.max_length; limit_value=4)&quot;</span>&#125;<br>&gt;&gt;&gt; curl <span class="hljs-string">&quot;127.0.0.1:8000/api?uid=123&amp;user_name=appl&amp;age=2&quot;</span><br>&#123;<span class="hljs-string">&quot;result&quot;</span>:&#123;<span class="hljs-string">&quot;uid&quot;</span>:123,<span class="hljs-string">&quot;user_name&quot;</span>:<span class="hljs-string">&quot;appl&quot;</span>,<span class="hljs-string">&quot;age&quot;</span>:2&#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>到这里,对于接口层的类型校验基本功能的升级基本完成了,可以看到理解了原理后是非常简单的代码(在引入Pydantic后),但减少了很多重复的代码量,再稍微拓展,就可以支持更多的框架啦.</p>
+<h3 id="2-6-更多功能"><a href="#2-6-更多功能" class="headerlink" title="2.6 更多功能"></a>2.6 更多功能</h3><p>这份代码很简单, 主要做了对接口的参数检查,转换等封装, 但是只获取了url的参数和json body参数, 在日常使用中我还更希望我能快速的获取到cookie和header的参数. 同时由于代码既文档的思想, 我还想让他能自动生成文档, 所以我再进行了升级改造, 使他能实现这些功能,详情查看我的开源项目<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>, 他还支持cbv模式, 支持更好的错误报错, 更重要的是支持更多的框架.</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h2><p>在第一次编写接口的类型校验时, 带我的大佬说不提倡这样写, 特别是不要经常引入装饰器(此时处于python2与python3的转换期),觉得装饰器会让人误解,导致别人很难一下子看得懂逻辑, 在路由函数的doc写就可以了, 但是后面慢慢多了TypeHint, 也有Pydantic这样优秀的框架, 我觉得实现这个类型校验带来的收益(比如减少代码量等)远远大于他让人难以理解时,那我们就可以选择使用他.所以我就从实现后一直使用这个功能,并且逐渐的完善他,让他更好用,同时也让我对Python的TypeHint更加的深入理解和运用,现在写非小脚本的Python代码时也都在用TypeHint了,推荐大家都使用他.随着TypeHint的发展,在大项目中写Python会越来越顺手的, 也能让Python项目更工程化.</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/04/15/%E7%BB%99python%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A3%80/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;15&#x2F;%E7%BB%99python%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A3%80&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;15&#x2F;%E7%BB%99python%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A3%80&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2019/06/08/python%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9D%91/"><i class="iconfont iconleft"></i>python常见的坑</a>
+    <a href="/2019/04/15/iptables/">iptables<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BA%E4%BD%95%E8%A6%81%E5%8A%A0%E4%B8%8A%E7%BB%99%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A0%A1%E9%AA%8C"><span class="toc-text">1.为何要加上给接口加上一层类型校验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E7%A4%BA%E4%BE%8B%E6%8E%A5%E5%8F%A3"><span class="toc-text">1.1.示例接口</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B%E6%A0%A1%E9%AA%8C%E5%8A%A0%E5%9C%A8%E5%93%AA%E9%87%8C"><span class="toc-text">2.接口类型校验加在哪里?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%AC%AC%E4%B8%80%E7%89%88-%E4%BD%BF%E7%94%A8python%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%A0%A1%E9%AA%8C"><span class="toc-text">2.1 第一版,使用python基本类型校验</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E7%AC%AC%E4%BA%8C%E7%89%88-%E6%B7%BB%E5%8A%A0%E5%85%B6%E4%BB%96%E5%B8%B8%E7%94%A8%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="toc-text">2.2 第二版,添加其他常用的功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E7%AC%AC%E4%B8%89%E7%89%88-%E4%BD%BF%E7%94%A8Type-Hints"><span class="toc-text">2.3 第三版,使用Type Hints</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E7%AC%AC%E5%9B%9B%E7%89%88-%E4%BD%BF%E7%94%A8inspect"><span class="toc-text">2.4 第四版,使用inspect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E7%AC%AC%E4%BA%94%E7%89%88-%E4%BD%BF%E7%94%A8Pydantic"><span class="toc-text">2.5 第五版,使用Pydantic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-%E6%9B%B4%E5%A4%9A%E5%8A%9F%E8%83%BD"><span class="toc-text">2.6 更多功能</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BA%E4%BD%95%E8%A6%81%E5%8A%A0%E4%B8%8A%E7%BB%99%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A0%A1%E9%AA%8C"><span class="toc-text">1.为何要加上给接口加上一层类型校验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E7%A4%BA%E4%BE%8B%E6%8E%A5%E5%8F%A3"><span class="toc-text">1.1.示例接口</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B%E6%A0%A1%E9%AA%8C%E5%8A%A0%E5%9C%A8%E5%93%AA%E9%87%8C"><span class="toc-text">2.接口类型校验加在哪里?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%AC%AC%E4%B8%80%E7%89%88-%E4%BD%BF%E7%94%A8python%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%A0%A1%E9%AA%8C"><span class="toc-text">2.1 第一版,使用python基本类型校验</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E7%AC%AC%E4%BA%8C%E7%89%88-%E6%B7%BB%E5%8A%A0%E5%85%B6%E4%BB%96%E5%B8%B8%E7%94%A8%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="toc-text">2.2 第二版,添加其他常用的功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E7%AC%AC%E4%B8%89%E7%89%88-%E4%BD%BF%E7%94%A8Type-Hints"><span class="toc-text">2.3 第三版,使用Type Hints</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E7%AC%AC%E5%9B%9B%E7%89%88-%E4%BD%BF%E7%94%A8inspect"><span class="toc-text">2.4 第四版,使用inspect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E7%AC%AC%E4%BA%94%E7%89%88-%E4%BD%BF%E7%94%A8Pydantic"><span class="toc-text">2.5 第五版,使用Pydantic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-%E6%9B%B4%E5%A4%9A%E5%8A%9F%E8%83%BD"><span class="toc-text">2.6 更多功能</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

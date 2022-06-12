@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python-gRPC实践(6)--编写gRPC网关 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前言就目前而言，在大多数场景中，用户侧的客户端和服务端...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python-gRPC实践(6)--编写gRPC网关</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2022/02/bd67e15aa8d46101.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python-gRPC实践(6)--编写gRPC网关</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>May 23, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>13377</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>就目前而言，在大多数场景中，用户侧的客户端和服务端还是通过HTTP进行交互，然后服务端内部各种服务再通过过各种协议进行交互，所以在采用了gRPC做内部服务的交互协议后，就需要一个网关来把gRPC的调用自动映射到HTTP应用上，方便客户端调用。</p>
+<blockquote>
+<p>注：本文只针对一对一的gRPC服务。</p>
+<p>之前原本想当做一个简单的实现，后面发现可以与我编写的<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>框架可以嵌到一起，这样也可以对多个Web框架提供Gateway功能，于是就把这个功能的实现嵌入到<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>框架中，所以下面有些代码来自于我编写的<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>框架，对应的gRPC网关文档使用说明见:<a href="https://so1n.me/pait-zh-doc/7_gRPC_gateway/">Pait gRPC Gateway</a></p>
+</blockquote>
+<h2 id="1-网关的基础实现思路"><a href="#1-网关的基础实现思路" class="headerlink" title="1.网关的基础实现思路"></a>1.网关的基础实现思路</h2><p>网关的思路很简单，就是把HTTP请求转发到了对应的gRPC服务，在<code>Go</code>生态中，已经出现了一个类似的框架–<a target="_blank" rel="noopener" href="https://github.com/grpc-ecosystem/grpc-gateway">grpc-gateway</a>，它负责grpc服务自动的映射到HTTP服务中，同时它通过让HTTP服务和gRPC服务监听同一个端口来降低使用者的疑惑。</p>
+<p>通过前面的文章我们了解到，gRPC采用的是HTTP/2做传输协议，而HTTP/2是对于HTTP/1.1的一个升级，这样的话服务端在接收socket的数据且转为HTTP数据后就可以判断Header中<code>Upgrade</code>字段对应的值来把数据分别分发到HTTP服务和gRPC服务。</p>
+<p>但是，<code>Python</code>的gRPC是通过gRPC-C转译的，也就是它的底层是C实现的，所以<code>Python</code>的gRPC无法传socket来启动服务，而是只能通过指定ip:port的形式来启动服务，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> concurrent <span class="hljs-keyword">import</span> futures<br><br>grpc.server(<br>    futures.ThreadPoolExecutor(max_workers=<span class="hljs-number">10</span>),<br>).add_insecure_port(<span class="hljs-string">&quot;127.0.0.1:9000&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>这样上述的做法就无法实现了，只能让HTTP服务和gRPC服务分别监听不同的端口，无法做到像<a target="_blank" rel="noopener" href="https://github.com/grpc-ecosystem/grpc-gateway">Go grpc-gateway</a>那样，毕竟Go才是亲儿子。</p>
+<p>最终只能以下面的方式实现：<br><img src="https://cdn.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1653363969391gRPC-Gateway.jpg"><br>图中客户端发起的请求会先发送到HTTP服务绑定的端口，HTTP服务收到请求后，会转发到gRPC客户端，交由gRPC客户端发送到gRPC服务端，这样一系列服务就串起来了。</p>
+<blockquote>
+<p>图中的示例HTTP服务与gRPC客户端在同一个进程，而gRPC服务在同台机器的另外一个进程，但是他们也可以在同一个进程内。</p>
+</blockquote>
+<h2 id="2-如何编写转发路由"><a href="#2-如何编写转发路由" class="headerlink" title="2.如何编写转发路由"></a>2.如何编写转发路由</h2><p>总体思路决定后，就开始细究路由的实现了，路由只负责转发，不做其它功能，通过前面文章<a href="https://so1n.me/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/">Python-gRPC实践（1）–gRPC简介</a>的捉包可以知道，gRPC传输数据时，采用的是HTTP/2来传输请求，用的是POST方法，同时使用Body传输数据，那么我们可以采用尽量相似的方法来接收请求，再通过gRPC客户端传到对应的服务端，如下的Proto文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs proto">syntax &#x3D; &quot;proto3&quot;;<br>package example;<br><br><br>message LoginUserRequest &#123;<br>  string uid &#x3D; 1;<br>  string password &#x3D; 2;<br>&#125;<br>message LoginUserResult &#123;<br>  string uid &#x3D; 1;<br>  string user_name &#x3D; 2;<br>  string token &#x3D; 3;<br>&#125;<br><br><br>service User &#123;<br>    rpc login_user(LoginUserRequest) returns (LoginUserResult);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>接着，以这种方法来创建一个路由来映射这个Proto文件的请求，这个路由采用POST方法然后解析对应的数据并通过对应的gRPC客户端传递到服务端，为了尽量的跟gRPC一致，所以HTTP服务与客户端通过Json进行交互，映射的路由代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> starlette.applications <span class="hljs-keyword">import</span> Starlette<br><span class="hljs-keyword">from</span> starlette.routing <span class="hljs-keyword">import</span> Route<br><span class="hljs-keyword">from</span> starlette.requests <span class="hljs-keyword">import</span> Request<br><span class="hljs-keyword">from</span> starlette.responses <span class="hljs-keyword">import</span> JSONResponse<br><br><span class="hljs-comment"># pait项目的演示代码，由Proto文件生产的</span><br><span class="hljs-keyword">from</span> example.example_grpc.python_example_proto_code.example_proto.user <span class="hljs-keyword">import</span> user_pb2<br><span class="hljs-keyword">from</span> example.example_grpc.python_example_proto_code.example_proto.user <span class="hljs-keyword">import</span> user_pb2_grpc<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">login_route</span>(<span class="hljs-params">request: Request</span>) -&gt; JSONResponse:</span><br>    <span class="hljs-comment"># 接收请求</span><br>    request_dict: <span class="hljs-built_in">dict</span> = <span class="hljs-keyword">await</span> request.json()<br>    user_service: user_pb2_grpc.UserStub = request.app.state.user_service<br>    <span class="hljs-comment"># 发送请求到对应的gRPC服务端</span><br>    result: user_pb2.LoginUserResult = user_service.login_user(<br>        user_pb2.LoginUserRequest(uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>], password=request_dict[<span class="hljs-string">&quot;password&quot;</span>])<br>    )<br>    <span class="hljs-comment"># 返回对应的响应</span><br>    <span class="hljs-keyword">return</span> JSONResponse(<br>        &#123;<br>            <span class="hljs-string">&quot;uid&quot;</span>: result.uid,<br>            <span class="hljs-string">&quot;user_name&quot;</span>: result.user_name,<br>            <span class="hljs-string">&quot;token&quot;</span>: result.token,<br>        &#125;<br>    )<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_app</span>() -&gt; Starlette:</span><br>    <span class="hljs-comment"># 绑定路由</span><br>    app: Starlette = Starlette(routes=[Route(<span class="hljs-string">&quot;/api/login&quot;</span>, login_route, methods=[<span class="hljs-string">&quot;POST&quot;</span>])])<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_before_server_start</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 启动时绑定gRPC客户端到对应的实例</span><br>        app.state.user_service = user_pb2_grpc.UserStub(grpc.aio.insecure_channel(<span class="hljs-string">&quot;0.0.0.0:9000&quot;</span>))<br>    <br>    app.add_event_handler(<span class="hljs-string">&quot;startup&quot;</span>, _before_server_start)<br>    <span class="hljs-keyword">return</span> app<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-keyword">import</span> uvicorn  <span class="hljs-comment"># type: ignore</span><br><br>    uvicorn.run(create_app(), log_level=<span class="hljs-string">&quot;debug&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>这样一个简单的转发就编写完毕了，但是目前是手动编写的代码，意味着每新增一个接口，我们就需有编写一个对应的路由函数，同时如果Protobuf文件发生了变更，那么我们需要定位到对应的代码再修改，非常麻烦，特别是我们在定义Protobuf文件时，已经很像在定义一个接口了，结果还要再编写路由函数，效率非常低，所以一个网关最关键的是需要通过Protobuf文件或者通过Protobuf的产物来自动生成路由函数并映射到对应的服务，这样一来，其它使用者后续只要修改Protobuf文件即可。</p>
+<h2 id="3-提取路由需要的数据"><a href="#3-提取路由需要的数据" class="headerlink" title="3.提取路由需要的数据"></a>3.提取路由需要的数据</h2><p>为了自动生成路由，还需要一些数据，通过编写的转发路由可以发现，我们只需要收到用户的请求，解析数据，然后通过对应的gRPC客户端方法来发送数据即可，所以需要通过这个gRPC客户端的方法来找到所有需要的数据（尝试了多种方法，目前这种是最优的）。</p>
+<p>以上面的Protobuf文件自动生成的<code>Python</code>代码中的<code>user_pb2_grpc.UserStub</code>为例子(可以通过<a target="_blank" rel="noopener" href="https://github.com/so1n/pait/tree/master/example/example_grpc">pait/example/example_grpc</a>了解)，它的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> grpc<br><br><span class="hljs-keyword">from</span> example.example_grpc.python_example_proto_code.example_proto.user <span class="hljs-keyword">import</span> user_pb2 <span class="hljs-keyword">as</span> example__proto_dot_user_dot_user__pb2<br><span class="hljs-keyword">from</span> google.protobuf <span class="hljs-keyword">import</span> empty_pb2 <span class="hljs-keyword">as</span> google_dot_protobuf_dot_empty__pb2<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserStub</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, channel</span>):</span><br>        self.get_uid_by_token = channel.unary_unary(<br>                <span class="hljs-string">&#x27;/user.User/get_uid_by_token&#x27;</span>,<br>                request_serializer=example__proto_dot_user_dot_user__pb2.GetUidByTokenRequest.SerializeToString,<br>                response_deserializer=example__proto_dot_user_dot_user__pb2.GetUidByTokenResult.FromString,<br>                )<br>        self.logout_user = channel.unary_unary(<br>                <span class="hljs-string">&#x27;/user.User/logout_user&#x27;</span>,<br>                request_serializer=example__proto_dot_user_dot_user__pb2.LogoutUserRequest.SerializeToString,<br>                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,<br>                )<br>        self.login_user = channel.unary_unary(<br>                <span class="hljs-string">&#x27;/user.User/login_user&#x27;</span>,<br>                request_serializer=example__proto_dot_user_dot_user__pb2.LoginUserRequest.SerializeToString,<br>                response_deserializer=example__proto_dot_user_dot_user__pb2.LoginUserResult.FromString,<br>                )<br>        self.create_user = channel.unary_unary(<br>                <span class="hljs-string">&#x27;/user.User/create_user&#x27;</span>,<br>                request_serializer=example__proto_dot_user_dot_user__pb2.CreateUserRequest.SerializeToString,<br>                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,<br>                )<br>        self.delete_user = channel.unary_unary(<br>                <span class="hljs-string">&#x27;/user.User/delete_user&#x27;</span>,<br>                request_serializer=example__proto_dot_user_dot_user__pb2.DeleteUserRequest.SerializeToString,<br>                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,<br>                )<br></code></pre></td></tr></table></figure>
+<p>通过这份生成的代码可以发现，这个对象类中包括了每个调用的url，请求体和响应体，这样再加上上面说了gRPC是以POST方法进行请求的，那么构成一个最小路由的条件都已经满足了。<br>但是，要通过这份代码提取数据却比较麻烦，由于都是在<code>__init__</code>方法后才初始化各个gRPC的调用方法，所以没办法通过<code>dir(UserStub)</code>获取到对应的gRPC调用方法，只能通过<code>UserStub(channel).__dict__</code>来获取gRPC的调用方法，不过<code>channel</code>最好需要在对应的HTTP服务启动时再初始化，特别是对于uvicorn来说，如果grpc.aio.channel提前初始化，那么他们使用的不是同一个事件循环，这意味着就必须在Web实例启动后再注册路由，但由于<code>Sanic</code>等框架是不支持实例启动后再注册路由的，所以这个方法行不通。此外，示例代码中的请求体，响应体都是调用对应的方法再加载到<code>channel.unary_unary</code>中，之后我们没办法在运行时通过<code>UserStub</code>的实例来直接获取。</p>
+<p>幸运的是，由Proto文件生成的<code>UserStub</code>对象是有规则的，所以可以在程序运行时获取到<code>UserStub</code>的源码，然后通过一定的规则把数据提取出来，分析上面的源码，可以发现有如下几个规则：</p>
+<ul>
+<li>1.<code>self.xxx</code>中是gRPC调用的方法名，同时<code>channel.unary_unary</code>代表了这是一对一的请求。</li>
+<li>2.<code>self.xxx</code>的下面第一行是gRPC方法对应的url</li>
+<li>3.<code>self.xxx</code>的下面第二行出现了gRPC方法的请求对象，这一行是以<code>request_serializer=</code>开头，以<code>.SerializeToString</code>结尾，可以通过正则提取中间的对象字符串，然后可以在运行时通过解析字符串从<code>UserStub</code>所在的模块中提取到正确的请求对象。</li>
+<li>4.<code>self.xxx</code>的下面第三行则是gRPC方法的响应对象，处理方法跟请求对象类似。</li>
+</ul>
+<p>发现了规则后就可以通过规则提取对应的数据，具体代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> inspect<br><span class="hljs-keyword">import</span> re<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, List, Generator, Optional, Type<br><span class="hljs-keyword">from</span> types <span class="hljs-keyword">import</span> ModuleType<br><span class="hljs-keyword">from</span> google.protobuf.message <span class="hljs-keyword">import</span> Message<br><br><span class="hljs-keyword">from</span> example.example_grpc.python_example_proto_code.example_proto.user <span class="hljs-keyword">import</span> user_pb2_grpc<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_gen_message</span>(<span class="hljs-params">class_module: ModuleType, line: <span class="hljs-built_in">str</span>, match_str: <span class="hljs-built_in">str</span></span>) -&gt; Type[Message]:</span><br>    <span class="hljs-comment"># 通过正则提取对应的字符串</span><br>    module_path_find_list = re.findall(match_str, line)<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(module_path_find_list) != <span class="hljs-number">1</span>:<br>        <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&quot;module path not found&quot;</span>)<br>    module_path: <span class="hljs-built_in">str</span> = module_path_find_list[<span class="hljs-number">0</span>]<br>    module_path_list: List[<span class="hljs-built_in">str</span>] = module_path.split(<span class="hljs-string">&quot;.&quot;</span>)<br>    <span class="hljs-comment"># 通过UserStub模块获取到消息体对应的模块</span><br>    message_module: ModuleType = <span class="hljs-built_in">getattr</span>(class_module, module_path_list[<span class="hljs-number">0</span>])<br>    <span class="hljs-comment"># 从模块提取到对应的对象</span><br>    message_model: Type[Message] = <span class="hljs-built_in">getattr</span>(message_module, module_path_list[<span class="hljs-number">1</span>])<br><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-built_in">issubclass</span>(message_model, Message):<br>        <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Can not found message&quot;</span>)<br>    <span class="hljs-keyword">return</span> message_model<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">stub: Any</span>) -&gt; Generator[tuple, <span class="hljs-keyword">None</span>, <span class="hljs-keyword">None</span>]:</span><br>    <span class="hljs-comment"># 提取对应对象的源码，以`\n`切分成每一行</span><br>    line_list: List[<span class="hljs-built_in">str</span>] = inspect.getsource(stub).split(<span class="hljs-string">&quot;\n&quot;</span>)<br><br>    <span class="hljs-comment"># 获取对象的模块，这样就能知道这个模块引用了什么包，方便后面提取请求和响应对象</span><br>    class_module: Optional[ModuleType] = inspect.getmodule(stub)<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> class_module:<br>        <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">f&quot;Can not found <span class="hljs-subst">&#123;stub&#125;</span> module&quot;</span>)<br>    <span class="hljs-comment"># 通过enumerate，可以获取到行数对应的索引</span><br>    <span class="hljs-keyword">for</span> index, line <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(line_list):<br>        <span class="hljs-comment"># 不是self.所在的行，就跳过</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;self.&quot;</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> line:<br>            <span class="hljs-keyword">continue</span><br>        <span class="hljs-comment"># 只映射一对一的gRPC请求，其它gRPC请求则忽略</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;channel.unary_unary&quot;</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> line:<br>            <span class="hljs-keyword">continue</span><br><br>        <span class="hljs-comment"># 通过这一行提取gRPC调用端方法名</span><br>        invoke_name: <span class="hljs-built_in">str</span> = line.split(<span class="hljs-string">&quot;=&quot;</span>)[<span class="hljs-number">0</span>].replace(<span class="hljs-string">&quot;self.&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).strip()<br>        <span class="hljs-comment"># 从下一行提取url</span><br>        method: <span class="hljs-built_in">str</span> = line_list[index + <span class="hljs-number">1</span>].strip()[<span class="hljs-number">1</span>:-<span class="hljs-number">2</span>]<br>        <span class="hljs-comment"># 从下两行提取请求对象</span><br>        request: Type[Message] = _gen_message(<br>            class_module, line_list[index + <span class="hljs-number">2</span>], <span class="hljs-string">r&quot;request_serializer=(.+).SerializeToString&quot;</span><br>        )<br>        <span class="hljs-comment"># 从下三行提取响应对象</span><br>        response: Type[Message] = _gen_message(<br>            class_module, line_list[index + <span class="hljs-number">3</span>], <span class="hljs-string">r&quot;response_deserializer=(.+).FromString&quot;</span><br>        )<br>        <span class="hljs-comment"># 返回提取的数据</span><br>        <span class="hljs-keyword">yield</span> invoke_name, method, request, response<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> parse(user_pb2_grpc.UserStub):<br>        print(i)<br><br><br></code></pre></td></tr></table></figure>
+<p>这段代码执行后就会输出以下结果，可以发现，这段代码正常的从<code>UserStub</code>中提取到了我们想要的数据。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">(<span class="hljs-string">&#x27;get_uid_by_token&#x27;</span>, <span class="hljs-string">&#x27;/user.User/get_uid_by_token&#x27;</span>, &lt;class <span class="hljs-string">&#x27;example_proto.user.user_pb2.GetUidByTokenRequest&#x27;</span>&gt;, &lt;class <span class="hljs-string">&#x27;example_proto.user.user_pb2.GetUidByTokenResult&#x27;</span>&gt;)<br>(<span class="hljs-string">&#x27;logout_user&#x27;</span>, <span class="hljs-string">&#x27;/user.User/logout_user&#x27;</span>, &lt;class <span class="hljs-string">&#x27;example_proto.user.user_pb2.LogoutUserRequest&#x27;</span>&gt;, &lt;class <span class="hljs-string">&#x27;google.protobuf.empty_pb2.Empty&#x27;</span>&gt;)<br>(<span class="hljs-string">&#x27;login_user&#x27;</span>, <span class="hljs-string">&#x27;/user.User/login_user&#x27;</span>, &lt;class <span class="hljs-string">&#x27;example_proto.user.user_pb2.LoginUserRequest&#x27;</span>&gt;, &lt;class <span class="hljs-string">&#x27;example_proto.user.user_pb2.LoginUserResult&#x27;</span>&gt;)<br>(<span class="hljs-string">&#x27;create_user&#x27;</span>, <span class="hljs-string">&#x27;/user.User/create_user&#x27;</span>, &lt;class <span class="hljs-string">&#x27;example_proto.user.user_pb2.CreateUserRequest&#x27;</span>&gt;, &lt;class <span class="hljs-string">&#x27;google.protobuf.empty_pb2.Empty&#x27;</span>&gt;)<br>(<span class="hljs-string">&#x27;delete_user&#x27;</span>, <span class="hljs-string">&#x27;/user.User/delete_user&#x27;</span>, &lt;class <span class="hljs-string">&#x27;example_proto.user.user_pb2.DeleteUserRequest&#x27;</span>&gt;, &lt;class <span class="hljs-string">&#x27;google.protobuf.empty_pb2.Empty&#x27;</span>&gt;)<br></code></pre></td></tr></table></figure>
+
+<p>不过这还不够，比如使用者可能想自定义这个请求映射的URL，或者是控制这个gRPC请求方法是否要映射等等，这些功能是无法通过Proto文件来控制的，如果写在另一个文件配置又非常麻烦，最后决定通过Proto文件的注释来实现这些功能，比如下面的Proto代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs proto">service User &#123;<br>  &#x2F;&#x2F; The interface should not be exposed for external use<br>  &#x2F;&#x2F; pait: &#123;&quot;enable&quot;: false&#125;<br>  rpc get_uid_by_token (GetUidByTokenRequest) returns (GetUidByTokenResult);<br>  &#x2F;&#x2F; pait: &#123;&quot;tag&quot;: [[&quot;grpc-user&quot;, &quot;grpc_user_service&quot;], [&quot;grpc-user-system&quot;, &quot;grpc_user_service&quot;]]&#125;<br>  &#x2F;&#x2F; pait: &#123;&quot;summary&quot;: &quot;Create users through the system&quot;, &quot;url&quot;: &quot;&#x2F;user&#x2F;create&quot;&#125;<br>  rpc create_user(CreateUserRequest) returns (google.protobuf.Empty);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这段代码有一个标准的<code>pait:</code>开头，这样在解析时，就可以知道这一行是需要解析的文本，然后就会去解析后面跟着的一串Json字符串，就可以知道<code>get_uid_by_token</code>设置了<code>enable</code>为<code>false</code>，而<code>create_user</code>设置了url为<code>/user/create</code>。不过，默认生成的代码中，客户端对象是没有携带Proto文件的注释信息的，只有他们对应的服务端对象才有携带，比如<code>UserStub</code>没有携带注释信息，而<code>UserStub</code>对应的<code>User</code>对象则携带，所以需要从<code>User</code>中提取数据。</p>
+<p>此外，对于请求对象和响应对象也可以采用这样的思路，但是<code>Python</code>的gRPC库通过Proto文件生成<code>Python</code>代码时，Proto文件中为Message编写的注释是不会一起跟过来的，需要自己编写一个插件，或者通过<code>mypy-proto</code>插件生成的文件来获取。由于这部分的代码比较长且繁杂，这里只做简单说明，具体源码见<a target="_blank" rel="noopener" href="https://github.com/so1n/pait/blob/master/pait/util/grpc_inspect/stub.py">pait.util.groc_inspect.stub.py</a></p>
+<h2 id="4-自动映射路由"><a href="#4-自动映射路由" class="headerlink" title="4.自动映射路由"></a>4.自动映射路由</h2><p>至此，url，请求方法，请求体和响应体都获取到了，现在可以自动映射路由了，还是以<code>starlette</code>框架为例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> starlette.applications <span class="hljs-keyword">import</span> Starlette<br><span class="hljs-keyword">from</span> starlette.requests <span class="hljs-keyword">import</span> Request<br><span class="hljs-keyword">from</span> starlette.responses <span class="hljs-keyword">import</span> JSONResponse<br><span class="hljs-keyword">from</span> google.protobuf.message <span class="hljs-keyword">import</span> Message<br><span class="hljs-keyword">from</span> google.protobuf.json_format <span class="hljs-keyword">import</span> MessageToDict<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, Callable<br><br><span class="hljs-comment"># pait项目的演示代码，由Proto文件生产的</span><br><span class="hljs-keyword">from</span> example.example_grpc.python_example_proto_code.example_proto.user <span class="hljs-keyword">import</span> user_pb2<br><span class="hljs-keyword">from</span> example.example_grpc.python_example_proto_code.example_proto.user <span class="hljs-keyword">import</span> user_pb2_grpc<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gen_route</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">    app: Starlette,</span></span><br><span class="hljs-function"><span class="hljs-params">    stub: Any,</span></span><br><span class="hljs-function"><span class="hljs-params">    url: <span class="hljs-built_in">str</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    invoke_name: <span class="hljs-built_in">str</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    grpc_request: Message,</span></span><br><span class="hljs-function"><span class="hljs-params">    grpc_response: Message,</span></span><br><span class="hljs-function"><span class="hljs-params"></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    :param app: Starlette实例</span><br><span class="hljs-string">    :param stub: gRPC客户端对应的类</span><br><span class="hljs-string">    :param url: url</span><br><span class="hljs-string">    :param invoke_name: gRPC调用的方法名</span><br><span class="hljs-string">    :param grpc_request: gRPC请求体</span><br><span class="hljs-string">    :param grpc_response: gRPC响应体，可以发现它没有被使用</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_route</span>(<span class="hljs-params">request: Request</span>) -&gt; JSONResponse:</span><br>        resp_dict: <span class="hljs-built_in">dict</span> = <span class="hljs-keyword">await</span> request.json()<br>        <span class="hljs-comment"># 通过app实例携带的channel来调用gRPC服务</span><br>        func: Callable = <span class="hljs-built_in">getattr</span>(stub(app.state.channel), invoke_name)<br>        <span class="hljs-comment"># 把gRPC响应数据专为json响应</span><br>        <span class="hljs-keyword">return</span> JSONResponse(MessageToDict(<span class="hljs-keyword">await</span> func(grpc_request(**resp_dict))))<br><br>    <span class="hljs-comment"># 注册路由</span><br>    app.add_route(url, _route, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_app</span>() -&gt; Starlette:</span><br>    <span class="hljs-comment"># 绑定路由</span><br>    app: Starlette = Starlette()<br><br>    <span class="hljs-comment"># 通过调用上面段parse函数得到了gRPC对应的数据再通过gen_route来自动注册路由</span><br>    <span class="hljs-keyword">for</span> parse_result_list <span class="hljs-keyword">in</span> parse(user_pb2_grpc.UserStub):<br>        gen_route(<br>            app,<br>            user_pb2_grpc.UserStub,<br>            *parse_result_list,<br>        )<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_before_server_start</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 启动时绑定gRPC客户端对应的channel</span><br>        app.state.channel = grpc.aio.insecure_channel(<span class="hljs-string">&quot;0.0.0.0:9000&quot;</span>)<br><br>    app.add_event_handler(<span class="hljs-string">&quot;startup&quot;</span>, _before_server_start)<br>    <span class="hljs-keyword">return</span> app<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-keyword">import</span> uvicorn  <span class="hljs-comment"># type: ignore</span><br><br>    uvicorn.run(create_app(), log_level=<span class="hljs-string">&quot;debug&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5.总结"></a>5.总结</h2><p>至此，gRPC网关的最核心的实现已经编写完成了，不过可以发现gRPC的响应体并没有被使用，同时这个实现非常简单，不容易拓展，可以通过<a href="https://so1n.me/pait-zh-doc/7_gRPC_gateway/#6gateway-route">自定义Gateway Route路由函数</a>了解更多的拓展。</p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/05/23/Python-gRPC%E5%AE%9E%E8%B7%B5(6)--%E7%BC%96%E5%86%99gRPC%E7%BD%91%E5%85%B3/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;05&#x2F;23&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(6)--%E7%BC%96%E5%86%99gRPC%E7%BD%91%E5%85%B3&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;05&#x2F;23&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(6)--%E7%BC%96%E5%86%99gRPC%E7%BD%91%E5%85%B3&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2022/06/08/python_asyncio_schedule/"><i class="iconfont iconleft"></i>Python Asyncio调度原理</a>
+    <a href="/2022/04/16/Python-gRPC%E5%AE%9E%E8%B7%B5(5)--%E7%AE%80%E8%BF%B0gRPC%E7%9A%84%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95/">Python-gRPC实践(5)--简述gRPC的高级用法<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%BD%91%E5%85%B3%E7%9A%84%E5%9F%BA%E7%A1%80%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="toc-text">1.网关的基础实现思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A6%82%E4%BD%95%E7%BC%96%E5%86%99%E8%BD%AC%E5%8F%91%E8%B7%AF%E7%94%B1"><span class="toc-text">2.如何编写转发路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%8F%90%E5%8F%96%E8%B7%AF%E7%94%B1%E9%9C%80%E8%A6%81%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="toc-text">3.提取路由需要的数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%87%AA%E5%8A%A8%E6%98%A0%E5%B0%84%E8%B7%AF%E7%94%B1"><span class="toc-text">4.自动映射路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%BD%91%E5%85%B3%E7%9A%84%E5%9F%BA%E7%A1%80%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="toc-text">1.网关的基础实现思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A6%82%E4%BD%95%E7%BC%96%E5%86%99%E8%BD%AC%E5%8F%91%E8%B7%AF%E7%94%B1"><span class="toc-text">2.如何编写转发路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%8F%90%E5%8F%96%E8%B7%AF%E7%94%B1%E9%9C%80%E8%A6%81%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="toc-text">3.提取路由需要的数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%87%AA%E5%8A%A8%E6%98%A0%E5%B0%84%E8%B7%AF%E7%94%B1"><span class="toc-text">4.自动映射路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

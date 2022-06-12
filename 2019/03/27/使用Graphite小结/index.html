@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>使用Graphite小结 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记初次认识Graphite时,Graphite已经发...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">使用Graphite小结</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">使用Graphite小结</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 27, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>14415</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>初次认识Graphite时,Graphite已经发展了十年了,那时在负责kamailio相关工作内容,为了监控和查看kamailio数据,查找到的文章<a target="_blank" rel="noopener" href="https://acalustra.com/kamailio-statsd-better-statistics-in-your-voip-platform.html">Kamailio statsd, better statistics in your voip platform.</a>,虽然不太认同作者把statsd客户端的嵌入kamailio的理念,但发现Graphite这东西还是很不错的(虽然后面接触了Prometheus emmmm…….不过Graphite可以保存长期的历史数据,并根据时间自动做聚合旧数据, 这个优点Prometheus是无法代替的).</p>
+<p>Graphite是一个包含了用于接收和整合数据的<code>carbon</code>,存储数据的时序数据库<code>Whisper</code>还有一个提供API的server.<br>它的理念十分简单,存的数据只有timestamp-value,该数据存在key的文件里面,用户可以用过以<code>*.*.*</code>的方式来设置数据维度或者标签.而写数据就更简单了只要发送TCP/UDP文本<code>&#123;key&#125; &#123;value&#125; &#123;timestamp&#125;</code>到carbon即可.同时他还提供按数据落盘时长来聚合数据的归档功能,觉得这个功能是非常棒的,因为数据的有分冷热的, 我们也不会专门去查看一年前的具体数据,只会去查看他的大概数据.</p>
+        <h2 id="1-Graphite的好处"><a href="#1-Graphite的好处" class="headerlink" title="1.Graphite的好处"></a>1.Graphite的好处</h2><ul>
+<li>类似于RRD的时序数据库<code>Whisper</code>,支持Metrics的精度递减,如一天内10s一条,七天内合并为1m一条,一年内1h一条(<strong>这点最棒!</strong>)</li>
+<li>带有丰富的查询函数,  sum/min/max/avg/alias等等</li>
+<li>简单的TCP/UDP协议,很容易插入数据</li>
+<li>通过carbon-relay实现一个完整的HA方案</li>
+<li>通过carbon-aggregator时间数据聚合方案</li>
+<li>查询结构支持REST-API,查询功能丰富,查询简单</li>
+<li>配置简单方便</li>
+<li>支持百万数据收集(官方说的,实际上会打折扣)</li>
+</ul>
+<h2 id="2-Graphite组件"><a href="#2-Graphite组件" class="headerlink" title="2.Graphite组件"></a>2.Graphite组件</h2><p>初次接触Graphite会比较蒙圈,因为一个最简单的完整Graphite需要由carbon-cache,Whisper,GraphiteWeb组合在一起</p>
+<h3 id="2-1组件介绍"><a href="#2-1组件介绍" class="headerlink" title="2.1组件介绍"></a>2.1组件介绍</h3><ul>
+<li>carbon-cache<br>它的主要功能是把接收到的数据先写在内存里,等过了一段时间后,把数据都flush 到whisper里.<br>carbon.conf中的[cache]定义了监听的端口和缓存策略,默认是2003端口接收文本协议,2004端口接收pick协议,此外还提供一个叫<code>CACHE_QUERY</code>的配置,方便GraphiteWeb从carbon-cache查询数据；<br>storage-schemas.conf 定义了Metric数据的retentions规则,当carbon-cache收到一个新的Metric时,就会创建一个新的.wsp文件,并把该规则应用到该文件上(所以文件创立后,再更改规则是没用的)</li>
+<li>carbon-relay  提供复制和分片功能，为分布式而服务。carbon.conf中的[relay]定义了监听的主机、端口和分发模式；relay-rules.conf定义了在rules模式下详细的分发策略。</li>
+<li>carbon-aggregator  负责数据的聚合，通过聚合减少数据库压力防止磁盘爆掉.涉及到的配置文件：carbon.conf中的[aggregator]定义了接收和分发的主机；aggregation-rules.conf定义的是聚合策略。</li>
+<li>Whisper<br>存储数据的时序数据库,本身没有暴露出公共接口.但是Carbon-Cache会将以Whisper数据库格式将数据写入磁盘.以及直接从磁盘上的Whisper数据库文件查询数据.Graphite以上面两种形式来完成Whisper的读写.</li>
+<li>GraphiteWeb 提供一些简单的图表和API功能,同时对一些查询到的数据进行缓存.GraphiteWeb在查询数据会通过carbon-cache来获得数据, carbon-cache会查询Whisper数据,以及还缓存在内存中的数据,再一起返回给调用者.</li>
+</ul>
+<h3 id="2-2结构介绍"><a href="#2-2结构介绍" class="headerlink" title="2.2结构介绍"></a>2.2结构介绍</h3><p>TODO</p>
+<h2 id="3-与Graphite相关组件"><a href="#3-与Graphite相关组件" class="headerlink" title="3.与Graphite相关组件"></a>3.与Graphite相关组件</h2><p>由于Graphite十分简单,单纯使用Graphite是无法完成监控的,他还需要其他组件一起组合起来,才能变成一个完善的监控系统</p>
+<ul>
+<li><p>聚合数据-Statsd<br>Graphite只存单纯的value,没有像Prometheus有time,gauge,set等概念,所以我们把数据写入Graohite前,需要自己先聚合数据,好在出现了一个StatsD,我们可以把数据发送给Statsd,由他实现time,gauge,set等功能,然后每隔一段时间再统一发送到Graphite里面(每隔一段时间也是比较重要的,自己把value直接写入Graphite时,多个Client也要控制到相同的写入点,不然看数据很难受).</p>
+</li>
+<li><p>收集系统指标-Collectd<br>如果像从zabbix之类转过来的用户,应该会很怀念zabbix自带的报警指标,而collected就是这样的存在,通过配置,collected会收集机器上面的系统指标并发送到Graphite.</p>
+</li>
+<li><p>报警系统<br>这一点我觉得是Graphite最缺的生态了,到现在都找不到一个适合Graphite且操作界面简便,配置简单的报警系统..如果不需要拥有ui界面,可以考虑自己编写一个简单的报警系统,如果需要界面,我觉得<a target="_blank" rel="noopener" href="https://github.com/moira-alert/moira">moira</a>和<a target="_blank" rel="noopener" href="https://bosun.org/">Bosun</a>都是比较不错的选择(需要注意的是,截止到2020-04,bosun的快速入门docker版本并不是最新的,需要下载后再自己手动替换.不然看了官方的配置文档会一脸闷逼)</p>
+<h2 id="4-优化"><a href="#4-优化" class="headerlink" title="4.优化"></a>4.优化</h2><p>Graphite的使用比较简单,只要更改下配置文件即可,比起使用,经常遇到的问题是如何去优化.虽然作者说Graphite很容易的去处理百万Metrics,但是实际上使用时觉得作者是有些场景没考虑进去.比如在查找某个metric中最大的前5个,而这个查询需要去打开所有的metric,消耗的时间和cpu都是非常痛苦的…</p>
+</li>
+<li><p>1.使用SSD,毕竟是存在硬盘上的,SSD的速度更快.</p>
+</li>
+<li><p>2.如果Metric太多,那就尽可能的减少数据精度.比如可以降到1分钟记录一次就不要10秒记录一次,这样可以减少写入的压力和文件的大小</p>
+</li>
+<li><p>3.使用Carbon-Aggratoe做预聚合.比如可以预聚合某个维度的Metric为All,这样在查询所有数据时,可以只查AlL的数据</p>
+</li>
+<li><p>4.写入层改用一些c或者go的方案如<code>carbon-relay</code>改为<code>carbon-c-relay</code>.</p>
+</li>
+<li><p>5.缓存部分预查询的数据  在使用图片时,可以配置让GraphiteWeb支持Memcached,缓存已查询的数据.在查询数据时只能自己实现一个proxy-api-server(把时间以某个间隔聚合再以查询查询变为key即可),并加上一个redis为查询的数据做缓存</p>
+</li>
+<li><p>6.替换GraphiteWeb为GraphiteApi,因为他只保留核心的Query功能,速度稍微快一些,同时他的插件功能也是很不错的.</p>
+</li>
+<li><p>7.替换Whisper为<a target="_blank" rel="noopener" href="https://github.com/douban/Kenshin">Kenshin</a>,Kenshin通过把多个metric聚合到同一个文件里面,减少了查询时打开文件的开销,极大的降低了IOPS,不过由于底层逻辑已经变了,替换是需要一些成本</p>
+</li>
+<li><p>8.使用集群,集群能同时缓解读写的开销,同时增加系统可用性</p>
+</li>
+<li><p>9.使用标签功能,目前Graphite支持类似于Prometheus的标签功能,比原本的<code>*.*.*</code>好很多,对性能也带来一定的提升,不过使用了GraphiteApi的话,就没办法使用标签功能了,GraphiteAPI到目前还未支持标签功能.(注:carbon-cache的配置中,标签功能默认开启的,如果不想使用需要配置carbon.conf的ENABLE_TAGS = False,不然会打印出大量的日志,影响服务器I/O)</p>
+</li>
+</ul>
+<h2 id="5-其他"><a href="#5-其他" class="headerlink" title="5.其他"></a>5.其他</h2><p>这里说的是平时遇到一些小问题或提高效率的方法说明</p>
+<ul>
+<li><p>写入间隔<br>如果数据先到Statsd,再从Statsd写入Carbon,那一定要配置好Statsd与Carbon的间隔,不然可能会出现一些null的数据.<br>如果是自己多节点聚合数据再发送到Carbon,那要统一每个节点的发送时间是一致的,不然会出现数据间隔波动,数据展示会十分奇怪,同时聚合数据有时会出现数据不准的问题.</p>
+</li>
+<li><p>Metric命名<br>因为Metric是数量非常多,我们需要把Metric根据命令来分类,方便管理与查询.<br>首先是Metric的大类,主要有</p>
+<ul>
+<li>server-服务</li>
+<li>app-应用</li>
+<li>system-系统指标</li>
+<li>container-容器几大类.<br>之后再根据小类的情况进行细分,比如有这样一个Metric:<code>server.server_name.project.region.ip.key</code>, 就是按照服务名,项目名,地区,IP,最后才是Metric本来的名字.如果在命名遇到像region和ip这类Metric,不知道哪个先哪个后,那就要根据自己的业务查询情况,看看哪个先置被查询的文件数会少以点,以少的Metric来命名.</li>
+</ul>
+</li>
+<li><p>批量查看Metric或者批量修改Metric(以whisper-resize.py为例子)<br>用久了Graphite,肯定会遇到Metric管理的问题,比如有个Metric命名为Server.so1n.{app1, app2, app3}<br>如果我们要用whisper-resize.py去操作Metric,那就会进入/path/Server/app路径里面,进行如下操作</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">whisper-resize.py Server.so1n.app1  <span class="hljs-comment"># 省略参数</span><br>whisper-resize.py Server.so1n.app2  <span class="hljs-comment"># 省略参数</span><br>whisper-resize.py Server.so1n.app3  <span class="hljs-comment"># 省略参数</span><br></code></pre></td></tr></table></figure>
+<p>如果只有3个还好,有时有很多个或者是类似这样Metric:Server.{so1n, user_1}.{app1, app2}要进入多个路径更麻烦,这时候就需要借助其他命令进行批量处理了, 如: <code>find ./ -type f -name &#39;*.wsp&#39; -exec whisper-resize.py --nobackup &#123;&#125; 1s:2d 10s:31d 60s:365d \;</code> 这个命令要主要加上’{}’和’;‘具体见find使用方法, 也可以写成一个脚本来调用:</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> $(find <span class="hljs-variable">$1</span> -iname <span class="hljs-string">&quot;*.wsp&quot;</span>); <span class="hljs-keyword">do</span> <br>    <span class="hljs-keyword">if</span> [ -a <span class="hljs-variable">$f</span> ]; <br>        <span class="hljs-keyword">then</span> whisper-resize.py <span class="hljs-comment"># 省略参数 </span><br>    <span class="hljs-keyword">fi</span>; <br><span class="hljs-keyword">done</span><br></code></pre></td></tr></table></figure></li>
+<li><p>自动删除无用Metric<br>如果用Graphite来做监控时,被监控的机器会出现变动, 当机器被删除后,Graphite中对应的Metric并不会被删除,需要我们进行人工干预,同上面一样我们也是用find命令来处理</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">find /opt/graphite/storage/whisper/* -name <span class="hljs-string">&#x27;*\.wsp&#x27;</span> -mtime 1 -delete<br></code></pre></td></tr></table></figure>
+<p>其中<code>/opt/graphite/storage/whisper/*</code>是whisper的路径, <code>-mtime 1</code>的1是代表文件最后修改时间是1天之前,<code>-delete</code>代表删除的动作<br>只要自己配置好命令的路径和天数,并运用到crontab中,即可自动删除无用Metric</p>
+</li>
+<li><p>预测磁盘容量<br>在用时序数据库时,我们必须要做的就是去预测我们的规则(在Graphite是retentions规则)对空间占用的影响,会不会跑满磁盘的总空间.<br>carbon-cache在初次接收时会为每个指标创建一个Whisper文件，大小是由配置的精度和retentions确定的,Whisper数据库文件永远不会单独变小或变大.<br>因为Whisper文件会根据精度和retentions确定生成多少个数据点,而数据点的大小固定为12位.<br>所以我们可以确定存储容量大小跟精度和retentions有关系,但是自己计算太麻烦了,直接使用<a target="_blank" rel="noopener" href="https://gist.github.com/jjmaestro/5774063">whisper-calculator.py</a> 再输入retentions规则,如:<code>10s:30d,10m:180d</code>即可得知空间占用大小.</p>
+</li>
+</ul>
+<h2 id="6-集群"><a href="#6-集群" class="headerlink" title="6.集群"></a>6.集群</h2><p>在使用Graphite时,最让我困惑的是,我该如何去横向拓展Graphite,以提高Graphite的可用性和性能.在13年之前国内外都很难找到关于Graphite的横向拓展文章(我18年才接触),截止到本文章发表之前,国内也没有搜索到几篇关于Graphite的集群相关文章,经过一番搜索也只看到豆瓣和微博在使用Graphite(限定于大厂).而豆瓣通过改造Whisper为Kenshin,并用了稍微不同的架构来达到横向拓展的能力,而微博只看到18年时疯狂招人并维护一套跟Graphite的体系,我还没找到他们发表的相关文章.</p>
+<p>搜索一圈后有一些感慨(可能是我搜索姿势不对),明明是一个挺不错的监控软件(不止于监控),感觉国内用Graphite的公司真少,可能18年大家都已经掉头到了go体系或者上云了,还好还有很多关于Graphite的英文文章可以参考.</p>
+<h3 id="6-1集群结构"><a href="#6-1集群结构" class="headerlink" title="6.1集群结构"></a>6.1集群结构</h3><p>Graphite的集群看起来复杂,实际上却是很简单的,因为Graphite的集群架构就是给一群单点Graphite的写入写出套上一层网关层处理数据和节点调用.集群的架构图如下,分为机器A,B,C. 其中A是最外层的carbon-relay和Gtaphite Web, 他们所属机器是Master机器, 负责处理写入数据和读取数据. 而另外两个小框是B,C机器, 他们负责数据的存取.</p>
+<p>如图,  A机器代表网关层节点上面跑着接受Metric的carbon-relay以及GraphiteWeb,carbon-relay负责接受Metric并利用hash分配到不同的机器B,C.而GraphiteWeb则根据请求去B,C机器采集数据,合并后返回给调用者.</p>
+<p>B,C机器代表存储节点,它的功能则是一样的,负责存储数据,基本与单机Graphite一样,由carbon-relay把Metric分发给两个carbon-cache,并由GraphiteWeb提供接口给master的GraphiteWeb获取数据</p>
+<p>这个架构的优点就是简单,没引入其他比较复杂的技术,同时网关节点跟存储节点横向拓展比较方便,特别是在引入配置中心后,配置文件的更改就可以自动化,只要做到安装Graphtie即可.</p>
+<p><img src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/graphite.png?raw=true" alt="Graphite架构图"></p>
+<h3 id="6-2如何配置"><a href="#6-2如何配置" class="headerlink" title="6.2如何配置"></a>6.2如何配置</h3><h4 id="6-2-1存储节点"><a href="#6-2-1存储节点" class="headerlink" title="6.2.1存储节点"></a>6.2.1存储节点</h4><p>首先是改造存储节点,如果只使用单个carbon-cache的话,可以根据内核数增加新的<strong>carbon-cache</strong>,将配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">[cache]<br>LINE_RECEIVER_INTERFACE = 0.0.0.0<br>LINE_RECEIVER_PORT = 2003<br>PICKLE_RECEIVER_INTERFACE = 0.0.0.0<br>PICKLE_RECEIVER_PORT = 2004<br>CACHE_QUERY_INTERFACE = 0.0.0.0<br>CACHE_QUERY_PORT = 7002<br></code></pre></td></tr></table></figure>
+<p>改为</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash">[cache]<br>LINE_RECEIVER_INTERFACE = 127.0.0.1<br>PICKLE_RECEIVER_INTERFACE = 127.0.0.1<br>CACHE_QUERY_INTERFACE = 127.0.0.1<br><br>[cache:a]<br>LINE_RECEIVER_PORT = 2013<br>PICKLE_RECEIVER_PORT = 2014<br>CACHE_QUERY_PORT = 7012<br><br>[cache:b]<br>LINE_RECEIVER_PORT = 2023<br>PICKLE_RECEIVER_PORT = 2024<br>CACHE_QUERY_PORT = 7022<br></code></pre></td></tr></table></figure>
+<p>启动方式从<code>bin/carbon-cache.py start</code>改为<code>bin/carbon-cache.py –-instance=a start</code>和 <code>bin/carbon-cache.py –-instance=b start</code></p>
+<p><strong>carbon-relay</strong>配置改成如下,可以根据metric的一致哈希自动分配给对应的carbon-cache,由于是carbon-relay与carbon-cache的数据交换,把传输方式改为PICKLE,这样子传输速度快一点.</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[relay]</span><br><span class="hljs-attr">LINE_RECEIVER_INTERFACE</span> = <span class="hljs-number">0.0</span>.<span class="hljs-number">0.0</span><br><span class="hljs-attr">LINE_RECEIVER_PORT</span> = <span class="hljs-number">2003</span><br><span class="hljs-attr">PICKLE_RECEIVER_INTERFACE</span> = <span class="hljs-number">0.0</span>.<span class="hljs-number">0.0</span><br><span class="hljs-attr">PICKLE_RECEIVER_PORT</span> = <span class="hljs-number">2004</span><br><span class="hljs-attr">RELAY_METHOD</span> = consistent-hashing<br><span class="hljs-attr">DESTINATIONS</span> = <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>:<span class="hljs-number">2014</span>:a, <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>:<span class="hljs-number">2024</span>:b<br></code></pre></td></tr></table></figure>
+<p>接下来就是<strong>GraphiteWeb</strong>(如果用GraphiteAPI自行变通),通过更改<code>local-setting.py</code>文件的CARBONLINK_HOSTS:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python">CARBONLINK_HOSTS = [<span class="hljs-string">&#x27;127.0.0.1:7012&#x27;</span>, <span class="hljs-string">&#x27;127.0.0.1:7022&#x27;</span>]<br>DATABASES = &#123;<br>    <span class="hljs-string">&#x27;default&#x27;</span>: &#123;<br>        <span class="hljs-string">&#x27;NAME&#x27;</span>: <span class="hljs-string">&#x27;/opt/graphite/storage/graphite.db&#x27;</span>,<br>        <span class="hljs-string">&#x27;ENGINE&#x27;</span>: <span class="hljs-string">&#x27;django.db.backends.sqlite3&#x27;</span>,<br>        <span class="hljs-string">&#x27;USER&#x27;</span>: <span class="hljs-string">&#x27;&#x27;</span>,<br>        <span class="hljs-string">&#x27;PASSWORD&#x27;</span>: <span class="hljs-string">&#x27;&#x27;</span>,<br>        <span class="hljs-string">&#x27;HOST&#x27;</span>: <span class="hljs-string">&#x27;&#x27;</span>,<br>        <span class="hljs-string">&#x27;PORT&#x27;</span>: <span class="hljs-string">&#x27;&#x27;</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>GraphiteWebc在查数据时,可以通过多个Carbon-cache一起查询,增加查询效率.</p>
+<p>可以发现存储节点的配置是固定的,可以直接使用docker或者ansible一键部署.这样关于存储节点的配置就结束了,接下来就是配置网关层</p>
+<h4 id="6-2-2网关节点"><a href="#6-2-2网关节点" class="headerlink" title="6.2.2网关节点"></a>6.2.2网关节点</h4><p>还是以B,Ｃ节点为例，假设Ｂ节点ip为10.0.1.10，Ｃ节点为10.0.1.11,由于网关层只是负责把数据写入指定存储节点与从存储节点读取数据,所以只需要配置<code>carbon-relay</code>以及<code>GraphiteWeb</code>即可.<br>首先是<code>carbon-relay</code>,同样也是配置一致哈希与目标位置,同时配置REPLICATION_FACTOR,一般REPLICATION_FACTOR的值应该大于等于3(示例是2),确保数据安全保存.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">[relay]<br>LINE_RECEIVER_INTERFACE = 0.0.0.0<br>LINE_RECEIVER_PORT = 2003<br>PICKLE_RECEIVER_INTERFACE = 0.0.0.0<br>PICKLE_RECEIVER_PORT = 2004<br>RELAY_METHOD = consistent-hashing<br>REPLICATION_FACTOR = 2<br>DESTINATIONS = 10.0.1.10:2004, 10.0.1.11:2004<br></code></pre></td></tr></table></figure>
+<p>然后就是<code>GraphiteWeb</code>,他的配置跟存储节点一样,只要把<code>CLUSTER_SERVERS</code>配置为存储节点的GraphiteWeb,即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">CLUSTER_SERVERS= [<span class="hljs-string">&quot;10.0.1.10:80&quot;</span>, <span class="hljs-string">&quot;10.0.1.11:80&quot;</span>]<br></code></pre></td></tr></table></figure>
+<p>这样网关层就配置完毕了,唯一缺点就是每次新增存储节点时,网关层都需要重新更改配置并重启进程,这里可以根据自己的基础服务进行改进</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>StatsD, Graphite, Grafana方案唯一的缺点就是安装繁琐了,所以把自己的安装过程记录下来,当然目前有许多打包,如果需要可以参考打包安装的对应链接.<br>使用系统安装如(debian)的包会比较旧,一般都是python2,如无其他需要默认所有安装默认python2比较好</p>
+<h4 id="1-打包安装"><a href="#1-打包安装" class="headerlink" title="1.打包安装"></a>1.打包安装</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/obfuscurity/synthesize">Synthesize版</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/graphite-project/docker-graphite-statsd">docker版</a></li>
+</ul>
+<h4 id="2-分步安装"><a href="#2-分步安装" class="headerlink" title="2.分步安装"></a>2.分步安装</h4><h5 id="2-1graphite"><a href="#2-1graphite" class="headerlink" title="2.1graphite"></a>2.1graphite</h5><p>若可以按以下安装的,之后安装方法查看此链接:<a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tutorials/how-to-install-and-use-graphite-on-an-ubuntu-14-04-server">https://www.digitalocean.com/community/tutorials/how-to-install-and-use-graphite-on-an-ubuntu-14-04-server</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt-get update<br>sudo apt-get install graphite-carbon<br></code></pre></td></tr></table></figure>
+<p><strong>注:以该方式安装后路径是(pip):/etc/carbon/ or /etc/whisper/,而以下示例路径是(python setup.py install):/opt/graphite/</strong></p>
+<h5 id="2-1-1carbon"><a href="#2-1-1carbon" class="headerlink" title="2.1.1carbon"></a>2.1.1carbon</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install carbon --install-option=<span class="hljs-string">&quot;--prefix=/opt/graphite&quot;</span> --install-option=<span class="hljs-string">&quot;--install-lib=/opt/graphite/lib&quot;</span><br></code></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">mkdir ./path/...<br><span class="hljs-built_in">cd</span> ./path/...<br>git <span class="hljs-built_in">clone</span> https://github.com/graphite-project/carbon.git<br><span class="hljs-built_in">cd</span> carbon<br>pip install twisted<br>python setup.py install<br><span class="hljs-comment"># 查看安装情况</span><br>ls -l /opt/graphite<br></code></pre></td></tr></table></figure>
+<p>在bin文件夹下，能够找到如下三种不同类型的Carbon守护进程：</p>
+<ul>
+<li>Cache：接受通过各种协议传输来的指标项数据并以尽可能高的效率将它们写入磁盘；在接收到指标项时，将指标项值缓存在 RAM 中，并用底层的 Whisper 库按照指定的时间间隔将这些值写入磁盘。</li>
+<li>Relay：有两个不同的用途：将输入的指标项复制并分区。</li>
+<li>Aggregator：运行于 cache 前方，在 Whisper 中记录指标项之前，缓存这些指标项一段时间。</li>
+</ul>
+<h5 id="2-1-2-Whisper"><a href="#2-1-2-Whisper" class="headerlink" title="2.1.2 Whisper"></a>2.1.2 Whisper</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install whisper<br></code></pre></td></tr></table></figure>
+<p>or</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 可能需要更新setuptools    </span><br><span class="hljs-comment"># pip install --upgrade setuptools</span><br>mkdir ./path/...<br><span class="hljs-built_in">cd</span> ./path/...<br>git <span class="hljs-built_in">clone</span> https://github.com/graphite-project/whisper.git<br><span class="hljs-built_in">cd</span> whisper <br>python setup.py install<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-1-3运行carbon"><a href="#2-1-3运行carbon" class="headerlink" title="2.1.3运行carbon"></a>2.1.3运行carbon</h5><p>使用默认配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /opt/graphite/conf<br>cp aggregation-rules.conf.example aggregation-rules.conf<br>cp blacklist.conf.example blacklist.conf<br>cp carbon.conf.example carbon.conf<br>cp carbon.amqp.conf.example carbon.amqp.conf<br>cp relay-rules.conf.example relay-rules.conf<br>cp rewrite-rules.conf.example rewrite-rules.conf<br>cp storage-schemas.conf.example storage-schemas.conf<br>cp storage-aggregation.conf.example storage-aggregation.conf<br>cp whitelist.conf.example whitelist.conf<br><span class="hljs-comment"># 确定ip和端口</span><br>vi carbon.conf<br><span class="hljs-comment"># 默认配置</span><br>[cache]<br>LINE_RECEIVER_INTERFACE = 0.0.0.0<br>LINE_RECEIVER_PORT = 2003<br><span class="hljs-comment"># 启动</span><br>/opt/graphite/bin/carbon-cache.py start<br><span class="hljs-comment">#　查看进程是否运行以及监听的端口</span><br>ps -efla | grep carbon-cache<br>netstat -nap | grep 2003<br></code></pre></td></tr></table></figure>
+<h5 id="2-1-4查看whisper数据"><a href="#2-1-4查看whisper数据" class="headerlink" title="2.1.4查看whisper数据"></a>2.1.4查看whisper数据</h5><p>路径:/opt/graphite/storage/whisper<br>查看命令(对于后辍为.wsp的可用, 使用方法为命令+路径):</p>
+<ul>
+<li>whisper-info.py (whisper-info脚本获取为这些指标项创建的 Whisper 文件的元数据信息。)</li>
+<li>whisper-dump.py(whisper-dump是一个更完整的脚本，可以输出所有存储保留周期内的原始数据以及 Whisper 文件的元数据信息。)<br>使用方法<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs vim"># <span class="hljs-keyword">grep</span>是为了去除无效数据<br>whisper-dump.<span class="hljs-keyword">py</span> invite.wsp | <span class="hljs-keyword">grep</span> -v <span class="hljs-string">&#x27;: 0,&#x27;</span><br></code></pre></td></tr></table></figure>
+<h5 id="2-1-5graphite-api"><a href="#2-1-5graphite-api" class="headerlink" title="2.1.5graphite-api"></a>2.1.5graphite-api</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install graphite-api --install-option=<span class="hljs-string">&quot;--prefix=/opt/graphite&quot;</span><br></code></pre></td></tr></table></figure>
+或者<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 注:目前不支持python3, 请用上面的pip再加指定位置的方法,或者先安装cairocffi (0.9.0)</span><br>mkdir ./path/...<br><span class="hljs-built_in">cd</span> ./path/...<br>git <span class="hljs-built_in">clone</span> https://github.com/brutasse/graphite-api<br><span class="hljs-built_in">cd</span> graphite-api<br>python setup.py install<br></code></pre></td></tr></table></figure>
+按需确定自己是否需要<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt-get install libpango1.0-0<br> sudo apt-get install libcairo2<br> sudo apt-get install libpq-dev<br><span class="hljs-comment"># python2</span><br>sudo apt-get install python-dev  \<br>     build-essential libssl-dev libffi-dev \<br>     libxml2-dev libxslt1-dev zlib1g-dev \<br>     python-pip<br><span class="hljs-comment"># python3</span><br>sudo apt-get install python3 python-dev python3-dev \<br>     build-essential libssl-dev libffi-dev \<br>     libxml2-dev libxslt1-dev zlib1g-dev \<br>     python-pip<br></code></pre></td></tr></table></figure>
+创建graphite-api的配置文件：<br>/opt/graphite/conf/graphite-api.yml<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash">search_index: /opt/graphite/storage/index<br>finders:<br> - graphite_api.finders.whisper.WhisperFinder<br><span class="hljs-built_in">functions</span>:<br> - graphite_api.functions.SeriesFunctions<br> - graphite_api.functions.PieFunctions<br>whisper:<br> directories:<br> - /opt/graphite/storage/whisper<br>carbon:<br> hosts:<br> - 127.0.0.1:7002<br> timeout: 1<br> retry_delay: 15<br> carbon_prefix: carbon<br> replication_factor: 1<br></code></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>在这个配置文件中,<br>search_index的路径一般为:/opt/graphite/storage/index,如果没有则需要自己运行 build-index.sh(位于/opt/graphite/bin, 需要安装graphite-web, 由于使用了graphite-web所以不用生成)命令生成,记得运行命令chmod 0644 index更改权限<br>whisper的数据路径配置为/opt/graphite/storage/whisper，这个是在carbon配置文件 /opt/graphite/conf/carbon.conf 中使用配置项LOCAL_DATA_DIR进行定义的。</p>
+<p><strong>注:如果遇到dlopen() failed to load a library: cairo / cairo-2且不会用到图形元素的可以屏蔽掉graphite_api/app.py526行以及下面相关的image代码,同时屏蔽/render/glyph.py<br>里的import cairocffi,不然需要安装更多依赖</strong></p>
+<h5 id="2-1-6uwsgi"><a href="#2-1-6uwsgi" class="headerlink" title="2.1.6uwsgi"></a>2.1.6uwsgi</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">apt-get install uwsgi<br></code></pre></td></tr></table></figure>
+<p>debain和ubuntu系统或者运行后提示无法加载graphite_api.app模块的则需要先安装uwsgi-plugin-python(如debian:运行apt-get install uwsgi-plugin-python)<br>配置uwsgi</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">vi /etc/uwsgi/apps-enabled/graphite-api.ini <br><br>[uwsgi]<br>processes = 2<br><span class="hljs-comment"># 如果对接nginx则使用socket  如果直接调用则用http</span><br>socket = 127.0.0.1:5000<br>http = 127.0.0.1:5000<br>module = graphite_api.app:app<br><span class="hljs-comment"># python版本</span><br>plugins = python27<br>env = GRAPHITE_API_CONFIG=/opt/graphite/conf/graphite-api.yml<br></code></pre></td></tr></table></figure>
+<p>如果搭配nginx ,也就是上面的uwsgi配置写的是socket而非http<br>在nginx配置中添加</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">location / &#123;<br>    include uwsgi_params;<br>    uwsgi_pass localhost:5000;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs maxima">重启<br>service uwsgi <span class="hljs-built_in">restart</span><br></code></pre></td></tr></table></figure>
+<h4 id="2-2StatsD"><a href="#2-2StatsD" class="headerlink" title="2.2StatsD"></a>2.2StatsD</h4><h5 id="2-2-1安装"><a href="#2-2-1安装" class="headerlink" title="2.2.1安装"></a>2.2.1安装</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt-get install nodejs devscripts debhelper dh-systemd<br><span class="hljs-comment"># 有些发行版带的nodejs比较老,需要大于8.0,可以到这里安装https://github.com/nodesource/distributions/blob/master/README.md</span><br>mkdir ./path/...<br><span class="hljs-built_in">cd</span> ./path/...<br>git <span class="hljs-built_in">clone</span> https://github.com/etsy/statsd.git <br><span class="hljs-built_in">cd</span> statsd<br><span class="hljs-comment"># *.deb 会在上级目录创建</span><br>dpkg-buildpackage<br><span class="hljs-built_in">cd</span> ..<br>dpkg -i statsd*.deb<br>service statsd start<br><span class="hljs-comment"># 配置文件:/etc/statsd/localConfig.js</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="2-2-2-更改配置"><a href="#2-2-2-更改配置" class="headerlink" title="2.2.2 更改配置"></a>2.2.2 更改配置</h5><p>在Graphite为StatsD更改匹配模式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">vi /opt/graphite/conf/storage-schemas.conf<br><span class="hljs-comment"># 在文件增加以下匹配模式</span><br><span class="hljs-comment"># StatsD将带有stats前缀的数据发送到Graphite</span><br>[statsd]<br>pattern = ^stats.*<br>retentions = 10s:1d,1m:7d,10m:1y<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-2-3-重启"><a href="#2-2-3-重启" class="headerlink" title="2.2.3 重启"></a>2.2.3 重启</h5><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-regexp">/opt/g</span>raphite<span class="hljs-regexp">/bin/</span>carbon-cache.py stop<br><span class="hljs-regexp">/opt/g</span>raphite<span class="hljs-regexp">/bin/</span>carbon-cache.py start<br></code></pre></td></tr></table></figure>
+<h5 id="2-3grafana"><a href="#2-3grafana" class="headerlink" title="2.3grafana"></a>2.3grafana</h5><blockquote>
+<p>详见:<a target="_blank" rel="noopener" href="https://grafana.com/docs/installation/debian/">https://grafana.com/docs/installation/debian/</a></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://dl.grafana.com/oss/release/grafana_6.4.3_amd64.deb<br>sudo apt-get install -y adduser libfontconfig<br>sudo dpkg -i grafana_6.4.3_amd64.deb<br>sudo service grafana-server start<br><span class="hljs-comment"># 开机自启</span><br>sudo update-rc.d grafana-server defaults<br></code></pre></td></tr></table></figure>
+
+<p>配置nginx反向代理grafana</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># nginx 配置</span><br>    location /grafana &#123;<br>        root   html;<br>        index  index.html index.htm;<br>        add_header <span class="hljs-string">&#x27;Access-Control-Allow-Origin&#x27;</span> <span class="hljs-string">&#x27;*&#x27;</span>;<br>        add_header Access-Control-Allow-Methods GET,POST,OPTIONS,DELETE;<br>        add_header <span class="hljs-string">&#x27;Access-Control-Allow-Headers&#x27;</span> <span class="hljs-string">&#x27;userId,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type&#x27;</span>;<br>        proxy_pass http://localhost:3000; <br>        rewrite ^/grafana/(.*) /<span class="hljs-variable">$1</span> <span class="hljs-built_in">break</span>;<br>        proxy_set_header   Host <span class="hljs-variable">$host</span>;<br>    &#125;<br><span class="hljs-comment"># grafana配置</span><br><span class="hljs-comment"># /etc/grafana/grafana.ini</span><br>root_url=%(protocol)s://%(domain)s:%(http_port)s/grafana<br></code></pre></td></tr></table></figure>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/03/27/%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;03&#x2F;27&#x2F;%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;03&#x2F;27&#x2F;%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Graphite/" rel="tag">Graphite</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1/" rel="tag">基础服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%91%E6%8E%A7/" rel="tag">监控</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2019/04/06/%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86/"><i class="iconfont iconleft"></i>记一次TCP长连接过多的问题--实际上是被攻击了</a>
+    <a href="/2019/03/21/Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F,%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF,%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9/">Redis缓存穿透,缓存击穿,缓存雪崩<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Graphite%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">1.Graphite的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Graphite%E7%BB%84%E4%BB%B6"><span class="toc-text">2.Graphite组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.1组件介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E7%BB%93%E6%9E%84%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.2结构介绍</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%8EGraphite%E7%9B%B8%E5%85%B3%E7%BB%84%E4%BB%B6"><span class="toc-text">3.与Graphite相关组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96"><span class="toc-text">4.优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%85%B6%E4%BB%96"><span class="toc-text">5.其他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E9%9B%86%E7%BE%A4"><span class="toc-text">6.集群</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1%E9%9B%86%E7%BE%A4%E7%BB%93%E6%9E%84"><span class="toc-text">6.1集群结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2%E5%A6%82%E4%BD%95%E9%85%8D%E7%BD%AE"><span class="toc-text">6.2如何配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Graphite%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">1.Graphite的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Graphite%E7%BB%84%E4%BB%B6"><span class="toc-text">2.Graphite组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.1组件介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E7%BB%93%E6%9E%84%E4%BB%8B%E7%BB%8D"><span class="toc-text">2.2结构介绍</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%8EGraphite%E7%9B%B8%E5%85%B3%E7%BB%84%E4%BB%B6"><span class="toc-text">3.与Graphite相关组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E5%8C%96"><span class="toc-text">4.优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%85%B6%E4%BB%96"><span class="toc-text">5.其他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E9%9B%86%E7%BE%A4"><span class="toc-text">6.集群</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1%E9%9B%86%E7%BE%A4%E7%BB%93%E6%9E%84"><span class="toc-text">6.1集群结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2%E5%A6%82%E4%BD%95%E9%85%8D%E7%BD%AE"><span class="toc-text">6.2如何配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

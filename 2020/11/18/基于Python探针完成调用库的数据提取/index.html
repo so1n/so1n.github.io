@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>基于Python探针完成调用库的数据提取 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记最近在完善公司的监控系统, 发现在项目运行时经常会...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">基于Python探针完成调用库的数据提取</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://i.loli.net/2021/07/11/s3o479WjbqZRBMy.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">基于Python探针完成调用库的数据提取</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 18, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>11823</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近在完善公司的监控系统, 发现在项目运行时经常会出现一些运行时的问题， 这些问题往往不是一个子服务引发的问题， 而可能是某个环节出现了问题， 这时候就需要引入APM系统。在收集APM数据时发现在<code>Python</code>生态中针对web框架都有完善的APM中间件用于接口统计与监控, 但是第三方调用库相关的APM实现都比较少(几乎没有)， 同时这些库大多数也都没提供一些钩子实现。这就需要自己去封装一些库， 为这些库实现一套调用过程的数据提供逻辑。</p>
+<p>本文是以<code>Python</code>的<code>aiomysql</code>库为例，阐述如何基于<code>Python</code>的探针完成调用库的调用过程统计与监控的封装。 </p>
+        <blockquote>
+<p>注: 监控的形式的agent有很多种，如<code>Prometheus</code>，<code>Zabbix</code>, <code>Graphite</code>和<code>Opentracing</code>他们的数据源有很大的不同，但是他们都是基于元数据封装成自己的源数据，然后发送到对应的服务，所以本文只介绍如何提取元数据，剩下的如何发送需要自己按照特定的监控系统去实现。</p>
+</blockquote>
+<blockquote>
+<p>注：这里以aiomysql库来做示例，提取数据的方法应该用统一的dbapi2， 本文只阐述如何简单的实现。</p>
+</blockquote>
+<h2 id="1-简单粗暴的方法–对mysql库进行封装"><a href="#1-简单粗暴的方法–对mysql库进行封装" class="headerlink" title="1.简单粗暴的方法–对mysql库进行封装"></a>1.简单粗暴的方法–对mysql库进行封装</h2><p>要统计一个执行过程， 有一个必要的条件就是需要知道这个执行过程的开始位置和结束位置， 所以最简单粗暴的方法就是要基于调用的方法进行封装，在框架调用<code>MySQL</code>库和<code>MySQL</code>库中间实现一个中间层, 并基于中间层完成耗时统计,如:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 伪代码</span><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">my_execute</span>(<span class="hljs-params">conn, sql, param</span>):</span><br>    <span class="hljs-comment"># 针对MySql库的统计封装组件</span><br>    <span class="hljs-keyword">with</span> MyTracer(conn, sql, param):<br>        <span class="hljs-comment"># 以下为正常使用MySql库的代码</span><br>        <span class="hljs-keyword">with</span> conn.cursor <span class="hljs-keyword">as</span> cursor:<br>            cursor.execute(sql, param)<br>            ...<br></code></pre></td></tr></table></figure>
+<p>这样的实现看起来非常不错, 而且更改非常方便, 但由于是在最顶层的API上进行修改, 其实是非常不灵活的, 同时<code>cursor.execute</code>里面会执行一些预操作, 如把sql和param进行拼接, 以及调用<code>nextset</code>清除当前游标的数据等等。 所以最后拿到的数据如时间耗时也是不准确的, 同时也没办法得到一些详细的元数据， 如错误码等等.</p>
+<p>如果要拿到最直接有用的数据，就只能去改源代码, 然后再调用了, 但是如果每个库都需要改源代码才能统计, 那也太麻烦了, 好在<code>Python</code>也提供了一些类似探针的接口, 可以通过探针把库的源码进行替换完成我们的代码.</p>
+<h2 id="2-Python的探针"><a href="#2-Python的探针" class="headerlink" title="2.Python的探针"></a>2.Python的探针</h2><p>在<code>Python</code>中可以通过<code>sys.meta_path</code>来实现<code>import hook</code>的功能, 当执行 import 相关操作时, 会根据<code>sys.meta_path</code>定义的对象对import相关库进行更改.<br><code>sys.meta_path</code>中的对象需要实现一个<code>find_module</code>方法， 这个<code>find_module</code>方法返回<code>None</code>或一个实现了<code>load_module</code>方法的对象, 我们可以通过这个对象, 针对一些库在import时, 把相关的方法进行替换, 简单用法如下,通过hook<code>time.sleep</code>让他在sleep的时候能打印消耗的时间.<br><a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/python_hook/hook_demo">github源码存储</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> importlib<br><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> wraps<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">func_wrapper</span>(<span class="hljs-params">func</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;这里通过一个装饰器来达到狸猫换太子和获取数据的效果&quot;&quot;&quot;</span><br><span class="hljs-meta">    @wraps(<span class="hljs-params">func</span>)</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wrapper</span>(<span class="hljs-params">*args, **kwargs</span>):</span><br>        <span class="hljs-comment"># 记录开始时间</span><br>        start = time.time()<br>        result = func(*args, **kwargs)<br>        <span class="hljs-comment"># 统计消耗时间</span><br>        end = time.time()<br>        print(<span class="hljs-string">f&quot;speed time:<span class="hljs-subst">&#123;end - start&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">return</span> result<br>    <span class="hljs-keyword">return</span> wrapper<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MetaPathFinder</span>:</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">find_module</span>(<span class="hljs-params">self, fullname, path=<span class="hljs-literal">None</span></span>):</span><br>        <span class="hljs-comment"># 执行时可以看出来在import哪些模块</span><br>        print(<span class="hljs-string">f&#x27;find module:<span class="hljs-subst">&#123;path&#125;</span>:<span class="hljs-subst">&#123;fullname&#125;</span>&#x27;</span>)<br>        <span class="hljs-keyword">return</span> MetaPathLoader()<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MetaPathLoader</span>:</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load_module</span>(<span class="hljs-params">self, fullname</span>):</span><br>        <span class="hljs-comment"># import的模块都会存放在sys.modules里面， 通过判断可以减少重复import</span><br>        <span class="hljs-keyword">if</span> fullname <span class="hljs-keyword">in</span> sys.modules:<br>            <span class="hljs-keyword">return</span> sys.modules[fullname]<br>        <span class="hljs-comment"># 防止递归调用</span><br>        finder = sys.meta_path.pop(<span class="hljs-number">0</span>)<br>        <span class="hljs-comment"># 导入 module</span><br>        module = importlib.import_module(fullname)<br>        <span class="hljs-keyword">if</span> fullname == <span class="hljs-string">&#x27;time&#x27;</span>:<br>            <span class="hljs-comment"># 替换函数</span><br>            module.sleep = func_wrapper(module.sleep)<br>        sys.meta_path.insert(<span class="hljs-number">0</span>, finder)<br>        <span class="hljs-keyword">return</span> module<br><br><br>sys.meta_path.insert(<span class="hljs-number">0</span>, MetaPathFinder())<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    <span class="hljs-keyword">import</span> time<br>    time.sleep(<span class="hljs-number">1</span>)<br><br><br><span class="hljs-comment"># 输出示例:</span><br><span class="hljs-comment"># find module:datetime</span><br><span class="hljs-comment"># find module:time</span><br><span class="hljs-comment"># load module:time</span><br><span class="hljs-comment"># find module:math</span><br><span class="hljs-comment"># find module:_datetime</span><br><span class="hljs-comment"># speed time:1.00073385238647468</span><br></code></pre></td></tr></table></figure>
+<h2 id="3-制作探针模块"><a href="#3-制作探针模块" class="headerlink" title="3.制作探针模块"></a>3.制作探针模块</h2><p>了解完了主要流程后， 可以开始制作自己的探针模块了, 由于示例只涉及到aiomysql模块, 那么在<code>MetaPathFinder.find_module</code>中需要只对aiomysql模块进行处理, 其他的先忽略.<br>然后我们需要确定要把aiomysql的哪个功能给替换, 从业务上来说, 一般情况下我们只要<code>cursor.execute</code>, <code>cursor.fetchone</code>, <code>cursor.fetchall</code>, <code>cursor.executemany</code>这几个主要的操作,所以需要深入<a target="_blank" rel="noopener" href="https://github.com/aio-libs/aiomysql/blob/master/aiomysql/cursors.py">cursor的源码</a>, 看看如何去更改代码, 后者重载哪个函数.</p>
+<p>先从<code>cursor.execute</code>的源码(<code>cursor.executemanay</code>也类似)入手, 发现会先调用<code>self.nextset</code>的方法, 把上个请求的数据先拿完, 再合并sql语句, 最后通过<code>self._query</code>进行查询:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">execute</span>(<span class="hljs-params">self, query, args=<span class="hljs-literal">None</span></span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;Executes the given operation</span><br><span class="hljs-string">    Executes the given operation substituting any markers with</span><br><span class="hljs-string">    the given parameters.</span><br><span class="hljs-string">    For example, getting all rows where id is 5:</span><br><span class="hljs-string">        cursor.execute(&quot;SELECT * FROM t1 WHERE id = %s&quot;, (5,))</span><br><span class="hljs-string">    :param query: ``str`` sql statement</span><br><span class="hljs-string">    :param args: ``tuple`` or ``list`` of arguments for sql query</span><br><span class="hljs-string">    :returns: ``int``, number of rows that has been produced of affected</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    conn = self._get_db()<br><br>    <span class="hljs-keyword">while</span> (<span class="hljs-keyword">await</span> self.nextset()):<br>        <span class="hljs-keyword">pass</span><br><br>    <span class="hljs-keyword">if</span> args <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>        query = query % self._escape_args(args, conn)<br><br>    <span class="hljs-keyword">await</span> self._query(query)<br>    self._executed = query<br>    <span class="hljs-keyword">if</span> self._echo:<br>        logger.info(query)<br>        logger.info(<span class="hljs-string">&quot;%r&quot;</span>, args)<br>    <span class="hljs-keyword">return</span> self._rowcount<br></code></pre></td></tr></table></figure>
+<p>再看<code>cursor.fetchone</code>的源码(<code>cursor.fetchall</code>也类似), 发现其实是从缓存中获取数据, 这些数据在执行<code>cursor.execute</code>中就已经获取了:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fetchone</span>(<span class="hljs-params">self</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;Fetch the next row &quot;&quot;&quot;</span><br>    self._check_executed()<br>    fut = self._loop.create_future()<br><br>    <span class="hljs-keyword">if</span> self._rows <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">or</span> self._rownumber &gt;= <span class="hljs-built_in">len</span>(self._rows):<br>        fut.set_result(<span class="hljs-literal">None</span>)<br>        <span class="hljs-keyword">return</span> fut<br>    result = self._rows[self._rownumber]<br>    self._rownumber += <span class="hljs-number">1</span><br><br>    fut = self._loop.create_future()<br>    fut.set_result(result)<br>    <span class="hljs-keyword">return</span> fut<br></code></pre></td></tr></table></figure>
+<p>综合上面的分析, 可以发现只要对核心的方法<code>self._query</code>进行重载即可拿到我们想要的数据, 从源码中我们可以知道, 我们能获取到传入<code>self._query</code>的<code>self</code>和<code>sql</code>参数, 根据<code>self</code>又能获取到查询的结果, 同时我们通过装饰器能获取到运行的时间, 要的数据基本都到齐了, 按照思路修改后的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> importlib<br><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> wraps<br><br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> cast, Any, Callable, Optional, Tuple, TYPE_CHECKING<br><span class="hljs-keyword">from</span> types <span class="hljs-keyword">import</span> ModuleType<br><span class="hljs-keyword">if</span> TYPE_CHECKING:<br>    <span class="hljs-keyword">import</span> aiomysql<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">func_wrapper</span>(<span class="hljs-params">func: Callable</span>):</span><br><span class="hljs-meta">    @wraps(<span class="hljs-params">func</span>)</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">wrapper</span>(<span class="hljs-params">*args, **kwargs</span>) -&gt; Any:</span><br>        start: <span class="hljs-built_in">float</span> = time.time()<br>        func_result: Any = <span class="hljs-keyword">await</span> func(*args, **kwargs)<br>        end: <span class="hljs-built_in">float</span> = time.time()<br><br>        <span class="hljs-comment"># 根据_query可以知道, 第一个参数是self, 第二个参数是sql</span><br>        self: aiomysql.Cursor = args[<span class="hljs-number">0</span>]<br>        sql: <span class="hljs-built_in">str</span> = args[<span class="hljs-number">1</span>]<br>        <span class="hljs-comment"># 通过self,我们可以拿到其他的数据</span><br>        db: <span class="hljs-built_in">str</span> = self._connection.db<br>        user: <span class="hljs-built_in">str</span> = self._connection.user<br>        host: <span class="hljs-built_in">str</span> = self._connection.host<br>        port: <span class="hljs-built_in">str</span> = self._connection.port<br>        execute_result: Tuple[Tuple] = self._rows<br>        <span class="hljs-comment"># 可以根据自己定义的agent把数据发送到指定的平台, 然后我们就可以在平台上看到对应的数据或进行监控了, </span><br>        <span class="hljs-comment"># 这里只是打印一部分数据出来</span><br>        print(&#123;<br>            <span class="hljs-string">&quot;sql&quot;</span>: sql,<br>            <span class="hljs-string">&quot;db&quot;</span>: db,<br>            <span class="hljs-string">&quot;user&quot;</span>: user,<br>            <span class="hljs-string">&quot;host&quot;</span>: host,<br>            <span class="hljs-string">&quot;port&quot;</span>: port,<br>            <span class="hljs-string">&quot;result&quot;</span>: execute_result,<br>            <span class="hljs-string">&quot;speed time&quot;</span>: end - start<br>        &#125;)<br>        <span class="hljs-keyword">return</span> func_result<br>    <span class="hljs-keyword">return</span> cast(Callable, wrapper)<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MetaPathFinder</span>:</span><br><br><span class="hljs-meta">    @staticmethod</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">find_module</span>(<span class="hljs-params">fullname: <span class="hljs-built_in">str</span>, path: Optional[<span class="hljs-built_in">str</span>] = <span class="hljs-literal">None</span></span>) -&gt; Optional[&quot;MetaPathLoader&quot;]:</span><br>        <span class="hljs-keyword">if</span> fullname == <span class="hljs-string">&#x27;aiomysql&#x27;</span>:<br>            <span class="hljs-comment"># 只有aiomysql才进行hook</span><br>            <span class="hljs-keyword">return</span> MetaPathLoader()<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MetaPathLoader</span>:</span><br><br><span class="hljs-meta">    @staticmethod</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load_module</span>(<span class="hljs-params">fullname: <span class="hljs-built_in">str</span></span>):</span><br>        <span class="hljs-keyword">if</span> fullname <span class="hljs-keyword">in</span> sys.modules:<br>            <span class="hljs-keyword">return</span> sys.modules[fullname]<br>        <span class="hljs-comment"># 防止递归调用</span><br>        finder: <span class="hljs-string">&quot;MetaPathFinder&quot;</span> = sys.meta_path.pop(<span class="hljs-number">0</span>)<br>        <span class="hljs-comment"># 导入 module</span><br>        module: ModuleType = importlib.import_module(fullname)<br>        <span class="hljs-comment"># 针对_query进行hook</span><br>        module.Cursor._query = func_wrapper(module.Cursor._query)<br>        sys.meta_path.insert(<span class="hljs-number">0</span>, finder)<br>        <span class="hljs-keyword">return</span> module<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test_mysql</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">import</span> aiomysql<br>    pool: aiomysql.Pool = <span class="hljs-keyword">await</span> aiomysql.create_pool(<br>        host=<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, port=<span class="hljs-number">3306</span>, user=<span class="hljs-string">&#x27;root&#x27;</span>, password=<span class="hljs-string">&#x27;123123&#x27;</span>, db=<span class="hljs-string">&#x27;mysql&#x27;</span><br>    )<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> pool.acquire() <span class="hljs-keyword">as</span> conn:<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> conn.cursor() <span class="hljs-keyword">as</span> cur:<br>            <span class="hljs-keyword">await</span> cur.execute(<span class="hljs-string">&quot;SELECT 42;&quot;</span>)<br>            (r,) = <span class="hljs-keyword">await</span> cur.fetchone()<br>            <span class="hljs-keyword">assert</span> r == <span class="hljs-number">42</span><br>    pool.close()<br>    <span class="hljs-keyword">await</span> pool.wait_closed()<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    sys.meta_path.insert(<span class="hljs-number">0</span>, MetaPathFinder())<br>    <span class="hljs-keyword">import</span> asyncio<br><br>    asyncio.run(test_mysql())<br><br><span class="hljs-comment"># 输出示例:</span><br><span class="hljs-comment"># 可以看出sql语句与我们输入的一样, db, user, host, port等参数也是, 还能知道执行的结果和运行时间</span><br><span class="hljs-comment"># &#123;&#x27;sql&#x27;: &#x27;SELECT 42;&#x27;, &#x27;db&#x27;: &#x27;mysql&#x27;, &#x27;user&#x27;: &#x27;root&#x27;, &#x27;host&#x27;: &#x27;127.0.0.1&#x27;, &#x27;port&#x27;: 3306, &#x27;result&#x27;: ((42,),), &#x27;speed time&#x27;: 0.00045609474182128906&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>这个例子看来很不错, 但是需要在调用的入口处显式调用该逻辑, 通常一个项目可能有几个入口, 每个入口都显示调用该逻辑会非常麻烦， 而且必须先调用我们的hook逻辑后才能import， 这样就得订好引入规范， 不然就可能出现部分地方hook不成功, 如果能把引入hook这个逻辑安排在解析器启动后马上执行， 就可以完美地解决这个问题了.<br>查阅了一翻资料后发现,<code>python</code>解释器初始化的时候会自动<code>import PYTHONPATH</code>下存在的<code>sitecustomize</code>和<code>usercustomize</code>模块, 我们只需要创建该模块, 并在模块里面写入我们的<br>替换函数即可。</p>
+<p>具体结构如下，也可以参考<a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/python_hook/hook_by_sys/">github存储</a></p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs vim">.<br>├── __init__.<span class="hljs-keyword">py</span><br>├── hook_aiomysql.<span class="hljs-keyword">py</span><br>├── sitecustomize.<span class="hljs-keyword">py</span><br>└── test_auto_hook.<span class="hljs-keyword">py</span><br></code></pre></td></tr></table></figure>
+<p><code>hook_aiomysql.py</code>是我们制作探针的代码为例子， 而<code>sitecustomize.py</code>存放的代码如下, 非常简单， 就是引入我们的探针代码, 并插入到<code>sys.meta_path</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">from</span> hook_aiomysql <span class="hljs-keyword">import</span> MetaPathFinder<br><br>sys.meta_path.insert(<span class="hljs-number">0</span>, MetaPathFinder())<br></code></pre></td></tr></table></figure>
+<p><code>test_auto_hook.py</code>则是测试代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> hook_aiomysql <span class="hljs-keyword">import</span> test_mysql<br><br><br>asyncio.run(test_mysql())<br></code></pre></td></tr></table></figure>
+<p>接下来只要设置<code>PYTHONPATH</code>并运行我们的代码即可（如果是项目的话一般交由superisor启动，则可以在配置文件中设置好<code>PYTHONPATH</code>）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">(.venv) ➜  python_hook git:(master) ✗ <span class="hljs-built_in">export</span> PYTHONPATH=.      <br>(.venv) ➜  python_hook git:(master) ✗ python test_auto_hook.py <br>&#123;<span class="hljs-string">&#x27;sql&#x27;</span>: <span class="hljs-string">&#x27;SELECT 42;&#x27;</span>, <span class="hljs-string">&#x27;db&#x27;</span>: <span class="hljs-string">&#x27;mysql&#x27;</span>, <span class="hljs-string">&#x27;user&#x27;</span>: <span class="hljs-string">&#x27;root&#x27;</span>, <span class="hljs-string">&#x27;host&#x27;</span>: <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-string">&#x27;port&#x27;</span>: 3306, <span class="hljs-string">&#x27;result&#x27;</span>: ((42,),), <span class="hljs-string">&#x27;speed time&#x27;</span>: 0.000213623046875&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="4-直接替换方法"><a href="#4-直接替换方法" class="headerlink" title="4.直接替换方法"></a>4.直接替换方法</h2><p>可以看到上面的方法很好的运行了， 而且可以很方便的嵌入到我们的项目中， 但是该方法依赖了<code>sitecustomize.py</code>文件， 我们很难让它抽离成一个第三方的库， 如果要抽离成第三方的库就得考虑看看有没有其他的方法。<br>在上面介绍<code>MetaPathLoader</code>时说到了<code>sys.module</code>, 在里面通过<code>sys.modules</code>来减少重复引入：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MetaPathLoader</span>:</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load_module</span>(<span class="hljs-params">self, fullname</span>):</span><br>        <span class="hljs-comment"># import的模块都会存放在sys.modules里面， 通过判断可以减少重复import</span><br>        <span class="hljs-keyword">if</span> fullname <span class="hljs-keyword">in</span> sys.modules:<br>            <span class="hljs-keyword">return</span> sys.modules[fullname]<br>        <span class="hljs-comment"># 防止递归调用</span><br>        finder = sys.meta_path.pop(<span class="hljs-number">0</span>)<br>        <span class="hljs-comment"># 导入 module</span><br>        module = importlib.import_module(fullname)<br>        <span class="hljs-keyword">if</span> fullname == <span class="hljs-string">&#x27;time&#x27;</span>:<br>            <span class="hljs-comment"># 替换函数</span><br>            module.sleep = func_wrapper(module.sleep)<br>        sys.meta_path.insert(<span class="hljs-number">0</span>, finder)<br>        <span class="hljs-keyword">return</span> module<br></code></pre></td></tr></table></figure>
+<p>这个减少重复引入的原理是， 每次引入一个模块后， 他就会存放在sys.modules， 如果是重复引入， 就会直接刷新成最新引入的模块。上面之所以会考虑到减少重复import是因为我们不会在程序运行时升级第三方库的依赖。</p>
+<p>利用到我们可以不考虑重复引入同名不同实现的模块， 以及sys.modules会缓存引入模块的特点， 我们可以把上面的逻辑简化成<code>引入模块-&gt;替换当前模块方法为我们修改的hook方法</code>。<br>第一次接触这个方法是从<a target="_blank" rel="noopener" href="https://github.com/uber-common/opentracing-python-instrumentation">opentracing-python-instrumentation</a>学的， 不过他夹带着其他的封装， 所以我这里进行了简化处理<a target="_blank" rel="noopener" href="https://github.com/so1n/example/tree/master/example_python/example_python/python_hook/hook_by_global">github代码仓</a>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> wraps<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, Callable, Tuple, cast<br><br><span class="hljs-keyword">import</span> aiomysql<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">func_wrapper</span>(<span class="hljs-params">func: Callable</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;和上面一样的封装函数, 这里简单略过&quot;&quot;&quot;</span><br>    <br><span class="hljs-comment"># 判断是否hook过</span><br>_IS_HOOK: <span class="hljs-built_in">bool</span> = <span class="hljs-literal">False</span><br><span class="hljs-comment"># 存放原来的_query</span><br>_query: Callable = aiomysql.Cursor._query<br><br><br><span class="hljs-comment"># hook函数</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">install_hook</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">global</span> _IS_HOOK<br>    _IS_HOOK = <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">if</span> _IS_HOOK:<br>        <span class="hljs-keyword">return</span><br>    aiomysql.Cursor._query = func_wrapper(aiomysql.Cursor._query)<br>    _IS_HOOK = <span class="hljs-literal">True</span><br><br><br><span class="hljs-comment"># 还原到原来的函数方法</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">reset_hook</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    aiomysql.Cursor._query = _query<br>    _IS_HOOK = <span class="hljs-literal">False</span><br></code></pre></td></tr></table></figure>
+<p>代码简单明了，接下来跑一跑刚才的测试：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> aiomysql<br><br><span class="hljs-keyword">from</span> demo <span class="hljs-keyword">import</span> install_hook, reset_hook<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test_mysql</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    pool: aiomysql.Pool = <span class="hljs-keyword">await</span> aiomysql.create_pool(<br>        host=<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, port=<span class="hljs-number">3306</span>, user=<span class="hljs-string">&#x27;root&#x27;</span>, password=<span class="hljs-string">&#x27;&#x27;</span>, db=<span class="hljs-string">&#x27;mysql&#x27;</span><br>    )<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> pool.acquire() <span class="hljs-keyword">as</span> conn:<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> conn.cursor() <span class="hljs-keyword">as</span> cur:<br>            <span class="hljs-keyword">await</span> cur.execute(<span class="hljs-string">&quot;SELECT 42;&quot;</span>)<br>            (r,) = <span class="hljs-keyword">await</span> cur.fetchone()<br>            <span class="hljs-keyword">assert</span> r == <span class="hljs-number">42</span><br>    pool.close()<br>    <span class="hljs-keyword">await</span> pool.wait_closed()<br><br>print(<span class="hljs-string">&quot;install hook&quot;</span>)<br>install_hook()<br>asyncio.run(test_mysql())<br>print(<span class="hljs-string">&quot;reset hook&quot;</span>)<br>reset_hook()<br>asyncio.run(test_mysql())<br>print(<span class="hljs-string">&quot;end&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>通过测试输出可以发现我们的逻辑的正确的, install hook后能出现我们提取的元信息， 而reset后则不会打印原信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">install hook<br>&#123;<span class="hljs-string">&#x27;sql&#x27;</span>: <span class="hljs-string">&#x27;SELECT 42;&#x27;</span>, <span class="hljs-string">&#x27;db&#x27;</span>: <span class="hljs-string">&#x27;mysql&#x27;</span>, <span class="hljs-string">&#x27;user&#x27;</span>: <span class="hljs-string">&#x27;root&#x27;</span>, <span class="hljs-string">&#x27;host&#x27;</span>: <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-string">&#x27;port&#x27;</span>: 3306, <span class="hljs-string">&#x27;result&#x27;</span>: ((42,),), <span class="hljs-string">&#x27;speed time&#x27;</span>: 0.000347137451171875&#125;<br>reset hook<br>end<br></code></pre></td></tr></table></figure>
+
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5.总结"></a>5.总结</h2><p>得益于Python动态语言的特性， 我们可以很容易为第三方库实现钩子方法，上面说的两种方法中， 第二种方法非常简单， 但在自己项目中最好还是采用第一种方法， 因为<code>Python</code>是通过一行一行代码进行扫描执行的， 第二种方法只能放在入口代码中， 并且要在被hook的对象实例化之前执行， 不然就会实现hook失败的现象, 而第一种方法除了麻烦外， 基本上能躲避所有坑。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/11/18/%E5%9F%BA%E4%BA%8EPython%E6%8E%A2%E9%92%88%E5%AE%8C%E6%88%90%E8%B0%83%E7%94%A8%E5%BA%93%E7%9A%84%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;11&#x2F;18&#x2F;%E5%9F%BA%E4%BA%8EPython%E6%8E%A2%E9%92%88%E5%AE%8C%E6%88%90%E8%B0%83%E7%94%A8%E5%BA%93%E7%9A%84%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;11&#x2F;18&#x2F;%E5%9F%BA%E4%BA%8EPython%E6%8E%A2%E9%92%88%E5%AE%8C%E6%88%90%E8%B0%83%E7%94%A8%E5%BA%93%E7%9A%84%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/APM/" rel="tag">APM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/12/10/Celery%E5%90%8C%E4%B8%80%E6%97%B6%E5%88%BB%E5%8F%AA%E6%89%A7%E8%A1%8C%E4%B8%80%E4%B8%AA%E7%9B%B8%E5%90%8C%E4%BB%BB%E5%8A%A1/"><i class="iconfont iconleft"></i>Celery同一时刻只执行一个相同任务</a>
+    <a href="/2020/09/07/%E5%88%86%E5%B8%83%E5%BC%8Fid/">分布式ID的几种方案<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AE%80%E5%8D%95%E7%B2%97%E6%9A%B4%E7%9A%84%E6%96%B9%E6%B3%95%E2%80%93%E5%AF%B9mysql%E5%BA%93%E8%BF%9B%E8%A1%8C%E5%B0%81%E8%A3%85"><span class="toc-text">1.简单粗暴的方法–对mysql库进行封装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Python%E7%9A%84%E6%8E%A2%E9%92%88"><span class="toc-text">2.Python的探针</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%88%B6%E4%BD%9C%E6%8E%A2%E9%92%88%E6%A8%A1%E5%9D%97"><span class="toc-text">3.制作探针模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%9B%B4%E6%8E%A5%E6%9B%BF%E6%8D%A2%E6%96%B9%E6%B3%95"><span class="toc-text">4.直接替换方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AE%80%E5%8D%95%E7%B2%97%E6%9A%B4%E7%9A%84%E6%96%B9%E6%B3%95%E2%80%93%E5%AF%B9mysql%E5%BA%93%E8%BF%9B%E8%A1%8C%E5%B0%81%E8%A3%85"><span class="toc-text">1.简单粗暴的方法–对mysql库进行封装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Python%E7%9A%84%E6%8E%A2%E9%92%88"><span class="toc-text">2.Python的探针</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%88%B6%E4%BD%9C%E6%8E%A2%E9%92%88%E6%A8%A1%E5%9D%97"><span class="toc-text">3.制作探针模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%9B%B4%E6%8E%A5%E6%9B%BF%E6%8D%A2%E6%96%B9%E6%B3%95"><span class="toc-text">4.直接替换方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

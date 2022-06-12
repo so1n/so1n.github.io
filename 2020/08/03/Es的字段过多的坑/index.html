@@ -1,0 +1,445 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Es的字段过多的坑 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记前几天,突然发现线上Es有大量的错误日志,核心日志...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Es的字段过多的坑</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Es的字段过多的坑</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 03, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5379</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>前几天,突然发现线上Es有大量的错误日志,核心日志是Limit of total fields [1000] in index.经过查明发现是同事存api server日志时他是数据带有有很多field,导致报错,解决这个问题很简单,又却很复杂,最好的解决方案是分开存储,让Es只做好Es的职责,但是对于架构又复杂了.</p>
+        <h2 id="1-发生问题"><a href="#1-发生问题" class="headerlink" title="1.发生问题"></a>1.发生问题</h2><p>前几天在准备增加Logstash的机器部署时发现旧Logstash机器上面有一些错误日志,核心的信息是<code>Limit of total fields [1000] in index</code>.很容易理解,就是本次发送的数据字段数量大于1000了.</p>
+<blockquote>
+<p>题外话,之所以会有这样大的数据量是因为同事那边发送的日志数据里有一个动态的json对象,而对于es来说{‘a’: {‘b’: 1, ‘c’: 2}}会认为有a.b,和a.c两个字段.在发现问题后,把含有该动态json对象的字段解析为文本就好了(不过没事还是不要存那么多数据).</p>
+</blockquote>
+<h2 id="2-解决问题"><a href="#2-解决问题" class="headerlink" title="2.解决问题"></a>2.解决问题</h2><p>解决这个问题也非常的简单只要针对有问题的索引处理即可,如下是把限制放宽到2000:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -X PUT  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -d <span class="hljs-string">&#x27;&#123;&quot;index.mapping.total_fields.limit&quot;:2000&#125;&#x27;</span> http://127.0.0.1:9200/so1n_index/_settings<br></code></pre></td></tr></table></figure>
+<p>如果需要永久解决,则需要给索引增加temple,并执行以下命令:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -X PUT  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -d <span class="hljs-string">&#x27;&#123;&quot;template&quot;: &quot;so1n-*&quot;,&quot;settings&quot;:&#123;&quot;index.mapping.total_fields.limit&quot;:2000&#125;&#125;&#x27;</span> http://127.0.0.1:9200/_template/logstash<br></code></pre></td></tr></table></figure>
+<p>好了问题就到此解决了,不过如果是简单的解决问题,那我就是在水文章了,接下来当然是迎接一个新的坑</p>
+<h2 id="3-坑"><a href="#3-坑" class="headerlink" title="3.坑"></a>3.坑</h2><p>在处理完问题后的第二天发现被应用了<code>index.mapping.total_fields.limit</code>在<code>grafana</code>和自建报表平台都查不出数据了,而在<code>Kibana</code>上面使用KQL查询时,则是可以查询数据的.</p>
+<p>对问题进行排查与梳理后发现,只要使用query语句查询时,就会无法查询数据,同时会有类似的报错:<code>field expansion matches too many fields, limit: 1024, got: 1889</code>.<br>一开始看到这个报错的想法是:写入的限制通过改索引的配置就可以解决了,那读取的限制也可以通过改索引来解决.然而事实上并没有想象中的容易,找了一圈都找不到可以通过改索引的配置来解决查询数据字段过多的限制.</p>
+<p>最后发现有一个改法,需要更改elasticsearch.yml的一个配置<code>indices.query.bool.max_clause_count</code>,然后滚动重启集群.好处是可以马上解决,坏处是解决成本太高了,所以放弃该方法,换成另一个方法:删除字段过长的数据.</p>
+<p>想着那些过长的数据都没啥用,只是为了出问题时能排查问题,那现在直接删掉就可以了.然而在删除数据后,问题并没有解决…</p>
+<h2 id="4-避坑"><a href="#4-避坑" class="headerlink" title="4.避坑"></a>4.避坑</h2><p>回想一下,目前查询中只有用到es的query字符串查询方法才有问题,而使用KQL查询时,是能正常查询到数据的,那么一定是query字符串的查询机制与字段过多而引发限制.</p>
+<p>先看一看出问题的query字符串查询的语法:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;query&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;bool&quot;</span>: &#123;<br>            <span class="hljs-attr">&quot;filter&quot;</span>: [<br>                &#123;<br>                    <span class="hljs-attr">&quot;range&quot;</span>: &#123;<br>                        <span class="hljs-attr">&quot;@timestamp&quot;</span>: &#123;<br>                            <span class="hljs-attr">&quot;gte&quot;</span>: start_time,<br>                            <span class="hljs-attr">&quot;lte&quot;</span>: end_time,<br>                            <span class="hljs-attr">&quot;format&quot;</span>: <span class="hljs-string">&quot;epoch_millis&quot;</span><br>                        &#125;<br>                    &#125;<br>                &#125;,<br>                &#123;<br>                    <span class="hljs-attr">&quot;query_string&quot;</span>: &#123;<br>                        <span class="hljs-attr">&quot;analyze_wildcard&quot;</span>: True,<br>                        &quot;query&quot;: &#123;query str&#125;,<br>                    &#125;<br>                &#125;<br>            ]<br>        &#125;<br>    &#125;,<br>    &quot;aggs&quot;: ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>看了之后会发现还是找不到问题,那就看看<code>query_string</code>的相关<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">文档</a>吧.在文档中发现有对参数<code>default_field</code>的描述</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">(Optional, string) <span class="hljs-keyword">Default</span> field you wish <span class="hljs-keyword">to</span> <span class="hljs-keyword">search</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">no</span> field <span class="hljs-keyword">is</span> provided <span class="hljs-keyword">in</span> the query string.<br><br>Defaults <span class="hljs-keyword">to</span> the <span class="hljs-keyword">index</span>.query.default_field <span class="hljs-keyword">index</span> setting, which has a <span class="hljs-keyword">default</span> <span class="hljs-keyword">value</span> <span class="hljs-keyword">of</span> *. The * <span class="hljs-keyword">value</span> extracts <span class="hljs-keyword">all</span> fields that are eligible <span class="hljs-keyword">for</span> term queries <span class="hljs-keyword">and</span> filters the metadata fields. <span class="hljs-keyword">All</span> extracted fields are <span class="hljs-keyword">then</span> combined <span class="hljs-keyword">to</span> build a query <span class="hljs-keyword">if</span> <span class="hljs-keyword">no</span> prefix <span class="hljs-keyword">is</span> specified.<br><br>Searching across <span class="hljs-keyword">all</span> eligible fields does <span class="hljs-keyword">not</span> <span class="hljs-keyword">include</span> nested documents. Use a nested query <span class="hljs-keyword">to</span> <span class="hljs-keyword">search</span> those documents.<br><br><span class="hljs-keyword">For</span> mappings <span class="hljs-keyword">with</span> a <span class="hljs-keyword">large</span> number <span class="hljs-keyword">of</span> fields, searching across <span class="hljs-keyword">all</span> eligible fields could be expensive.<br><br>There <span class="hljs-keyword">is</span> a <span class="hljs-keyword">limit</span> <span class="hljs-keyword">on</span> the number <span class="hljs-keyword">of</span> fields that can be queried at once. It <span class="hljs-keyword">is</span> defined <span class="hljs-keyword">by</span> the indices.query.bool.max_clause_count <span class="hljs-keyword">search</span> setting, which defaults <span class="hljs-keyword">to</span> <span class="hljs-number">1024.</span><br></code></pre></td></tr></table></figure>
+
+<p>大概就是说如果没填<code>default_field</code>时,会默认按照*多所有字段进行匹配,如果字段数量超过<code>indices.query.bool.max_clause_count</code>的限制则会抛错.</p>
+<p>由于自己的项目中有一个公有字段<code>log_level</code>,所以只要把参数body按下面更改即可:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;size&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;query&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;bool&quot;</span>: &#123;<br>            <span class="hljs-attr">&quot;filter&quot;</span>: [<br>                &#123;<br>                    <span class="hljs-attr">&quot;range&quot;</span>: &#123;<br>                        <span class="hljs-attr">&quot;@timestamp&quot;</span>: &#123;<br>                            <span class="hljs-attr">&quot;gte&quot;</span>: start_time,<br>                            <span class="hljs-attr">&quot;lte&quot;</span>: end_time,<br>                            <span class="hljs-attr">&quot;format&quot;</span>: <span class="hljs-string">&quot;epoch_millis&quot;</span><br>                        &#125;<br>                    &#125;<br>                &#125;,<br>                &#123;<br>                    <span class="hljs-attr">&quot;query_string&quot;</span>: &#123;<br>                        <span class="hljs-attr">&quot;analyze_wildcard&quot;</span>: True,<br>                        &quot;query&quot;: &#123;query str&#125;,<br>                        &quot;default_field&quot;: &quot;log_level&quot; &lt;-- changed<br>                    &#125;<br>                &#125;<br>            ]<br>        &#125;<br>    &#125;,<br>    &quot;aggs&quot;: ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>如果由于设计的问题,导致每个查询的字段相差比较大,没有公有字段,那么还是更改限制并重启吧.</p>
+<h2 id="5-解决方案"><a href="#5-解决方案" class="headerlink" title="5.解决方案"></a>5.解决方案</h2><p>上面只是从写入和读取层解决问题的,但需要注意的是,我们不应该把大量非正常使用的数据全塞入Es.首先从ES的查询原理来看看为什么不应该这样处理?.</p>
+<p>Es在查询数据时,会把命中查询的数据全部都拉到内存里面,并根据语句进行计算与统计.当数据的字段变多时,对应的数据量就更多了,Es就需要更多的内存来存放数据,如果此时机器不够(一般不能配置机器内存大于32g),旧的数据就会被清掉,下次查询时又得重新从硬盘里拉取符合条件的数据.<br>简单来说Es读取热数据(内存数据)的速度远远大于读取冷数据(硬盘数据)的速度,如果单个数据量越大或者内存不够大,那么会影响到Es的查询速度和效率,除此之外,Es数据的每个字段都是索引,而这些会占用了大量的空间.</p>
+<p>了解完上面那些,我们就可以知道我们不应该把所有数据都存在于Es,特别是数据量比较多的时候.我们应该对数据进行拆分,把每个数据存到他应该呆的地方.我们可以按照上面的说法来拆分两大类数据,一类是<code>索引型数据</code>,也就是存在Es中的可以被快速查询到的数据;一类型是<code>详情型数据</code>,这类数据类似于商品信息数据,数据量很大,记录了商品的说明等等,可以不用存入Es中被索引,可以存在Mysql或者Hbase之中.除此之外,还有一种介于<code>索引性数据</code>和<code>详情型数据</code>的<code>辅助型数据</code>,他可以被Es做聚合运算或者充当辅助查询,这类型数据必须存在与Es之中,也可以存在于数据库之中,如果没办法确定就先放Es里吧.</p>
+<p>做好数据类型拆分后,我们就需要给架构添加复杂性了…<br>如图,我们需要在后端服务与Es之间添加一个中间件,这里中间件负责的是在写数据时把数据进行拆分,把<code>索引性数据</code>和<code>辅助型数据</code>发送到Es,并拿到写入成功的id与<code>详情型数据</code>一起写入数据库.而在查的时候需要把查询语句转发到Es进行查询,并拿到查询成功的id从数据库拉取数据并返回给用户.<br>![Untitled Diagram](/home/so1n/Downloads/Untitled Diagram.png)</p>
+<p>虽然描述起来简单,但是实现还是比较复杂的,比如发给Es的数据需要内部保存,每隔一段时间bluk一次,同时要防止数据保存期间丢失.还有中间件接受到数据时该如何拆分数据,怎么制订方案等都是比较复杂同时又得结合自己本身项目来制订.</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/08/03/Es%E7%9A%84%E5%AD%97%E6%AE%B5%E8%BF%87%E5%A4%9A%E7%9A%84%E5%9D%91/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;08&#x2F;03&#x2F;Es%E7%9A%84%E5%AD%97%E6%AE%B5%E8%BF%87%E5%A4%9A%E7%9A%84%E5%9D%91&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;08&#x2F;03&#x2F;Es%E7%9A%84%E5%AD%97%E6%AE%B5%E8%BF%87%E5%A4%9A%E7%9A%84%E5%9D%91&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElasticSearch/" rel="tag">ElasticSearch</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/08/17/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/"><i class="iconfont iconleft"></i>分布式事务</a>
+    <a href="/2020/06/03/Python%E7%9A%84TypeHints/">Python的TypeHints<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8F%91%E7%94%9F%E9%97%AE%E9%A2%98"><span class="toc-text">1.发生问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98"><span class="toc-text">2.解决问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9D%91"><span class="toc-text">3.坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%81%BF%E5%9D%91"><span class="toc-text">4.避坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">5.解决方案</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8F%91%E7%94%9F%E9%97%AE%E9%A2%98"><span class="toc-text">1.发生问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98"><span class="toc-text">2.解决问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9D%91"><span class="toc-text">3.坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%81%BF%E5%9D%91"><span class="toc-text">4.避坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">5.解决方案</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

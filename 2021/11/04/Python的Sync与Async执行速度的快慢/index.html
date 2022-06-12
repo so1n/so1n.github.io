@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python的Sync与Async执行速度的快慢 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记Python新的版本中支持了async/await...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python的Sync与Async执行速度的快慢</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2021/11/42b835643bb64c94.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python的Sync与Async执行速度的快慢</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 04, 2021</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3636</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>Python新的版本中支持了<code>async/await</code>语法， 很多文章都在说这种语法的实现代码会变得很快， 但是这种快是有场景限制的。这篇文章将尝试简单的解释为何<code>Async</code>的代码在某些场景比<code>Sync</code>的代码快。</p>
+        <h2 id="1-一个简单的例子"><a href="#1-一个简单的例子" class="headerlink" title="1.一个简单的例子"></a>1.一个简单的例子</h2><p>首先先从一个例子了解两种调用方法的差别, 为了能清晰的看出他们的运行时长差别， 都让他们重复运行10000次， 具体代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> time<br><br><br>n_call = <span class="hljs-number">10000</span><br><br><br><span class="hljs-comment"># sync的调用时长</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>(<span class="hljs-params">n: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>    <span class="hljs-keyword">return</span> n ** n<br><br>s_time = time.time()<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n_call):<br>    demo(i)<br>print(time.time() - s_time)<br><br><span class="hljs-comment"># async的调用时长</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sub_demo</span>(<span class="hljs-params">n: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>    <span class="hljs-keyword">return</span> n ** n<br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">async_main</span>() -&gt; <span class="hljs-keyword">None</span>:</span> <br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n_call):<br>        <span class="hljs-keyword">await</span> sub_demo(i)<br><br>loop = asyncio.get_event_loop()<br>s_time = time.time()<br>loop.run_until_complete(async_main())<br>print(time.time() - s_time)<br><br><span class="hljs-comment"># 输出</span><br><span class="hljs-comment"># 5.310615682601929</span><br><span class="hljs-comment"># 5.614157438278198</span><br></code></pre></td></tr></table></figure>
+<p>可以看得出来， <code>sync</code>的语法大家都是很熟悉， 而<code>async</code>的语法比较不一样， 函数需要使用<code>async def</code>开头， 同时调用<code>async def</code>函数需要使用<code>await</code>语法， 运行的时候需要先获取线程的事件循环， 然后在通过事件循环来运行<code>async_main</code>函数来达到一样的效果， 但是从运行结果的输出可以看得出,  <code>sync</code>的语法在这个场景中比<code>async</code>的语法速度快了一些些（由于Python的GIL原因， 这里无法使用多核的性能， 只能以单核来跑）。</p>
+<p>造成这样的原因是同样由同一个线程执行的情况下(cpu单核心)，<code>async</code>的调用还需要经过一些事件循环的额外调用， 这会产生一些小开销， 从而运行时间会比<code>sync</code>的慢， 同时这是一个纯cpu运算的示例， 而<code>async</code>的的优势在于网络io运算， 在这个场景无法发挥优势， 但会在高并发场景则会大放光彩, 造成这样的原因则是因为<code>async</code>是以协程运行的， <code>sync</code>是以线程运行的。</p>
+<blockquote>
+<p>NOTE: 目前所说的<code>async</code>语法都是支持网络io， 而文件系统的异步io还不是非常的完善， 所以文件系统的异步读写是通过封装交给多线程去处理， 而不是协程。<br>具体可见: <a target="_blank" rel="noopener" href="https://github.com/python/asyncio/wiki/ThirdParty#filesystem">https://github.com/python/asyncio/wiki/ThirdParty#filesystem</a></p>
+</blockquote>
+<h2 id="2-一个io的例子"><a href="#2-一个io的例子" class="headerlink" title="2.一个io的例子"></a>2.一个io的例子</h2><p>为了了解<code>async</code>在io场景下的运行优势， 先假定有一个io场景–Web后台服务通常需要处理许多请求， 所有请求都是从不同的客户端发出的， 示例如图：<br><img src="https://ftp.bmp.ovh/imgs/2021/11/42b835643bb64c94.png" alt="io场景"></p>
+<p>在这种场景下， 客户端请求都是在短时间内发出的。 而服务端为了能够在短时间内处理大量的请求， 防止处理延迟， 都会以某种方式来支持并发或者并行。 </p>
+<blockquote>
+<p>NOTE: 并发，在操作系统中，是指一个时间段中有几个程序都处于已启动运行到运行完毕之间，且这几个程序都是在同一个处理机上运行，但任一个时刻点上只有一个程序在处理机上运行。<br>并行是计算机系统中能同时执行两个或多个处理的一种计算方法。 </p>
+</blockquote>
+<p>对于<code>sync</code>语法来说， 这个Web后台可以通过进程， 线程或者两者结合来实现， 他们的提供并发/并行的能力会局限于woker的数量， 比如当有5个客户端同时请求而服务端只有4个worker时， 有一个请求会进入阻塞等待阶段, 直到运行的4个worker有一个被处理完毕。 为了让服务器能提供更好的服务， 我们都会提供足够多的worker, 同时由于进程具有良好的隔离性且比较每起一个进程都会占用一份独立的资源， 所以都是以几个进程+大量线程的形式来提供服务。</p>
+<blockquote>
+<p>NOTE： 进程是最小的资源分配单位, 过多的进程会占用很多系统资源， 一般的后台服务启用的进程数量不会很多， 同时线程是最小的调度单位， 所以以下的调度我都以线程来描述。</p>
+</blockquote>
+<p>但是这种方式是很耗系统的资源的(相对于协程来说), 因为线程的运行都是靠cpu来执行的， 而cpu是有限的， 同一时刻只能支持固定的几个worker运行, 其他线程则得等待被调度, 这样就意味着每个线程都只能工作一个时间分片， 之后就会被调度系统控制进入阻塞或者就绪阶段， 让位给其他线程， 直到下次获取时间分片时才可以继续运行。 为了能模拟出同一时刻内， 多个线程同时运行， 且防止其他线程饿死的情况， 线程每次获得的运行时间很短， 线程间的调度切换很频繁， 当启用更多的进程和更多的线程时， 调度就会更加的频繁。</p>
+<p>不过调度线程的开销还不算大， 比较大的开销是调度线程而产生的下文切换和竞争条件(具体可以参考《计算机导论》中进程调度相关的资料， 我这里只是简单说明)， cpu在执行代码时，它需要把数据加载到cpu的缓存中去的再运行， 当cpu运行的线程在这个时间分片内执行完成时， 该线程的最新运行数据就会保存起来， 然后cpu会去加载准备被调度的线程的数据， 并运行。 虽然这部分暂存数据是保存在比内存更快， 比内存更靠近cpu的寄存器上， 但是寄存器的访问速度也没有cpu缓存的访问速度快， 所以cpu在切换运行的线程时， 都会花上一部分时间用来装载数据上还有装载缓存时的竞争问题。</p>
+<p>对比线程的调度产生的上下文切换与抢占式， <code>async</code>语法实现的协程是非抢占式的， 协程的调度是依赖于一个循环来控制， 这个循环是一个非常常高效的任务管理器和调度器,  由于调度的是一段代码的实现逻辑， 所以cpu的执行代码并不用切换， 也就没有上下文切换的开销, 同时， 也不用考虑装载缓存的竞争问题。<br>还是以上面那个图为例子， 在服务开始启动时， 会先启动一个事件循环， 当收到请求时， 它会创建一个任务来处理客户端发送过来的请求， 这个任务会从事件循环获取到了执行权，独占整个线程资源并一直执行， 直到遇到需要等待外部事件， 比如等待数据库返回数据的事件， 这时任务会告诉事件循环自己在等待这个事件， 然后交出执行权， 事件循环就会把执行权传递给最需要运行的任务。 当刚才交出执行权的任务在后续收到数据库事件响应时， 事件循环会把它安排到就绪列表的第一个(不同的事件循环实现可能不一样)并在下一次切换执行权时， 把执行权返回给他, 让他继续执行， 直到遇到下一个等待事件。</p>
+<p>这种切换协程的方式称为协作式多任务处理， 由于只会在单个进程或者单个线程中运行， 切换协程时上下文是不用改变的， cpu不用重新读写缓存， 所以会节省一些开销。 从上面可以看出协作式切换执行权是基于协程自己主动让出的, 而线程是抢占式的， 线程在没遇到io事件时， 也可能从运行状态转为就绪状态， 直到再次被调用, 这样会多出很多调度带来的开销, 而协程是会一直运行， 直到遇到让步事件才切换， 所以协程调度的次数会比线程少很多。 同时可以看出协程的何时调度是由开发者指定（比如上面所说的等等数据库返回事件）， 而且是非抢占式的, 这就意味着某个协程在运行时， 其他协程是没办法运行的， 只能等到运行的协程交出执行权， 所以开发者要确保不能让任务在cpu上停留太长时间，否则剩余的任务就会饿死。</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h2><p>在io场景下， io的开销比cpu执行代码逻辑外的开销大很多， 从这里也可以换个想法思考， 在遇到io的开销时， 代码逻辑需要进行等待， 而cpu是空闲的， 于是就通过协程/线程的方式对于cpu的多路复用， 压榨cpu。<br>假设<code>sync</code>语法和<code>async</code>语法执行的代码逻辑是一样的， 那么他们执行速度快慢的对比可以转换为协程与多进程/线程的开销对比, 也就是协程事件循环调度开销与多进程/线程的调度的开销逻辑对比， 而事件循环调度的开销是基本不变(或者变化不大)，多进程/线程的开销除了比事件循环调度的开销大外，还会随着worker的量变多而变多， 当并发量高到一定程度时， 多进程/多线程的开销会大于协程切换的开销， 这时<code>async</code>语法的执行速度就会快于<code>sync</code>语法。<br>所以在普通场景下， <code>sync</code>语法的执行速度会快于<code>async</code>语法的执行速度， 但在io计算大于cpu计算且高并发场景下时， <code>async</code>语法的执行速度会比<code>sync</code>语法速度还快。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2021/11/04/Python%E7%9A%84Sync%E4%B8%8EAsync%E6%89%A7%E8%A1%8C%E9%80%9F%E5%BA%A6%E7%9A%84%E5%BF%AB%E6%85%A2/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;04&#x2F;Python%E7%9A%84Sync%E4%B8%8EAsync%E6%89%A7%E8%A1%8C%E9%80%9F%E5%BA%A6%E7%9A%84%E5%BF%AB%E6%85%A2&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;11&#x2F;04&#x2F;Python%E7%9A%84Sync%E4%B8%8EAsync%E6%89%A7%E8%A1%8C%E9%80%9F%E5%BA%A6%E7%9A%84%E5%BF%AB%E6%85%A2&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asyncio/" rel="tag">Asyncio</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2021/11/08/%E5%88%9D%E8%AF%86Python%20Async%E7%9A%84%E5%AE%9E%E7%8E%B0/"><i class="iconfont iconleft"></i>初识Python协程的实现</a>
+    <a href="/2021/10/29/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E4%BC%98%E5%8C%96%E6%A1%86%E6%9E%B6%E6%80%A7%E8%83%BD%E6%B5%81%E6%B0%B4%E6%97%A5%E8%AE%B0/">RPC框架编写实践--优化框架性能流水日记<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%B8%80%E4%B8%AAio%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">2.一个io的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%B8%80%E4%B8%AAio%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">2.一个io的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>记一次ElasticSearch冷热分离索引无法正确分配的问题 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记一开始ElasticSearch是同事自己搭的一个...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">记一次ElasticSearch冷热分离索引无法正确分配的问题</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">记一次ElasticSearch冷热分离索引无法正确分配的问题</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 10, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7511</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>一开始ElasticSearch是同事自己搭的一个单节点, 我在接手后开始使用mapping,集群等功能, 但很多旧<code>index</code>在单节点时被应用了很多奇怪的配置, 导致添加新的功能非常麻烦, 比如在启用冷热分离功能的时候, 旧的<code>index</code>无法正确分配.</p>
+        <h2 id="1-问题"><a href="#1-问题" class="headerlink" title="1.问题"></a>1.问题</h2><p>当给ElasticSearch配置了ILM后,ElasticSearch会根据配置自动执行,按照配置把索引进行在集群之中迁移,但是运行一段时间后发现,之前用logstash传过来的且没有使用mapping的旧索引都无法正常执行ILM,而其他数据却能正常处理.<br>由于发现这个问题时,对于Es不是十分了解,只能copy错误去搜索,搜索后发现几乎没有一个答案是满意的,最多说的是升级ElasticSearch版本解决,所以就又水了一文.</p>
+<h2 id="2-查看索引ilm运行情况"><a href="#2-查看索引ilm运行情况" class="headerlink" title="2.查看索引ilm运行情况"></a>2.查看索引ilm运行情况</h2><p>由于是由ilm自己自动运行的, 我们可以通过查看ilm的运行情况查看问题发生在哪</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">GET so1n_index/_ilm/explain<br></code></pre></td></tr></table></figure>
+<p>得出响应如下, 这里使用so1n_index代替索引名(下同).</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;indices&quot;</span> : &#123;<br>    <span class="hljs-attr">&quot;so1n_index&quot;</span> : &#123;<br>      <span class="hljs-attr">&quot;index&quot;</span> : <span class="hljs-string">&quot;so1n_index&quot;</span>,<br>      <span class="hljs-attr">&quot;managed&quot;</span> : <span class="hljs-literal">true</span>,<br>      <span class="hljs-attr">&quot;policy&quot;</span> : <span class="hljs-string">&quot;so1n_index_policy&quot;</span>,<br>      <span class="hljs-attr">&quot;lifecycle_date_millis&quot;</span> : <span class="hljs-number">1585008002962</span>,<br>      <span class="hljs-attr">&quot;age&quot;</span> : <span class="hljs-string">&quot;35.41d&quot;</span>,<br>      <span class="hljs-attr">&quot;phase&quot;</span> : <span class="hljs-string">&quot;cold&quot;</span>,<br>      <span class="hljs-attr">&quot;phase_time_millis&quot;</span> : <span class="hljs-number">1587686411329</span>,<br>      <span class="hljs-attr">&quot;action&quot;</span> : <span class="hljs-string">&quot;allocate&quot;</span>,<br>      <span class="hljs-attr">&quot;action_time_millis&quot;</span> : <span class="hljs-number">1587686419823</span>,<br>      <span class="hljs-attr">&quot;step&quot;</span> : <span class="hljs-string">&quot;check-allocation&quot;</span>,<br>      <span class="hljs-attr">&quot;step_time_millis&quot;</span> : <span class="hljs-number">1587686428607</span>,<br>      <span class="hljs-attr">&quot;step_info&quot;</span> : &#123;<br>        <span class="hljs-attr">&quot;message&quot;</span> : <span class="hljs-string">&quot;Waiting for [2] shards to be allocated to nodes matching the given filters&quot;</span>,<br>        <span class="hljs-attr">&quot;shards_left_to_allocate&quot;</span> : <span class="hljs-number">2</span>,<br>        <span class="hljs-attr">&quot;all_shards_active&quot;</span> : <span class="hljs-literal">true</span>,<br>        <span class="hljs-attr">&quot;actual_replicas&quot;</span> : <span class="hljs-number">1</span><br>      &#125;,<br>      <span class="hljs-attr">&quot;phase_execution&quot;</span> : &#123;<br>        <span class="hljs-attr">&quot;policy&quot;</span> : <span class="hljs-string">&quot;so1n_index_policy&quot;</span>,<br>        <span class="hljs-attr">&quot;phase_definition&quot;</span> : &#123;<br>          <span class="hljs-attr">&quot;min_age&quot;</span> : <span class="hljs-string">&quot;31d&quot;</span>,<br>          <span class="hljs-attr">&quot;actions&quot;</span> : &#123;<br>            <span class="hljs-attr">&quot;freeze&quot;</span> : &#123; &#125;,<br>            <span class="hljs-attr">&quot;allocate&quot;</span> : &#123;<br>              <span class="hljs-attr">&quot;include&quot;</span> : &#123; &#125;,<br>              <span class="hljs-attr">&quot;exclude&quot;</span> : &#123; &#125;,<br>              <span class="hljs-attr">&quot;require&quot;</span> : &#123;<br>                <span class="hljs-attr">&quot;box_type&quot;</span> : <span class="hljs-string">&quot;cold&quot;</span><br>              &#125;<br>            &#125;,<br>            <span class="hljs-attr">&quot;set_priority&quot;</span> : &#123;<br>              <span class="hljs-attr">&quot;priority&quot;</span> : <span class="hljs-number">10</span><br>            &#125;<br>          &#125;<br>        &#125;,<br>        <span class="hljs-attr">&quot;version&quot;</span> : <span class="hljs-number">3</span>,<br>        <span class="hljs-attr">&quot;modified_date_in_millis&quot;</span> : <span class="hljs-number">1587663954354</span><br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>看输出可以发现,我在ilm配置索引min_age超过31天就执行so1n_index_policy中的一个cold phase,而在执行其中allocate的check-allocation步骤时报错<code>Waiting for [2] shards to be allocated to nodes matching the given filters</code>,也就是ilm执行到so1n_index节点分配时就已经出问题了,而且还是在check-allocation阶段.所以我们只要查明为什么check-allocation不通过就好了.</p>
+<h2 id="3-查看索引allocation情况"><a href="#3-查看索引allocation情况" class="headerlink" title="3.查看索引allocation情况"></a>3.查看索引allocation情况</h2><p>直接使用explain查看allocation的错误原因</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">GET /_cluster/allocation/explain<br>&#123;<br>  <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-string">&quot;so1n_index&quot;</span>,<br>  <span class="hljs-string">&quot;shard&quot;</span>: 0,<br>  <span class="hljs-string">&quot;primary&quot;</span>: <span class="hljs-literal">true</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>返回响应如下:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;index&quot;</span> : <span class="hljs-string">&quot;so1n_index&quot;</span>,<br>  <span class="hljs-attr">&quot;shard&quot;</span> : <span class="hljs-number">0</span>,<br>  <span class="hljs-attr">&quot;primary&quot;</span> : <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">&quot;current_state&quot;</span> : <span class="hljs-string">&quot;started&quot;</span>,<br>  <span class="hljs-attr">&quot;current_node&quot;</span> : &#123;<br>    <span class="hljs-attr">&quot;id&quot;</span> : <span class="hljs-string">&quot;so1n_id_1&quot;</span>,<br>    <span class="hljs-attr">&quot;name&quot;</span> : <span class="hljs-string">&quot;so1n-elastic-node-1&quot;</span>,<br>    <span class="hljs-attr">&quot;transport_address&quot;</span> : <span class="hljs-string">&quot;10.142.0.1:9300&quot;</span>,<br>    <span class="hljs-attr">&quot;attributes&quot;</span> : &#123;<br>      <span class="hljs-attr">&quot;ml.machine_memory&quot;</span> : <span class="hljs-string">&quot;7839637504&quot;</span>,<br>      <span class="hljs-attr">&quot;xpack.installed&quot;</span> : <span class="hljs-string">&quot;true&quot;</span>,<br>      <span class="hljs-attr">&quot;box_type&quot;</span> : <span class="hljs-string">&quot;hot&quot;</span>,<br>      <span class="hljs-attr">&quot;ml.max_open_jobs&quot;</span> : <span class="hljs-string">&quot;20&quot;</span><br>    &#125;<br>  &#125;,<br>  <span class="hljs-attr">&quot;can_remain_on_current_node&quot;</span> : <span class="hljs-string">&quot;no&quot;</span>,<br>  <span class="hljs-attr">&quot;can_remain_decisions&quot;</span> : [<br>    &#123;<br>      <span class="hljs-attr">&quot;decider&quot;</span> : <span class="hljs-string">&quot;filter&quot;</span>,<br>      <span class="hljs-attr">&quot;decision&quot;</span> : <span class="hljs-string">&quot;NO&quot;</span>,<br>      <span class="hljs-attr">&quot;explanation&quot;</span> : <span class="hljs-string">&quot;&quot;</span><span class="hljs-string">&quot;node does not match index setting [index.routing.allocation.require] filters [box_type:&quot;</span>cold<span class="hljs-string">&quot;,_id:&quot;</span>so1n_id_3<span class="hljs-string">&quot;]&quot;</span><span class="hljs-string">&quot;&quot;</span><br>    &#125;<br>  ],<br>  <span class="hljs-attr">&quot;can_move_to_other_node&quot;</span> : <span class="hljs-string">&quot;no&quot;</span>,<br>  <span class="hljs-attr">&quot;move_explanation&quot;</span> : <span class="hljs-string">&quot;cannot move shard to another node, even though it is not allowed to remain on its current node&quot;</span>,<br>  <span class="hljs-attr">&quot;node_allocation_decisions&quot;</span> : [<br>    &#123;<br>      <span class="hljs-attr">&quot;node_id&quot;</span> : <span class="hljs-string">&quot;so1n_id_2&quot;</span>,<br>      <span class="hljs-attr">&quot;node_name&quot;</span> : <span class="hljs-string">&quot;so1n-elastic-node-2&quot;</span>,<br>      <span class="hljs-attr">&quot;transport_address&quot;</span> : <span class="hljs-string">&quot;10.142.0.2:9300&quot;</span>,<br>      <span class="hljs-attr">&quot;node_attributes&quot;</span> : &#123;<br>        <span class="hljs-attr">&quot;ml.machine_memory&quot;</span> : <span class="hljs-string">&quot;7839653888&quot;</span>,<br>        <span class="hljs-attr">&quot;ml.max_open_jobs&quot;</span> : <span class="hljs-string">&quot;20&quot;</span>,<br>        <span class="hljs-attr">&quot;box_type&quot;</span> : <span class="hljs-string">&quot;cold&quot;</span>,<br>        <span class="hljs-attr">&quot;xpack.installed&quot;</span> : <span class="hljs-string">&quot;true&quot;</span><br>      &#125;,<br>      <span class="hljs-attr">&quot;node_decision&quot;</span> : <span class="hljs-string">&quot;no&quot;</span>,<br>      <span class="hljs-attr">&quot;weight_ranking&quot;</span> : <span class="hljs-number">1</span>,<br>      <span class="hljs-attr">&quot;deciders&quot;</span> : [<br>        &#123;<br>          <span class="hljs-attr">&quot;decider&quot;</span> : <span class="hljs-string">&quot;filter&quot;</span>,<br>          <span class="hljs-attr">&quot;decision&quot;</span> : <span class="hljs-string">&quot;NO&quot;</span>,<br>          <span class="hljs-attr">&quot;explanation&quot;</span> : <span class="hljs-string">&quot;&quot;</span><span class="hljs-string">&quot;node does not match index setting [index.routing.allocation.require] filters [box_type:&quot;</span>cold<span class="hljs-string">&quot;,_id:&quot;</span>so1n_id_3<span class="hljs-string">&quot;]&quot;</span><span class="hljs-string">&quot;&quot;</span><br>        &#125;<br>      ]<br>    &#125;<br>  ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这里可以发现,原来是索引多了一段配置,导致在分配索引时,必须要确保节点的id是:so1n_id_3且box_type为cold,可是被分配的节点这一台的box_type是虽然是cold, 但是节点id是:so1n_id_2.<br>接下来就可以具体查看索引的设置(kibana的设置里面可以查看):</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;index.blocks.read_only_allow_delete&quot;</span>: <span class="hljs-string">&quot;false&quot;</span>,<br>  <span class="hljs-attr">&quot;index.query.default_field&quot;</span>: [<br>    <span class="hljs-string">&quot;*&quot;</span><br>  ],<br>  <span class="hljs-attr">&quot;index.refresh_interval&quot;</span>: <span class="hljs-string">&quot;1s&quot;</span>,<br>  <span class="hljs-attr">&quot;index.write.wait_for_active_shards&quot;</span>: <span class="hljs-string">&quot;1&quot;</span>,<br>  <span class="hljs-attr">&quot;index.lifecycle.name&quot;</span>: <span class="hljs-string">&quot;so1n_index_policy&quot;</span>,<br>  <span class="hljs-attr">&quot;index.routing.allocation.require._id&quot;</span>: <span class="hljs-string">&quot;so1n_id_3&quot;</span>,<br>  <span class="hljs-attr">&quot;index.routing.allocation.require.box_type&quot;</span>: <span class="hljs-string">&quot;cold&quot;</span>,<br>  <span class="hljs-attr">&quot;index.blocks.write&quot;</span>: <span class="hljs-string">&quot;true&quot;</span>,<br>  <span class="hljs-attr">&quot;index.priority&quot;</span>: <span class="hljs-string">&quot;10&quot;</span>,<br>  <span class="hljs-attr">&quot;index.number_of_replicas&quot;</span>: <span class="hljs-string">&quot;1&quot;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>可以发现,这里多了一段</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&quot;index.routing.allocation.require._id&quot;: &quot;so1n_id_3&quot;<br></code></pre></td></tr></table></figure>
+<p>这一段从来没配置过,估计是没使用mapping时,当数据发送到so1n_id_3节点时,Es会自动给索引加上<code>index.routing.allocation.require._id</code>.</p>
+<h2 id="4-解决"><a href="#4-解决" class="headerlink" title="4.解决"></a>4.解决</h2><p>从上面可以发现, 由于旧索引带有:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&quot;index.routing.allocation.require._id&quot;: &quot;so1n_id_3&quot;<br></code></pre></td></tr></table></figure>
+<p>导致了旧索引无法分配, 目前业务上不需要该限制条件, 可以确定Es上面的所有索引都可以不需要<code>index.routing.allocation.require._id</code>,那可以通过以下进行修改:(如果有部分索引需要<code>index.routing.allocation.require._id</code>,则需要通配符修改)</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs json">PUT */_settings<br>&#123;<br>   <span class="hljs-attr">&quot;index.routing.allocation.require._id&quot;</span>: <span class="hljs-literal">null</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>修改完成后再调用explain查看:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs json">GET /_cluster/allocation/explain<br>&#123;<br>  <span class="hljs-attr">&quot;index&quot;</span>: <span class="hljs-string">&quot;so1n_index&quot;</span>,<br>  <span class="hljs-attr">&quot;shard&quot;</span>: <span class="hljs-number">0</span>,<br>  <span class="hljs-attr">&quot;primary&quot;</span>: <span class="hljs-literal">true</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>通过响应可以发现Es已经在后台执行索引迁移了:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;index&quot;</span> : <span class="hljs-string">&quot;so1n_index&quot;</span>,<br>  <span class="hljs-attr">&quot;shard&quot;</span> : <span class="hljs-number">0</span>,<br>  <span class="hljs-attr">&quot;primary&quot;</span> : <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">&quot;current_state&quot;</span> : <span class="hljs-string">&quot;relocating&quot;</span>,<br>  <span class="hljs-attr">&quot;current_node&quot;</span> : &#123;<br>    <span class="hljs-attr">&quot;id&quot;</span> : <span class="hljs-string">&quot;so1n_id_1&quot;</span>,<br>    <span class="hljs-attr">&quot;name&quot;</span> : <span class="hljs-string">&quot;so1n-elastic-node-1&quot;</span>,<br>    <span class="hljs-attr">&quot;transport_address&quot;</span> : <span class="hljs-string">&quot;10.142.0.1:9300&quot;</span>,<br>    <span class="hljs-attr">&quot;attributes&quot;</span> : &#123;<br>      <span class="hljs-attr">&quot;ml.machine_memory&quot;</span> : <span class="hljs-string">&quot;7839637504&quot;</span>,<br>      <span class="hljs-attr">&quot;xpack.installed&quot;</span> : <span class="hljs-string">&quot;true&quot;</span>,<br>      <span class="hljs-attr">&quot;box_type&quot;</span> : <span class="hljs-string">&quot;hot&quot;</span>,<br>      <span class="hljs-attr">&quot;ml.max_open_jobs&quot;</span> : <span class="hljs-string">&quot;20&quot;</span><br>    &#125;<br>  &#125;,<br>  <span class="hljs-attr">&quot;explanation&quot;</span> : <span class="hljs-string">&quot;the shard is in the process of relocating from node [so1n-elastic-node-1] to node [so1n-elastic-node-4], wait until relocation has completed&quot;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>迁移完成后再去查看可以发现字段<code>rebalance_explanation</code>会显示:<code>cannot rebalance as no target node exists that can both allocate this shard and improve the cluster balance</code><br>则此,索引冷热分离规则全部适配运行完成.</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/04/10/%E8%AE%B0%E4%B8%80%E6%AC%A1ElasticSearch%E5%86%B7%E7%83%AD%E5%88%86%E7%A6%BB%E7%B4%A2%E5%BC%95%E6%97%A0%E6%B3%95%E6%AD%A3%E7%A1%AE%E5%88%86%E9%85%8D%E7%9A%84%E9%97%AE%E9%A2%98/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;04&#x2F;10&#x2F;%E8%AE%B0%E4%B8%80%E6%AC%A1ElasticSearch%E5%86%B7%E7%83%AD%E5%88%86%E7%A6%BB%E7%B4%A2%E5%BC%95%E6%97%A0%E6%B3%95%E6%AD%A3%E7%A1%AE%E5%88%86%E9%85%8D%E7%9A%84%E9%97%AE%E9%A2%98&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;04&#x2F;10&#x2F;%E8%AE%B0%E4%B8%80%E6%AC%A1ElasticSearch%E5%86%B7%E7%83%AD%E5%88%86%E7%A6%BB%E7%B4%A2%E5%BC%95%E6%97%A0%E6%B3%95%E6%AD%A3%E7%A1%AE%E5%88%86%E9%85%8D%E7%9A%84%E9%97%AE%E9%A2%98&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElasticSearch/" rel="tag">ElasticSearch</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/05/28/%E5%86%85%E5%AD%98%E7%BB%9F%E8%AE%A1/"><i class="iconfont iconleft"></i>由内存溢出的思考:如何监控内存?</a>
+    <a href="/2020/03/26/APScheduler%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">APScheduler原理分析<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%97%AE%E9%A2%98"><span class="toc-text">1.问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95ilm%E8%BF%90%E8%A1%8C%E6%83%85%E5%86%B5"><span class="toc-text">2.查看索引ilm运行情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95allocation%E6%83%85%E5%86%B5"><span class="toc-text">3.查看索引allocation情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%A7%A3%E5%86%B3"><span class="toc-text">4.解决</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%97%AE%E9%A2%98"><span class="toc-text">1.问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95ilm%E8%BF%90%E8%A1%8C%E6%83%85%E5%86%B5"><span class="toc-text">2.查看索引ilm运行情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95allocation%E6%83%85%E5%86%B5"><span class="toc-text">3.查看索引allocation情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%A7%A3%E5%86%B3"><span class="toc-text">4.解决</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>MySQL分区,分表,分库 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="在使用MySQL且数据库数据越来越大后就需要进行优化,...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">MySQL分区,分表,分库</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">MySQL分区,分表,分库</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 12, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>6008</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <p>在使用<code>MySQL</code>且数据库数据越来越大后就需要进行优化, 常见的方案有分区, 分表, 分库, 这三种听起来很类似, 也都起到了性能优化, 加快查询的作用, 但是他们的区别很大, 应用情况也不一样</p>
+        <h2 id="1-分区"><a href="#1-分区" class="headerlink" title="1.分区"></a>1.分区</h2><p>分区是一种数据库表的设计模式，分区是将一大表，根据条件分割成若干个小表, 但是对于应用程序来说是无感的, 只是通过优化器识别sql语句来识别当前的语句应该去查询哪个小表，分区的表和没有分区的表是一样的, 但能提升很大的查询性能。换句话来讲，分区对于应用是透明的，只是数据库对于数据的重新整理。</p>
+<h2 id="1-1分区注意事项"><a href="#1-1分区注意事项" class="headerlink" title="1.1分区注意事项"></a>1.1分区注意事项</h2><p>分区表虽然很棒, 但是有很多限制和需要注意的事项：</p>
+<ul>
+<li>分区字段必须是整数类型或解析为整数的表达式.</li>
+<li>分区字段建议设置为NOT NULL，若某行数据分区字段为null，在RANGE分区中，该行数据会划分到最小的分区里.(任何表的字段都不应该为null)</li>
+<li>MySQL分区中如果存在主键或唯一键，则分区列必须包含在其中.(任何表都应该有主键)</li>
+<li>Innodb分区表不支持外键.(业务里尽量减少使用外建)</li>
+<li>更改sql_mode模式可能影响分区表的表现.</li>
+<li>分区表不影响自增列.</li>
+</ul>
+<h2 id="1-2分区适用情况"><a href="#1-2分区适用情况" class="headerlink" title="1.2分区适用情况"></a>1.2分区适用情况</h2><p>分区表适用于一些日志记录表.这类表的特点是数据量大、并且有冷热数据区分，可以按照时间维度来进行数据归档。这类表是比较适合使用分区表的，因为分区表可以对单独的分区进行维护，对于数据归档更方便。</p>
+<p>除此之外, 分区表还适用于其他情况, 如现在的业务经常有马甲包, 这类产品共享主逻辑, 唯一的区别就是包名不一样, 这时候我们可以对包名做分区, 避免每个包的查询都会扫描到别的包的记录.</p>
+<h2 id="1-3分区的目的及分区类型"><a href="#1-3分区的目的及分区类型" class="headerlink" title="1.3分区的目的及分区类型"></a>1.3分区的目的及分区类型</h2><p><code>MySQL</code>在创建表的时候可以通过使用<code>PARTITION BY</code>子句定义每个分区存放的数据. 在执行查询的时候, 优化器根据分区定义过滤掉那些我们不需要的数据的分区, 这样查询就可以无需扫描所有分区, 只需要查找包含需要数据的分区即可.分区除了带来性能的提升外, 分区将数据按照一个较粗的粒度分别存放在不同的表中, 我们想要一次批量删除整个分区的数据也会变得很方便. 常见的分区类型有以下四种:</p>
+<ul>
+<li>RANGE分区: 基于属于一个给定连续区间的列值, 把多行分配给分区.最常见的是基于时间字段.RANGE分区的特点是多个分区的范围要连续，但是不能重叠，默认情况下使用<code>VALUES LESS THAN</code>属性，即每个分区不包括指定的那个值, 如下的分区代码, 以年这个字段分区, 会分为小于1990, 小于1995大于1990, 小于2000大于1995三个分区:  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs sql"># 创建分区表<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `example_table` (<br>  `id` <span class="hljs-type">INT</span>, <br>  `name` <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">50</span>), <br>  `create_date` <span class="hljs-type">DATE</span><br>) ENGINE<span class="hljs-operator">=</span>InnoDB <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8<br><span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> <span class="hljs-keyword">RANGE</span>( <span class="hljs-keyword">YEAR</span>(purchased) ) (<br><span class="hljs-keyword">PARTITION</span> p0 <span class="hljs-keyword">VALUES</span> LESS THAN (<span class="hljs-number">1990</span>),<br><span class="hljs-keyword">PARTITION</span> p1 <span class="hljs-keyword">VALUES</span> LESS THAN (<span class="hljs-number">1995</span>),<br><span class="hljs-keyword">PARTITION</span> p2 <span class="hljs-keyword">VALUES</span> LESS THAN (<span class="hljs-number">2000</span>)<br>);<br></code></pre></td></tr></table></figure></li>
+<li>LIST分区： LIST分区和RANGE分区类似，区别在于LIST是枚举值列表的集合，RANGE是连续的区间值的集合.</li>
+<li>HASH分区： 基于用户定义的表达式的返回值来进行选择的分区, 该表达式使用将要插入到表中的这些行的列值进行计算. 这个函数可以包含MySQL中有效的、产生非负整数值的任何表达式.</li>
+<li>KEY分区: 类似于按HASH分区, 区别在于KEY分区只支持计算一列或多列, 且MySQL服务器提供其自身的哈希函数.必须有一列或多列包含整数值.</li>
+</ul>
+<p>创建分区后, 我们可以通过<code>PARTITION</code>语句查询该分区的所有内容, 如果不带<code>PARTITION</code>就会查该表的所有分区:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"># 语句里的p1指明了只使用p1<br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> example_table <span class="hljs-keyword">PARTITION</span> (p1) <br></code></pre></td></tr></table></figure>
+<p>在创建分区后, 如果没有更新分区, 插入的数据找不到分区会直接报错, 我们可以直接直接增加分区:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">alter</span> <span class="hljs-keyword">table</span> example_table <span class="hljs-keyword">add</span> <span class="hljs-keyword">partition</span>(<span class="hljs-keyword">partition</span> p3 <span class="hljs-keyword">VALUES</span> LESS THAN (<span class="hljs-number">2005</span>));<br></code></pre></td></tr></table></figure>
+<p>除了上面查找和创建分区外, 还有其他分区的操作:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs sql"># 拆分分区<br><span class="hljs-keyword">alter</span> <span class="hljs-keyword">table</span> example_table reorganize <span class="hljs-keyword">partition</span> p3 <span class="hljs-keyword">into</span> (<span class="hljs-keyword">partition</span> s0 <span class="hljs-keyword">values</span> less than(<span class="hljs-number">2002</span>),  <span class="hljs-keyword">partition</span> s1 <span class="hljs-keyword">values</span> less than(<span class="hljs-number">2004</span>));<br><br># 合并分区<br><span class="hljs-keyword">alter</span> <span class="hljs-keyword">table</span> example_table reorganize <span class="hljs-keyword">partition</span> s0, s1 <span class="hljs-keyword">into</span> (<span class="hljs-keyword">partition</span> p3 <span class="hljs-keyword">VALUES</span> LESS THAN (<span class="hljs-number">2005</span>));<br><br># 清空分区<br><span class="hljs-keyword">alter</span> <span class="hljs-keyword">table</span> example_table <span class="hljs-keyword">truncate</span> <span class="hljs-keyword">partition</span> p3;<br><br># 删除分区<br><span class="hljs-keyword">alter</span> <span class="hljs-keyword">table</span> example_table <span class="hljs-keyword">drop</span> <span class="hljs-keyword">partition</span> p3;<br><br># 交换分区, 比如把过时的数据迁移到备份表<br># 先创建一样的表<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `example_table_bak` (<br>    `id` <span class="hljs-type">INT</span>, <br>    `name` <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">50</span>), <br>    `create_date` <span class="hljs-type">DATE</span><br>) ENGINE<span class="hljs-operator">=</span>InnoDB <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8;<br><br><span class="hljs-keyword">alter</span> <span class="hljs-keyword">table</span> example_table exchange <span class="hljs-keyword">PARTITION</span> p3 <span class="hljs-keyword">with</span> <span class="hljs-keyword">table</span> example_table_bak;<br></code></pre></td></tr></table></figure>
+
+<h2 id="2-分表与分库"><a href="#2-分表与分库" class="headerlink" title="2.分表与分库"></a>2.分表与分库</h2><p>经过分区后, 我们每个查询的速度会变快了(I/O的读写速度变快了), 单位时间内的查询量可以得到提升, 但是每个表的并发查询次数是没有得到提升的, 或者单机容量已经存不下那么多数据了,  所以对于一些业务量来说, 分区是不够的, 还需要分表, 甚至是分库.分表分库带来的性能提升是巨大的, 但是带来的限制以及维护和管理工作量也是很大的, 在做分表分库之前一定要做好评估.</p>
+<p>分表一般有三种:</p>
+<ul>
+<li>利用merge引擎来实现分表, 这个方案是最简单的, 该方案的实现会跟分区一样, 对于业务代码来说是无感的, 但是很多业务都会依赖Innodb引擎, 切引擎的成本也很大.</li>
+<li>MySQL集群, MySQL集群中, 会有几台机器保存一样的数据, 通过多个机器分流查询实际上也是分表的一个思路, 但是效率上没有真正的分表快(如果是一个表的数据按照分片分布在不同的机器, 那速度就跟真正的分表速度差不多).</li>
+<li>通过MySQL-Proxy或者自己在业务代码上根据一定的条件选择把数据插入到哪个表或者哪个库, 该方法是最灵活的, 但也是修改和维护成本最高的.</li>
+</ul>
+<p>一般情况下都是选择第三种, 而且很多团队没办法自己去实现MySQL-Proxy, 都是通过代码的业务逻辑去控制分表分库的.一般分表和分库的切分方法按照垂直切分和水平切分:</p>
+<ul>
+<li><p>垂直切分<br>垂直切分是按照表的功能和关系密切程度切分出来, 如用户的表可以分为用户业务数据的表和第三方应用数据的表.一般情况下,各项业务逻辑划分清晰、低耦合的就选择垂直切分.<br>垂直分表是基于数据库中的”列”进行，某个表字段较多，可以新建一张扩展表，将不经常用或字段长度较大的字段拆分出去到扩展表中.在字段很多的情况下（例如一个大表有100多个字段），通过”大表拆小表”，更便于开发与维护，也能避免跨页问题，MySQL底层是通过数据页存储的，一条记录占用空间过大会导致跨页，造成额外的性能开销.<br>垂直切分可以解决业务系统层面的耦合，业务清晰,也能对不同业务的数据进行分级管理、维护、监控、扩展等, 但是垂直切分会使部分表无法join，只能通过接口聚合方式解决，提升了开发的复杂度让分布式事务处理复杂.另外数据库以行为单位将数据加载到内存中，这样表中字段长度较短且访问频率较高，内存能加载更多的数据，命中率更高，减少了磁盘IO，从而提升了数据库性能.</p>
+</li>
+<li><p>水平切分<br>当一个应用难以再细粒度的垂直切分，或切分后数据量行数巨大，存在单库读写、存储性能瓶颈，这时候就需要进行水平切分了.<br>水平切分将同一个表按不同的条件分散到多个数据库或多个表中，每个表中只包含一部分数据，从而使得单个表的数据量变小. 如按照uid, 日期等字段的数据进行散列, 然后分开存放在不同的相同数据结构的表.一般情况下, 单表的数据量很大、或数据热度很高，这种情况之下就应该选择水平切分，水平切分比垂直切分要复杂一些，它将原本逻辑上属于一体的数据进行了物理分割，除了在分割时要对分割的粒度做好评估，考虑数据平均和负载平均,后期也将对项目人员及应用程序产生额外的数据管理负担。</p>
+</li>
+</ul>
+<p>垂直切分是根据业务逻辑来进行切分的, 除了切的时候麻烦点,  维护的时候还是挺方便的, 而水平切割闹除了切割外, 还要在代码层面考虑数据增长的问题, 所以会比较复杂. 常见的水平切割规则有:</p>
+<ul>
+<li>根据数值范围切分, 常见的用于以日期条件来水平切割的表, 像上面分区一样, 每隔一段时间进行切分, 我们可以根据实际增长情况对代码的切分粒度进行更改, 水平拓展非常方便, 完全可控, 同时对于报表型的数据表也能达到冷热分离的效果(所以也要注意热点数据的问题, 以及容易出现跨表查询的问题).</li>
+<li>根据数值哈希, 常见于以uid为条件的水平切割表, 他能有效的避免热点数据并发查找的问题, 但是在扩容的时候比较麻烦, 除非使用一致哈希算法.</li>
+</ul>
+<p>良好的分表分库能为性能带来极大的提升, 突破网络IO,硬件资源,连接数的瓶颈, 但也有几个弊端:</p>
+<ul>
+<li>事务: 在执行分库分表之后，由于数据存储到了不同的库上，数据库事务管理出现了困难。如果依赖数据库本身的分布式事务管理功能去执行事务，将付出高昂的性能代价；如果由应用程序去协助控制,实现分布式事务的两阶段提交等等, 又会造成编程方面的负担.</li>
+<li>跨库跨表join: 在执行了分库分表之后，难以避免会将原本逻辑关联性很强的数据划分到不同的表、不同的库上，这时，表的关联操作将受到限制，我们无法join位于不同分库的表，也无法join分表粒度不同的表，结果原本一次查询能够完成的业务，可能需要多次查询才能完成, 或者几个表都加上一个相同的字段, 但是这个字段要更新时, 两个表都得更新。</li>
+<li>额外的数据管理负担和数据运算压力: 额外的数据管理负担，最显而易见的就是数据的定位问题和数据的增删改查的重复执行问题，这些都可以通过应用程序解决，但必然引起额外的逻辑运算, 如limit分页, order by 排序的问题. 例如, 对于一个记录用户成绩的用户数据表userTable，业务要求查出成绩最好的100位，在进行分表之前，只需一个order by语句就可以搞定，但是在进行分表之后，将需要n个order by语句，分别查出每一个分表的前100名用户数据，然后再对这些数据进行合并计算，才能得出结果.</li>
+</ul>
+<h3 id="2-1如何水平分表"><a href="#2-1如何水平分表" class="headerlink" title="2.1如何水平分表"></a>2.1如何水平分表</h3><p>了解完分表后, 可以发现没有一个十全十美的方法来分表, 只能根据当下业务选择一个最合适的方法来分表, 而且要尽量的让表均匀的分散到多个表, 这样子系统的并发能力才能提高.</p>
+<p>以订单数据的分表为例子, 目前的分表思路一般有两种, 一种是按照订单号来分表, 一种是按照用户id来分表. 不管是那种分表, 都会把值的后几位当成一个值, 然后根据现有的库的数量取模, 这样数据会根据模的结果均匀的插入几个表里面 在插入和查询订单号时, 都是通过该订单号的模结果来判断从哪个表进行操作.之所以取模而不哈希的原因是在使用取模且每次按照倍数扩容时, 只需要迁移一半的数量, 这样子扩容相对简单.比如原先只有6个表, 需要扩容时, 就变为12个表, 10原先的取模结果是4, 新的取模结果是10, 需要迁移, 而12原先的取模结果是0, 新的取模结果也还是0, 不需要迁移(可以把该实现认为的简单的一致Hash).</p>
+<p>了解了如何分表以及扩容后, 回到刚开始的问题, 使用订单号分表和用户id分表的区别.正常逻辑下, 用户会通过订单号查询数据, 或者用户查询自己的订单号列表. 如果是第一种且用户id分表, 则需要查询所有的表, 如果是第二种以订单号分表的话, 也需要查询所有表了, 这样的话两种分表都有查询效率都会非常差的时候. 不过有一个简单的方法可以解决, 订单号一般是一段非常长的字符串, 我们可以把订单号切割开来, 并定义好第几位到第几位代表什么意思, 就像雪花算法一样. 由于uid是固定的, 而我们都是以后面几位进行取模存放数据, 那么订单号也可以把后面几位变为uid的后面几位, 这样就是明面上以订单号分表, 但是实际上是以用户id分表, 无论是通过订单号查询数据, 还是用户查询自己的订单列表, 都只需要查询一个数据表, 效率变高了.</p>
+<p>但是, 订单号关联的用户不止是一个, 而是关联了卖家和买家(虽然卖家只有一个).如果按买家id来分表,有卖家的商品，会有n个用户购买，他所有的订单，会分散到多个库多个表中去了，卖家查询自己的所有订单，会出现跨表扫描，性能低下. 如果按卖家id分库分表, 买家会在n个店铺下单,订单就会分散在多个库、多个表中, 买家查询自己所有订单，同样要去所有的库、所有的表搜索，性能低下.所以，无论是按照买家id切分订单表，还是按照卖家id切分订单表.两边都不讨好, 又回到了上面按照订单号分表还是用户id分表的问题了. 当然, 也可以在订单号里面再划出几位数来存放卖家的uid, 但是订单号的长度是有限的, 总不能有点需求就划几位数来存数据. 这时可以拆分为卖家库和买家库, 通过数据冗余来解决, 一个订单, 除了主表外, 还有另外的关联表, 并在代码逻辑里面维护主表和关联表的数据, 当然, 关联表数量多的话也需要分表- -….</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h2><p>分区, 分表, 分库能提升我们系统的并发能力, 如果发现项目里的Sql没办法再优化的情况下, 那赶紧考虑分区, 分表, 分库吧. 不过除了分区外, 分表, 分库都会使架构变得复杂, 分的不好的话, 小事一堆, 所以一定要确保当前真的需要分表, 分库再操作. </p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/12/12/Mysql%E5%88%86%E5%8C%BA%20%E5%88%86%E8%A1%A8%E5%88%86%E5%BA%93/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;12&#x2F;12&#x2F;Mysql%E5%88%86%E5%8C%BA%20%E5%88%86%E8%A1%A8%E5%88%86%E5%BA%93&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;12&#x2F;12&#x2F;Mysql%E5%88%86%E5%8C%BA%20%E5%88%86%E8%A1%A8%E5%88%86%E5%BA%93&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/" rel="tag">MySQL</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2021/02/10/2021plan/"><i class="iconfont iconleft"></i>2021plan</a>
+    <a href="/2020/12/10/Celery%E8%B0%83%E7%94%A8%E4%B8%8D%E5%90%8C%E9%A1%B9%E7%9B%AE%E7%9A%84%E4%BB%BB%E5%8A%A1/">Celery调用不同项目的任务<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%88%86%E5%8C%BA"><span class="toc-text">1.分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E5%88%86%E5%8C%BA%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">1.1分区注意事项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E5%88%86%E5%8C%BA%E9%80%82%E7%94%A8%E6%83%85%E5%86%B5"><span class="toc-text">1.2分区适用情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3%E5%88%86%E5%8C%BA%E7%9A%84%E7%9B%AE%E7%9A%84%E5%8F%8A%E5%88%86%E5%8C%BA%E7%B1%BB%E5%9E%8B"><span class="toc-text">1.3分区的目的及分区类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%88%86%E8%A1%A8%E4%B8%8E%E5%88%86%E5%BA%93"><span class="toc-text">2.分表与分库</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E5%A6%82%E4%BD%95%E6%B0%B4%E5%B9%B3%E5%88%86%E8%A1%A8"><span class="toc-text">2.1如何水平分表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%88%86%E5%8C%BA"><span class="toc-text">1.分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E5%88%86%E5%8C%BA%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">1.1分区注意事项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E5%88%86%E5%8C%BA%E9%80%82%E7%94%A8%E6%83%85%E5%86%B5"><span class="toc-text">1.2分区适用情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3%E5%88%86%E5%8C%BA%E7%9A%84%E7%9B%AE%E7%9A%84%E5%8F%8A%E5%88%86%E5%8C%BA%E7%B1%BB%E5%9E%8B"><span class="toc-text">1.3分区的目的及分区类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%88%86%E8%A1%A8%E4%B8%8E%E5%88%86%E5%BA%93"><span class="toc-text">2.分表与分库</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E5%A6%82%E4%BD%95%E6%B0%B4%E5%B9%B3%E5%88%86%E8%A1%A8"><span class="toc-text">2.1如何水平分表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

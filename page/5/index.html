@@ -1,0 +1,617 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="so1n blog">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: true,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center"> </div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  
+  <div class="container" id="container">
+    <section class="row post">
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/06/13/contextvars%E6%A8%A1%E5%9D%97/" class="post-image">
+      <img src="https://i.loli.net/2021/06/20/c4ipDTHEP8SuvBs.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/06/13/contextvars%E6%A8%A1%E5%9D%97/" title="如何使用contextvars模块和源码分析" >如何使用contextvars模块和源码分析</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记在Python3.7后官方库出现了contextvars模块, 它的主要功能就是可以为多线程以及asyncio生态添加上下文功能,即使程序在多个协程并发运行的情况下,也能调用到程序的上下文变...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>June 13, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>21553</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/06/08/python%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9D%91/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/06/08/python%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9D%91/" title="python常见的坑" >python常见的坑</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记本文主体思想和内容来自于Buggy Python Code: The 10 Most Common Mistakes That Python Developers Make。由于结合内容写出...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>June 08, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>9895</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/04/15/%E7%BB%99python%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A3%80/" class="post-image">
+      <img src="https://i.loli.net/2021/06/20/s73qnjTLrP2BQpy.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/04/15/%E7%BB%99python%E6%8E%A5%E5%8F%A3%E5%8A%A0%E4%B8%8A%E4%B8%80%E5%B1%82%E7%B1%BB%E5%9E%8B%E6%A3%80/" title="给Python Web框架接口加上类型检查" >给Python Web框架接口加上类型检查</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记给接口加上类型检查的想法源于我实习时写接口的灵感, 那时候就是一个crud boy,一直在写接口,但每次都要在接口写一些参数校验或参数类型转换, 觉得很繁琐,总觉得这个是可以自己封装一个,减...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 15, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>24474</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/04/15/iptables/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/04/15/iptables/" title="iptables" >iptables</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">iptables 是一个配置 Linux 内核 防火墙 的命令行工具，是 netfilter 项目的一部分。</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 15, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>7253</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/04/06/%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/04/06/%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86/" title="记一次TCP长连接过多的问题--实际上是被攻击了" >记一次TCP长连接过多的问题--实际上是被攻击了</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记在接手了公司的SIP项目后的不久，发现服务器时不时就遇到了kamailio进程(用于处理sip协议)占用了过多的文件描述符,直接超过限制的情况，造成kamailio进程无法接收新的请求,影响...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 06, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>7436</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/03/27/%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/03/27/%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93/" title="使用Graphite小结" >使用Graphite小结</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记初次认识Graphite时,Graphite已经发展了十年了,那时在负责kamailio相关工作内容,为了监控和查看kamailio数据,查找到的文章Kamailio statsd, bet...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 27, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>14415</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/03/21/Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F,%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF,%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/03/21/Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F,%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF,%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9/" title="Redis缓存穿透,缓存击穿,缓存雪崩" >Redis缓存穿透,缓存击穿,缓存雪崩</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记最近使用Redis越来越多了,使用Redis可以提升接口性能,同时也可以基于Redis实现分布式锁以及使用Redis限流等等.不过在使用Redis与Mysql结合时会遇到一些常见的单机缓存相...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 21, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>5872</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/03/20/github_start/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/03/20/github_start/" title="收藏" >收藏</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">说明由于github的start功能比较废，所以把自己的start整理下，可以按照以下标签或每个项目对应说明快速查找</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 20, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>12601</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/03/07/%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0tail/" class="post-image">
+      <img src="https://i.loli.net/2021/06/20/K9SLcDqurpCWU6h.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/03/07/%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0tail/" title="使用python实现tail" >使用python实现tail</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记tail是一个常用的Linux命令, 它可以打印文件的后面n行数据, 也能实时输出文件的追加数据.tail的实现很简单,但是要实现一个完善的tail却需要考虑很多细节,如果要注重性能,则需要...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 07, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>10897</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2019/01/31/2019_plan/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2019/01/31/2019_plan/" title="2019plan" >2019plan</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记mv 2018plan.md 2019plan.md</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>January 31, 2019</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>1417</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2018/04/10/%E4%B8%8D%E5%A4%AARESTurl%E7%9A%84%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2018/04/10/%E4%B8%8D%E5%A4%AARESTurl%E7%9A%84%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" title="不太RESTurl的接口设计" >不太RESTurl的接口设计</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记又是一篇水文- -. 
+在还没开始实习的时候,除了在弄一些练习项目或者刷面试题时,经常碰到RESTurl,知道这是一个非常重要的前后端交互的接口设计模式,也是很少人/公司能把RESTurl完...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 10, 2018</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>4043</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
+    <a href="/2018/03/20/MySql%E6%96%AD%E5%BC%80%E9%87%8D%E8%BF%9E/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2018/03/20/MySql%E6%96%AD%E5%BC%80%E9%87%8D%E8%BF%9E/" title="MySQL断开重连" >MySQL断开重连</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记今天上班发现在在跑的业务接口无法访问了,查看的日志后发现MySQL断开连接,只有重启web程序后才能恢复正常.MySQL断开重连这个问题第一次遇到时还是有点懵逼的,主要与库选型有关才造成发现...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 20, 2018</span>
+        
+        <span class="post-info-item"><i class="iconfont iconfont-size"></i>1366</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+</section>
+    <section class="paginator">
+  
+    <a class="extend prev" rel="prev" href="/page/4/">&lt;</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/6/">&gt;</a>
+  
+</section>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

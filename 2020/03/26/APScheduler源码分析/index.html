@@ -1,0 +1,537 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>APScheduler原理分析 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记最近由于账单提交和脚本过多不好控制的原因,一直在寻...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">APScheduler原理分析</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">APScheduler原理分析</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 26, 2020</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>14299</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近由于账单提交和脚本过多不好控制的原因,一直在寻找解决方案,发现APScheduler比较轻量级以及适合我的账单提交,和脚本运行控制(如果脚本运行需要依赖的话就可以上AirFlow).为了弄清楚原理,以及更好的使用APScheduler,所以阅读了APScheduler代码.其实是APScheduler代码量比较少的分析起来才容易(逃)</p>
+<p>不过apscheduler有一个致命的缺点, 除,由于apscheduler的实现比较简单, 在初始化时, 能达到分布式work的效果外,  在运行时增加任务时, 并不会同步到每个work.</p>
+        <p><strong>注:</strong> 为了节省篇幅,下面分析代码时大多数是只贴github的源码链接,并加以说明,源码是<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/tree/3.x/apscheduler">APscheduler第三版</a></p>
+<h2 id="1-主体逻辑"><a href="#1-主体逻辑" class="headerlink" title="1.主体逻辑"></a>1.主体逻辑</h2><h3 id="1-1代码结构"><a href="#1-1代码结构" class="headerlink" title="1.1代码结构"></a>1.1代码结构</h3><p>首先看看APScheduler的代码结构,除了job,event,util这几个简单的封装外,APScheduler中的组件都各自一个文件夹</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">├── executors      执行器,用于执行任务<br>├── jobstores      储存器,用于存放任务<br>├── schedulers     调度器,用于调度任务实例,由执行器,存储器,触发器三个组件构成<br>├── triggers       触发器,用于设定触发任务的条件<br>├── __init__.py<br>├── events.py      事件,调度器触发时的事件封装<br>├── job.py         job,对添加的任务进行封装,方便调度器调用<br>└── util.py        工具包,apscheduler一些常用函数封装<br></code></pre></td></tr></table></figure>
+<h3 id="1-2简单的例子"><a href="#1-2简单的例子" class="headerlink" title="1.2简单的例子"></a>1.2简单的例子</h3><p>看完了代码结构,会觉得APScheduler代码并不复杂,但是APScheduler大量的用到了Python动态语言的特性,一个一个看可能比较懵,所以需要找一个切入点开始进入APScheduler的代码世界,而这个切入点就是从一个简单的例子开始.先看APScheduler的<code>Hello World</code>级别的入门代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime,timedelta<br><span class="hljs-keyword">from</span> apscheduler.schedulers.blocking <span class="hljs-keyword">import</span> BlockingScheduler<br><br>scheduler = BlockingScheduler()  <span class="hljs-comment"># 1</span><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">so1n_job</span>(<span class="hljs-params">text</span>):</span>   <span class="hljs-comment"># 2</span><br>    print(text)<br><br>scheduler.add_job(so1n_job, <span class="hljs-string">&#x27;date&#x27;</span>, run_date=datetime.now() + timeelta(hours=<span class="hljs-number">1</span>), args=[<span class="hljs-string">&#x27;test&#x27;</span>])   <span class="hljs-comment"># 3</span><br>scheduler.start()   <span class="hljs-comment"># 4</span><br></code></pre></td></tr></table></figure>
+<p>这个简单的代码如要做如下步骤:</p>
+<ul>
+<li>1.实例化一个scheduler,这里使用的是BlockingScheduler,它在运行时会阻塞代码</li>
+<li>2.为了演示而创建的简单job函数,只执行print功能</li>
+<li>3.通过scheduler的add_job方式添加job, 同时定义了date触发器和触发时间以及运行job时的参数, 这里定义的是一小时后执行任务.</li>
+<li>4.开始运行scheduler,检查和执行调度.</li>
+</ul>
+<h3 id="1-3-初始化scheduler"><a href="#1-3-初始化scheduler" class="headerlink" title="1.3 初始化scheduler"></a>1.3 初始化scheduler</h3><p>在实例化scheduler时,会先把其他三个组件加载到自己的父属性[源码]:(<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L66">https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L66</a>)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python">_trigger_plugins = <span class="hljs-built_in">dict</span>((ep.name, ep) <span class="hljs-keyword">for</span> ep <span class="hljs-keyword">in</span> iter_entry_points(<span class="hljs-string">&#x27;apscheduler.triggers&#x27;</span>))<br>_trigger_classes = &#123;&#125;<br>_executor_plugins = <span class="hljs-built_in">dict</span>((ep.name, ep) <span class="hljs-keyword">for</span> ep <span class="hljs-keyword">in</span> iter_entry_points(<span class="hljs-string">&#x27;apscheduler.executors&#x27;</span>))<br>_executor_classes = &#123;&#125;<br>_jobstore_plugins = <span class="hljs-built_in">dict</span>((ep.name, ep) <span class="hljs-keyword">for</span> ep <span class="hljs-keyword">in</span> iter_entry_points(<span class="hljs-string">&#x27;apscheduler.jobstores&#x27;</span>))<br>_jobstore_classes = &#123;&#125;<br></code></pre></td></tr></table></figure>
+<p>在实例化后,<code>__init__</code>会创建一些锁相关的属性以及调用<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L89">configure</a>方法初始化一些数据(在scheduler还没start前,我们也可以直接调用<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L89">configure</a>方法修改数据)</p>
+<ul>
+<li><p>加载配置,把所有数据加载到一个叫config的dict里面</p>
+</li>
+<li><p>通过调用<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L694">_configure</a>初始化常用配置, 对于一些特定的scheduler, 还会初始化一些属性, 如<code>background</code>会初始化deamon, <code>asyncio</code>会初始化loop等:</p>
+<ul>
+<li>logger,APScheduler运行时打日志的logger,默认为apscheduler.scheduler</li>
+<li>timezone, 设置时区, 默认为本地时区. 对于调度系统来说时区是一个非常关键的参数, 特别是对于有冬夏令时的国家, 如果有做多国家业务的, 必须要用时区.</li>
+<li>jobstore_retry_interval, 重试时间, 如果get_due_jobs()调用引发异常，则至少在设置n秒内进行一次新的唤醒</li>
+</ul>
+</li>
+<li><p>同时也会创建创建job的默认配置:</p>
+<ul>
+<li>misfire_grace_time,在指定的运行时之后几秒钟，仍允许运行该作业. 如果有个业务是指定一分钟后运行, 但apscheduler需要在两分钟后才有空闲运行该业务, 那么可以把<code>misfire_grace_time</code>的值设置为120+.</li>
+<li>coalesce,为True时,即使调度程序确定该job可以运行多次，也只运行一次</li>
+<li>max_instances, apscheduler同时最大运行实例数.</li>
+</ul>
+</li>
+<li><p>配置执行器executors以及它的插件,并启动执行器</p>
+</li>
+<li><p>配置任务存储器jobstores以及它的插件,并启动任务存储器</p>
+<h3 id="1-4添加job"><a href="#1-4添加job" class="headerlink" title="1.4添加job"></a>1.4添加job</h3><p>scheduler初始化完就可以开始添加job了,对于APScheduler来说,每个job的本体都是一个Python函数,在添加job本体的同时,顺便添加执行器,以及其他信息,如触发器,执行器,函数的参数,job的名称和id等,构成一个可以给scheduler调用的job.</p>
+</li>
+</ul>
+<p>不过在添加job的时候还有一个参数叫<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L448">replace_existing</a>,他不属于job的属性,当它为True时,scheduler会用相同的id替换已经存在的job,同时保留job的运行次数.还有存储器也不属于job的属性,只是让scheduler知道可以从该存储器可以获取到刚才添加的job.</p>
+<p>例子中的job添加时,scheduler还未运行,所以会把job, jobstore, replace_existing拼成一个元祖,并存放到一个叫<code>_pending_jobs</code>的等待队列中.</p>
+<p>如果job添加时scheduler还在运行,那就会进行如下一些处理(<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L843">_real_add_job</a>函数),把job真正的添加到调度系统中:</p>
+<ul>
+<li>1.如果此时的job没有下次运行时间,则为其创建下次运行时间</li>
+<li>2.调用job的_modify方法,当配置有效时更新job的配置</li>
+<li>3.把job添加到对应的store,或更新已经存在store里的job, 这里会调用store的<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/jobstores/memory.py#L82">_get_job_index</a>通过二分法查找job需要插入对应的index中.</li>
+<li>4.如果scheduler正在运行, 则唤醒scheduler,看看新添加的job是否可以被调度(注意,此次唤醒会替换原本已经安排的唤醒计划)</li>
+</ul>
+<p>注意, 上面第4步只会唤醒本身的apscheduler, 如果是多个worker,那么其他的apscheduler并不会被唤醒.</p>
+<h3 id="1-5开始运行scheduler"><a href="#1-5开始运行scheduler" class="headerlink" title="1.5开始运行scheduler"></a>1.5开始运行scheduler</h3><p>添加完job后,scheduler就可以开始运行了,通过调用scheduler的<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L128">start</a>开始处理任务.<br>在开始运行前,scheduler会先去<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L835">检查是否在使用禁用线程的uWSGI环境下运行</a>,只有检查通过后才能继续运行.</p>
+<p>检查完毕后,scheduler会去进行一些初始化,首先scheduler会激活所有添加到scheduler的执行器,以便待会可以使用,同样激活所有添加到scheduler的储存器,以便待会可以使用.这里会把scheduler初始化时的<code>_pending_jobs</code>通过<strong>1.4添加job</strong>里面说到的<code>_real_add_job</code>函数,把job真正的添加到调度系统中.</p>
+<p>初始化完成了,scheduler可以真正的开始去检查和调度job了,这一切都发生在scheduler的<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L927">_process_jobs</a>函数里,他会遍历每个作业存储器中的job，然后执行可以被调度的job，最后检查下次运行时间,apscheduler会休眠到下次运行时间在启动,防止一直运行导致浪费计算机资源,具体操作如下:</p>
+<ul>
+<li>1.遍历存储器,并从存储器的<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/jobstores/memory.py#L23">get_due_jobs</a>方法找出比目前时间早的job列表,如果处理失败则会根据scheduler的<code>jobstore_retry_interval</code>生成下一次唤醒scheduler的时间.</li>
+<li>2.遍历并处理从步骤1拿到的job列表<ul>
+<li>2.1.遍历步骤1的job列表,提取job的执行器,如果提取失败则从存储器中删除掉job.</li>
+<li>2.2.从job的<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/job.py#L123">_get_run_times</a>方法获取介于现在时间到job的下一次运行时间中触发器可以触发的时间,并放在run_times列表中.</li>
+<li>2.3.调用执行器的<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/executors/base.py#L55">submit_job</a>方法,首先检查目前该job的执行实例数会不会大于或等于定义的max_instances,只有没超过定义的max_instances时,才会继续执行执行器的<code>_do_submit_job</code>方法,执行job.</li>
+<li>2.4.运行完毕job后,[计算job是否还有next_run_time,如果有更新job以及对应的存储器,如果没有则把job从存储器中移除</li>
+</ul>
+</li>
+<li>3.执行完job后,算出存储器中最早的下次运行时间,并与next_wakeup_time比对,如果早于next_wakeup_time则把next_wakeup_time设置为存储器中最早的下次运行时间(<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L992">992-997</a>)</li>
+<li>4.处理队列中的event,并算出距离下次运行时间与现在时间的时间差wait_seconds,并让scheduler睡眠wait_seconds,防止cpu空转(<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/schedulers/base.py#L999">999-1004</a>).</li>
+<li>5.等待了wait_seconds后scheduler从步骤1继续开始执行操作.</li>
+</ul>
+<p>则此,根据例子的主体逻辑代码分析已经分析完毕了,但是还有一些scheduler的方法,event,APScheduler的util以及APScheduler支持的gevent,async等库代码还没有分析.</p>
+<h2 id="2-源码分析"><a href="#2-源码分析" class="headerlink" title="2.源码分析"></a>2.源码分析</h2><p>上一部分主要说的是APScheduler中的主要逻辑,简单的了解到APScheduler是如何运行的,以及运行时要做哪些操作,在说到主要函数时只说了是哪个模块下的哪个函数以及这个函数做了什么,对于一些细节并没有披露出来.而这一节不再跟着APScheduler的运行顺序进行分析,而是根据APScheduler的代码结构逐一分析里面的代码,从代码中了解APScheduler的原理,以及从APScheduler中吸收一些比较棒的idea.</p>
+<h3 id="2-1-executors"><a href="#2-1-executors" class="headerlink" title="2.1 executors"></a>2.1 executors</h3><p>executors是apscheduler中的执行器,apscheduler为python中各种类型封装了executors,但核心的方法就只有几个,比较简单.</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/executors/base.py#L33">start</a></p>
+<p>从scheduler获取资源和部分数据初始化,其余由其他封装实现</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/executors/base.py#L47">shutdown</a></p>
+<p>由其他封装实现,停用执行器并删除部分资源,如果任务并未完成,则会取消或清空任务</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/executors/base.py#L55">submit_job</a></p>
+<p>用于运行前的初始化和检查,主要用于检查当前job有多少实例正在运行,如果超出限制则抛出异常,未超出限制则执行_do_submit_job</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/executors/base.py#L75">_do_submit_job</a></p>
+<p>由其他封装实现,负责运行job,并检查运行结果,成功则调用_run_job_success, 失败则调用_run_job_error</p>
+</li>
+<li><p>_run_job_success<br>运行成功的后续操作</p>
+</li>
+<li><p>_run_job_error<br>运行失败的后续操作</p>
+</li>
+</ul>
+<p>除此之外executors文件中还有一个叫<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/executors/base.py#L103">run_job</a>的函数,它才是正真用于执行job的函数,它除了调用job的func和处理异常外,还对任务是否错过运行窗口进行检查,比如任务应该在9.00-9.10间运行,然而直到9.15程序没有运行,那么apscheduler会抛出对应的错误event和job.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run_job</span>(<span class="hljs-params">job, jobstore_alias, run_times, logger_name</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Called by executors to run the job. Returns a list of scheduler events to be dispatched by the</span><br><span class="hljs-string">    scheduler.</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    events = []<br>    logger = logging.getLogger(logger_name)<br>    <span class="hljs-keyword">for</span> run_time <span class="hljs-keyword">in</span> run_times:<br>        <span class="hljs-comment"># 如果设置了,misfire_grace_time,且时间差在misfire_grace_time外,则超出了任务执行时间的时间窗口,放弃运行</span><br>        <span class="hljs-keyword">if</span> job.misfire_grace_time <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            difference = datetime.now(utc) - run_time<br>            grace_time = timedelta(seconds=job.misfire_grace_time)<br>            <span class="hljs-keyword">if</span> difference &gt; grace_time:<br>                events.append(JobExecutionEvent(EVENT_JOB_MISSED, job.<span class="hljs-built_in">id</span>, jobstore_alias,<br>                                                run_time))<br>                logger.warning(<span class="hljs-string">&#x27;Run time of job &quot;%s&quot; was missed by %s&#x27;</span>, job, difference)<br>                <span class="hljs-keyword">continue</span><br><br>        logger.info(<span class="hljs-string">&#x27;Running job &quot;%s&quot; (scheduled at %s)&#x27;</span>, job, run_time)<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 执行job</span><br>            retval = job.func(*job.args, **job.kwargs)<br>        <span class="hljs-keyword">except</span> BaseException:<br>            exc, tb = sys.exc_info()[<span class="hljs-number">1</span>:]<br>            formatted_tb = <span class="hljs-string">&#x27;&#x27;</span>.join(format_tb(tb))<br>            events.append(JobExecutionEvent(EVENT_JOB_ERROR, job.<span class="hljs-built_in">id</span>, jobstore_alias, run_time,<br>                                            exception=exc, traceback=formatted_tb))<br>            logger.exception(<span class="hljs-string">&#x27;Job &quot;%s&quot; raised an exception&#x27;</span>, job)<br><br>            <span class="hljs-comment"># 回收对象</span><br>            <span class="hljs-keyword">if</span> six.PY2:<br>                sys.exc_clear()<br>                <span class="hljs-keyword">del</span> tb<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">import</span> traceback<br>                traceback.clear_frames(tb)<br>                <span class="hljs-keyword">del</span> tb<br>        <span class="hljs-keyword">else</span>:<br>            events.append(JobExecutionEvent(EVENT_JOB_EXECUTED, job.<span class="hljs-built_in">id</span>, jobstore_alias, run_time,<br>                                            retval=retval))<br>            logger.info(<span class="hljs-string">&#x27;Job &quot;%s&quot; executed successfully&#x27;</span>, job)<br><br>    <span class="hljs-keyword">return</span> events<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-2-JobStore"><a href="#2-2-JobStore" class="headerlink" title="2.2 JobStore"></a>2.2 JobStore</h3><p>JobStore是apscheduler中的存储器,apscheduler为各种存储器做了封装,核心的JobStore比较简单,各个封装的功能都一样,只是具体逻辑跟对应的客户端相关.这里先以<code>MemoryJobStore</code>和<code>BaseJobStore</code>对JobStore的所有功能函数进行分析.</p>
+<h4 id="2-2-1-MemoryJobStore和BaseJobStore"><a href="#2-2-1-MemoryJobStore和BaseJobStore" class="headerlink" title="2.2.1 MemoryJobStore和BaseJobStore"></a>2.2.1 MemoryJobStore和BaseJobStore</h4><ul>
+<li>start<br>当apscheduler开始执行start或者job被添加到jobstores时,开始执行start,初始化scheduler以及jobstores的别名.</li>
+<li>shutdown<br>关闭对应stores的客户端链接或者清理内存回收空间.</li>
+<li>_fix_paused_jobs_sorting 返回没有<code>next_run_time</code>属性的任务(或者说暂停的任务)</li>
+<li>lookup_job 获取指定任务id的任务</li>
+<li>get_due_jobs  返回早于<code>next_run_time</code>或等于<code>now</code>的任务列表,返回的任务必须按<code>next_run_time</code>（升序）进行排序</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/jobstores/memory.py#L33">get_next_run_time</a> 从存储器的所有job中获取最早运行的一个,由于在<code>MemoryJobStore</code>中对保存job的_jobs队列进行了排序维护,不管添加和删除都确保他是有序的,所以<code>MemoryJobStore</code>的<code>get_next_run_time</code>只要从_jobs[0]获取的job就是即将最早运行的job</li>
+<li>get_all_jobs 从存储器中获取所有任务</li>
+<li>add_job 向存储器添加任务</li>
+<li>update_job 更新已经存储在存储器中的任务</li>
+<li>remove_job 从存储器中删除指定的任务(根据job id)</li>
+<li>remove_all_jobs 从存储器中删除所有任务</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/blob/3.x/apscheduler/jobstores/memory.py#L82">_get_job_index(<code>MemoryJobStore</code>特有方法)</a>  通过二分法查找快速查找job的索引，或者如果找不到索引，则根据给定的时间戳记将job插入的索引。</li>
+</ul>
+<h4 id="2-2-2-其他JobStore"><a href="#2-2-2-其他JobStore" class="headerlink" title="2.2.2 其他JobStore"></a>2.2.2 其他JobStore</h4><p>其他JobStore提供的功能也是与MemoryJobStore一样,但是由于各个存储容器/数据库不同,实现的逻辑都是不同,但原理还是一样的.Apschedulers除了MemoryJobStore外,通过把Job序列化存到JobStore中,使得job可以与add_job的进程分离,达到分布式调用的效果,但是由于每个Apschedulers并不会互相通信,所以可能存在多个Apschedulers获得到相同的Job,所以我们需要添加一个锁来解决该问题.</p>
+<h3 id="2-3-schedulers"><a href="#2-3-schedulers" class="headerlink" title="2.3 schedulers"></a>2.3 schedulers</h3><p>schedulers是Apschedulers的调度器,负责Apschedulers的核心功能,所以在上面的<code>主体逻辑</code>中基本都说了,这里只说一些上面没提到的功能函数.</p>
+<ul>
+<li><p>状态</p>
+<p>Apschedulers中提供以下三种状态，通过状态机切换状态使Apschedulers可以正确的启动停止，以及在<code>_process_jobs</code>中通过判断当前状态是否为<code>STATE_PAUSED</code>来实现暂停的功能</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">STATE_STOPPED</span> = <span class="hljs-number">0</span>  <span class="hljs-comment"># 停止</span><br><span class="hljs-attr">STATE_RUNNING</span> = <span class="hljs-number">1</span>  <span class="hljs-comment"># 运行</span><br><span class="hljs-attr">STATE_PAUSED</span> = <span class="hljs-number">2</span>   <span class="hljs-comment">#暂停</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p><code>_process_jobs</code><br>process_jobs函数为了处理job,函数比较长, 这里看实际代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_process_jobs</span>(<span class="hljs-params">self</span>):</span><br>    <span class="hljs-comment"># 如果是暂停状态,则暂停运行</span><br>    <span class="hljs-keyword">if</span> self.state == STATE_PAUSED:<br>        self._logger.debug(<span class="hljs-string">&#x27;Scheduler is paused -- not processing jobs&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>  		<br>    self._logger.debug(<span class="hljs-string">&#x27;Looking for jobs to run&#x27;</span>)<br>    now = datetime.now(self.timezone)<br>    next_wakeup_time = <span class="hljs-literal">None</span><br>    events = []<br>  <br>    <span class="hljs-keyword">with</span> self._jobstores_lock:<br>        <span class="hljs-comment"># 获取存储job的jobstore</span><br>        <span class="hljs-keyword">for</span> jobstore_alias, jobstore <span class="hljs-keyword">in</span> six.iteritems(self._jobstores):<br>            <span class="hljs-keyword">try</span>:<br>                <span class="hljs-comment"># 从jobstore中获取满足条件的job list</span><br>                due_jobs = jobstore.get_due_jobs(now)<br>            <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>                <span class="hljs-comment"># 计算该jobstore至少需要n秒内唤醒一次</span><br>                self._logger.warning(<span class="hljs-string">&#x27;Error getting due jobs from job store %r: %s&#x27;</span>,<br>                                     jobstore_alias, e)<br>                retry_wakeup_time = now + timedelta(seconds=self.jobstore_retry_interval)<br>                <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> next_wakeup_time <span class="hljs-keyword">or</span> next_wakeup_time &gt; retry_wakeup_time:<br>                    next_wakeup_time = retry_wakeup_time<br>  <br>                <span class="hljs-keyword">continue</span><br>  <br>            <span class="hljs-keyword">for</span> job <span class="hljs-keyword">in</span> due_jobs:<br>                <span class="hljs-keyword">try</span>:<br>                    <span class="hljs-comment"># 获取job的存储器</span><br>                    executor = self._lookup_executor(job.executor)<br>                <span class="hljs-keyword">except</span> BaseException:<br>                    self._logger.error(<br>                        <span class="hljs-string">&#x27;Executor lookup (&quot;%s&quot;) failed for job &quot;%s&quot; -- removing it from the &#x27;</span><br>                        <span class="hljs-string">&#x27;job store&#x27;</span>, job.executor, job)<br>                    <span class="hljs-comment"># 从存储器中移除掉job</span><br>                    self.remove_job(job.<span class="hljs-built_in">id</span>, jobstore_alias)<br>                    <span class="hljs-keyword">continue</span><br>    <span class="hljs-comment"># 获取job的运行时间</span><br>                run_times = job._get_run_times(now)<br>                run_times = run_times[-<span class="hljs-number">1</span>:] <span class="hljs-keyword">if</span> run_times <span class="hljs-keyword">and</span> job.coalesce <span class="hljs-keyword">else</span> run_times<br>                <span class="hljs-keyword">if</span> run_times:<br>                    <span class="hljs-keyword">try</span>:<br>                        <span class="hljs-comment"># 运行job</span><br>                        executor.submit_job(job, run_times)<br>                    <span class="hljs-keyword">except</span> MaxInstancesReachedError:<br>                        self._logger.warning(<br>                            <span class="hljs-string">&#x27;Execution of job &quot;%s&quot; skipped: maximum number of running &#x27;</span><br>                            <span class="hljs-string">&#x27;instances reached (%d)&#x27;</span>, job, job.max_instances)<br>                        <span class="hljs-comment"># 提交job运行实例过大的event</span><br>                        event = JobSubmissionEvent(EVENT_JOB_MAX_INSTANCES, job.<span class="hljs-built_in">id</span>,<br>                                                   jobstore_alias, run_times)<br>                        events.append(event)<br>                    <span class="hljs-keyword">except</span> BaseException:<br>                        self._logger.exception(<span class="hljs-string">&#x27;Error submitting job &quot;%s&quot; to executor &quot;%s&quot;&#x27;</span>,<br>                                               job, job.executor)<br>                    <span class="hljs-keyword">else</span>:<br>                        <span class="hljs-comment"># 提交job运行成功的event</span><br>                        event = JobSubmissionEvent(EVENT_JOB_SUBMITTED, job.<span class="hljs-built_in">id</span>, jobstore_alias,<br>                                                   run_times)<br>                        events.append(event)<br>  <br>                    <span class="hljs-comment"># 如果有下一个执行时间，则更新job，否则将job从jobstore中删除。</span><br>                    job_next_run = job.trigger.get_next_fire_time(run_times[-<span class="hljs-number">1</span>], now)<br>                    <span class="hljs-keyword">if</span> job_next_run:<br>                        job._modify(next_run_time=job_next_run)<br>                        jobstore.update_job(job)<br>                    <span class="hljs-keyword">else</span>:<br>                        self.remove_job(job.<span class="hljs-built_in">id</span>, jobstore_alias)<br>  <br>            <span class="hljs-comment"># 计算jobstore下次唤醒时间</span><br>            jobstore_next_run_time = jobstore.get_next_run_time()<br>            <span class="hljs-keyword">if</span> jobstore_next_run_time <span class="hljs-keyword">and</span> (next_wakeup_time <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">or</span><br>                                           jobstore_next_run_time &lt; next_wakeup_time):<br>                next_wakeup_time = jobstore_next_run_time.astimezone(self.timezone)<br>  <br>    <span class="hljs-comment"># 触发所有event</span><br>    <span class="hljs-keyword">for</span> event <span class="hljs-keyword">in</span> events:<br>        self._dispatch_event(event)<br>  <br>    <span class="hljs-comment"># 计算下次运行时间</span><br>    <span class="hljs-keyword">if</span> self.state == STATE_PAUSED:<br>        wait_seconds = <span class="hljs-literal">None</span><br>        self._logger.debug(<span class="hljs-string">&#x27;Scheduler is paused; waiting until resume() is called&#x27;</span>)<br>    <span class="hljs-keyword">elif</span> next_wakeup_time <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>        wait_seconds = <span class="hljs-literal">None</span><br>        self._logger.debug(<span class="hljs-string">&#x27;No jobs; waiting until a job is added&#x27;</span>)<br>    <span class="hljs-keyword">else</span>:<br>        wait_seconds = <span class="hljs-built_in">min</span>(<span class="hljs-built_in">max</span>(timedelta_seconds(next_wakeup_time - now), <span class="hljs-number">0</span>), TIMEOUT_MAX)<br>        self._logger.debug(<span class="hljs-string">&#x27;Next wakeup is due at %s (in %f seconds)&#x27;</span>, next_wakeup_time,<br>                           wait_seconds)<br>  <br>    <span class="hljs-keyword">return</span> wait_seconds<br></code></pre></td></tr></table></figure>
+<h3 id="2-4-triggers"><a href="#2-4-triggers" class="headerlink" title="2.4 triggers"></a>2.4 triggers</h3><p>首先<code>BaseTrigger</code>提供一个触发器的基本方法,用于给<code>get_next_fire_time</code>添加抖动时间,防止大量任务在同一时间运行.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python">  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_apply_jitter</span>(<span class="hljs-params">self, next_fire_time, jitter, now</span>):</span><br>      <span class="hljs-keyword">if</span> next_fire_time <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> jitter:<br>          <span class="hljs-keyword">return</span> next_fire_time<br><br><span class="hljs-comment"># 主要的代码,通过随机选择+-jitter值与next_fire_time进行和运算</span><br>      next_fire_time_with_jitter = next_fire_time + timedelta(<br>              seconds=random.uniform(-jitter, jitter))<br><br>      <span class="hljs-keyword">if</span> next_fire_time_with_jitter &lt; now:<br>      	<span class="hljs-comment"># 如果新的时间值小于当前时间,则返回旧时间</span><br>          <span class="hljs-keyword">return</span> next_fire_time<br>      <span class="hljs-keyword">return</span> next_fire_time_with_jitter<br></code></pre></td></tr></table></figure>
+<p>而其他细节比较简单,各种触发器都是按照设置的时间进行运行,如果能算出下次运行时间,则在运行后按照下次运行时间继续运行,算不出下次运行时间该job将停止运行</p>
+<h3 id="2-5-job-py"><a href="#2-5-job-py" class="headerlink" title="2.5 job.py"></a>2.5 job.py</h3><p>job比较简单,主要是提供一些给scheduler调用的方法.<br>job的方法分为两大类,一类是类似于代理,通过调用scheduler的方法来修改自己本身,如<code>modify</code>,<code>reschedule</code>,<code>pause</code>,<code>resume</code>,<code>remove</code>.<br>这类方法比较简单,而且主要逻辑在于scheduler,不在于job,另外的就是主要逻辑在job的方法.如<code>__getstate__</code>以及<code>__setstate__</code>的序列化相关方法,同时还有一个<code>_modify</code>用来接受更新job的方法,虽然该方法很长,但主要逻辑也是各种判断再更新指</p>
+</li>
+</ul>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h2><p>表面上看APScheduler的代码会比较复杂,但经过拆解后,Apscheduler的代码除了scheduler的代码是非常简单的,主要是针对各种不同的运行环境而封装的代码比较多,导致在分析代码时,觉得这些代码经不起分析,但是APScheduler的核心设计还是很不错的.</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2020/03/26/APScheduler%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;03&#x2F;26&#x2F;APScheduler%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;03&#x2F;26&#x2F;APScheduler%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag">源码分析</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2020/04/10/%E8%AE%B0%E4%B8%80%E6%AC%A1ElasticSearch%E5%86%B7%E7%83%AD%E5%88%86%E7%A6%BB%E7%B4%A2%E5%BC%95%E6%97%A0%E6%B3%95%E6%AD%A3%E7%A1%AE%E5%88%86%E9%85%8D%E7%9A%84%E9%97%AE%E9%A2%98/"><i class="iconfont iconleft"></i>记一次ElasticSearch冷热分离索引无法正确分配的问题</a>
+    <a href="/2020/03/22/new/">重换新生<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BB%E4%BD%93%E9%80%BB%E8%BE%91"><span class="toc-text">1.主体逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%84"><span class="toc-text">1.1代码结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.2简单的例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E5%88%9D%E5%A7%8B%E5%8C%96scheduler"><span class="toc-text">1.3 初始化scheduler</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4%E6%B7%BB%E5%8A%A0job"><span class="toc-text">1.4添加job</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5%E5%BC%80%E5%A7%8B%E8%BF%90%E8%A1%8Cscheduler"><span class="toc-text">1.5开始运行scheduler</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">2.源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-executors"><span class="toc-text">2.1 executors</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-JobStore"><span class="toc-text">2.2 JobStore</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-schedulers"><span class="toc-text">2.3 schedulers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-triggers"><span class="toc-text">2.4 triggers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-job-py"><span class="toc-text">2.5 job.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BB%E4%BD%93%E9%80%BB%E8%BE%91"><span class="toc-text">1.主体逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%84"><span class="toc-text">1.1代码结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.2简单的例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E5%88%9D%E5%A7%8B%E5%8C%96scheduler"><span class="toc-text">1.3 初始化scheduler</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4%E6%B7%BB%E5%8A%A0job"><span class="toc-text">1.4添加job</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5%E5%BC%80%E5%A7%8B%E8%BF%90%E8%A1%8Cscheduler"><span class="toc-text">1.5开始运行scheduler</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">2.源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-executors"><span class="toc-text">2.1 executors</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-JobStore"><span class="toc-text">2.2 JobStore</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-schedulers"><span class="toc-text">2.3 schedulers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-triggers"><span class="toc-text">2.4 triggers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-job-py"><span class="toc-text">2.5 job.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

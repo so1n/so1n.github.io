@@ -1,0 +1,444 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Linux日志--logrotate - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记生产的机器会产生很多的日志, 如果不对日志进行管理...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Linux日志--logrotate</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Linux日志--logrotate</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 03, 2019</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>4639</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>生产的机器会产生很多的日志, 如果不对日志进行管理, 日志会不断消耗硬盘空间, 直到把硬盘挤爆, 同时所有日志挤在同一个文件, 也很难去翻前几天的日志数据, 这时候就需要一个日志管理工具–<code>logrotate</code>.<br>Linux机器中自带<code>logrotate</code>用于日志轮转, 他的实现是最简单的, 也是最好用的, 基本适用所有情况, 一般情况下, 机器上面有logrotate时, 就不要使用其他的日志轮转, 如Python日志模块的转换, Java日志模块的转换, supervisor的日志轮转模块, 他们在多线程/多进程的时候基本有坑.</p>
+        <h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h2><p><code>logrotate</code>是一个linux系统日志的管理工具。可以对单个日志文件或者某个目录下的文件按时间或者文件大小进行切割，压缩等操作, 并能按照指定设置的保留n个日志；还可以在切割之后运行自定义命令。</p>
+<p>logrotate 并不是一个守护进程, 正常情况下不会启动, 而是按照一定的周期启动的, 这个周期是基于<code>crontab</code>运行的，所以这个时间点是由 crontab 控制的，具体可以查询 crontab 的配置文件<code>/etc/crontab</code>. 系统会按照计划的频率运行 logrotate，通常是每天, 也就是通过<code>/etc/cron.daily/logrotate</code>配置文件来配置logrotate的运行.</p>
+<p><code>logrotate</code>默认的配置文件<code>/etc/logrotate.conf</code>里有一句<code>include /etc/logrotate.d</code>, 所以<code>logrotate</code>在启动后会读取<code>/etc/logrotate.d</code>里的所有配置, 如果我们有新的需求, 就在该目录下面创建需求对应的文件夹, 并在里面写<code>logrotate</code>脚本, 或者在<code>/etc/logrotate.d</code>里面直接写配置文件.</p>
+<p>当时间到时,<code>crontab</code>会通过命令调用启动<code>logrotate</code>,<code>logrotate</code>使用<code>/etc/logrotate.conf</code>配置文件, 按照文件执行轮换/清理日志文件.</p>
+<h2 id="2-轮换机制"><a href="#2-轮换机制" class="headerlink" title="2.轮换机制"></a>2.轮换机制</h2><p><code>logrotate</code> 是一个普通的文件, 为了能不侵入代码且在执行日志轮转后 程序能写到新的日志文件, <code>logrotate</code>提供两套日志轮换方法.</p>
+<ul>
+<li><p>create<br>这是最好的方案也是默认的方案,这个方案是重命名旧文件, 再创建一个新的文件, 在告诉程序把日志流写到新的文件, 前两步比较简单, 最后一步比较复杂, 需要程序的支持, 具体如下:</p>
+<ul>
+<li>1.重命名正在输出日志文件，因为重命名只修改目录以及文件的名称，而进程操作文件使用的是<code>inode</code>, 所以并不影响原程序继续输出日志. 可以看到程序在往重命名的文件输出日志.</li>
+<li>2.创建新的日志文件，文件名和原日志文件一样，此时只是文件名称一样，而<code>inode</code>编号不同，原程序输出的日志还是往原日志文件输出, 并不会对该新创建的日志文件输日志.</li>
+<li>3.最后通过信号通知程序，程序收到信号后会重新打开日志文件;由于重新打开日志文件会用到文件路径而非<code>inode</code>编号，所以打开的是新的日志文件, 此时程序的日志流就会输到新的日志文件.<br>总的来说, 就是mv文件,再create文件, 然后再通知程序重新打开日志文件, 这几个操作的成本很低, 一般redis, nginx, mysql都使用这种方式.<br>上面说的信号其实是Linux的USR1信号, 它常被用来告知应用程序重载配置文件,通过<code>kill -USR1 xx.pid</code>把信号发送给对应的pid(除非这个程序的文档有说是靠另外一个信号来控制的)<br><a href="www.baidu.com">TODO inode说明参见</a></li>
+</ul>
+</li>
+<li><p>copytruncate<br>create方式虽好, 但不是所有的程序都支持监听信号并做出响应的操作, 这时候只能使用土办法了: 直接把日志的数据从文件1copy到文件2, 并清空文件1的数据, 具体如下:</p>
+<ul>
+<li>1.将当前正在输出的日志文件复制为目标文件，此时程序仍然将日志输出到原来文件中，此时，原文件名也没有变.</li>
+<li>2.清空日志文件，原程序仍然还是输出到预案日志文件中，因为清空文件只把文件的内容删除了，而<code>inode</code>并没改变，后续日志的输出仍然写入该文件中,但是查看文件后可以发现文件像新创建的一样.<br>这种方式十分简单, 只需要两步操作, 但是具体的操作成本比较高, 当日志文件比较大时, 复制就会比较耗时导致可能丢失部分日志, 这是<code>copytruncate</code>的缺点之一, 但很多人都不会遇到很大的日志文件.</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-logrotate的配置"><a href="#3-logrotate的配置" class="headerlink" title="3.logrotate的配置"></a>3.logrotate的配置</h2><p><code>logrotate</code>也有一套自己的配置, 用户只要写好了这配置, 放到<code>/etc/logrotate.d/</code>就可以被<code>logrotate</code>调用到, <code>logrotate</code>配置主要是告诉<code>logrotate</code>对哪些文件进行哪些操作, 具体可以看如下的nginx的<code>logrotate</code>配置:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 这里配置了日志的所在位置, *号代表匹配xxxlog的日志</span><br>/usr/<span class="hljs-built_in">local</span>/nginx/logs/*<span class="hljs-built_in">log</span> &#123;<br>    daily          <span class="hljs-comment"># 每天转储</span><br>    rotate 30      <span class="hljs-comment"># 保存30个备份, 一般按时间排序, 超过30天前的日志会被删除</span><br>    missingok      <span class="hljs-comment"># 在日志转储期间,任何错误将被忽略, 如权限不够, 找不到文件等</span><br>    notifempty     <span class="hljs-comment"># 文件为空时不转储</span><br>    compress       <span class="hljs-comment"># 轮转后的日志 通过 gzip 压缩</span><br>    dateext        <span class="hljs-comment"># 日志文件以当前日期为格式结尾</span><br>    sharedscripts  <span class="hljs-comment"># 所有日志文件转储完毕后再执行下面的脚本</span><br>    postrotate     <span class="hljs-comment"># 转储之后执行命令，和endscript成对使用</span><br>        <span class="hljs-comment"># 发送信号给nginx, 把返回的输出写到/dev/null中丢掉</span><br>        /bin/<span class="hljs-built_in">kill</span> -USR1 \$(cat /usr/<span class="hljs-built_in">local</span>/nginx/logs/nginx.pid 2&gt;/dev/null) 2&gt;/dev/null || :<br>    endscript      <span class="hljs-comment"># 转储之后执行命令，和postrotate成对使用</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>上面只是对一种类型的日志进行轮换, 如果像<code>rsyslog</code>一样, 可以通过如下以回车切分多行配置多种类型日志来适用同一套规则:</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-regexp">/var/</span>log/mail<br><span class="hljs-regexp">/var/</span>log/messages<br><span class="hljs-regexp">/var/</span>log/syslog<br>&#123;<br>        sharedscripts<br>        dateext<br>        rotate <span class="hljs-number">25</span><br>        <span class="hljs-keyword">size</span> <span class="hljs-number">40</span>M<br>        compress<br>        dateformat -%Y%m%d%s<br>        postrotate<br>                <span class="hljs-regexp">/bin/</span>kill -HUP `cat <span class="hljs-regexp">/var/</span>run<span class="hljs-regexp">/syslogd.pid 2&gt; /</span>dev<span class="hljs-regexp">/null` 2&gt; /</span>dev/<span class="hljs-keyword">null</span> || <span class="hljs-keyword">true</span><br>        endscript<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>可以看到配置文件十分简单, 实际上<code>logrotate</code>的配置也不多, 具体如下:<br>| 参数 | 描述 |<br>| —| — |<br>| dateext | 切换后的日志文件会附加上一个短横线和YYYYMMDD格式的日期，没有这个配置项会附加一个小数点加一个数字序号.|<br>| dateformat | 配合dateext使用可以为切割后的日志加上YYYYMMDD格式的日期，如dateformat -%Y%m%d|<br>| compress | 通过gzip 压缩转储以后的日志 |<br>| nocompress | 不需要压缩时，用这个参数 |<br>| delaycompress | 一起使用时，转储的日志文件到下一次转储时才压缩 |<br>| nodelaycompress | 覆盖 delaycompress 选项，转储同时压缩。 |<br>| copytruncate | 用于还在打开中的日志文件，把当前日志备份并清空 |<br>| nocopytruncate | 备份日志文件但是不截断 |<br>| create mode owner group | 转储文件，使用指定的文件模式创建新的日志文件 |<br>| nocreate | 不建立新的日志文件 |<br>| errors address | 专储时的错误信息发送到指定的Email 地址 |<br>| ifempty | 即使是空文件也转储，这个是 logrotate 的缺省选项。 |<br>| notifempty | 如果是空文件的话，不转储 |<br>| mail address | 把转储的日志文件发送到指定的E-mail 地址 |<br>| nomail | 转储时不发送日志文件 |<br>| olddir directory | 转储后的日志文件放入指定的目录，必须和当前日志文件在同一个文件系统 |<br>| noolddir | 转储后的日志文件和当前日志文件放在同一个目录下 |<br>| sharedscripts | 运行postrotate脚本，作用是在所有日志都轮转后统一执行一次脚本。如果没有配置这个，那么每个日志轮转后都会执行一次脚本 |<br>| prerotate/endscript | 在转储以前需要执行的命令可以放入这个对，这两个关键字必须单独成行 |<br>| postrotate/endscript | 在转储以后需要执行的命令可以放入这个对，这两个关键字必须单独成行 |<br>| daily | 指定转储周期为每天 |<br>| weekly | 指定转储周期为每周 |<br>| monthly | 指定转储周期为每月 |<br>| rotate count | 指定日志文件删除之前转储的次数，0 指没有备份，5 指保留5 个备份 |<br>| tabootext [+] list | 让logrotate 不转储指定扩展名的文件，缺省的扩展名是：.rpm-orig, .rpmsave, v, 和 ~ |<br>| size size | 当日志文件到达指定的大小时才转储，后缀MB. |</p>
+<h2 id="4-手动调用logrotate命令"><a href="#4-手动调用logrotate命令" class="headerlink" title="4.手动调用logrotate命令"></a>4.手动调用logrotate命令</h2><p>一般情况写完配置文件, 我们都需要测试文件是否合法或者需要手动轮转日志, 这时候就需要用到logrotate命令了, 具体的logrotate命令如下:</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">logrotate [OPTION.<span class="hljs-string">..</span>] &lt;configfile&gt;<br>-d, <span class="hljs-params">--debug</span> ：debug模式，测试配置文件是否有错误。<br>-f, <span class="hljs-params">--force</span> ：强制转储文件。<br>-m, <span class="hljs-params">--mail=command</span> ：压缩日志后，发送日志到指定邮箱。<br>-s, <span class="hljs-params">--state=statefile</span> ：使用指定的状态文件。<br>-v, <span class="hljs-params">--verbose</span> ：显示转储过程。<br></code></pre></td></tr></table></figure>
+
+<p>默认<code>crontab</code>通过调用<code>logrotate /etc/logrotate.conf</code>来启动<code>logrotate</code>以及读取对应的配置文件, 我们也可以通过这样来启动, 不过一般情况不建议直接使用<code>logrotate /etc/logrotate.conf</code>, 而是要直接调用我们自己的文件. 此外, 每次写完一个配置文件, 都要<code>logrotate -d xxx</code>来检查文件是否配置正常</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2019/11/03/logrotate/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;11&#x2F;03&#x2F;logrotate&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;11&#x2F;03&#x2F;logrotate&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A5%E5%BF%97/" rel="tag">日志</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2019/12/05/linux%E6%97%A5%E5%BF%97%E6%9C%BA%E5%88%B6/"><i class="iconfont iconleft"></i>linux日志规则</a>
+    <a href="/2019/10/07/docker%E9%83%A8%E7%BD%B2python%E5%90%8E%E5%8F%B0%E5%BA%94%E7%94%A8/">如何把自己的Python应用容器化<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="toc-text">1.简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%BD%AE%E6%8D%A2%E6%9C%BA%E5%88%B6"><span class="toc-text">2.轮换机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-logrotate%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-text">3.logrotate的配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%89%8B%E5%8A%A8%E8%B0%83%E7%94%A8logrotate%E5%91%BD%E4%BB%A4"><span class="toc-text">4.手动调用logrotate命令</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="toc-text">1.简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%BD%AE%E6%8D%A2%E6%9C%BA%E5%88%B6"><span class="toc-text">2.轮换机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-logrotate%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-text">3.logrotate的配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%89%8B%E5%8A%A8%E8%B0%83%E7%94%A8logrotate%E5%91%BD%E4%BB%A4"><span class="toc-text">4.手动调用logrotate命令</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
