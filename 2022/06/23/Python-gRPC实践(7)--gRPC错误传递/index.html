@@ -1,0 +1,459 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python-gRPC实践(7)--gRPC的错误传递 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前言之前在文章《Python-gRPC实践(3)–使用...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python-gRPC实践(7)--gRPC的错误传递</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2022/02/bd67e15aa8d46101.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python-gRPC实践(7)--gRPC的错误传递</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>June 23, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>17614</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前在文章<a href="https://so1n.me/2022/04/07/Python-gRPC%E5%AE%9E%E8%B7%B5(3)--%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0gRPC%E6%9C%8D%E5%8A%A1/">《Python-gRPC实践(3)–使用Python实现gRPC服务》</a>介绍的实现<code>gRPC</code>服务中使用了一套自定义的协议来传递错误，但这并不是一个优雅的解决方案，因为这种方案的兼容性很差，好在官方定义了一种解决方案，通过这种方案可以使不同的服务都能传递错误。</p>
+<h2 id="1-自定义的错误传递"><a href="#1-自定义的错误传递" class="headerlink" title="1.自定义的错误传递"></a>1.自定义的错误传递</h2><p>在编写普通的HTTP/1.1接口时，我们都会定制一套业务相关的错误来与HTTP标注的错误区分开，比如通常都会返回这样一个结构体：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这个结构体包含了<code>code</code>,<code>msg</code>和<code>data</code>三个字段，他们分别是错误码，错误信息，和要返回的结构。<br>客户端在收到响应后，会判断<code>code</code>的值是什么，如果属于定义的成功状态码则通过<code>data</code>提取数据，否则把<code>msg</code>信息通过异常抛出来。</p>
+<p>在使用<code>gRPC</code>中更不例外，因为我们在使用<code>gRPC</code>调用时，就像调用一个普通函数一样，不过<code>gRPC</code>服务间是通过传递message数据来进行交互的，每个调用的请求message和响应message都已经被固定了，如果我们想返回一个错误信息，那么必定会跟响应结构体不一样，所以错误的信息的结构体一定要跟响应体匹配，否则只能另寻它路，比如在每个响应体嵌入错误信息的字段，如下:</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs protobuf"><span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">Demo</span> </span>&#123;<br>    <span class="hljs-built_in">string</span> a=<span class="hljs-number">1</span>;<br>    <span class="hljs-built_in">int32</span> b=<span class="hljs-number">2</span>;<br><br>    <span class="hljs-built_in">int32</span> err_code=<span class="hljs-number">3</span>;<br>    <span class="hljs-built_in">string</span> err_msg=<span class="hljs-number">4</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>然后服务端判断调用执行出错就把错误转换为对应的<code>err_code</code>和<code>err_msg</code>再塞入到message中传给客户端，而客户端每收到调用响应就判断<code>err_code</code>是否有值，有则代表是异常请求，只把<code>err_code</code>和<code>err_msg</code>提取出来生成一个异常并抛给调用者，否则就正常返回数据。</p>
+<p>采用这种方法可以兼容每一种调用，但是并不是十分的优雅，如果能通过别的协议容器把数据传给客户端，客户端通过对应的协议解析到错误信息并生产异常就好，在之前介绍的<code>gRPC</code>服务中，就是采用<code>gRPC.metadata</code>来传输数据。同时为了能自动处理服务端异常的捕获和客户端的异常生成，会分别在客户端和服务端设置一个顶层的拦截器，服务端的顶层拦截器代码如下(因为其它的拦截器可能会抛错，所以捕获错误的拦截器一定要放置在最顶层)：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># code url: https://github.com/so1n/grpc-example-common/blob/v0.1.5/grpc_example_common/interceptor/server_interceptor/customer_top.py</span><br><span class="hljs-keyword">import</span> logging<br><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, Callable, List, Tuple<br><br><span class="hljs-keyword">import</span> grpc<br><br><span class="hljs-keyword">from</span> grpc_example_common.helper.context <span class="hljs-keyword">import</span> context_proxy<br><br><span class="hljs-keyword">from</span> .base <span class="hljs-keyword">import</span> BaseInterceptor<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomerTopInterceptor</span>(<span class="hljs-params">BaseInterceptor</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">intercept</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        next_handler_method: Callable,</span></span><br><span class="hljs-function"><span class="hljs-params">        request_proto_message: Any,</span></span><br><span class="hljs-function"><span class="hljs-params">        context: grpc.ServicerContext,</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; Any:</span><br>        return_initial_metadata: List[Tuple] = [(<span class="hljs-string">&quot;customer-user-agent&quot;</span>, <span class="hljs-string">&quot;Python3&quot;</span>)]<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 执行gRPC的调用</span><br>            <span class="hljs-keyword">return</span> next_handler_method(request_proto_message, context)<br>        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>            <span class="hljs-comment"># 限定客户端带有如下Key-Value的才设置错误信息</span><br>            <span class="hljs-keyword">if</span> self.metadata_dict.get(<span class="hljs-string">&quot;customer-user-agent&quot;</span>, <span class="hljs-string">&quot;&quot;</span>) == <span class="hljs-string">&quot;Python3&quot;</span>:<br>                return_initial_metadata.append((<span class="hljs-string">&quot;exc_name&quot;</span>, e.__class__.__name__))<br>                return_initial_metadata.append((<span class="hljs-string">&quot;exc_info&quot;</span>, <span class="hljs-built_in">str</span>(e)))<br>            <span class="hljs-comment"># 抛出异常，这样gRPC服务端就能捕获到对应的异常，方便服务端进行后续的处理</span><br>            <span class="hljs-keyword">raise</span> e<br>        <span class="hljs-keyword">finally</span>:<br>            <span class="hljs-comment"># 发送结束metadata流到客户端</span><br>            context.send_initial_metadata(return_initial_metadata)<br></code></pre></td></tr></table></figure>
+<p>该拦截器会捕获调用的异常，然后把异常的方法名和异常信息存在metedata中，这里之所以把值设置到metadata中，而不通过<code>context.set_code</code>,<code>context.set_details</code>来设置错误码和错误信息是有原因的。</p>
+<p>首先是<code>code</code>，<code>gRPC</code>限制了只能设置它允许的<code>code</code>，所以这会限制我们去自定义<code>code</code>，同时我们也不应该把业务的错误码设置到响应的错误码中，所以不在这里使用<code>context.set_code</code>；而对于<code>set_details</code>,则是因为<code>gRPC</code>服务端在捕获到异常后会解析对应的异常，然后把异常数据通过<code>context.set_details</code>设置到<code>details</code>中，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_call_behavior</span>(<span class="hljs-params">rpc_event,</span></span><br><span class="hljs-function"><span class="hljs-params">                   state,</span></span><br><span class="hljs-function"><span class="hljs-params">                   behavior,</span></span><br><span class="hljs-function"><span class="hljs-params">                   argument,</span></span><br><span class="hljs-function"><span class="hljs-params">                   request_deserializer,</span></span><br><span class="hljs-function"><span class="hljs-params">                   send_response_callback=<span class="hljs-literal">None</span></span>):</span><br>    <span class="hljs-keyword">from</span> grpc <span class="hljs-keyword">import</span> _create_servicer_context<br>    <span class="hljs-keyword">with</span> _create_servicer_context(rpc_event, state,<br>                                  request_deserializer) <span class="hljs-keyword">as</span> context:<br>        <span class="hljs-keyword">try</span>:<br>            response_or_iterator = <span class="hljs-literal">None</span><br>            <span class="hljs-comment"># 调用请求</span><br>            <span class="hljs-keyword">if</span> send_response_callback <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>                response_or_iterator = behavior(argument, context,<br>                                                send_response_callback)<br>            <span class="hljs-keyword">else</span>:<br>                response_or_iterator = behavior(argument, context)<br>            <span class="hljs-keyword">return</span> response_or_iterator, <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> exception:  <span class="hljs-comment"># pylint: disable=broad-except</span><br>            <span class="hljs-keyword">with</span> state.condition:<br>                <span class="hljs-keyword">if</span> state.aborted:<br>                    _abort(state, rpc_event.call, cygrpc.StatusCode.unknown,<br>                           <span class="hljs-string">b&#x27;RPC Aborted&#x27;</span>)<br>                <span class="hljs-keyword">elif</span> exception <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> state.rpc_errors:<br>                    <span class="hljs-comment"># 这里判断并不属于grpc的错误，则会把错误信息设置到details</span><br>                    details = <span class="hljs-string">&#x27;Exception calling application: &#123;&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(<br>                        exception)<br>                    _LOGGER.exception(details)<br>                    _abort(state, rpc_event.call, cygrpc.StatusCode.unknown,<br>                           _common.encode(details))<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>, <span class="hljs-literal">False</span><br></code></pre></td></tr></table></figure>
+<p>这就意味着我们即使在拦截器设置了<code>details</code>，但是由于抛出来的异常并不属于<code>gRPC</code>的异常，所以<code>details</code>最终被异常信息覆盖了。</p>
+<p>了解完了服务端的拦截器实现，接下来看看客户端的拦截器实现，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># code url: https://github.com/so1n/grpc-example-common/blob/v0.1.5/grpc_example_common/interceptor/client_interceptor/customer_top.py</span><br><span class="hljs-keyword">import</span> inspect<br><span class="hljs-keyword">import</span> logging<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any, Callable, Dict, List, Optional, Type<br><br><br><span class="hljs-keyword">from</span> .base <span class="hljs-keyword">import</span> GRPC_RESPONSE, BaseInterceptor, ClientCallDetailsType<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomerTopInterceptor</span>(<span class="hljs-params">BaseInterceptor</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, exc_list: Optional[List[Type[Exception]]] = <span class="hljs-literal">None</span></span>):</span><br>        self.exc_dict: Dict[<span class="hljs-built_in">str</span>, Type[Exception]] = &#123;&#125;<br>        <span class="hljs-keyword">for</span> key, exc <span class="hljs-keyword">in</span> <span class="hljs-built_in">globals</span>()[<span class="hljs-string">&quot;__builtins__&quot;</span>].items():<br>            <span class="hljs-comment"># 注册Python自带的异常</span><br>            <span class="hljs-keyword">if</span> inspect.isclass(exc) <span class="hljs-keyword">and</span> <span class="hljs-built_in">issubclass</span>(exc, Exception):<br>                self.exc_dict[key] = exc<br><br>        <span class="hljs-keyword">if</span> exc_list:<br>            <span class="hljs-comment"># 注册用户指定的异常</span><br>            <span class="hljs-keyword">for</span> exc <span class="hljs-keyword">in</span> exc_list:<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">issubclass</span>(exc, Exception):<br>                    self.exc_dict[exc.__name__] = exc<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">intercept</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        method: Callable,</span></span><br><span class="hljs-function"><span class="hljs-params">        request_or_iterator: Any,</span></span><br><span class="hljs-function"><span class="hljs-params">        call_details: ClientCallDetailsType,</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; GRPC_RESPONSE:</span><br>        <span class="hljs-keyword">if</span> call_details.metadata <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-comment"># 添加协定的信息 </span><br>            call_details.metadata.append((<span class="hljs-string">&quot;customer-user-agent&quot;</span>, <span class="hljs-string">&quot;Python3&quot;</span>))  <span class="hljs-comment"># type: ignore</span><br>        response: GRPC_RESPONSE = method(call_details, request_or_iterator)<br>        metadata_dict: <span class="hljs-built_in">dict</span> = &#123;item.key: item.value <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> response.initial_metadata()&#125;<br>        <span class="hljs-keyword">if</span> metadata_dict.get(<span class="hljs-string">&quot;customer-user-agent&quot;</span>) == <span class="hljs-string">&quot;Python3&quot;</span>:<br>            <span class="hljs-comment"># 提取异常信息</span><br>            exc_name: <span class="hljs-built_in">str</span> = metadata_dict.get(<span class="hljs-string">&quot;exc_name&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>            exc_info: <span class="hljs-built_in">str</span> = metadata_dict.get(<span class="hljs-string">&quot;exc_info&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>            <span class="hljs-comment"># 通过exc_name查找异常</span><br>            exc: Optional[Type[Exception]] = self.exc_dict.get(exc_name)<br>            <span class="hljs-keyword">if</span> exc:<br>                <span class="hljs-comment"># 抛出异常</span><br>                <span class="hljs-keyword">raise</span> exc(exc_info)<br>        <span class="hljs-keyword">return</span> response<br></code></pre></td></tr></table></figure>
+<p>可以看出客户端拦截器通过获取服务端返回的metada来判断是否有异常信息，如果有就提取出并抛出错误，否则就正常返回响应。这样一来只要客户端服务端都设置了正确的拦截器，客户端就能获得到服务端的错误信息并抛出异常，不过这种实现方式是依赖<code>gRPC.metadata</code>传输数据的，而<code>gRPC.metadata</code>的值必须是ASCII或者规范的字节，不然就不给传输甚至还会卡住请求，这就意味着我们需要对错误信息进行一些序列化。</p>
+<h2 id="2-基于官方协定的错误传输实现"><a href="#2-基于官方协定的错误传输实现" class="headerlink" title="2.基于官方协定的错误传输实现"></a>2.基于官方协定的错误传输实现</h2><p>由于上面的实现不是很优雅，于是就上网冲浪寻找一个官方的实现，后面终于在<code>Github</code>中找到了<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/tree/master/examples/python/errors">官方的错误传输示例</a>，其中官方的服务端示例代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_greet_limit_exceed_error_status</span>(<span class="hljs-params">name</span>):</span><br>    <span class="hljs-comment"># 创建一个Message对象</span><br>    detail = any_pb2.Any()<br>    <span class="hljs-comment"># 把一个自定义的错误转为一个Any的对象，这样收发消息时就不会出现校验不通过的情况了</span><br>    detail.Pack(<br>        error_details_pb2.QuotaFailure(violations=[<br>            error_details_pb2.QuotaFailure.Violation(<br>                subject=<span class="hljs-string">&quot;name: %s&quot;</span> % name,<br>                description=<span class="hljs-string">&quot;Limit one greeting per person&quot;</span>,<br>            )<br>        ],))<br>    <span class="hljs-comment"># 生成一个Status对象，这个对象包括了code,message,details三个字段</span><br>    <span class="hljs-keyword">return</span> status_pb2.Status(<br>        code=code_pb2.RESOURCE_EXHAUSTED,<br>        message=<span class="hljs-string">&#x27;Request limit exceeded.&#x27;</span>,<br>        <span class="hljs-comment"># 错误对象数组</span><br>        details=[detail],<br>    )<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LimitedGreeter</span>(<span class="hljs-params">helloworld_pb2_grpc.GreeterServicer</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>):</span><br>        self._lock = threading.RLock()<br>        self._greeted = <span class="hljs-built_in">set</span>()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">SayHello</span>(<span class="hljs-params">self, request, context</span>):</span><br>        <span class="hljs-comment"># 对应的gRPC调用</span><br>        <span class="hljs-keyword">with</span> self._lock:<br>            <span class="hljs-keyword">if</span> request.name <span class="hljs-keyword">in</span> self._greeted:<br>                rich_status = create_greet_limit_exceed_error_status(<br>                    request.name)<br>                context.abort_with_status(rpc_status.to_status(rich_status))<br>            <span class="hljs-keyword">else</span>:<br>                self._greeted.add(request.name)<br>        <span class="hljs-keyword">return</span> helloworld_pb2.HelloReply(message=<span class="hljs-string">&#x27;Hello, %s!&#x27;</span> % request.name)<br></code></pre></td></tr></table></figure>
+<p>该示例代码中的<code>SayHello</code>方法逻辑非常简单，它判断如果<code>name</code>不存在，就把<code>name</code>添加到集合中，并正常返回，如果已经存在，则先生成一个<code>Status</code>对象，再通过<code>to_status</code>方法生成 一个<code>_Status</code>对象， 最后通过<code>abort_with_stauts</code>方法把<code>_Status</code>对象传进去，这样就把错误数据传输到了客户端。</p>
+<p>其中<code>abort_with_stauts</code>方法会使请求引发异常并以非正常状态终止，再把用户指定的<code>Status</code>对象传给客户端，而<code>to_status</code>的源码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">to_status</span>(<span class="hljs-params">status</span>):</span><br>    <span class="hljs-keyword">return</span> _Status(code=code_to_grpc_status_code(status.code),<br>                   details=status.message,<br>                   trailing_metadata=((GRPC_DETAILS_METADATA_KEY,<br>                                       status.SerializeToString()),))<br></code></pre></td></tr></table></figure>
+<p>通过源码可以看出这个函数就是把<code>status.code</code>转为<code>gRPC</code>响应的<code>code</code>，把<code>status.message</code>转为<code>gRPC</code>的<code>details</code>，最后把<code>status</code>转为合法的字符串，并通过<code>GRPC_DETAILS_METADATA_KEY</code>把字符串设置到metadata中。</p>
+<p>而对于客户端则比较简单，源码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process</span>(<span class="hljs-params">stub</span>):</span><br>    <span class="hljs-keyword">try</span>:<br>        response = stub.SayHello(helloworld_pb2.HelloRequest(name=<span class="hljs-string">&#x27;Alice&#x27;</span>))<br>        _LOGGER.info(<span class="hljs-string">&#x27;Call success: %s&#x27;</span>, response.message)<br>    <span class="hljs-keyword">except</span> grpc.RpcError <span class="hljs-keyword">as</span> rpc_error:<br>        _LOGGER.error(<span class="hljs-string">&#x27;Call failure: %s&#x27;</span>, rpc_error)<br>        <span class="hljs-comment"># 通过`grpc.RpcError`提取Status对象</span><br>        status = rpc_status.from_call(rpc_error)<br>        <span class="hljs-keyword">for</span> detail <span class="hljs-keyword">in</span> status.details:<br>            <span class="hljs-comment"># 读取detail里面的对象，并判断是不是对应的message，如果是则打印一条错误日志，如果不是则抛错</span><br>            <span class="hljs-keyword">if</span> detail.Is(error_details_pb2.QuotaFailure.DESCRIPTOR):<br>                info = error_details_pb2.QuotaFailure()<br>                detail.Unpack(info)<br>                _LOGGER.error(<span class="hljs-string">&#x27;Quota failure: %s&#x27;</span>, info)<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&#x27;Unexpected failure: %s&#x27;</span> % detail)<br></code></pre></td></tr></table></figure>
+<p>这段代码中，如果是正常响应，则打印响应体，而如果是异常，客户端会发现响应体的<code>code</code>并不是正常的状态码，所以会抛出一个<code>grpc.RpcError</code>异常，然后通过<code>rpc_status.from_call</code>函数提取异常, 这个函数的逻辑非常简单，源码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">from_call</span>(<span class="hljs-params">call</span>):</span><br>    <span class="hljs-comment"># 如果没有metadata数据就直接返回空</span><br>    <span class="hljs-keyword">if</span> call.trailing_metadata() <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>    <span class="hljs-comment"># 有数据就遍历数据</span><br>    <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> call.trailing_metadata():<br>        <span class="hljs-comment"># 如果Key为官方指定的Key，就进入提取数据逻辑</span><br>        <span class="hljs-keyword">if</span> key == GRPC_DETAILS_METADATA_KEY:<br>            <span class="hljs-comment"># 把数据反序列化成一个message对象</span><br>            rich_status = status_pb2.Status.FromString(value)<br>            <span class="hljs-comment"># 校验对象数据是否跟响应体一样</span><br>            <span class="hljs-keyword">if</span> call.code().value[<span class="hljs-number">0</span>] != rich_status.code:<br>                <span class="hljs-keyword">raise</span> ValueError(<br>                    <span class="hljs-string">&#x27;Code in Status proto (%s) doesn\&#x27;t match status code (%s)&#x27;</span><br>                    % (code_to_grpc_status_code(rich_status.code), call.code()))<br>            <span class="hljs-keyword">if</span> call.details() != rich_status.message:<br>                <span class="hljs-keyword">raise</span> ValueError(<br>                    <span class="hljs-string">&#x27;Message in Status proto (%s) doesn\&#x27;t match status details (%s)&#x27;</span><br>                    % (rich_status.message, call.details()))<br>            <span class="hljs-keyword">return</span> rich_status<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br></code></pre></td></tr></table></figure>
+<p>通过源码看出这个逻辑和自定义的错误传递一样，也是通过<code>metadata</code>提取数据然后拼成一个异常对象。不过，需要注意的是<code>from_call</code>的<code>call</code>参数不仅支持<code>grpc.RpcError</code>，它还支持客户端拦截器中得到的<code>response</code>对象，因为<code>call</code>参数在<code>form_call</code>中用到了<code>trailing_metadata</code>，<code>code</code>和<code>details</code>方法都是<code>grpc.RpcError</code>和<code>response</code>对象共同拥有的方法。</p>
+<p>在简单的了解了<code>gRPC</code>的错误传递示例后可以发现，官方的方法与自定义的错误传递很类似，只不过它定义了一个规范的Key，这样一来大家都会认为这个Key对应的值是一个<code>Status</code>对象的序列化成的字符串（由于序列化了，就不用担心存在非ASCII字符的问题）。而这个<code>Status</code>对象中包含了<code>code</code>,<code>message</code>和<code>detail</code>三个字段，分别对应着上面所说的错误结构体:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>中的<code>code</code>,<code>msg</code>和<code>data</code>，不过需要注意的是<code>detail</code>是一个数组，它可以存放多个自定义的<code>Message</code>对象。</p>
+<h2 id="3-重新设计错误传递实现"><a href="#3-重新设计错误传递实现" class="headerlink" title="3.重新设计错误传递实现"></a>3.重新设计错误传递实现</h2><p>通过官方的错误传输实现可以发现，这个例子需要服务端的业务逻辑主动通过<code>context.abort_with_status</code>逻辑来主动把错误信息设置到<code>metadata</code>中，同时也需要客户端捕获<code>grpc.RpcError</code>异常再打印出来，这样对业务层来说是非常啰嗦的，于是就尝试把官方协定的错误传输实现与自定义的错误传递结合起来。</p>
+<p>首先是定义一个内部统一的<code>message</code>：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs protobuf"><span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">Exec</span></span>&#123;<br>  <span class="hljs-built_in">string</span> name = <span class="hljs-number">1</span>; <span class="hljs-comment">// 异常名</span><br>  <span class="hljs-built_in">string</span> msg = <span class="hljs-number">2</span>;  <span class="hljs-comment">// 异常信息</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这个Message只用于内部业务服务，如果该服务端有开发给其它部门使用，且他们没有兼容这个<code>message</code>，他们也可以通过<code>code</code>和<code>detail</code>知道大概是什么样的错误。</p>
+<p>然后就开始折腾服务端的顶层拦截器，这个拦截器只要改造捕获异常部分的代码即可，源码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># code url: https://github.com/so1n/grpc-example-common/blob/v0.1.7/grpc_example_common/interceptor/server_interceptor/customer_top.py</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomerTopInterceptor</span>(<span class="hljs-params">BaseInterceptor</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">intercept</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        next_handler_method: Callable,</span></span><br><span class="hljs-function"><span class="hljs-params">        request_proto_message: Any,</span></span><br><span class="hljs-function"><span class="hljs-params">        context: grpc.ServicerContext,</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; Any:</span><br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-comment"># 服务调用</span><br>            <span class="hljs-keyword">return</span> next_handler_method(request_proto_message, context)<br>        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>            <span class="hljs-comment"># 创建一个Message对象</span><br>            detail = any_pb2.Any()<br>            <span class="hljs-comment"># 把一个自定义的错误转为一个Any的对象，这样收发消息时就不会出现校验不通过的情况了</span><br>            <span class="hljs-comment"># 需要注意的是，这里是我们自己定义的message.Exec</span><br>            detail.Pack(<br>                Exec(<br>                    name=e.__class__.__name__,<br>                    msg=<span class="hljs-built_in">str</span>(e)<br>                )<br>            )<br>            <span class="hljs-comment"># 通过abort_with_status把数据通过metadata传给客户端</span><br>            context.abort_with_status(<br>                rpc_status.to_status(<br>                    status_pb2.Status(<br>                        code=code_pb2.RESOURCE_EXHAUSTED,  <span class="hljs-comment"># 这里只允许填写gRPC的错误码，就像我们定义了业务的错误码为2001，但是HTTP的状态码还是200一样</span><br>                        message=<span class="hljs-built_in">str</span>(e),<br>                        details=[detail], <span class="hljs-comment"># 这里是一个数组，所以这里可以定义多套异常的对象去兼容不同的系统，不过在内部调用中尽量统一只有一套方法</span><br>                    )<br>                )<br>            )<br>            <span class="hljs-comment"># 抛出异常，不过gRPC服务端判断该调用已经被标记为abort，不会继续处理</span><br>            <span class="hljs-comment"># 但是对于其它的功能却是有用的，比如opentelemetry的官方实现是在channel外再套用一个channel，所以它需要捕获异常并生成对应的Event</span><br>            <span class="hljs-keyword">raise</span> e<br></code></pre></td></tr></table></figure>
+<p>接着就折腾客户端的顶层拦截器，同样的它只需要改一下数据的获取就可以了，源码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># code url: https://github.com/so1n/grpc-example-common/blob/v0.1.7/grpc_example_common/interceptor/client_interceptor/customer_top.py</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomerTopInterceptor</span>(<span class="hljs-params">BaseInterceptor</span>):</span><br><br>    <span class="hljs-comment"># 注册异常的带按摩略</span><br>    ...<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">intercept</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        method: Callable,</span></span><br><span class="hljs-function"><span class="hljs-params">        request_or_iterator: Any,</span></span><br><span class="hljs-function"><span class="hljs-params">        call_details: ClientCallDetailsType,</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; GRPC_RESPONSE:</span><br>        response: GRPC_RESPONSE = method(call_details, request_or_iterator)<br>        <span class="hljs-comment"># 前面说到`from_call`也支持客户端拦截器里通过`method`方法得到的response对象</span><br>        status: Optional[status_pb2.Status] = rpc_status.from_call(response)<br>        <span class="hljs-comment"># 如果不为None,则证明得到了异常数据</span><br>        <span class="hljs-keyword">if</span> status:<br>            <span class="hljs-keyword">for</span> detail <span class="hljs-keyword">in</span> status.details:<br>                <span class="hljs-comment"># 判断这个detail是不是我们要的Message</span><br>                <span class="hljs-keyword">if</span> detail.Is(Exec.DESCRIPTOR):<br>                    <span class="hljs-comment"># 通过反序列化获取数据</span><br>                    exec_instance: Exec = Exec()<br>                    detail.Unpack(exec_instance)<br>                    <span class="hljs-comment"># 生成异常并抛出</span><br>                    exec_class: Type[Exception] = self.exc_dict.get(exec_instance.name) <span class="hljs-keyword">or</span> RuntimeError<br>                    <span class="hljs-keyword">raise</span> exec_class(exec_instance.msg)<br>                <span class="hljs-keyword">else</span>:<br>                    <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&#x27;Unexpected failure: %s&#x27;</span> % detail)<br>        <span class="hljs-keyword">return</span> response<br></code></pre></td></tr></table></figure>
+<p>这样一来，新的错误传递实现已经完成了，现在通过一个简单的demo来验证成果，demo代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># grpc_example_common url:https://github.com/so1n/grpc-example-common/tree/v0.1.7</span><br><span class="hljs-comment"># 服务端代码</span><br><span class="hljs-keyword">from</span> concurrent <span class="hljs-keyword">import</span> futures<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> List<br><br><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> grpc_example_common.interceptor.server_interceptor.base <span class="hljs-keyword">import</span> BaseInterceptor<br><span class="hljs-keyword">from</span> google.protobuf.empty_pb2 <span class="hljs-keyword">import</span> Empty  <span class="hljs-comment"># type: ignore</span><br><span class="hljs-keyword">from</span> grpc_example_common.protos.user <span class="hljs-keyword">import</span> user_pb2 <span class="hljs-keyword">as</span> user_message<br><span class="hljs-keyword">from</span> grpc_example_common.interceptor.server_interceptor.customer_top <span class="hljs-keyword">import</span> CustomerTopInterceptor<br><br><span class="hljs-keyword">from</span> grpc_example_common.protos.user <span class="hljs-keyword">import</span> user_pb2_grpc <span class="hljs-keyword">as</span> user_service<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span>(<span class="hljs-params">user_service.UserServicer</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete_user</span>(<span class="hljs-params">self, request: user_message.DeleteUserRequest,</span></span><br><span class="hljs-function"><span class="hljs-params">                    context: grpc.ServicerContext</span>) -&gt; Empty:</span><br>        uid: <span class="hljs-built_in">str</span> = request.uid<br>        <span class="hljs-keyword">if</span> uid == <span class="hljs-string">&quot;123&quot;</span>:<br>            <span class="hljs-keyword">return</span> Empty()<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&quot;Not found user:<span class="hljs-subst">&#123;uid&#125;</span>&quot;</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>(<span class="hljs-params">host: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;127.0.0.1&quot;</span>, port: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;9000&quot;</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    interceptor_list: List[BaseInterceptor] = [CustomerTopInterceptor()]<br>    server: grpc.server = grpc.server(<br>        futures.ThreadPoolExecutor(max_workers=<span class="hljs-number">10</span>),<br>        interceptors=interceptor_list,<br>    )<br>    user_service.add_UserServicer_to_server(UserService(), server)<br>    server.add_insecure_port(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;host&#125;</span>:<span class="hljs-subst">&#123;port&#125;</span>&quot;</span>)<br>    server.start()<br>    <span class="hljs-keyword">try</span>:<br>        server.wait_for_termination()<br>    <span class="hljs-keyword">except</span> KeyboardInterrupt:<br>        server.stop(<span class="hljs-number">0</span>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    main()<br><br><span class="hljs-comment"># 客户端代码</span><br><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> grpc_example_common.protos.user <span class="hljs-keyword">import</span> user_pb2 <span class="hljs-keyword">as</span> user_message<br><span class="hljs-keyword">from</span> grpc_example_common.protos.user <span class="hljs-keyword">import</span> user_pb2_grpc <span class="hljs-keyword">as</span> user_service<br><span class="hljs-keyword">from</span> grpc_example_common.interceptor.client_interceptor.customer_top <span class="hljs-keyword">import</span> CustomerTopInterceptor<br><br>channel: grpc.Channel = grpc.intercept_channel(<br>    grpc.insecure_channel(<span class="hljs-string">&quot;127.0.0.1:9000&quot;</span>), CustomerTopInterceptor()<br>)<br>user_stub: user_service.UserStub = user_service.UserStub(channel)<br>user_stub.delete_user(user_message.DeleteUserRequest(uid=<span class="hljs-string">&quot;123&quot;</span>))<br>user_stub.delete_user(user_message.DeleteUserRequest(uid=<span class="hljs-string">&quot;456&quot;</span>))<br></code></pre></td></tr></table></figure>
+<p>编写完demo后开始运行，运行后客户端抛出如下错误信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">Traceback (most recent call last):<br>  File <span class="hljs-string">&quot;/home/so1n/github/grpc-example-project/grpc-example-api-backend-service/demo.py&quot;</span>, line 11, <span class="hljs-keyword">in</span> &lt;module&gt;<br>    user_stub.delete_user(user_message.DeleteUserRequest(uid=<span class="hljs-string">&quot;456&quot;</span>))<br>  File <span class="hljs-string">&quot;/home/so1n/github/grpc-example-project/grpc-example-api-backend-service/.venv/lib/python3.8/site-packages/grpc/_interceptor.py&quot;</span>, line 216, <span class="hljs-keyword">in</span> __call__<br>    response, ignored_call = self._with_call(request,<br>  File <span class="hljs-string">&quot;/home/so1n/github/grpc-example-project/grpc-example-api-backend-service/.venv/lib/python3.8/site-packages/grpc/_interceptor.py&quot;</span>, line 254, <span class="hljs-keyword">in</span> _with_call<br>    call = self._interceptor.intercept_unary_unary(continuation,<br>  File <span class="hljs-string">&quot;/home/so1n/github/grpc-example-project/grpc-example-api-backend-service/.venv/lib/python3.8/site-packages/grpc_example_common/interceptor/client_interceptor/base.py&quot;</span>, line 74, <span class="hljs-keyword">in</span> intercept_unary_unary<br>    <span class="hljs-built_in">return</span> self.intercept(continuation, request, call_details)<br>  File <span class="hljs-string">&quot;/home/so1n/github/grpc-example-project/grpc-example-api-backend-service/.venv/lib/python3.8/site-packages/grpc_example_common/interceptor/client_interceptor/customer_top.py&quot;</span>, line 44, <span class="hljs-keyword">in</span> intercept<br>    raise exec_class(exec_instance.msg)<br>ValueError: Not found user:456<br></code></pre></td></tr></table></figure>
+<p>通过信息可以发现，重新设计的错误传递实现完美运行。</p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/06/23/Python-gRPC%E5%AE%9E%E8%B7%B5(7)--gRPC%E9%94%99%E8%AF%AF%E4%BC%A0%E9%80%92/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;06&#x2F;23&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(7)--gRPC%E9%94%99%E8%AF%AF%E4%BC%A0%E9%80%92&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;06&#x2F;23&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(7)--gRPC%E9%94%99%E8%AF%AF%E4%BC%A0%E9%80%92&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2022/06/13/two_functional_implementations_based_on_asyncio.Task_extensions/">Python 3.11 Asyncio新增的两个高级类<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E9%94%99%E8%AF%AF%E4%BC%A0%E9%80%92"><span class="toc-text">1.自定义的错误传递</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9F%BA%E4%BA%8E%E5%AE%98%E6%96%B9%E5%8D%8F%E5%AE%9A%E7%9A%84%E9%94%99%E8%AF%AF%E4%BC%A0%E8%BE%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.基于官方协定的错误传输实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%87%8D%E6%96%B0%E8%AE%BE%E8%AE%A1%E9%94%99%E8%AF%AF%E4%BC%A0%E9%80%92%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.重新设计错误传递实现</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E9%94%99%E8%AF%AF%E4%BC%A0%E9%80%92"><span class="toc-text">1.自定义的错误传递</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9F%BA%E4%BA%8E%E5%AE%98%E6%96%B9%E5%8D%8F%E5%AE%9A%E7%9A%84%E9%94%99%E8%AF%AF%E4%BC%A0%E8%BE%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.基于官方协定的错误传输实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%87%8D%E6%96%B0%E8%AE%BE%E8%AE%A1%E9%94%99%E8%AF%AF%E4%BC%A0%E9%80%92%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.重新设计错误传递实现</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
