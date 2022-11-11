@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>使用Pait构建gRPC Json网关 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记gRPC已经是一个大多数开发者使用微服务时选择的通...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">使用Pait构建gRPC Json网关</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16667142993131666714298611.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">使用Pait构建gRPC Json网关</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 29, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>3872</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>gRPC</code>已经是一个大多数开发者使用微服务时选择的通信协议，大多数公司的内部服务都会通过<code>gRPC</code>来通信，但是服务端和客户端使用的通信协议还是<code>HTTP</code>，这就意味着需要在客户端和内部服务之间架起一个可以转换<code>HTTP</code>与<code>gRPC</code>协议的网关。<br><a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>的<code>gRPC Gateway</code>模块就是实现了这样的一个功能，<code>gRPC Gateway</code>模块通过<code>pait</code>能快速的把<code>Python</code>Web框架和<code>gRPC</code>连接起来，并自动处理和转发请求。</p>
+<h2 id="1-一个简单的例子"><a href="#1-一个简单的例子" class="headerlink" title="1.一个简单的例子"></a>1.一个简单的例子</h2><p>在介绍如何使用网关之前先以一个简单的示例项目为例子，介绍没用网关前的局限性。</p>
+<blockquote>
+<p>例子项目代码见附录</p>
+</blockquote>
+<p>在这个例子中存在两个<code>gRPC</code>服务和一个api服务。<code>gRPC</code>有服务有两个，一个是<code>User</code>服务，负责用户的创建、注销、登录、登出，token校验五个功能，另外一个是<code>book</code>服务，主要负责书本的信息获取和书本评论和点赞等功能。而api服务只有一个，这个服务由<code>Flask</code>框架编写的，它负责暴露出HTTP接口供客户端调用，当被客户端调用时会把请求进行处理并通过<code>gRPC</code>客户端转发给另外两个<code>gRPC</code>服务，他们的关系图如下：<br><img src="https://files.catbox.moe/s5e3hf.png"><br>通过关系图可以发现客户端只与<code>Flask</code>应用通信，<code>Flask</code>应用通过<code>gRPC</code>客户端与其它机器的<code>gRPC</code>服务进行通信，客户端无法直接访问到<code>gRPC</code>服务所在的机器<code>node2</code>和<code>node3</code>，这个设计简单又使用，挺不错的，但是在编写代码时却有点烦恼，以用户服务为例子，编写<code>gRPC</code>服务的第一步是编写好<code>Protobuf文件</code>，用户服务的<code>Protobuf</code>文件描述的<code>Service</code>如下：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs Protobuf"><span class="hljs-comment">// 省略其它protobuf 代码</span><br><span class="hljs-class"><span class="hljs-keyword">service</span> <span class="hljs-title">User</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> get_uid_by_token (GetUidByTokenRequest) <span class="hljs-keyword">returns</span> (GetUidByTokenResult)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> logout_user (LogoutUserRequest) <span class="hljs-keyword">returns</span> (google.protobuf.Empty)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> login_user(LoginUserRequest) <span class="hljs-keyword">returns</span> (LoginUserResult)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> create_user(CreateUserRequest) <span class="hljs-keyword">returns</span> (google.protobuf.Empty)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> delete_user(DeleteUserRequest) <span class="hljs-keyword">returns</span> (google.protobuf.Empty)</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>第二步是根据<code>Protobuf</code>文件生成的接口代码来编写对应的代码逻辑，然后把代码部署在<code>node2</code>机器上运行。<br>接下来就是麻烦的第三步了，首先是根据<code>Protobuf</code>文件生成客户端代码，然后编写调用<code>gRPC</code>客户端的路由函数，如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Response, request<br><span class="hljs-keyword">from</span> grpc_example_common.protos.user <span class="hljs-keyword">import</span> user_pb2 <span class="hljs-keyword">as</span> user_message<br><br><span class="hljs-keyword">from</span> app_service.utils <span class="hljs-keyword">import</span> g, get_uid_by_token, make_response<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_user</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    g.user_grpc_service.create_user(<br>        uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>], user_name=request_dict[<span class="hljs-string">&quot;user_name&quot;</span>], password=request_dict[<span class="hljs-string">&quot;password&quot;</span>]<br>    )<br>    <span class="hljs-keyword">return</span> make_response()<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete_user</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    g.user_grpc_service.delete_user(uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>])<br>    <span class="hljs-keyword">return</span> make_response()<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">login_route</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    login_result: user_message.LoginUserResult = g.user_grpc_service.login_user(<br>        uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>], password=request_dict[<span class="hljs-string">&quot;password&quot;</span>]<br>    )<br>    <span class="hljs-keyword">return</span> make_response(&#123;<span class="hljs-string">&quot;token&quot;</span>: login_result.token, <span class="hljs-string">&quot;uid&quot;</span>: login_result.uid&#125;)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">logout_route</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    <span class="hljs-keyword">if</span> get_uid_by_token() == request_dict[<span class="hljs-string">&quot;uid&quot;</span>]:<br>        token: <span class="hljs-built_in">str</span> = request.headers.get(<span class="hljs-string">&quot;token&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>        g.user_grpc_service.logout_user(uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>], token=token)<br>        <span class="hljs-keyword">return</span> make_response()<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Uid ERROR&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>路由函数编写完成后需要把路由函数注册到<code>Flask</code>应用中，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> flask.blueprints <span class="hljs-keyword">import</span> Blueprint<br><br><span class="hljs-keyword">from</span> app_service <span class="hljs-keyword">import</span> user_route<br><br>user_bp: Blueprint = Blueprint(<span class="hljs-string">&quot;user_bp&quot;</span>, __name__, url_prefix=<span class="hljs-string">&quot;/api/user&quot;</span>)<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/create&quot;</span>, view_func=user_route.create_user, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/delete&quot;</span>, view_func=user_route.delete_user, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/login&quot;</span>, view_func=user_route.login_route, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/logout&quot;</span>, view_func=user_route.logout_route, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br></code></pre></td></tr></table></figure>
+<p>在编写完<code>blueprint</code>并注册到<code>Flask</code>应用后，<code>api</code>服务也编写完成了，接着就可以部署到<code>node1</code>机器上并供客户端调用了。</p>
+<p>这一切都非常简单，但是手动编写的重复代码比较多，通过示例代码可以看到路由函数名和url名都差不多，每个路由代码逻辑也很像。而且当一个服务调用的名称发生变动后，除了修改<code>Protobuf</code>文件外，<code>api</code>服务的代码也要跟着手动修改，这太麻烦了，也容易出错。</p>
+<p>同时可以发现在上述例子中编写的转发路由代码跟<code>Protobuf</code>很像，这意味着也可以通过<code>Protobuf</code>文件生成对应的路由代码，这也是<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>的实现思路，同时<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a><br>参照了<a target="_blank" rel="noopener" href="https://github.com/googleapis/googleapis/blob/master/google/api/http.proto">google.api.http</a>来补充<code>Protobuf</code>缺少的HTTP信息，参照<a target="_blank" rel="noopener" href="https://github.com/bufbuild/protoc-gen-validate">protoc-gen-validate</a>补充了请求体的信息，使<code>Protobuf</code>文件能表示<code>OpenAPI</code>的所有字段数据。</p>
+<h2 id="2-使用Pait构建gRPC-Json网关"><a href="#2-使用Pait构建gRPC-Json网关" class="headerlink" title="2.使用Pait构建gRPC Json网关"></a>2.使用Pait构建gRPC Json网关</h2><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>示例代码只是为了演示，并无任何实际意义，也不适用于生产环境，对应连接如下：<br>api服务：<a target="_blank" rel="noopener" href="https://github.com/so1n/grpc-example-api-backend-service">https://github.com/so1n/grpc-example-api-backend-service</a><br>用户服务: <a target="_blank" rel="noopener" href="https://github.com/so1n/grpc-example-user-grpc-service">https://github.com/so1n/grpc-example-user-grpc-service</a><br>书籍管理服务：<a target="_blank" rel="noopener" href="https://github.com/so1n/grpc-example-book-grpc-service">https://github.com/so1n/grpc-example-book-grpc-service</a><br><code>gRPC</code>共有包（包括<code>gRPC</code>调用封装和protobuf文件）：<a target="_blank" rel="noopener" href="https://github.com/so1n/grpc-example-common">https://github.com/so1n/grpc-example-common</a></p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/10/29/%E4%BD%BF%E7%94%A8Pait%E6%9E%84%E5%BB%BAgRPC%20Json%E7%BD%91%E5%85%B3/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;10&#x2F;29&#x2F;%E4%BD%BF%E7%94%A8Pait%E6%9E%84%E5%BB%BAgRPC%20Json%E7%BD%91%E5%85%B3&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;10&#x2F;29&#x2F;%E4%BD%BF%E7%94%A8Pait%E6%9E%84%E5%BB%BAgRPC%20Json%E7%BD%91%E5%85%B3&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC-pait/" rel="tag">gRPC,pait</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a href="/2022/11/01/%E6%9C%AA%E5%91%BD%E5%90%8D/"><i class="iconfont iconleft"></i></a>
+    <a href="/2022/10/15/%E4%B8%BA%E4%BD%95%E5%9C%A8Python%E7%94%9F%E6%80%81%E5%BE%88%E5%B0%91%E5%90%AC%E8%AF%B4%E5%88%B0%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">为何在Python生态很少听说到依赖注入<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8Pait%E6%9E%84%E5%BB%BAgRPC-Json%E7%BD%91%E5%85%B3"><span class="toc-text">2.使用Pait构建gRPC Json网关</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.一个简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8Pait%E6%9E%84%E5%BB%BAgRPC-Json%E7%BD%91%E5%85%B3"><span class="toc-text">2.使用Pait构建gRPC Json网关</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

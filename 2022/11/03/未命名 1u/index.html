@@ -1,0 +1,967 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="AnyApiName: get.getSummary:...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="/images/theme/post-image.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title"></h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 03, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7464</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h1 id="AnyApi"><a href="#AnyApi" class="headerlink" title="AnyApi"></a>AnyApi</h1><h3 id="Name-get-get"><a href="#Name-get-get" class="headerlink" title="Name: get.get"></a>Name: get.get</h3><p><strong>Summary</strong>: get request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/info</p>
+</li>
+<li><p>Method: get</p>
+</li>
+<li><p>Request:<br>  <strong>header</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>query</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#x65;&#120;&#x61;&#109;&#112;&#x6c;&#x65;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;">&#x65;&#120;&#x61;&#109;&#112;&#x6c;&#x65;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-get-cookie"><a href="#Name-get-cookie" class="headerlink" title="Name: get.cookie"></a>Name: get.cookie</h3><p><strong>Summary</strong>: cookie request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/extra-info</p>
+</li>
+<li><p>Method: get</p>
+</li>
+<li><p>Request:<br>  <strong>cookie</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface <br>&gt;Note for Swagger UI and Swagger Editor users:  <br>&gt;Cookie authentication iscurrently not supported for “try it out” requests due to browser securityrestrictions. See <a target="_blank" rel="noopener" href="https://github.com/swagger-api/swagger-js/issues/1163">this issue</a>for more information. <a target="_blank" rel="noopener" href="https://swagger.io/tools/swaggerhub/">SwaggerHub</a>does not have this limitation.</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-file"><a href="#Name-post-file" class="headerlink" title="Name: post.file"></a>Name: post.file</h3><p><strong>Summary</strong>: file request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/upload-file</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>multipart/form-data</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>upload_file</td>
+<td></td>
+<td>string</td>
+<td></td>
+<td></td>
+<td>format:binary</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-form"><a href="#Name-post-form" class="headerlink" title="Name: post.form"></a>Name: post.form</h3><p><strong>Summary</strong>: form request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/info-form</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>application/x-www-form-urlencoded</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td>666</td>
+<td>exclusiveMinimum:10;<br>exclusiveMaximum:1000</td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td>mock_name</td>
+<td>maxLength:10;<br>minLength:2</td>
+</tr>
+<tr>
+<td>extend_info</td>
+<td><code>Required</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>- sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>- age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>- email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x40;&#x73;&#x6f;&#x31;&#x6e;&#x2e;&#x6d;&#x65;">&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x40;&#x73;&#x6f;&#x31;&#x6e;&#x2e;&#x6d;&#x65;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-multiform"><a href="#Name-post-multiform" class="headerlink" title="Name: post.multiform"></a>Name: post.multiform</h3><p><strong>Summary</strong>: multiform request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/info-multiform</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>application/x-www-form-urlencoded</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>mobile</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>Mobile</td>
+<td></td>
+<td>items:{‘type’: ‘string’}</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-post"><a href="#Name-post-post" class="headerlink" title="Name: post.post"></a>Name: post.post</h3><p><strong>Summary</strong>: post request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/borrow-book</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>header</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>application/json</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td>666</td>
+<td>exclusiveMinimum:10;<br>exclusiveMaximum:1000</td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td>mock_name</td>
+<td>maxLength:10;<br>minLength:2</td>
+</tr>
+<tr>
+<td>extend_info</td>
+<td><code>Required</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>- sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>- age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>- email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#x65;&#x78;&#97;&#109;&#112;&#108;&#x65;&#x40;&#x73;&#x6f;&#49;&#110;&#x2e;&#109;&#101;">&#x65;&#x78;&#97;&#109;&#112;&#108;&#x65;&#x40;&#x73;&#x6f;&#49;&#110;&#x2e;&#109;&#101;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-post-and-has-query"><a href="#Name-post-post-and-has-query" class="headerlink" title="Name: post.post_and_has_query"></a>Name: post.post_and_has_query</h3><p><strong>Summary</strong>: post and has query request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/borrow-book/v2</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>header</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>query</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>isbn</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>book isbn</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>book name</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>application/json</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td>666</td>
+<td>exclusiveMinimum:10;<br>exclusiveMaximum:1000</td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td>mock_name</td>
+<td>maxLength:10;<br>minLength:2</td>
+</tr>
+<tr>
+<td>extend_info</td>
+<td><code>Required</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>- sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>- age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>- email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;">&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/11/03/%E6%9C%AA%E5%91%BD%E5%90%8D%201u/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;03&#x2F;%E6%9C%AA%E5%91%BD%E5%90%8D%201u&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;03&#x2F;%E6%9C%AA%E5%91%BD%E5%90%8D%201u&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2022/11/01/%E6%9C%AA%E5%91%BD%E5%90%8D/"><i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AnyApi"><span class="toc-text">AnyApi</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-get-get"><span class="toc-text">Name: get.get</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-get-cookie"><span class="toc-text">Name: get.cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-file"><span class="toc-text">Name: post.file</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-form"><span class="toc-text">Name: post.form</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-multiform"><span class="toc-text">Name: post.multiform</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-post"><span class="toc-text">Name: post.post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-post-and-has-query"><span class="toc-text">Name: post.post_and_has_query</span></a></li></ol></li></ol></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AnyApi"><span class="toc-text">AnyApi</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-get-get"><span class="toc-text">Name: get.get</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-get-cookie"><span class="toc-text">Name: get.cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-file"><span class="toc-text">Name: post.file</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-form"><span class="toc-text">Name: post.form</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-multiform"><span class="toc-text">Name: post.multiform</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-post"><span class="toc-text">Name: post.post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Name-post-post-and-has-query"><span class="toc-text">Name: post.post_and_has_query</span></a></li></ol></li></ol></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

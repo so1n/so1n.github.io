@@ -17,6 +17,619 @@
       </tags>
   </entry>
   <entry>
+    <title></title>
+    <url>/2022/11/03/%E6%9C%AA%E5%91%BD%E5%90%8D%201u/</url>
+    <content><![CDATA[<h1 id="AnyApi"><a href="#AnyApi" class="headerlink" title="AnyApi"></a>AnyApi</h1><h3 id="Name-get-get"><a href="#Name-get-get" class="headerlink" title="Name: get.get"></a>Name: get.get</h3><p><strong>Summary</strong>: get request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/info</p>
+</li>
+<li><p>Method: get</p>
+</li>
+<li><p>Request:<br>  <strong>header</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>query</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#x65;&#120;&#x61;&#109;&#112;&#x6c;&#x65;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;">&#x65;&#120;&#x61;&#109;&#112;&#x6c;&#x65;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-get-cookie"><a href="#Name-get-cookie" class="headerlink" title="Name: get.cookie"></a>Name: get.cookie</h3><p><strong>Summary</strong>: cookie request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/extra-info</p>
+</li>
+<li><p>Method: get</p>
+</li>
+<li><p>Request:<br>  <strong>cookie</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface <br>&gt;Note for Swagger UI and Swagger Editor users:  <br>&gt;Cookie authentication iscurrently not supported for “try it out” requests due to browser securityrestrictions. See <a href="https://github.com/swagger-api/swagger-js/issues/1163">this issue</a>for more information. <a href="https://swagger.io/tools/swaggerhub/">SwaggerHub</a>does not have this limitation.</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-file"><a href="#Name-post-file" class="headerlink" title="Name: post.file"></a>Name: post.file</h3><p><strong>Summary</strong>: file request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/upload-file</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>multipart/form-data</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>upload_file</td>
+<td></td>
+<td>string</td>
+<td></td>
+<td></td>
+<td>format:binary</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-form"><a href="#Name-post-form" class="headerlink" title="Name: post.form"></a>Name: post.form</h3><p><strong>Summary</strong>: form request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/info-form</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>application/x-www-form-urlencoded</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td>666</td>
+<td>exclusiveMinimum:10;<br>exclusiveMaximum:1000</td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td>mock_name</td>
+<td>maxLength:10;<br>minLength:2</td>
+</tr>
+<tr>
+<td>extend_info</td>
+<td><code>Required</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>- sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>- age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>- email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x40;&#x73;&#x6f;&#x31;&#x6e;&#x2e;&#x6d;&#x65;">&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x40;&#x73;&#x6f;&#x31;&#x6e;&#x2e;&#x6d;&#x65;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-multiform"><a href="#Name-post-multiform" class="headerlink" title="Name: post.multiform"></a>Name: post.multiform</h3><p><strong>Summary</strong>: multiform request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/info-multiform</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>application/x-www-form-urlencoded</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>mobile</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>Mobile</td>
+<td></td>
+<td>items:{‘type’: ‘string’}</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-post"><a href="#Name-post-post" class="headerlink" title="Name: post.post"></a>Name: post.post</h3><p><strong>Summary</strong>: post request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/borrow-book</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>header</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>application/json</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td>666</td>
+<td>exclusiveMinimum:10;<br>exclusiveMaximum:1000</td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td>mock_name</td>
+<td>maxLength:10;<br>minLength:2</td>
+</tr>
+<tr>
+<td>extend_info</td>
+<td><code>Required</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>- sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>- age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>- email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#x65;&#x78;&#97;&#109;&#112;&#108;&#x65;&#x40;&#x73;&#x6f;&#49;&#110;&#x2e;&#109;&#101;">&#x65;&#x78;&#97;&#109;&#112;&#108;&#x65;&#x40;&#x73;&#x6f;&#49;&#110;&#x2e;&#109;&#101;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="Name-post-post-and-has-query"><a href="#Name-post-post-and-has-query" class="headerlink" title="Name: post.post_and_has_query"></a>Name: post.post_and_has_query</h3><p><strong>Summary</strong>: post and has query request demo<br><strong>Tag</strong>: demo</p>
+<ul>
+<li><p>Path: /api/user/borrow-book/v2</p>
+</li>
+<li><p>Method: post</p>
+</li>
+<li><p>Request:<br>  <strong>header</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>Token to be carried by the user to access the interface</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>query</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>isbn</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>book isbn</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>book name</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>  <strong>application/json</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Type</th>
+<th>Desc</th>
+<th>Example</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uid</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>user id</td>
+<td>666</td>
+<td>exclusiveMinimum:10;<br>exclusiveMaximum:1000</td>
+</tr>
+<tr>
+<td>user_name</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user name</td>
+<td>mock_name</td>
+<td>maxLength:10;<br>minLength:2</td>
+</tr>
+<tr>
+<td>extend_info</td>
+<td><code>Required</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- multi_user_name</td>
+<td><code>Required</code></td>
+<td>array</td>
+<td>user name</td>
+<td>[‘mock_name’]</td>
+<td>maxLength:10;<br>minLength:2;<br>items:{‘type’: ‘string’, ‘minLength’: 2, ‘maxLength’: 10}</td>
+</tr>
+<tr>
+<td>- sex</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>An enumeration.</td>
+<td></td>
+<td>enum:[‘man’, ‘woman’]</td>
+</tr>
+<tr>
+<td>- age</td>
+<td><code>Required</code></td>
+<td>integer</td>
+<td>age</td>
+<td>99</td>
+<td>exclusiveMinimum:1;<br>exclusiveMaximum:100</td>
+</tr>
+<tr>
+<td>- email</td>
+<td><code>Required</code></td>
+<td>string</td>
+<td>user email</td>
+<td><a href="mailto:&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;">&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#64;&#x73;&#111;&#49;&#110;&#46;&#x6d;&#x65;</a></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<ul>
+<li>Response</li>
+</ul>
+<p><strong>Desc</strong>: success response|success response<br>    - 200:application/json<br>    <strong>Response Info</strong></p>
+<pre><code>     |Name|Default|Type|Desc|Example|Other|
+     |---|---|---|---|---|---|
+     |code|0|integer|api code|||
+     |msg|success|string|api status msg|||
+     |data|`Required`|object|success result|||
+
+    **Response Example**
+
+    <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;code&quot;</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-attr">&quot;msg&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>    <span class="hljs-attr">&quot;data&quot;</span>: &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</code></pre>
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2022/11/01/%E6%9C%AA%E5%91%BD%E5%90%8D/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>使用Pait构建gRPC Json网关</title>
+    <url>/2022/10/29/%E4%BD%BF%E7%94%A8Pait%E6%9E%84%E5%BB%BAgRPC%20Json%E7%BD%91%E5%85%B3/</url>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>gRPC</code>已经是一个大多数开发者使用微服务时选择的通信协议，大多数公司的内部服务都会通过<code>gRPC</code>来通信，但是服务端和客户端使用的通信协议还是<code>HTTP</code>，这就意味着需要在客户端和内部服务之间架起一个可以转换<code>HTTP</code>与<code>gRPC</code>协议的网关。<br><a href="https://github.com/so1n/pait">pait</a>的<code>gRPC Gateway</code>模块就是实现了这样的一个功能，<code>gRPC Gateway</code>模块通过<code>pait</code>能快速的把<code>Python</code>Web框架和<code>gRPC</code>连接起来，并自动处理和转发请求。</p>
+<h2 id="1-一个简单的例子"><a href="#1-一个简单的例子" class="headerlink" title="1.一个简单的例子"></a>1.一个简单的例子</h2><p>在介绍如何使用网关之前先以一个简单的示例项目为例子，介绍没用网关前的局限性。</p>
+<blockquote>
+<p>例子项目代码见附录</p>
+</blockquote>
+<p>在这个例子中存在两个<code>gRPC</code>服务和一个api服务。<code>gRPC</code>有服务有两个，一个是<code>User</code>服务，负责用户的创建、注销、登录、登出，token校验五个功能，另外一个是<code>book</code>服务，主要负责书本的信息获取和书本评论和点赞等功能。而api服务只有一个，这个服务由<code>Flask</code>框架编写的，它负责暴露出HTTP接口供客户端调用，当被客户端调用时会把请求进行处理并通过<code>gRPC</code>客户端转发给另外两个<code>gRPC</code>服务，他们的关系图如下：<br><img   class="lazyload" data-original="https://files.catbox.moe/s5e3hf.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ><br>通过关系图可以发现客户端只与<code>Flask</code>应用通信，<code>Flask</code>应用通过<code>gRPC</code>客户端与其它机器的<code>gRPC</code>服务进行通信，客户端无法直接访问到<code>gRPC</code>服务所在的机器<code>node2</code>和<code>node3</code>，这个设计简单又使用，挺不错的，但是在编写代码时却有点烦恼，以用户服务为例子，编写<code>gRPC</code>服务的第一步是编写好<code>Protobuf文件</code>，用户服务的<code>Protobuf</code>文件描述的<code>Service</code>如下：</p>
+<figure class="highlight protobuf"><table><tr><td class="code"><pre><code class="hljs Protobuf"><span class="hljs-comment">// 省略其它protobuf 代码</span><br><span class="hljs-class"><span class="hljs-keyword">service</span> <span class="hljs-title">User</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> get_uid_by_token (GetUidByTokenRequest) <span class="hljs-keyword">returns</span> (GetUidByTokenResult)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> logout_user (LogoutUserRequest) <span class="hljs-keyword">returns</span> (google.protobuf.Empty)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> login_user(LoginUserRequest) <span class="hljs-keyword">returns</span> (LoginUserResult)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> create_user(CreateUserRequest) <span class="hljs-keyword">returns</span> (google.protobuf.Empty)</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> delete_user(DeleteUserRequest) <span class="hljs-keyword">returns</span> (google.protobuf.Empty)</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>第二步是根据<code>Protobuf</code>文件生成的接口代码来编写对应的代码逻辑，然后把代码部署在<code>node2</code>机器上运行。<br>接下来就是麻烦的第三步了，首先是根据<code>Protobuf</code>文件生成客户端代码，然后编写调用<code>gRPC</code>客户端的路由函数，如下:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Response, request<br><span class="hljs-keyword">from</span> grpc_example_common.protos.user <span class="hljs-keyword">import</span> user_pb2 <span class="hljs-keyword">as</span> user_message<br><br><span class="hljs-keyword">from</span> app_service.utils <span class="hljs-keyword">import</span> g, get_uid_by_token, make_response<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_user</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    g.user_grpc_service.create_user(<br>        uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>], user_name=request_dict[<span class="hljs-string">&quot;user_name&quot;</span>], password=request_dict[<span class="hljs-string">&quot;password&quot;</span>]<br>    )<br>    <span class="hljs-keyword">return</span> make_response()<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete_user</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    g.user_grpc_service.delete_user(uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>])<br>    <span class="hljs-keyword">return</span> make_response()<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">login_route</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    login_result: user_message.LoginUserResult = g.user_grpc_service.login_user(<br>        uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>], password=request_dict[<span class="hljs-string">&quot;password&quot;</span>]<br>    )<br>    <span class="hljs-keyword">return</span> make_response(&#123;<span class="hljs-string">&quot;token&quot;</span>: login_result.token, <span class="hljs-string">&quot;uid&quot;</span>: login_result.uid&#125;)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">logout_route</span>() -&gt; Response:</span><br>    request_dict: <span class="hljs-built_in">dict</span> = request.json<br>    <span class="hljs-keyword">if</span> get_uid_by_token() == request_dict[<span class="hljs-string">&quot;uid&quot;</span>]:<br>        token: <span class="hljs-built_in">str</span> = request.headers.get(<span class="hljs-string">&quot;token&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>        g.user_grpc_service.logout_user(uid=request_dict[<span class="hljs-string">&quot;uid&quot;</span>], token=token)<br>        <span class="hljs-keyword">return</span> make_response()<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Uid ERROR&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>路由函数编写完成后需要把路由函数注册到<code>Flask</code>应用中，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> flask.blueprints <span class="hljs-keyword">import</span> Blueprint<br><br><span class="hljs-keyword">from</span> app_service <span class="hljs-keyword">import</span> user_route<br><br>user_bp: Blueprint = Blueprint(<span class="hljs-string">&quot;user_bp&quot;</span>, __name__, url_prefix=<span class="hljs-string">&quot;/api/user&quot;</span>)<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/create&quot;</span>, view_func=user_route.create_user, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/delete&quot;</span>, view_func=user_route.delete_user, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/login&quot;</span>, view_func=user_route.login_route, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br>user_bp.add_url_rule(<span class="hljs-string">&quot;/logout&quot;</span>, view_func=user_route.logout_route, methods=[<span class="hljs-string">&quot;POST&quot;</span>])<br></code></pre></td></tr></table></figure>
+<p>在编写完<code>blueprint</code>并注册到<code>Flask</code>应用后，<code>api</code>服务也编写完成了，接着就可以部署到<code>node1</code>机器上并供客户端调用了。</p>
+<p>这一切都非常简单，但是手动编写的重复代码比较多，通过示例代码可以看到路由函数名和url名都差不多，每个路由代码逻辑也很像。而且当一个服务调用的名称发生变动后，除了修改<code>Protobuf</code>文件外，<code>api</code>服务的代码也要跟着手动修改，这太麻烦了，也容易出错。</p>
+<p>同时可以发现在上述例子中编写的转发路由代码跟<code>Protobuf</code>很像，这意味着也可以通过<code>Protobuf</code>文件生成对应的路由代码，这也是<a href="https://github.com/so1n/pait">pait</a>的实现思路，同时<a href="https://github.com/so1n/pait">pait</a><br>参照了<a href="https://github.com/googleapis/googleapis/blob/master/google/api/http.proto">google.api.http</a>来补充<code>Protobuf</code>缺少的HTTP信息，参照<a href="https://github.com/bufbuild/protoc-gen-validate">protoc-gen-validate</a>补充了请求体的信息，使<code>Protobuf</code>文件能表示<code>OpenAPI</code>的所有字段数据。</p>
+<h2 id="2-使用Pait构建gRPC-Json网关"><a href="#2-使用Pait构建gRPC-Json网关" class="headerlink" title="2.使用Pait构建gRPC Json网关"></a>2.使用Pait构建gRPC Json网关</h2><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>示例代码只是为了演示，并无任何实际意义，也不适用于生产环境，对应连接如下：<br>api服务：<a href="https://github.com/so1n/grpc-example-api-backend-service">https://github.com/so1n/grpc-example-api-backend-service</a><br>用户服务: <a href="https://github.com/so1n/grpc-example-user-grpc-service">https://github.com/so1n/grpc-example-user-grpc-service</a><br>书籍管理服务：<a href="https://github.com/so1n/grpc-example-book-grpc-service">https://github.com/so1n/grpc-example-book-grpc-service</a><br><code>gRPC</code>共有包（包括<code>gRPC</code>调用封装和protobuf文件）：<a href="https://github.com/so1n/grpc-example-common">https://github.com/so1n/grpc-example-common</a></p>
+]]></content>
+      <categories>
+        <category>gRPC</category>
+      </categories>
+      <tags>
+        <tag>gRPC,pait</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>为何在Python生态很少听说到依赖注入</title>
     <url>/2022/10/15/%E4%B8%BA%E4%BD%95%E5%9C%A8Python%E7%94%9F%E6%80%81%E5%BE%88%E5%B0%91%E5%90%AC%E8%AF%B4%E5%88%B0%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>由于使用的主要编程语言是<code>Python</code>，所以对于依赖注入这个概念并不是很清楚或者不知道自己已经在代码中运用了依赖注入的用法，在接触了DDD后才开始真正的了解什么是依赖注入以及依赖注入的重要性，同时也很好奇为何在<code>Python</code> 生态中依赖注入的出现率较低。</p>
