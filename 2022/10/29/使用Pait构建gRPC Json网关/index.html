@@ -196,7 +196,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 29, 2022</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>15273</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>15312</span>
     </div>
   </div>
 </section>
@@ -206,6 +206,9 @@
         <!-- 展示文章摘录 -->
         
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>gRPC</code>已经是一个大多数开发者使用微服务时选择的通信协议，大多数公司的内部服务都会通过<code>gRPC</code>来通信，但是服务端和客户端使用的通信协议还是<code>HTTP</code>，这就意味着需要在客户端和内部服务之间架起一个可以转换<code>HTTP</code>与<code>gRPC</code>协议的网关。<br><a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a>的<code>gRPC Gateway</code>模块就是实现了这样的一个功能，<code>gRPC Gateway</code>模块通过<code>pait</code>能快速的把<code>Python</code>Web框架和<code>gRPC</code>连接起来，并自动处理和转发请求。</p>
+<blockquote>
+<p>目前只支持<code>Flask</code>, <code>Starlite</code>, <code>Sanic</code>, <code>Tornado</code></p>
+</blockquote>
 <h2 id="1-一个简单的例子"><a href="#1-一个简单的例子" class="headerlink" title="1.一个简单的例子"></a>1.一个简单的例子</h2><p>在介绍如何使用<code>Pait</code>快速构建<code>gRPC Json</code>网关之前先以一个简单的示例项目为例子来介绍没用网关前的局限性。</p>
 <blockquote>
 <p>例子项目代码见附录一链接</p>
