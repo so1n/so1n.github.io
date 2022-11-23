@@ -26,7 +26,7 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">➜  ~ <span class="hljs-built_in">cd</span> demo<br>➜  demo  <br>➜  demo  python3 -m venv .venv<br>➜  demo  <span class="hljs-built_in">source</span> .venv/bin/activate<br>➜  demo  python3 -m pip install --upgrade pip setuptools wheel<br>➜  demo  python3 -m pip install -r requirements.dev.txt<br></code></pre></td></tr></table></figure>
 <p>这几个命令中，由<code>venv</code>完成初始化和使用虚拟环境，再由<code>pip</code>命令来安装包含测试环境的依赖。<br>这些工具都能正常的使用，但是却有几个弊端：</p>
 <ul>
-<li>直接使用<code>python3</code>命令，本地的<code>Python</code>版本与其他人或者服务器的版本不同步。</li>
+<li>直接使用<code>python3</code>命令，无法确定准确的<code>Python</code>的版本，导致本地的<code>Python</code>版本与其他人或者服务器的版本不同步。</li>
 <li>每次都要显式的进入和切换虚拟换(<code>Pycharm</code>会默认读取到虚拟环境)。</li>
 <li>通过<code>pip</code>来管理依赖，无法完成依赖管理，也无法自动的对依赖进行分组，如区分测试依赖和正式依赖等。</li>
 </ul>
@@ -44,16 +44,16 @@
 <p>如果是在已有项目下使用<code>Poetry</code>则可以通过<code>poetry init</code>命令，这样<code>Poetry</code>就会通过一个交互式命令行来协助开发者创建项目信息和虚拟环境，不过在创建之前要先确保系统上拥有自己想要的<code>Python</code>版本，<code>Poetry</code>是不会负责<code>Python</code>版本的管理的，需要开发者通过手动处理,<code>pyenv</code>,<code>conda</code>等命令来完成这一步操作，具体的<code>poetry init</code>操作如动图:<br><img   class="lazyload" data-original="https://files.catbox.moe/hvev5v.gif" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ><br>可以看到如果没有填写值得话，<code>Poetry</code>会默认为你填写一些值，我在某些选项中填入了一些自己的值，最后<code>pyproject.toml</code>会生成如下内容：</p>
 <figure class="highlight toml"><table><tr><td class="code"><pre><code class="hljs toml"><span class="hljs-section">[tool.poetry]</span><br><span class="hljs-attr">name</span> = <span class="hljs-string">&quot;demo&quot;</span><br><span class="hljs-attr">version</span> = <span class="hljs-string">&quot;0.0.1&quot;</span><br><span class="hljs-attr">description</span> = <span class="hljs-string">&quot;My demo project&quot;</span><br><span class="hljs-attr">authors</span> = [<span class="hljs-string">&quot;so1n &lt;qaz6803609@163.com&gt;&quot;</span>]<br><span class="hljs-attr">license</span> = <span class="hljs-string">&quot;Apache&quot;</span><br><span class="hljs-attr">readme</span> = <span class="hljs-string">&quot;README.md&quot;</span><br><br><span class="hljs-section">[tool.poetry.dependencies]</span><br><span class="hljs-attr">python</span> = <span class="hljs-string">&quot;^3.9.10&quot;</span><br><br><br><span class="hljs-section">[build-system]</span><br><span class="hljs-attr">requires</span> = [<span class="hljs-string">&quot;poetry-core&quot;</span>]<br><span class="hljs-attr">build-backend</span> = <span class="hljs-string">&quot;poetry.core.masonry.api&quot;</span><br></code></pre></td></tr></table></figure>
 <p>至此，项目初始化完毕，可以开始编写我们的项目了，但是当用<code>PyCharm</code>打开项目的时候会发现有如图的提醒:<br><img   class="lazyload" data-original="https://files.catbox.moe/9ocxnn.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ></p>
-<p>这个提醒是<code>PyCharm</code>找不到<code>Poetry</code>创建的环境，需要通过我们指定<code>Poetry</code>的路径才可以执行，这时候可以通过命令：</p>
+<p>这个提醒是<code>PyCharm</code>找不到<code>Poetry</code>的可执行文件，需要通过我们指定<code>Poetry</code>的路径才可以执行，这时候可以通过命令：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">which</span> poetry<br></code></pre></td></tr></table></figure>
-<p>来获取<code>Poetry</code>的可执行路径并填写到弹窗里面，之后<code>PyCharm</code>就会调用<code>Poetry</code>进行虚拟环境初始化，并在当前路径创建<code>.venv</code>文件夹。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">➜  demo py env info <br>Virtualenv<br>Python:         3.9.10<br>Implementation: CPython<br>Path:           /home/so1n/demo/.venv<br>Executable:     /home/so1n/demo/.venv/bin/python<br>Valid:          True<br><br>System<br>Platform:   linux<br>OS:         posix<br>Python:     3.9.10<br>Path:       /usr/<span class="hljs-built_in">local</span><br>Executable: /usr/<span class="hljs-built_in">local</span>/bin/python3.9<br></code></pre></td></tr></table></figure>
+<p>来获取<code>Poetry</code>的可执行路径并填写到弹窗里面，之后<code>PyCharm</code>就会调用<code>Poetry</code>进行虚拟环境初始化，并在当前路径创建<code>.venv</code>文件夹，通过<code>poetry env info</code>获取当前项目的虚拟环境:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">➜  demo poetry env info <br>Virtualenv<br>Python:         3.9.10<br>Implementation: CPython<br>Path:           /home/so1n/demo/.venv<br>Executable:     /home/so1n/demo/.venv/bin/python<br>Valid:          True<br><br>System<br>Platform:   linux<br>OS:         posix<br>Python:     3.9.10<br>Path:       /usr/<span class="hljs-built_in">local</span><br>Executable: /usr/<span class="hljs-built_in">local</span>/bin/python3.9<br></code></pre></td></tr></table></figure>
 
 <blockquote>
 <ul>
 <li>1.如果想在已有的项目下使用<code>Poetry</code>则需要先删除当前的虚拟环境，并通过命令<code>poetry env use 3.9.10</code></li>
 <li>2.如果创建的虚拟环境版本不是自己想要的，且是通过<code>pyenv</code>管理<code>Python</code>版本，那么可以通过<a href="https://python-poetry.org/blog/announcing-poetry-1.2.0/#detection-of-the-currently-active-python-experimental%E4%BA%86%E8%A7%A3%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3">https://python-poetry.org/blog/announcing-poetry-1.2.0/#detection-of-the-currently-active-python-experimental了解如何解决</a></li>
-<li>3.如果第二点仍然无法解决，可以采用如下命令显示的指导<code>Poetry</code>使用到正确的<code>Python</code>版本:<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">pyenv <span class="hljs-built_in">local</span> 3.9.10<br>poetry env use $(pyenv <span class="hljs-built_in">which</span> python)<br></code></pre></td></tr></table></figure>
+<li>3.如果第二点仍然无法解决问题，可以采用如下命令显示的指导<code>Poetry</code>使用到正确的<code>Python</code>版本:<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">pyenv <span class="hljs-built_in">local</span> 3.9.10<br>poetry env use $(pyenv <span class="hljs-built_in">which</span> python)<br></code></pre></td></tr></table></figure>
 </li>
 </ul>
 </blockquote>
@@ -64,7 +64,7 @@
 <p>这段描述意味着<code>httpx</code>的版本会锁定在<code>0.23.1</code>这个版本中。</p>
 <p>安装好依赖后，在<code>demo/__init__.py</code>编写如下代码:</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> httpx<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_status_code</span>() -&gt; int:</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> httpx.AsyncClient() <span class="hljs-keyword">as</span> client:<br>        resp: httpx.Response = <span class="hljs-keyword">await</span> client.get(<span class="hljs-string">&quot;https://so1n.me&quot;</span>)<br>        <span class="hljs-keyword">return</span> resp.status_code<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>():</span><br>    <span class="hljs-keyword">import</span> asyncio<br>    print(asyncio.run(get_status_code()))<br>    <br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    main()<br></code></pre></td></tr></table></figure>
-<p>这段代码非常简单，就是请求<code>https://so1n.me</code>并打印对应的HTTP状态码，接着可以在终端通过命令直接运行，不用再通过激活文件，运行结果如下:</p>
+<p>这段代码非常简单，就是请求<code>https://so1n.me</code>并打印对应的HTTP状态码，接着可以在终端通过命令直接运行，不用再通激活虚拟环境，运行结果如下:</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">➜  demo poetry run python demo/__init__.py<br>200<br></code></pre></td></tr></table></figure>
 
 <p>不过这段命令比较长，经常这样输入会比较麻烦，这时可以采用<code>Poetry</code>的脚本功能，只需要向<code>pyproject.toml</code>文件追加如下内容:</p>
@@ -75,7 +75,7 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">➜  demo poetry install<br>Installing dependencies from lock file<br><br>No dependencies to install or update<br><br>Installing the current project: demo (0.0.1)<br>➜  demo poetry run <span class="hljs-built_in">which</span> demo<br>/home/so1n/demo/.venv/bin/demo<br>➜  demo cat /home/so1n/demo/.venv/bin/demo<br><span class="hljs-meta">#!/home/so1n/demo/.venv/bin/python</span><br>import sys<br>from demo.__init__ import main<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    sys.exit(main())<br></code></pre></td></tr></table></figure>
 <p>可以看到<code>Poetry</code>在<code>/home/so1n/demo/.venv/bin/demo</code>路径下创建了一个脚本文件，如果这时候如果通过<code>poetry shell</code>进入带有当前虚拟环境的交互<code>shell</code>，则可以通过<code>demo</code>直接执行我们的代码，如下:</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">➜  demo poetry shell<br>Spawning shell within /home/so1n/demo/.venv<br>➜  demo . /home/so1n/demo/.venv/bin/activate<br>(demo-py3.9.10) ➜  demo <span class="hljs-built_in">pwd</span><br>/home/so1n/demo/demo<br>(demo-py3.9.10) ➜  demo demo  <br>200<br></code></pre></td></tr></table></figure>
-<h2 id="4-测试项目的运行情况"><a href="#4-测试项目的运行情况" class="headerlink" title="4.测试项目的运行情况"></a>4.测试项目的运行情况</h2><p>项目编写完成后需要确保我们的代码符合规范以及需要补充对应的测试用例，这是一个良好的习惯，在<code>Python</code>生态中，常用的测试框架是<code>pytest</code>，常用的检查代码规范则是通过<code>pre-commit</code>去实现的。</p>
+<h2 id="4-运行测试用例"><a href="#4-运行测试用例" class="headerlink" title="4.运行测试用例"></a>4.运行测试用例</h2><p>项目编写完成后需要确保我们的代码符合规范以及需要补充对应的测试用例，这是一个良好的习惯，在<code>Python</code>生态中，常用的测试框架是<code>pytest</code>，常用的检查代码规范则是通过<code>pre-commit</code>去执行的。</p>
 <blockquote>
 <p>可以通过<a href="https://so1n.me/2021/08/10/%E4%BF%9D%E9%9A%9CPython%E9%A1%B9%E7%9B%AE%E8%B4%A8%E9%87%8F%E7%9A%84%E5%B7%A5%E5%85%B7/#1-%E9%A1%B9%E7%9B%AE%E7%8E%AF%E5%A2%83%E7%AE%A1%E7%90%86-Poetry">保障Python项目质量的工具</a>了解有什么提升代码质量的工具以及如何使用<code>pre-commit</code>。</p>
 </blockquote>
@@ -115,7 +115,7 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">➜  demo git:(master) ✗ poetry build<br>Building demo (v0.0.2)<br>  - Building sdist<br>  - Built demo-0.0.2.tar.gz<br>  - Building wheel<br>  - Built demo-0.0.2-py3-none-any.whl<br></code></pre></td></tr></table></figure>
 <p>通过命令可以发现包的版本正好是我们提交的tag<code>v0.0.2</code>中的<code>0.0.2</code>，如果找到包里面的<code>demo/__init__.py</code>的文件，可以发现文件中存在如下一行代码:</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs python">__version__ = <span class="hljs-string">&quot;v0.0.2&quot;</span><br></code></pre></td></tr></table></figure>
-<p>其中<code>__version__</code>的值与<code>poetry build</code>一样。</p>
+<p>其中<code>__version__</code>的值与<code>tag</code>一样。</p>
 <p>打包完成后就可以把包传到<code>PyPi</code>了，不过在第一次上传之前需要通过如下命令配置自己的<code>PyPi</code>账户信息:</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># my-token可以在`pypi.org`网站中设置</span><br>poetry config pypi-token.pypi my-token<br><span class="hljs-comment"># 或者通过如下命令配置自己的账号密码</span><br>poetry config http-basic.pypi &lt;username&gt; &lt;password&gt;<br></code></pre></td></tr></table></figure>
 <p>最后通过<code>poetry publish</code>命令即可把包传到<code>PyPi</code>中</p>
