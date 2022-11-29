@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python-gRPC实践(9)--gRPC在gevent与asyncio的简单使用对比.md - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前言之前在Python-gRPC实践系列文章中都是在多...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: '/images/theme/puff.svg'
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python-gRPC实践(9)--gRPC在gevent与asyncio的简单使用对比.md</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://ftp.bmp.ovh/imgs/2022/02/bd67e15aa8d46101.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python-gRPC实践(9)--gRPC在gevent与asyncio的简单使用对比.md</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 25, 2022</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>13164</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前在<a href="https://so1n.me/categories/Python-gRPC%E5%AE%9E%E8%B7%B5/">Python-gRPC实践</a>系列文章中都是在多线程模式中介绍如何使用<code>gRPC</code>，但是在<code>Python</code>生态中更偏好通过协程的方式来运行服务，而<code>Python</code>的协程运行方式却有多种，虽然他们的原理类似，但是使用上却有区别，本文主要是对在<code>gevent</code>和<code>asyncio</code>中对<code>gRPC</code>的使用进行对比。</p>
+<h2 id="1-简单的例子"><a href="#1-简单的例子" class="headerlink" title="1.简单的例子"></a>1.简单的例子</h2><p>本章以官方中的<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/examples/protos/helloworld.proto">helloworld</a> <code>Protobuf</code>文件为例子，介绍在不同协程中如何运行服务，该<code>Protobuf</code>文件内容如下:</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs protobuf"><span class="hljs-class"><span class="hljs-keyword">service</span> <span class="hljs-title">Greeter</span> </span>&#123;<br>  <span class="hljs-comment">// Sends a greeting</span><br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> SayHello (HelloRequest) <span class="hljs-keyword">returns</span> (HelloReply) </span>&#123;&#125;<br>&#125;<br><br><span class="hljs-comment">// The request message containing the user&#x27;s name.</span><br><span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">HelloRequest</span> </span>&#123;<br>  <span class="hljs-built_in">string</span> name = <span class="hljs-number">1</span>;<br>  <span class="hljs-built_in">int32</span> sleep_millisecond = <span class="hljs-number">2</span>;<br>&#125;<br><br><span class="hljs-comment">// The response message containing the greetings</span><br><span class="hljs-class"><span class="hljs-keyword">message</span> <span class="hljs-title">HelloReply</span> </span>&#123;<br>  <span class="hljs-built_in">string</span> <span class="hljs-class"><span class="hljs-keyword">message</span> = 1;</span><br><span class="hljs-class">&#125;</span><br></code></pre></td></tr></table></figure>
+<p>其中<code>HelloRequest</code>和<code>HelloReply</code>是<code>Message</code>，<code>Gretter</code>为<code>service</code>，它们生成的对应代码位于<code>grpc_asyncio_example/protos</code>目录下面，而对应的客户端代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> logging<br><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> grpc_asyncio_example.protos <span class="hljs-keyword">import</span> helloworld_pb2, helloworld_pb2_grpc<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">client</span>(<span class="hljs-params">target: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;localhost:9999&quot;</span></span>):</span><br>    <span class="hljs-keyword">with</span> grpc.insecure_channel(target=target) <span class="hljs-keyword">as</span> channel:<br>        stub: helloworld_pb2_grpc.GreeterStub = helloworld_pb2_grpc.GreeterStub(channel)<br>        response: helloworld_pb2.HelloReply = stub.SayHello(helloworld_pb2.HelloRequest(name=<span class="hljs-string">&#x27;you&#x27;</span>), timeout=<span class="hljs-number">10</span>)<br>    logging.info(<span class="hljs-string">&quot;Greeter client received: &quot;</span> + response.message)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    logging.basicConfig()<br>    client()<br></code></pre></td></tr></table></figure>
+<p>服务端代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> concurrent <span class="hljs-keyword">import</span> futures<br><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> logging<br><br><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> grpc_asyncio_example.protos <span class="hljs-keyword">import</span> helloworld_pb2, helloworld_pb2_grpc<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Greeter</span>(<span class="hljs-params">helloworld_pb2_grpc.GreeterServicer</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">SayHello</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self, request: helloworld_pb2.HelloRequest, context: grpc.ServicerContext</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; helloworld_pb2.HelloReply:</span><br>        time.sleep(request.sleep_millisecond / <span class="hljs-number">1000</span>)  <span class="hljs-comment"># 模拟IO</span><br>        <span class="hljs-keyword">return</span> helloworld_pb2.HelloReply(message=<span class="hljs-string">&#x27;Hello, %s!&#x27;</span> % request.name)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">serve</span>(<span class="hljs-params">target: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;localhost:9999&quot;</span></span>) -&gt; grpc.server:</span><br>    server: grpc.server = grpc.server(futures.ThreadPoolExecutor(max_workers=<span class="hljs-number">100</span>))<br>    helloworld_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)<br>    server.add_insecure_port(target)<br>    server.start()<br>    <span class="hljs-keyword">return</span> server<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    logging.basicConfig()<br>    serve().wait_for_termination()<br></code></pre></td></tr></table></figure>
+<p>客户端与服务端的代码都非常简单，客户端主要是发送一个请求，该请求参数为<code>name=you</code>，而服务端则是解析参数，并把<code>Hello &#123;name&#125;</code>返回给客户端，最终由客户端把服务端返回的消息打印出来。<br>这份代码只可以用于<code>Python</code>的多线程中，无法在协程环境中运行，接下来讲分别介绍<code>Python gRPC</code>在<code>gevent</code>和<code>asyncio</code>中的使用和原理分析。</p>
+<blockquote>
+<p>只介绍<code>UNARY_UNARY</code>请求方式，其他方式不同可以通过对应的文档了解如何使用。</p>
+</blockquote>
+<h2 id="2-Gevent"><a href="#2-Gevent" class="headerlink" title="2.Gevent"></a>2.Gevent</h2><p><code>gevent </code>是一个基于协程的<code>Python</code>网络库，它通过<code>greenlet</code>在<code>libev</code>或<code>libuv</code>事件循环之上提供高级同步API，在<code>Python</code>程序使用<code>gevent</code>很简单，只要在代码引入如下猴子补丁语法:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> gevent.monkey<br>gevent.monkey.patch_all()<br></code></pre></td></tr></table></figure>
+<p>那么整个程序的<code>Python</code>代码都支持<code>gevent</code>了，程序也可以通过<code>gevent</code>来运行。</p>
+<p>不过<code>Python gRPC</code>是个例外，因为<code>Python gRPC</code>的核心是由<code>C</code>语言编写的，而<code>gevent</code>应用的猴子补丁只能涉及到用<code>Python</code>语言编写的代码，所以单靠应用<code>gevent</code>的猴子补丁是没办法使<code>Python gRPC</code>在<code>gevent</code>中运行的，可能还会导致调用<code>gRPC</code>客户端方法时出现卡死的情况。</p>
+<p>好在<code>Python gRPC</code>提供了一个用法，使<code>Python gRPC</code>能够在<code>gevent</code>中兼容运行，代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 先应用猴子补丁</span><br><span class="hljs-keyword">import</span> gevent.monkey<br>gevent.monkey.patch_all()<br><br><span class="hljs-comment"># 再为gRPC启用gevent兼容模式</span><br><span class="hljs-keyword">import</span> grpc.experimental.gevent<br>grpc.experimental.gevent.init_gevent()<br><br><span class="hljs-comment"># gRPC客户端或服务端的代码</span><br>...<br><br></code></pre></td></tr></table></figure>
+<p>这份代码通过调用<code>grpc.experimental.gevent.init_gevent</code>，使<code>gRPC</code>能在<code>gevent</code>中运行，而且在<code>gevent</code>模式下<code>gRPC</code>的所有模块和方法的使用方式都不需要改变。 但是<code>gRPC</code>在通过<code>gevent</code>的兼容模式运行的时候，性能会大打折扣，比如通过下面的命令:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">ghz -c 100 -n 10000 \<br>    --insecure \<br>    --proto ../protos/grpc_asyncio_example/protos/helloworld.proto \<br>    --call helloworld.Greeter.SayHello \<br>    -d <span class="hljs-string">&#x27;&#123;&quot;name&quot;:&quot;Joe&quot;, &quot;sleep_millisecond&quot;: 10&#125;&#x27;</span> \<br>    localhost:9999<br></code></pre></td></tr></table></figure>
+<p>对<code>gevent</code>模式下的<code>Python gRPC</code>服务进行压测，其中<code>c</code>是指并发数，<code>n</code>为最大请求数，而<code>-d</code>是请求的参数，里面的<code>sleep_millisecond</code>代表服务端收到请求后会休眠10毫秒来模拟IO处理，他们的压测结果如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 多线程模式</span><br>Summary:<br>  Count:	10000<br>  Total:	2.67 s<br>  Slowest:	45.01 ms<br>  Fastest:	12.04 ms<br>  Average:	26.34 ms<br>  Requests/sec:	3746.87<br><span class="hljs-comment"># gevent兼容模式</span><br>Summary:<br>  Count:	10000<br>  Total:	5.23 s<br>  Slowest:	69.31 ms<br>  Fastest:	13.43 ms<br>  Average:	51.83 ms<br>  Requests/sec:	1913.44<br></code></pre></td></tr></table></figure>
+<p>通过压测结果可以发现，<code>gevent</code>兼容模式的性能只有多线程模式下的一半(以<code>Requests/sec</code>对比)，会有这样的结果是因为<code>Python gRPC</code>的异步请求是在多线程上执行，同时<code>Python gRPC</code>是一个基于<code>C</code>的库，它可以绕过<code>Python</code>的<code>GIL</code>，从而获得了CPU多核的并发能力，而在启用了<code>gevent</code>兼容模式后<code>gevent</code>可能会导致多线程无法绕过<code>Python</code>的<code>GIL</code>，从而失去了上面提到的并发性。</p>
+<p>此外<code>Python gRPC</code>目前只做到了兼容<code>gevent</code>的运行，通过<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/src/python/grpcio_tests/commands.py">commands.py</a>中<code>TestGevent</code>的注释可以看出<code>Python gRPC</code>尚未对<code>gevent</code>模式的性能做出优化，所以建议不要在<code>Python gRPC</code>的服务端启用<code>gevent</code>兼容模式，在<code>Python gRPC</code>的客户端可以根据实际情况决定是否启用(比如在<code>gunicorn</code> + <code>gevent</code> + <code>Flask</code>运行的服务中的<code>Python gRPC</code>客户端)。</p>
+<blockquote>
+<p>通过下列文件可以看出<code>gevent</code>兼容模式是把线程池替换为<code>gevent</code>的线程池:</p>
+<ul>
+<li>客户端调用到<code>gevent</code>的代码<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/2d4f3c56001cd1e1f85734b2f7c5ce5f2797c38a/src/python/grpcio/grpc/_cython/_cygrpc/credentials.pyx.pxi#L27">credentials.pyx.pxi</a></li>
+<li>服务端调用到<code>gevent</code>的代码<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/b8c2818c6b5b9013adfe3f02a49dcc93675a7787/src/python/grpcio/grpc/_cython/_cygrpc/completion_queue.pyx.pxi#L111">completion_queue.pyx.pxi</a></li>
+<li>启用<code>gevent</code>兼容模式的代码<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/066a310df1fe9d68a00f346bd36e6c965d62e528/src/python/grpcio/grpc/_cython/_cygrpc/grpc_gevent.pyx.pxi">grpc_gevent.pyx.pxi</a></li>
+</ul>
+</blockquote>
+<h2 id="3-Asyncio"><a href="#3-Asyncio" class="headerlink" title="3.Asyncio"></a>3.Asyncio</h2><p><code>Python gRPC</code>一开始是不支持在<code>Asyncio</code>中运行的，所以社区出现了一个名为<a target="_blank" rel="noopener" href="https://github.com/vmagamedov/grpclib">grpclib</a>的库来解决这一问题，而官方的<code>Python gRPC</code>在后面的迭代后诞生了<code>grpc.aio</code>模块以支持<code>grpc</code>在<code>Asyncio</code>中运行。</p>
+<h3 id="3-1-grpclib"><a href="#3-1-grpclib" class="headerlink" title="3.1.grpclib"></a>3.1.grpclib</h3><p><a target="_blank" rel="noopener" href="https://github.com/vmagamedov/grpclib">grpclib</a>这个库提供了纯<code>Python</code>的实现，这意味着能按自己的需求对它进行拓展，可塑性强。<br>所以诞生了基于<a target="_blank" rel="noopener" href="https://github.com/vmagamedov/grpclib">grpclib</a>和<a target="_blank" rel="noopener" href="https://github.com/eigenein/protobuf/">pure-protobuf</a>封装的另一个库–<a target="_blank" rel="noopener" href="https://github.com/danielgtaylor/python-betterproto/tree/master">python-betterproto
+</a>。该库可以使开发者编写<code>grpc</code>代码更加的方便，比如<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/examples/protos/helloworld.proto">helloworld</a>生成对应的<code>Message</code>代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-meta">@dataclass(<span class="hljs-params">eq=<span class="hljs-literal">False</span>, <span class="hljs-built_in">repr</span>=<span class="hljs-literal">False</span></span>)</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloRequest</span>(<span class="hljs-params">betterproto.Message</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;The request message containing the user&#x27;s name.&quot;&quot;&quot;</span><br><br>    name: <span class="hljs-built_in">str</span> = betterproto.string_field(<span class="hljs-number">1</span>)<br>    sleep_millisecond: <span class="hljs-built_in">int</span> = betterproto.int32_field(<span class="hljs-number">2</span>)<br><br><br><span class="hljs-meta">@dataclass(<span class="hljs-params">eq=<span class="hljs-literal">False</span>, <span class="hljs-built_in">repr</span>=<span class="hljs-literal">False</span></span>)</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloReply</span>(<span class="hljs-params">betterproto.Message</span>):</span><br>    <span class="hljs-string">&quot;&quot;&quot;The response message containing the greetings&quot;&quot;&quot;</span><br><br>    message: <span class="hljs-built_in">str</span> = betterproto.string_field(<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
+<p>可以看到这段代码打可读性比起官方的<code>Python gRPC</code>要高很多，这样开发者在查阅<code>message</code>的用法时会非常的方便，而客户端和服务端的用法则与官方的<code>Python gRPC</code>类似，比如客户端的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> logging<br><br><span class="hljs-keyword">from</span> grpclib.client <span class="hljs-keyword">import</span> Channel<br><br><span class="hljs-keyword">from</span> grpc_asyncio_example.protos <span class="hljs-keyword">import</span> helloworld<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">client</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    channel: Channel = Channel(host=<span class="hljs-string">&quot;localhost&quot;</span>, port=<span class="hljs-number">9999</span>)<br>    response: helloworld.HelloReply = <span class="hljs-keyword">await</span> helloworld.GreeterStub(channel).say_hello(<br>        hello_request=helloworld.HelloRequest(name=<span class="hljs-string">&quot;you&quot;</span>)<br>    )<br>    logging.info(response)<br><br>    <span class="hljs-comment"># don&#x27;t forget to close the channel when done!</span><br>    channel.close()<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    asyncio.run(client())<br></code></pre></td></tr></table></figure>
+<p>可以看出与多线程的<code>Python gRPC</code>代码类似，而服务端的代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><br><span class="hljs-keyword">from</span> grpclib.server <span class="hljs-keyword">import</span> Server<br><br><span class="hljs-keyword">from</span> grpc_asyncio_example.protos <span class="hljs-keyword">import</span> helloworld<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloWorldService</span>(<span class="hljs-params">helloworld.GreeterBase</span>):</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">say_hello</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self, request: <span class="hljs-string">&quot;helloworld.HelloRequest&quot;</span></span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; &quot;helloworld.HelloReply&quot;:</span><br>        <span class="hljs-keyword">await</span> asyncio.sleep(request.sleep_millisecond / <span class="hljs-number">1000</span>)<br>        <span class="hljs-keyword">return</span> helloworld.HelloReply(message=<span class="hljs-string">&quot;Hello, %s!&quot;</span> % request.name)<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">serve</span>() -&gt; Server:</span><br>    server: Server = Server([HelloWorldService()])<br>    <span class="hljs-keyword">await</span> server.start(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>    <span class="hljs-keyword">return</span> server<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">await</span> (<span class="hljs-keyword">await</span> serve()).wait_closed()<br><br>    asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>可以看出服务端的代码与多线程的<code>Python gRPC</code>也类似，但是缺少<code>Context</code>的参数，如果跳进去<code>helloworld.GretterBase</code>查看源码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GreeterBase</span>(<span class="hljs-params">ServiceBase</span>):</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">say_hello</span>(<span class="hljs-params">self, hello_request: <span class="hljs-string">&quot;HelloRequest&quot;</span></span>) -&gt; &quot;HelloReply&quot;:</span><br>        <span class="hljs-keyword">raise</span> grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__rpc_say_hello</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self, stream: <span class="hljs-string">&quot;grpclib.server.Stream[HelloRequest, HelloReply]&quot;</span></span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        request = <span class="hljs-keyword">await</span> stream.recv_message()<br>        response = <span class="hljs-keyword">await</span> self.say_hello(request)<br>        <span class="hljs-keyword">await</span> stream.send_message(response)<br></code></pre></td></tr></table></figure>
+<p>则可以发现在<code>__rpc_say_hellp</code>方法中的<code>stream</code>对象是类似于官方<code>Python gRPC</code>中的<code>Context</code>，这意味着如果要使用<code>Context</code>方法时需要自己新增一个方法去处理，好在该库是纯<code>Python</code>编写的，<code>grpclib</code>对应客户端的<code>Channel</code>和服务端对应的<code>Server</code>代码也封装得很好，不像官方<code>Python gRPC</code>一样跳进源代码后就不知道它的代码在哪里，所以处理起来比较方便。</p>
+<p>不过它也因此拥有了纯<code>Python</code>编写库的缺点–性能较低， 在经过与<code>gevent</code>一样的命令进行压测后得出如下数据:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># grpclib</span><br>Summary:<br>  Count:	10000<br>  Total:	6.37 s<br>  Slowest:	96.38 ms<br>  Fastest:	31.54 ms<br>  Average:	63.33 ms<br>  Requests/sec:	1571.05<br><br><span class="hljs-comment"># grpclib &amp;&amp; uvloop</span><br>Summary:<br>  Count:	10000<br>  Total:	5.44 s<br>  Slowest:	90.97 ms<br>  Fastest:	38.18 ms<br>  Average:	53.13 ms<br>  Requests/sec:	1839.73<br></code></pre></td></tr></table></figure>
+<p>通过数据可以发现，<code>betterproto</code>的性能基本是多线程模式性能的3成，而这部分性能的差距主要来自于对<code>HTTP2</code>的解析，如果能把解析<code>HTTP2</code>的实现进行替换为高性能的版本，那么它的性能就能够接近<code>Python gRPC</code>官方实现的<code>grpc.aio</code>了。</p>
+<p>此外，<a target="_blank" rel="noopener" href="https://github.com/vmagamedov/grpclib">grpclib</a>的功能比官方<code>Python gRPC</code>比较少，需要开发能力比较强以及对<code>gRPC</code>了解得比较深的开发者对其进行二次开发，才能使它发挥更好的作用。</p>
+<h3 id="3-2-grpc-aio"><a href="#3-2-grpc-aio" class="headerlink" title="3.2.grpc.aio"></a>3.2.grpc.aio</h3><p>官方的<code>Python gRPC</code>现在通过<code>grpc.aio</code>模块对<code>Asyncio</code>提供了支持，它的用法与线程版本一致，只是涉及到IO相关的模块是存在于<code>grpc.aio</code>包中，对于使用者来说，需要把用到的<code>grpc.XXX</code>模块需要变为<code>grpc.aio.XXX</code>模块,同时要确保调用代码一处异步，处处异步，比如客户端的代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> logging<br><br><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> grpc_asyncio_example.protos <span class="hljs-keyword">import</span> helloworld_pb2, helloworld_pb2_grpc<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">client</span>(<span class="hljs-params">target: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;localhost:9999&quot;</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> grpc.aio.insecure_channel(target) <span class="hljs-keyword">as</span> channel:<br>        stub: helloworld_pb2_grpc.GreeterStub = helloworld_pb2_grpc.GreeterStub(channel)<br>        response: helloworld_pb2.HelloRequest = <span class="hljs-keyword">await</span> stub.SayHello(helloworld_pb2.HelloRequest(name=<span class="hljs-string">&#x27;you&#x27;</span>))<br>    logging.info(<span class="hljs-string">&quot;Greeter client received: &quot;</span> + response.message)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    logging.basicConfig()<br>    asyncio.run(client())<br></code></pre></td></tr></table></figure>
+<p>通过代码可以看出初始化<code>Channel</code>的代码不是<code>grpc.insecure_channel</code>而是<code>grpc.aio.insecure_channel</code>，而且在<code>helloworld_pb2_grpc.GreeterStub</code>没有发生变化的情况下，调用<code>stub.SayHello</code>时仍然需要加上<code>await</code>语法，这是因为<code>Python gRPC</code>中<code>Stub</code>的设计模式类似于<a target="_blank" rel="noopener" href="https://sans-io.readthedocs.io/">sans-io</a>，是否要添加<code>await</code>语法则是取决于核心IO处理的实现，在这里处理IO的是<code>Channel</code>，所以开发者在调用<code>stub.SayHello</code>时最终会由<code>stub</code>的<code>channel</code>来发送请求，而<code>channel</code>发送请求是一个异步IO实现，所以需要添加<code>await</code>语法。</p>
+<p>而对于服务端的改动也是类似的，对应的代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> logging<br><br><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> grpc_asyncio_example.protos <span class="hljs-keyword">import</span> helloworld_pb2, helloworld_pb2_grpc<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Greeter</span>(<span class="hljs-params">helloworld_pb2_grpc.GreeterServicer</span>):</span><br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">SayHello</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self, request: helloworld_pb2.HelloRequest, context: grpc.aio.ServicerContext</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; helloworld_pb2.HelloReply:</span><br>        <span class="hljs-keyword">await</span> asyncio.sleep(request.sleep_millisecond / <span class="hljs-number">1000</span>)<br>        <span class="hljs-keyword">return</span> helloworld_pb2.HelloReply(message=<span class="hljs-string">&#x27;Hello, %s!&#x27;</span> % request.name)<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">serve</span>(<span class="hljs-params">target: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;localhost:9999&quot;</span></span>) -&gt; grpc.aio.Server:</span><br>    server: grpc.aio.Server = grpc.aio.server()<br>    helloworld_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)<br>    server.add_insecure_port(target)<br>    logging.info(<span class="hljs-string">&quot;Starting server on %s&quot;</span>, target)<br>    <span class="hljs-keyword">await</span> server.start()<br>    <span class="hljs-keyword">return</span> server<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    logging.basicConfig(level=logging.INFO)<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">await</span> (<span class="hljs-keyword">await</span> serve()).wait_for_termination()<br><br>    asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>可以看到代码中IO相关语法都需要添加<code>await</code>语句，同时<code>SayHello</code>方法添加了<code>async</code>语法，这样就可以在<code>SayHello</code>函数里面编写<code>await</code>语句了。<br>需要注意的是，由于<code>Python gRPC</code>是通过<code>ServicerContext</code>来传输数据的，导致<code>ServicerContext</code>中有些方法是与IO相关的，所以这里用到的<code>ServicerContext</code>是<code>grpc.aio.ServicerContext</code>。</p>
+<p>对于IO相关的用法可能有一些区别，但是对于其他跟IO无关的功能，则保持跟多线程模式的一致，比如客户端在启用时填写的参数如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">with</span> grpc.insecure_channel(target=<span class="hljs-string">&#x27;localhost:50051&#x27;</span>,<br>                           options=[(<span class="hljs-string">&#x27;grpc.lb_policy_name&#x27;</span>, <span class="hljs-string">&#x27;pick_first&#x27;</span>),<br>                                    (<span class="hljs-string">&#x27;grpc.enable_retries&#x27;</span>, <span class="hljs-number">0</span>),<br>                                    (<span class="hljs-string">&#x27;grpc.keepalive_timeout_ms&#x27;</span>, <span class="hljs-number">10000</span>)<br>                                   ]) <span class="hljs-keyword">as</span> channel:<br></code></pre></td></tr></table></figure>
+<p>而在<code>grpc.aio</code>中代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> grpc.aio.insecure_channel(target=<span class="hljs-string">&#x27;localhost:50051&#x27;</span>,<br>                           options=[(<span class="hljs-string">&#x27;grpc.lb_policy_name&#x27;</span>, <span class="hljs-string">&#x27;pick_first&#x27;</span>),<br>                                    (<span class="hljs-string">&#x27;grpc.enable_retries&#x27;</span>, <span class="hljs-number">0</span>),<br>                                    (<span class="hljs-string">&#x27;grpc.keepalive_timeout_ms&#x27;</span>, <span class="hljs-number">10000</span>)<br>                                   ]) <span class="hljs-keyword">as</span> channel:<br></code></pre></td></tr></table></figure>
+<p>可以看到填写的参数Key名和值都是一样的，没有发生变化。</p>
+<p>这里只是以一些常见的功能举例，简述不同模式<code>Python gRPC</code>的使用，详细的<code>grpc.aio</code>功能见<a target="_blank" rel="noopener" href="https://grpc.github.io/grpc/python/grpc_asyncio.html#">grpc_asyncio文档</a>，如果熟悉多线程模式下<code>Python gRPC</code>和<code>Python Asyncio</code>的用法，那么上手<code>grpc.aio</code>是非常容易的。</p>
+<h4 id="3-2-1-grpc-aio的事件循环"><a href="#3-2-1-grpc-aio的事件循环" class="headerlink" title="3.2.1.grpc.aio的事件循环"></a>3.2.1.grpc.aio的事件循环</h4><p>在<code>Python gRPC</code>的<code>grpc.aio</code>中使用到了<code>asyncio</code>的事件循环，所以可以通过<code>uvloop</code>来提高<code>grpc.aio</code>的性能，使用<code>uvloop</code>非常简单，只要在代码最前面添加如下代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> uvloop<br>uvloop.install()<br></code></pre></td></tr></table></figure>
+<p>就可以使程序获得<code>uvloop</code>带来的性能加成，在对使用<code>asyncio.loop</code>和<code>uvloop.loop</code>的服务端代码进行压测后结果如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># asyncio.loop</span><br>Summary:<br>  Count:	10000<br>  Total:	2.15 s<br>  Slowest:	30.56 ms<br>  Fastest:	11.09 ms<br>  Average:	21.19 ms<br>  Requests/sec:	4643.73<br><br><span class="hljs-comment"># uvloop.loop</span><br>Summary:<br>  Count:	10000<br>  Total:	1.45 s<br>  Slowest:	25.14 ms<br>  Fastest:	9.41 ms<br>  Average:	14.08 ms<br>  Requests/sec:	6885.81<br></code></pre></td></tr></table></figure>
+<p>可以发现<code>grpc.aio</code>的性能比多线程模式稍好一些，同时在使用了<code>uvloop</code>后性能提升了50%(以<code>Requests/sec</code>对比)。</p>
+<p>不过在与用<code>uvicorn</code>运行的服务中使用<code>gRPC</code>客户端时，需要确保在<code>uvicorn</code>启动后才初始化<code>grpc.aio.Channel</code>，因为在初始化<code>grpc.aio.Channel</code>时会获取到一个事件循环，如果当前没有事件循环时则会自动创建一个事件循环，而<code>uvicorn</code>在启动是会单独创建一个新的事件循环，这会导致<code>grpc.aio.Channel</code>与<code>uvicorn</code>不在同一个事件循环运行导致运行出错。不过这个问题也很好解决，解决代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Any<br><span class="hljs-keyword">import</span> grpc<br><span class="hljs-keyword">from</span> starlette.applications <span class="hljs-keyword">import</span> Starlette<br><span class="hljs-keyword">from</span> grpc_asyncio_example.protos <span class="hljs-keyword">import</span> helloworld_pb2, helloworld_pb2_grpc<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_app</span>() -&gt; Starlette:</span><br>    app: Starlette = Starlette()<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_before_server_start</span>(<span class="hljs-params">*_: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        app.state.channel = grpc.aio.insecure_channel(<span class="hljs-string">&quot;localhost:9999&quot;</span>)<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_after_server_stop</span>(<span class="hljs-params">*_: Any</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">await</span> app.state.channel.close()<br><br>    app.add_event_handler(<span class="hljs-string">&quot;startup&quot;</span>, _before_server_start)<br>    app.add_event_handler(<span class="hljs-string">&quot;shutdown&quot;</span>, _after_server_stop)<br>    <span class="hljs-keyword">return</span> app<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br><br>    <span class="hljs-keyword">import</span> uvicorn  <span class="hljs-comment"># type: ignore</span><br>    starlette_app: Starlette = create_app()<br>    uvicorn.run(starlette_app)<br></code></pre></td></tr></table></figure>
+<p>在所示的代码中，<code>grpc.aio.channel</code>在<code>startup</code>事件时才进行初始化，在<code>shutdown</code>事件关闭，由于触发<code>startup</code>事件时，<code>uvicorn</code>已经初始化了一个事件循环，所以初始化<code>grpc.aio.Channel</code>时获取到的事件循环与<code>uvicorn</code>一致。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4.总结"></a>4.总结</h2><p>如果为了能跟上社区的脚步，以及为了跨语言能够很好的合作，建议还是根据服务所在场景来使用多线程默认的<code>gRPC</code>或者<code>grpc.aio</code>，这是最好的选择;<br>对于类似<code>gunicorn</code> + <code>gevnet</code> + 类似于<code>Flask</code>框架的服务通过<code>gRPC</code>客户端发送请求时可以使用<code>gevent</code>兼容模式；<br>对于开发能力比较强，本身也是追求<code>Pythonic</code>的开发者且是基于<code>Asyncio</code>生态编写服务以及有比较强的定制需求的，则可以考虑使用<code>betterproto</code>。</p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2022/11/25/Python-gRPC%E5%AE%9E%E8%B7%B5(9)--gRPC%E5%9C%A8gevent%E4%B8%8Easyncio%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AF%B9%E6%AF%94/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;25&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(9)--gRPC%E5%9C%A8gevent%E4%B8%8Easyncio%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AF%B9%E6%AF%94&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;25&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(9)--gRPC%E5%9C%A8gevent%E4%B8%8Easyncio%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AF%B9%E6%AF%94&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Protobuf/" rel="tag">Protobuf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2022/11/23/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Poetry(1.2+)%E7%AE%A1%E7%90%86Python%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83/">如何使用Poetry(1.2+)管理Python虚拟环境<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Gevent"><span class="toc-text">2.Gevent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Asyncio"><span class="toc-text">3.Asyncio</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-grpclib"><span class="toc-text">3.1.grpclib</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-grpc-aio"><span class="toc-text">3.2.grpc.aio</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%80%BB%E7%BB%93"><span class="toc-text">4.总结</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-text">1.简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Gevent"><span class="toc-text">2.Gevent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Asyncio"><span class="toc-text">3.Asyncio</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-grpclib"><span class="toc-text">3.1.grpclib</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-grpc-aio"><span class="toc-text">3.2.grpc.aio</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%80%BB%E7%BB%93"><span class="toc-text">4.总结</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a></p></div>
+  
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
