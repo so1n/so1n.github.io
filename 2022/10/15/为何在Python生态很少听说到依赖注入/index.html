@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -204,6 +212,7 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
+        
         
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>由于使用的主要编程语言是<code>Python</code>，所以对于依赖注入这个概念并不是很清楚或者不知道自己已经在代码中运用了依赖注入的用法，在接触了DDD后才开始真正的了解什么是依赖注入以及依赖注入的重要性，同时也很好奇为何在<code>Python</code> 生态中依赖注入的出现率较低。</p>
 <h2 id="1-控制反转与依赖注入"><a href="#1-控制反转与依赖注入" class="headerlink" title="1.控制反转与依赖注入"></a>1.控制反转与依赖注入</h2><p>在查找依赖注入的相关资料时发现依赖注入与控制反转这两个词是成对出现的，这是因为控制反转并不是一种技术，而是一种编程思想，这种思想能指导我们如何设计出松耦合优良的程序，而依赖注入是一个具体的设计模式，它是控制反转的一种具体实现。</p>
@@ -361,6 +370,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -392,7 +402,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

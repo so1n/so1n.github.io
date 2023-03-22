@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>无论是微服务， 还是普通的API服务器， 他们都是进程， 服务在发布的时候， 必定会重启， 这时候会先杀掉旧进程， 再启用新的进程， 但旧的服务还在进行通信， 这时候强制杀掉这些旧进程， 会造成脏数据， 以及客户端端连接到服务的连接中断。要解决这些问题， 就要做到服务能优雅的关闭或重启的时候可以保障整个总体服务零宕机。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>无论是微服务， 还是普通的API服务器， 他们都是进程， 服务在发布的时候， 必定会重启， 这时候会先杀掉旧进程， 再启用新的进程， 但旧的服务还在进行通信， 这时候强制杀掉这些旧进程， 会造成脏数据， 以及客户端端连接到服务的连接中断。要解决这些问题， 就要做到服务能优雅的关闭或重启的时候可以保障整个总体服务零宕机。</p></p>
+        
         <blockquote>
 <p><a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写框架<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>的想法和总结。</p>
 </blockquote>
@@ -368,6 +379,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -399,7 +411,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

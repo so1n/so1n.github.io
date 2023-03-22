@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>这是一个直接用别人的代码copy后再加上自己的想法来实现的小项目</p>
+        
+          <p><p>这是一个直接用别人的代码copy后再加上自己的想法来实现的小项目</p></p>
+        
         <p>这是一个直接用别人的代码copy后再加上自己的想法来实现的小项目</p>
 <h2 id="爬虫入门项目实战"><a href="#爬虫入门项目实战" class="headerlink" title="爬虫入门项目实战"></a>爬虫入门项目实战</h2><h3 id="1-寻找项目"><a href="#1-寻找项目" class="headerlink" title="1.寻找项目"></a>1.寻找项目</h3><p><a target="_blank" rel="noopener" href="http://www.jianshu.com/p/1be3d90b4c5f">直达票</a></p>
 <h3 id="2-修改项目"><a href="#2-修改项目" class="headerlink" title="2.修改项目"></a>2.修改项目</h3><p>原来那个太简单了，按照自己这几天学习的内容，打算对其进行修改<br>修改想法如下：</p>
@@ -349,6 +360,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -380,7 +392,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -196,7 +204,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 27, 2023</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>14768</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>15496</span>
     </div>
   </div>
 </section>
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Asyncio</code>的同步原语可以简化我们编写资源竞争的代码和规避资源竞争导致的Bug的出现。<br>但是由于协程的特性，在大部分业务代码中并不需要去考虑资源竞争的出现，导致<code>Asyncio</code>同步原语被使用的频率比较低，但是如果想机遇<code>Asyncio</code>编写框架则需要学习同步原语的使用。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Asyncio</code>的同步原语可以简化我们编写资源竞争的代码和规避资源竞争导致的Bug的出现。<br>但是由于协程的特性，在大部分业务代码中并不需要去考虑资源竞争的出现，导致<code>Asyncio</code>同步原语被使用的频率比较低，但是如果想机遇<code>Asyncio</code>编写框架则需要学习同步原语的使用。</p></p>
+        
         <h2 id="0-基础"><a href="#0-基础" class="headerlink" title="0.基础"></a>0.基础</h2><p>同步原语都是适用于某些条件下对某个资源的争夺，在代码中大部分的资源都是属于一个代码块，而<code>Python</code>对于代码块的管理的最佳实践是使用<code>with</code>语法，<code>with</code>语法实际上是调用了一个类中的<code>__enter__</code>和<code>__exit__</code>方法，比如下面的代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__enter__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-keyword">return</span> <br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__exit__</span>(<span class="hljs-params">self, exc_type, exc_val, exc_tb</span>):</span><br>        <span class="hljs-keyword">return</span> <br>    <br><br><span class="hljs-keyword">with</span> Demo():<br>    <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
 <p>代码中的<code>Demo</code>类实现了<code>__enter__</code>和<code>__exit__</code>方法后，就可以被<code>with</code>语法调用，其中<code>__enter__</code>方法是进入代码块执行的逻辑，<code>__enxi__</code>方法是用于退出代码块(包括异常退出)的逻辑。这两个方法符合同步原语中对资源的争夺和释放，但是<code>__enter__</code>和<code>__exit__</code>两个方法都是不支持<code>await</code>调用的，为了解决这个问题，<code>Python</code>引入了<code>async with</code>语法。</p>
@@ -238,6 +249,13 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TimeoutLock</span>(<span class="hljs-params">asyncio.Lock</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, timeout, *, loop=<span class="hljs-literal">None</span></span>):</span><br>        self.timeout = timeout<br>        <span class="hljs-built_in">super</span>().__init__(loop=loop)<br>        <br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">acquire</span>(<span class="hljs-params">self</span>) -&gt; bool:</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> asyncio.wait_for(<span class="hljs-built_in">super</span>().acquire(), self.timeout)<br></code></pre></td></tr></table></figure>
 <p>这份代码非常简单，他只需要在<code>__init__</code>方法传入<code>timeout</code>参数，并在<code>acuiqre</code>方法中通过<code>wait_for</code>来实现锁超时即可，现在假设<code>wait_for</code>方法是一个无法传递协程<code>cancel</code>的方法，且编写的<code>acquire</code>没有进行捕获异常再释放锁的操作，当异常发生的时候会导致锁一直被卡住。<br>为了解决这个问题，只需要对<code>TimeoutLock</code>的<code>acquire</code>方法添加异常捕获，并在捕获到异常时释放锁即可，代码如下:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TimeoutLock</span>(<span class="hljs-params">asyncio.Lock</span>):</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, timeout, *, loop=<span class="hljs-literal">None</span></span>):</span><br>        self.timeout = timeout<br>        <span class="hljs-built_in">super</span>().__init__(loop=loop)<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">acquire</span>(<span class="hljs-params">self</span>) -&gt; bool:</span><br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> asyncio.wait_for(<span class="hljs-built_in">super</span>().acquire(), self.timeout)<br>        <span class="hljs-keyword">except</span> Exception:<br>            self._wake_up_first()<br>            <span class="hljs-keyword">raise</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="1-1-什么时候要使用锁"><a href="#1-1-什么时候要使用锁" class="headerlink" title="1.1.什么时候要使用锁"></a>1.1.什么时候要使用锁</h3><p>在<code>async</code>中判断是否需要使用<code>asyncio.Lock</code>很简单，就是判断这个资源会不会被多个协程使用，最简单的就是这个资源是否被多个协程使用，如下代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio <br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>():</span><br>    cache = &#123;&#125;<br>    <span class="hljs-comment"># some code</span><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>():</span><br>    asyncio.create_task(demo())<br>    asyncio.create_task(demo())<br>    <span class="hljs-comment"># some code</span><br><br><br>asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>这段代码的资源是<code>demo</code>函数的<code>cache</code>，由于他归属于<code>demo</code>函数，只能被<code>demo</code>函数中的其他代码读写，后面只要确保<code>demo</code>函数的逻辑只会被一个协程完整的执行，那么就不需要锁了，即使<code>demo</code>函数被两个<code>asyncio.Task</code>并发驱动。<br>但是如果<code>demo</code>函数被改为如下代码就不一样了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>():</span><br>    cache = &#123;&#125;<br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_update</span>(<span class="hljs-params">key, value</span>):</span><br>        cache[key] = value<br>    asyncio.create(_update(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>))<br>    asyncio.create(_update(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>))<br></code></pre></td></tr></table></figure>
+<p>这时候出现了两个<code>asyncio.Task</code>并发驱动到修改<code>cache</code>的<code>_update</code>函数，会出现资源冲突的情况，这时候就需要锁了。</p>
+<p>所以判断资源需不需要锁的规则很简单，就是这个资源是否被多个<code>asyncio.Task</code>并发驱动，如果是则需要加锁。</p>
 <h2 id="2-Event"><a href="#2-Event" class="headerlink" title="2.Event"></a>2.Event</h2><p><code>asyncio.Event</code>也是一个简单的同步原语，但它跟<code>asyncio.Lock</code>不一样，<code>asyncio.Lock</code>是确保每个资源只能被一个协程操作，而<code>asyncio.Event</code>是确保某个资源何时可以被协程操作，可以认为<code>asyncio.Lock</code>锁的是资源，<code>asyncio.Event</code>锁的是协程，所以<code>asyncio.Event</code>并不需要<code>acquire</code>来锁资源，<code>release</code>释放资源，所以也用不到<code>async with</code>语法。</p>
 <p><code>asyncio.Event</code>的简单使用示例如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sub</span>(<span class="hljs-params">event: asyncio.Event</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">await</span> event.wait()<br>    print(<span class="hljs-string">&quot;I&#x27;m Done&quot;</span>)<br><br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    event = asyncio.Event()<br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>        asyncio.create_task(sub(event))<br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">1</span>)<br>    event.<span class="hljs-built_in">set</span>()<br><br>asyncio.run(main())<br></code></pre></td></tr></table></figure>
@@ -301,7 +319,7 @@
 
         
   <nav class="nav">
-    <a></a>
+    <a href="/2023/02/27/python_asyncio_lib_network/"><i class="iconfont iconleft"></i>Python Asyncio 库之网络编程详解</a>
     <a href="/2022/12/08/python_asyncio_lib_asyncio.task_introduction/">Python Asyncio 库之asyncio.task常用函数详解<i class="iconfont iconright"></i></a>
   </nav>
 
@@ -346,14 +364,14 @@
           
   <aside class="toc-wrap">
     <h3 class="toc-title">文章目录：</h3>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-%E5%9F%BA%E7%A1%80"><span class="toc-text">0.基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Lock"><span class="toc-text">1.Lock</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Event"><span class="toc-text">2.Event</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Condition"><span class="toc-text">4.Condition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Semaphore"><span class="toc-text">5.Semaphore</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-%E5%9F%BA%E7%A1%80"><span class="toc-text">0.基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Lock"><span class="toc-text">1.Lock</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%A6%81%E4%BD%BF%E7%94%A8%E9%94%81"><span class="toc-text">1.1.什么时候要使用锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Event"><span class="toc-text">2.Event</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Condition"><span class="toc-text">4.Condition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Semaphore"><span class="toc-text">5.Semaphore</span></a></li></ol>
   </aside>
 
         
           
   <aside class="toc-wrap">
     <h3 class="toc-title">文章目录：</h3>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-%E5%9F%BA%E7%A1%80"><span class="toc-text">0.基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Lock"><span class="toc-text">1.Lock</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Event"><span class="toc-text">2.Event</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Condition"><span class="toc-text">4.Condition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Semaphore"><span class="toc-text">5.Semaphore</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-%E5%9F%BA%E7%A1%80"><span class="toc-text">0.基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Lock"><span class="toc-text">1.Lock</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%A6%81%E4%BD%BF%E7%94%A8%E9%94%81"><span class="toc-text">1.1.什么时候要使用锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Event"><span class="toc-text">2.Event</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Condition"><span class="toc-text">4.Condition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Semaphore"><span class="toc-text">5.Semaphore</span></a></li></ol>
   </aside>
 
         
@@ -391,6 +409,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -422,7 +441,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

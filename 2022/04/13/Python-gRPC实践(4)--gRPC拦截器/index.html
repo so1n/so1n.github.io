@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>世界上没有百分之百不会挂的服务，只能人为的去增加服务的可用性，为了能让服务的可用性增加，需要为服务添加服务治理的功能，而在gRPC中，可以通过拦截器实现一些服务治理的功能。</p>
+        
+          <p><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>世界上没有百分之百不会挂的服务，只能人为的去增加服务的可用性，为了能让服务的可用性增加，需要为服务添加服务治理的功能，而在gRPC中，可以通过拦截器实现一些服务治理的功能。</p></p>
+        
         <h2 id="1-什么是拦截器"><a href="#1-什么是拦截器" class="headerlink" title="1.什么是拦截器"></a>1.什么是拦截器</h2><p>在<code>Python</code>中，很少有框架把自己的功能称为拦截器，反而都称为中间件或者是钩子，gRPC的拦截器功能与<code>Python</code>Web框架常用的中间件基本一样，它主要的功能是可以在调用函数之前，之后已经发生异常时能够捕获到对应的数据，比如如下代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo_rpc_method</span>():</span><br>    <span class="hljs-comment"># run before code</span><br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-keyword">pass</span>  <span class="hljs-comment"># rpc logic</span><br>    <span class="hljs-keyword">except</span> Exception:<br>        <span class="hljs-keyword">pass</span>  <span class="hljs-comment"># exc code</span><br>    <span class="hljs-keyword">finally</span>:<br>        <span class="hljs-comment"># run after code</span><br></code></pre></td></tr></table></figure>
 <p>这段代码提现了拦截器的主要特点：</p>
@@ -354,6 +365,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -385,7 +397,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

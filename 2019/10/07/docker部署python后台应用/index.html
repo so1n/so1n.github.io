@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>现在云原生越来越流行, 容器化势在必行, 作为一个开发人员， 多多少少也要接触一些容器相关的操作， 其中最基础的操作是如何把自己的应用构建为一个<code>Docker</code>容器， 并管理。 本文以<code>starlette</code>框架和后台的开发常见3件套<code>Nginx</code>， <code>MySQL</code>和<code>Redis</code>为底创建一个简单的Web后台演示项目, 并一步一步介绍如何编写成一个容器以及容器的运行。</p>
+        
+          <p><p>现在云原生越来越流行, 容器化势在必行, 作为一个开发人员， 多多少少也要接触一些容器相关的操作， 其中最基础的操作是如何把自己的应用构建为一个<code>Docker</code>容器， 并管理。 本文以<code>starlette</code>框架和后台的开发常见3件套<code>Nginx</code>， <code>MySQL</code>和<code>Redis</code>为底创建一个简单的Web后台演示项目, 并一步一步介绍如何编写成一个容器以及容器的运行。</p></p>
+        
         <p>注: 2021-02-07增加了示例代码<br>注: 2021-12-12部分内容进行重写</p>
 <h2 id="1-创建项目"><a href="#1-创建项目" class="headerlink" title="1.创建项目"></a>1.创建项目</h2><p>第一步会先创建一个<code>Python</code>后台项目， 这个项目包含3个接口， 一个接口用来测试服务是否正常， 另外一个是测试<code>MySQL</code>调用， 最后一个是测试<code>Redis</code>调用。</p>
 <p>首先是创建一个后台项目以及依赖:</p>
@@ -419,6 +430,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -450,7 +462,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

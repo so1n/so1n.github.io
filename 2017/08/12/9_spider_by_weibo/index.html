@@ -62,10 +62,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -117,7 +124,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -126,10 +133,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -207,6 +215,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>简单的爬一下微博以及发微博</p>
+        
+          <p><p>简单的爬一下微博以及发微博</p></p>
+        
         <h2 id="微博爬虫-发布微博以及获取微博资料"><a href="#微博爬虫-发布微博以及获取微博资料" class="headerlink" title="微博爬虫-发布微博以及获取微博资料"></a>微博爬虫-发布微博以及获取微博资料</h2><h3 id="1-发布微博"><a href="#1-发布微博" class="headerlink" title="1.发布微博"></a>1.发布微博</h3><p>首先要解决登录问题（为了减少限制我们使用移动版本登录），这里我采用cookie来登录<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E7%99%BB%E5%BD%95.png?raw=true"  ><span class="image-caption">enter description here</span><br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/cookie.png?raw=true"  ><span class="image-caption">enter description here</span><br>如图，登录后获得cookie ，<br>先发布一个微博查看需要传输什么值<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E6%9F%A5%E7%9C%8B%E5%8F%91%E9%80%81%E5%BE%AE%E5%8D%9A%E9%9C%80%E8%A6%81%E5%A1%AB%E5%86%99%E4%BB%80%E4%B9%88.png?raw=true"  ><span class="image-caption">enter description here</span><br>图中可以看出，我们需要2个值，一个为st一个为content，且content已知值为我们要发送的微博<br>发送微博的url在图片里面可以看出是：<a target="_blank" rel="noopener" href="https://m.weibo.cn/api/statuses/update">https://m.weibo.cn/api/statuses/update</a><br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E6%89%BE%E5%87%BAst%E7%9A%84%E5%80%BC.png?raw=true"  ><span class="image-caption">enter description here</span><br>接着我们从这个网页里面找到st值生成的地方，找到后我们就可以开始写发送微博的代码了</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> re<br><span class="hljs-keyword">import</span> requests<br><br><br>headers = &#123;<span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36&#x27;</span>&#125;<br>cookie = &#123;<span class="hljs-string">&quot;Cookie&quot;</span>: <span class="hljs-string">&quot;你的cookie&quot;</span>&#125;<br>url = <span class="hljs-string">&#x27;https://m.weibo.cn/compose&#x27;</span><br>html = requests.get(url, cookies=cookie).text<br>pattern = <span class="hljs-string">r&#x27;st:(.+)&#x27;</span><br>st = re.findall(pattern, html)[<span class="hljs-number">0</span>].replace(<span class="hljs-string">&quot;&#x27;&quot;</span>,<span class="hljs-string">&#x27;&#x27;</span>).replace(<span class="hljs-string">&#x27;,&#x27;</span>,<span class="hljs-string">&#x27;&#x27;</span>).replace(<span class="hljs-string">&#x27; &#x27;</span>,<span class="hljs-string">&#x27;&#x27;</span>)<br>post_url = <span class="hljs-string">&#x27;https://m.weibo.cn/api/statuses/update&#x27;</span><br>postdata = &#123;<br>            <span class="hljs-string">&#x27;st&#x27;</span>:st,<br>            <span class="hljs-string">&#x27;content&#x27;</span>:<span class="hljs-string">&#x27;测试Python发微博!&#x27;</span>,<br>            &#125;<br>update = requests.post(post_url, data=postdata, headers=headers, cookies=cookie)<br></code></pre></td></tr></table></figure>
 <p>在这里我用正则找出来，不过加了‘’就找不到了，所以只能粗略找出来再把不要的替换掉，接着就可以传入postdata进行发微博了<br>结果如图：<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E6%B7%B1%E5%BA%A6%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20170815141038.png?raw=true"  ><span class="image-caption">enter description here</span></p>
@@ -341,6 +352,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -372,7 +384,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

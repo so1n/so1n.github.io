@@ -61,10 +61,17 @@ Celery的示例或者常用使用...">
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -116,7 +123,7 @@ Celery的示例或者常用使用...">
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -125,10 +132,11 @@ Celery的示例或者常用使用...">
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -207,6 +215,10 @@ Celery的示例或者常用使用...">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>PS: 水文笔记…</p>
 <p><code>Celery</code>的示例或者常用使用方式中, <code>Celery</code>的Woker以及任务调用经常都是在同一个项目里面.<br>但是随着项目的拓展,很多时候<code>Celery</code>任务调用端与Woker的代码并不是在同一个项目里(但是共享同一个Mq, Redis等配置和中间件),而且<code>Celery</code>是基于<code>RabbitMQ</code>进行任务信息传输的,非常适合不同的项目调用解耦.<br>而<code>Celery</code>有一个非常好的概念–Signature,我们只要在远程端封装一个伪任务的Signature,就可以通过调用该Signature去让另一个项目的Celery执行对应的任务.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>PS: 水文笔记…</p>
+<p><code>Celery</code>的示例或者常用使用方式中, <code>Celery</code>的Woker以及任务调用经常都是在同一个项目里面.<br>但是随着项目的拓展,很多时候<code>Celery</code>任务调用端与Woker的代码并不是在同一个项目里(但是共享同一个Mq, Redis等配置和中间件),而且<code>Celery</code>是基于<code>RabbitMQ</code>进行任务信息传输的,非常适合不同的项目调用解耦.<br>而<code>Celery</code>有一个非常好的概念–Signature,我们只要在远程端封装一个伪任务的Signature,就可以通过调用该Signature去让另一个项目的Celery执行对应的任务.</p></p>
+        
         <h2 id="1-send-task"><a href="#1-send-task" class="headerlink" title="1.send_task"></a>1.send_task</h2><p>在<code>Celery</code>的文档中,有提到如果是调用不同项目的Woker可以使用send_task方法,先看看Woker端的代码:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> celery <span class="hljs-keyword">import</span> Celery<br><br>celery: Celery = Celery()    <span class="hljs-comment"># 省略配置</span><br><br><span class="hljs-comment"># 一个模拟任务,会跑60秒</span><br><span class="hljs-meta">@celery.task(<span class="hljs-params">name=<span class="hljs-string">&quot;test.block&quot;</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test</span>(<span class="hljs-params">sleep_seconds=<span class="hljs-number">60</span></span>):</span><br>    time.sleep(sleep_seconds)<br></code></pre></td></tr></table></figure>
 
@@ -337,6 +349,7 @@ Celery的示例或者常用使用...">
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -368,7 +381,9 @@ Celery的示例或者常用使用...">
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

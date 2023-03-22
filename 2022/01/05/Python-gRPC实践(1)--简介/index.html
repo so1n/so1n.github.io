@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -210,6 +218,14 @@
 </blockquote>
 <p>吐槽归吐糟， 但是还是得用， 因为其他语言的项目都用了<code>gRPC</code>, 不同团队服务的通信需要依赖<code>gRPC</code>进行通信， 所以这块硬骨头还是得啃下去。 在啃的过程非常艰辛， 因为官方文档太少了， 相关文章也不多， 中文社区零零散散， 英文社区的文章会比较多， 但很多搜索出来的都是<code>Go-gRPC</code>相关的， 这就很扎心了， 而这个系列文章就是我啃完的一个总结。</p>
 <p>好了， 唠嗑完毕， 以下是文章的正式内容。</p>
+        
+          <p><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接触<code>gRPC</code>比较早， 但我不怎么喜欢在<code>Python</code>中使用<code>gRPC</code>， 因为<code>Python</code>中的官方<code>gRPC</code>框架易用性太烂了， 只提供基本功能， 附带的其他功能要不就不完善， 要不文档就只有简单几句话， 啥东西都得去原本的项目找, 用起来都不顺心（毕竟不是Goole的亲儿子，支持的力度肯定比较少）。</p>
+<blockquote>
+<p>而且在<code>Python</code>项目中引入<code>gRPC</code>框架后， 项目就很难去维护了， 所以我基本不用， 为此我自己还开发了一款用于<code>asyncio</code>的<code>RPC</code>框架–<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>， 如果你恰好是基于<code>asyncio</code>生态构建项目， 且需要用到<code>gRPC</code>框架的，那么推荐接触下非官方的<code>gRPC</code>项目–<a target="_blank" rel="noopener" href="https://github.com/danielgtaylor/python-betterproto">python-betterproto</a>。</p>
+</blockquote>
+<p>吐槽归吐糟， 但是还是得用， 因为其他语言的项目都用了<code>gRPC</code>, 不同团队服务的通信需要依赖<code>gRPC</code>进行通信， 所以这块硬骨头还是得啃下去。 在啃的过程非常艰辛， 因为官方文档太少了， 相关文章也不多， 中文社区零零散散， 英文社区的文章会比较多， 但很多搜索出来的都是<code>Go-gRPC</code>相关的， 这就很扎心了， 而这个系列文章就是我啃完的一个总结。</p>
+<p>好了， 唠嗑完毕， 以下是文章的正式内容。</p></p>
+        
         <h2 id="1-什么是RPC"><a href="#1-什么是RPC" class="headerlink" title="1.什么是RPC"></a>1.什么是RPC</h2><p>在了解<code>gRPC</code>之前， 先了解什么叫RPC, RPC是Remote Procedure Call的简称， 中文称为远程过程调用， 它允许不同的进程或者不同的机器的程序互相调用。 其实按照这个定义，平时使用的HTTP（Restful API）请求也算RPC， 因为主流的HTTP（Restful API）在不同的服务之间兼容性虽是最棒的, 也有成熟的生态， 所以很多公司的内部服务还是以HTTP来互相调用， 但是由于传输体积很大， 这种方式的请求速度并不是很快， 传输性能不佳。 </p>
 <p>不过现在很多公司的内部服务间的调用越来越多， 调用链变长， 如果还用HTTP（Restful API）的方式做内部服务的调用， 那整个调用链的时间就变长, 同时增加了系统开销, 需要一些别的方案来解决这些问题;同时由于这些服务通常都是在内网， 这些服务只要内部协议兼容就行, 不用过多的去考虑外部因素， 追求的是更小的传输体积， 更快的传输速度（所以内网间用UDP也是可以的）， 同时对系统的性能消耗较低， 所以就有了各种RPC协议诞生。</p>
 <p>目前市面上各种RPC协议虽然互不兼容， 但是他们基本上只有在传输协议和序列化协议有较大的不同， 传输协议和序列化这两点恰好就是与传输体积， 传输速度和系统性能消耗的问题有关。<br>其中传输协议是为了解决传输体积和传输速度的问题， 一般使用的是TCP， UDP传输协议或者是直接基于HTTP自定义的应用层协议， 而序列化协议主要解决的是<code>通用性</code>， <code>流行性</code>， <code>成熟性</code>, <code>空间占用</code>，<code>时间占用</code>， 一般RPC定制的序列化, 都追求较少的空间占用（减少网络传输压力）和时间占用（减少机器的序列化时间）， 其次再满足其它3个特性， 兼容其它语言等。</p>
@@ -383,6 +399,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -414,7 +431,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

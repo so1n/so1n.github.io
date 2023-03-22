@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Python Asyncio</code>提供了很多基础的API以及对应的对象，如果只用于编写简单的HTTP API处理函数，那么这些<code>Python Asyncio</code>是足够的，但在面对一些复杂点多的需求或者编写网络相关框架时，就需要基于<code>Python Asyncio</code>的基础API封装成高级对象。目前比较常用的高级对象有两个，一个是用于管理代码域超时的<code>timeout</code>以及一个用于结构化并发的<code>TaskGroup</code>，它们最先出现在<a target="_blank" rel="noopener" href="https://github.com/python-trio/trio">Trio</a>这个协程库中，后来<a target="_blank" rel="noopener" href="https://github.com/agronholm/anyio">Anyio</a>库也支持这两个对象，现在，准备发布Python 3.11中<code>Asyncio</code>库也包括这两个功能。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Python Asyncio</code>提供了很多基础的API以及对应的对象，如果只用于编写简单的HTTP API处理函数，那么这些<code>Python Asyncio</code>是足够的，但在面对一些复杂点多的需求或者编写网络相关框架时，就需要基于<code>Python Asyncio</code>的基础API封装成高级对象。目前比较常用的高级对象有两个，一个是用于管理代码域超时的<code>timeout</code>以及一个用于结构化并发的<code>TaskGroup</code>，它们最先出现在<a target="_blank" rel="noopener" href="https://github.com/python-trio/trio">Trio</a>这个协程库中，后来<a target="_blank" rel="noopener" href="https://github.com/agronholm/anyio">Anyio</a>库也支持这两个对象，现在，准备发布Python 3.11中<code>Asyncio</code>库也包括这两个功能。</p></p>
+        
         <blockquote>
 <p>注： 正常情况下，调用经过封装的高级对象的耗时肯定会大于直接调用基础API的耗时，但是高级对象能使代码结构更加优美。比如<code>starlette</code>框架在集成<code>anyio</code>后，性能降低了4.5%，具体见:<a target="_blank" rel="noopener" href="https://github.com/encode/starlette/pull/1157">https://github.com/encode/starlette/pull/1157</a></p>
 </blockquote>
@@ -357,6 +368,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -388,7 +400,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>mv 2017plan.md 2018plan.md</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>mv 2017plan.md 2018plan.md</p></p>
+        
         <h2 id="amp"><a href="#amp" class="headerlink" title="%$*&amp;^"></a>%$*&amp;^</h2><p>从迷茫到有目标，这一年边摸坑边走过来，发现还是有点计划才不会半路迷路<br>接下来的一年也碰巧是在校与在外的交汇，希望能好好的走过这一年，不要有遗憾</p>
 <h2 id="身体"><a href="#身体" class="headerlink" title="身体"></a>身体</h2><p>找个旁边有的可以跑步的地方/或锻炼（emmmm）<br>虽然去年跑了一年了，还没瘦下来，但是这一年没大病，状态也挺好的。所以运动还是得坚持下去</p>
 <h2 id="语言"><a href="#语言" class="headerlink" title="语言"></a>语言</h2><p>编程方面，这一年多学java/go（优先go），还是很喜欢专研后端的东东<br>日语也要加油，看下明年能不能取考个证哈哈哈<br>英语就还是随着阅读文档和邮件列表、外网来长进吧(每周最少翻译一篇东东)</p>
@@ -328,6 +339,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -359,7 +371,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

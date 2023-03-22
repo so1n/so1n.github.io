@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Redis</code>拥有很多数据结构, 是一个非常灵活的内存数据库, 基本上很多后端业务都会用到<code>Redis</code>, 在网络社区中, 经常听到可以使用<code>Redis</code>来当做XXX的问题, 在第一次接触消息队列时, 会有一个疑问, 可以使用<code>Redis</code>当做消息队列吗? <code>Redis</code>容易部署与维护, 而且一般都业务已经有一套<code>Redis</code>在跑了, 开发人员也拥有了一些使用经验, 为什么一定要重新去用<code>Kafka</code>或者<code>RabbitMQ</code>呢? 如果选用<code>Redis</code>做消息队列, 哪用哪种数据结构会比较好呢? 在<code>Redis</code>中, 可以使用<code>Stream</code>当做消息队列, 但是由于<code>Redis</code>是一个内存型数据结构, 所以他并不是一个完备的消息队列, 还是有丢日志的可能, 如果要确保一个日志都不丢, 那还是得上硬盘型的消息队列.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Redis</code>拥有很多数据结构, 是一个非常灵活的内存数据库, 基本上很多后端业务都会用到<code>Redis</code>, 在网络社区中, 经常听到可以使用<code>Redis</code>来当做XXX的问题, 在第一次接触消息队列时, 会有一个疑问, 可以使用<code>Redis</code>当做消息队列吗? <code>Redis</code>容易部署与维护, 而且一般都业务已经有一套<code>Redis</code>在跑了, 开发人员也拥有了一些使用经验, 为什么一定要重新去用<code>Kafka</code>或者<code>RabbitMQ</code>呢? 如果选用<code>Redis</code>做消息队列, 哪用哪种数据结构会比较好呢? 在<code>Redis</code>中, 可以使用<code>Stream</code>当做消息队列, 但是由于<code>Redis</code>是一个内存型数据结构, 所以他并不是一个完备的消息队列, 还是有丢日志的可能, 如果要确保一个日志都不丢, 那还是得上硬盘型的消息队列.</p></p>
+        
         <h2 id="1-消息队列"><a href="#1-消息队列" class="headerlink" title="1.消息队列:"></a>1.消息队列:</h2><p>在内存中实现一个消息队列很简单, 消息队列的基础数据结构模型就是双端队列(双向链表), 然后只要确保这个双端队列的一端由生产者推数据进去, 消费者从另一端获取数据, 就是一个简单版的消息队列了.<br>但是这种实现是在程序内部, 需要考虑的事比较少, 如果转移到一个公共服务, 需要考虑的问题就很多了, 比如消息堆积, 还有网络的导致消息的收发问题等等, 而解决这些问题也可以认为是消息队列的特性:</p>
 <ul>
 <li>1.支持重复消费(可选), 这个往往不是最重要的, 但有这个特性会比较好.</li>
@@ -358,6 +369,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -389,7 +401,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

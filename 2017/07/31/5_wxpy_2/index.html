@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>在网上发现了wxpy这个库，可以调取一些微信API来玩转微信<br>由于图截得不太好，看图的请访问<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/ef75e97146c2">这里</a></p>
+        
+          <p><p>在网上发现了wxpy这个库，可以调取一些微信API来玩转微信<br>由于图截得不太好，看图的请访问<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/ef75e97146c2">这里</a></p></p>
+        
         <h2 id="Python玩微信（2）-wxpy的进阶"><a href="#Python玩微信（2）-wxpy的进阶" class="headerlink" title="Python玩微信（2）:wxpy的进阶"></a>Python玩微信（2）:wxpy的进阶</h2><h3 id="前记：其实我也不知道这个算不算进阶-。期初目的是因为我脑海里面有一个设想，通过微信机器人，自动完成对协会招新群的自动添加和群管理，还有自动接受他人报名协会，这些设想在当我发现WXPY这个库后才可以得以实现。一开始想从公众号那边入手的，但自己没有服务器很难弄，如果从其他现成的来弄这些功能的话，1是有限制，2是免费的量很少，3当然是学了就得拿来用一用，试一试。所以就开始写这些了（完整代码见最后面）"><a href="#前记：其实我也不知道这个算不算进阶-。期初目的是因为我脑海里面有一个设想，通过微信机器人，自动完成对协会招新群的自动添加和群管理，还有自动接受他人报名协会，这些设想在当我发现WXPY这个库后才可以得以实现。一开始想从公众号那边入手的，但自己没有服务器很难弄，如果从其他现成的来弄这些功能的话，1是有限制，2是免费的量很少，3当然是学了就得拿来用一用，试一试。所以就开始写这些了（完整代码见最后面）" class="headerlink" title="前记：其实我也不知道这个算不算进阶- -。期初目的是因为我脑海里面有一个设想，通过微信机器人，自动完成对协会招新群的自动添加和群管理，还有自动接受他人报名协会，这些设想在当我发现WXPY这个库后才可以得以实现。一开始想从公众号那边入手的，但自己没有服务器很难弄，如果从其他现成的来弄这些功能的话，1是有限制，2是免费的量很少，3当然是学了就得拿来用一用，试一试。所以就开始写这些了（完整代码见最后面）"></a>前记：其实我也不知道这个算不算进阶- -。期初目的是因为我脑海里面有一个设想，通过微信机器人，自动完成对协会招新群的自动添加和群管理，还有自动接受他人报名协会，这些设想在当我发现<a target="_blank" rel="noopener" href="http://wxpy.readthedocs.io/zh/latest/index.html">WXPY</a>这个库后才可以得以实现。一开始想从公众号那边入手的，但自己没有服务器很难弄，如果从其他现成的来弄这些功能的话，1是有限制，2是免费的量很少，3当然是学了就得拿来用一用，试一试。所以就开始写这些了（完整代码见最后面）</h3><h3 id="1-自动添加好友"><a href="#1-自动添加好友" class="headerlink" title="1.自动添加好友"></a>1.自动添加好友</h3><p>首先为了自动添加，所以先注册一个好友添加功能的消息，并当好友添加后，自动回复</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python">addfriend_request = <span class="hljs-string">&#x27;加好友&#x27;</span>  <span class="hljs-comment">#自动添加好友的条件</span><br><br><br><span class="hljs-comment"># 注册好友请求类消息</span><br><span class="hljs-meta">@bot.register(<span class="hljs-params">msg_types=FRIENDS,enabled=<span class="hljs-literal">True</span></span>)</span><br><span class="hljs-comment"># 自动接受验证信息中包含 &#x27;wxpy&#x27; 的好友请求</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">auto_accept_friends</span>(<span class="hljs-params">msg</span>):</span><br>    <span class="hljs-comment"># 判断好友请求中的验证文本</span><br>    <span class="hljs-keyword">if</span> addfriend_request <span class="hljs-keyword">in</span> msg.text.lower():<br>        <span class="hljs-comment"># 接受好友 (msg.card 为该请求的用户对象)</span><br>        new_friend = bot.accept_friend(msg.card)<br>        <span class="hljs-comment"># 或 new_friend = msg.card.accept()</span><br>        <span class="hljs-comment"># 向新的好友发送消息</span><br>        new_friend.send(<span class="hljs-string">&#x27;机器人自动接受了你的请求,你可以任意回复获取功能菜单，若机器人没回复菜单则表明机器人尚未工作，请等待&#x27;</span>)<br></code></pre></td></tr></table></figure>
 <h3 id="2-自动回复好友"><a href="#2-自动回复好友" class="headerlink" title="2.自动回复好友"></a>2.自动回复好友</h3><p>好友通过非关键字发送可以获取机器人的功能菜单，再通过相应的命令进入其他功能，如果好友没有发送正确的命令，则return 开始菜单</p>
@@ -338,6 +349,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -369,7 +381,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

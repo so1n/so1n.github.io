@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在文章<a href="https://so1n.me/2022/04/11/python's_waitable_objects_in_asyncio/">《Python的可等待对象在Asyncio的作用》</a>中介绍了<code>Python</code>的可等待对象作用，特别是<code>Task</code>对象在启动的时候可以自我驱动，但是一个<code>Task</code>对象只能驱动一条执行链，如果要多条链执行（并发），还是需要<code>EventLoop</code>来安排驱动，接下来将通过<code>Python.Asyncio</code>库的源码来了解<code>EventLoop</code>是如何运作的。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在文章<a href="https://so1n.me/2022/04/11/python's_waitable_objects_in_asyncio/">《Python的可等待对象在Asyncio的作用》</a>中介绍了<code>Python</code>的可等待对象作用，特别是<code>Task</code>对象在启动的时候可以自我驱动，但是一个<code>Task</code>对象只能驱动一条执行链，如果要多条链执行（并发），还是需要<code>EventLoop</code>来安排驱动，接下来将通过<code>Python.Asyncio</code>库的源码来了解<code>EventLoop</code>是如何运作的。</p></p>
+        
         <h2 id="1-基本介绍"><a href="#1-基本介绍" class="headerlink" title="1.基本介绍"></a>1.基本介绍</h2><p><code>Python.Asyncio</code>是一个大而全的库，它包括很多功能，而跟核心调度相关的逻辑除了三种可等待对象外，还有其它一些功能，它们分别位于<code>runners.py</code>，<code>base_event.py</code>，<code>event.py</code>三个文件中。</p>
 <p><code>runners.py</code>文件有一个主要的类–<code>Runner</code>，它的主要职责是做好进入协程模式的事件循环等到初始化工作，以及在退出协程模式时清理还在内存的协程，生成器等对象。</p>
 <blockquote>
@@ -364,6 +375,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -395,7 +407,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

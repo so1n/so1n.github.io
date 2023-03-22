@@ -63,10 +63,17 @@ vim命令1.vim模式以下介绍内...">
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -118,7 +125,7 @@ vim命令1.vim模式以下介绍内...">
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -127,10 +134,11 @@ vim命令1.vim模式以下介绍内...">
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -208,6 +216,9 @@ vim命令1.vim模式以下介绍内...">
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>vim常用命令</p>
+        
+          <p><p>vim常用命令</p></p>
+        
         <h2 id="vim命令"><a href="#vim命令" class="headerlink" title="vim命令"></a>vim命令</h2><h3 id="1-vim模式"><a href="#1-vim模式" class="headerlink" title="1.vim模式"></a>1.vim模式</h3><p>以下介绍内容来自维基百科Vim</p>
 <p>从vi演生出来的Vim具有多种模式，这种独特的设计容易使初学者产生混淆。几乎所有的编辑器都会有插入和执行命令两种模式，并且大多数的编辑器使用了与Vim截然不同的方式：命令目录（鼠标或者键盘驱动），组合键（通常通过control键（CTRL）和alt键（ALT）组成）或者鼠标输入。Vim和vi一样，仅仅通过键盘来在这些模式之中切换。这就使得Vim可以不用进行菜单或者鼠标操作，并且最小化组合键的操作。对文字录入员或者程序员可以大大增强速度和效率。</p>
 <p>Vim具有6种基本模式和5种派生模式，我们这里只简单介绍下6种基本模式：</p>
@@ -551,7 +562,7 @@ vim命令1.vim模式以下介绍内...">
 </tr>
 </tbody></table>
 <p>2.显示行号</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim">:<span class="hljs-keyword">set</span> <span class="hljs-keyword">nu</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">:<span class="hljs-builtin-name">set</span> nu<br></code></pre></td></tr></table></figure>
 
 <p>3.控制缩进和回退字符数</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">:<span class="hljs-builtin-name">set</span> <span class="hljs-attribute">shiftwidth</span>=10<br></code></pre></td></tr></table></figure>
@@ -677,6 +688,7 @@ vim命令1.vim模式以下介绍内...">
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -708,7 +720,9 @@ vim命令1.vim模式以下介绍内...">
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

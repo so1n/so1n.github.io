@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,7 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         
+        
         <h2 id="1-开发流程"><a href="#1-开发流程" class="headerlink" title="1.开发流程"></a>1.开发流程</h2><p>每个公司都有自己的一套git流程， 如果没有则推荐使用<a target="_blank" rel="noopener" href="https://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html">git-flow备完清单</a></p>
 <h2 id="2-log"><a href="#2-log" class="headerlink" title="2.log"></a>2.log</h2><p>优雅的输出git日志</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">log</span> --decorate --oneline --graph<br></code></pre></td></tr></table></figure>
@@ -233,7 +242,7 @@
 <li>分支变化<br><code>dev</code>在<code>rebase master</code>后，由原来的两个分岔的分支，变成重叠的分支，看起来<code>dev</code>是从最新的<code>master</code>上拉出的分支。<h3 id="5-2何时使用rebase"><a href="#5-2何时使用rebase" class="headerlink" title="5.2何时使用rebase"></a>5.2何时使用rebase</h3>假设现在有<code>dev</code>分支， 由于有功能开发， 基于<code>dev</code>分支创建了<code>feature</code>分支。<br>如果<code>dev</code>分支要合并<code>feature</code>， 则都在<code>dev</code>分支调用<code>git merge feature</code>, 反过来<code>feature</code>要更新<code>dev</code>的内容时，使用<code>git rebase dev</code><br>假设场景：从 dev 拉出分支 feature-a。那么当 dev 要合并 feature-a 的内容时，使用 git merge feature-a；反过来当 feature-a 要更新 dev 的内容时，使用 git rebase dev。<h3 id="5-3git-merge-–no-ff"><a href="#5-3git-merge-–no-ff" class="headerlink" title="5.3git merge –no-ff"></a>5.3git merge –no-ff</h3>在使用merge时， 如果分支没有冲突， 则会把被merge分支的指针指到merge的分支。而使用<code>git merge --no-ff</code>则是在新的分支上进行合并， 合并时会保留当前分支的信息。<h3 id="5-4git-pull-–rebase"><a href="#5-4git-pull-–rebase" class="headerlink" title="5.4git pull –rebase"></a>5.4git pull –rebase</h3>理论上， 任何时候执行<code>git pull</code>时， 都应该变为<code>git pull --rebase</code>.<br>当某个分支可能与其远程分支发生分离， 在使用<code>git pull</code>后就会变成本地分支和远程分支合并, 就会变成类似<code>git merge</code>的情况，  而我们拉取分支只是要同步线上的功能， 通过<code>5.2</code>可以知道， 应该使用类似<code>git merge</code>来更新功能。</li>
 </ul>
 <h2 id="6-commit规范"><a href="#6-commit规范" class="headerlink" title="6.commit规范"></a>6.commit规范</h2><p>每个项目的都应该有个一统一的commit规范， 不同公司的提交规范会不一致， 我个人常用的规范是：</p>
-<figure class="highlight mojolicious"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mojolicious"><span class="xml">git commit -m&quot;<span class="hljs-tag">&lt;<span class="hljs-name">issue_id</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">file</span> <span class="hljs-attr">change</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">operating</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">info</span>&gt;</span>&quot;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">git commit -m&quot;<span class="hljs-tag">&lt;<span class="hljs-name">issue_id</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">file</span> <span class="hljs-attr">change</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">operating</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">info</span>&gt;</span>&quot;<br></code></pre></td></tr></table></figure>
 <ul>
 <li>issue_id: 代表一个issue的id, 在准备写功能或者修复一个bug时，都应该先提一个issue，然后在针对这个issue提交代码</li>
 <li>file change: 代表文件的变化， 如增加， 删除， 修改;也有人使用<code>+,-，*</code>来分别代表增加， 删除， 修改</li>
@@ -270,7 +279,7 @@
 <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">git <span class="hljs-keyword">reset</span> <span class="hljs-comment">--hard HEAD^</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="10-移除git的某些commit"><a href="#10-移除git的某些commit" class="headerlink" title="10.移除git的某些commit"></a>10.移除git的某些commit</h2><p>执行该命令,会撤销对应的提交,然后再重新提交一个新的提交(该操作可以撤销,如果使用reset则会直接回退到某个commit,除非有reflog记录或记得某个commit id,不然无法撤销).<br>再执行git revert前,必须执行</p>
-<figure class="highlight handlebars"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs handlebars"><span class="xml">git diff <span class="hljs-tag">&lt;<span class="hljs-name">commit1</span>&gt;</span> HEAD</span><br><span class="xml">git diff <span class="hljs-tag">&lt;<span class="hljs-name">commit1</span>&gt;</span>..<span class="hljs-tag">&lt;<span class="hljs-name">commit2</span>&gt;</span></span><br></code></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">git</span> diff &lt;commit<span class="hljs-number">1</span>&gt; HEAD<br><span class="hljs-attribute">git</span> diff &lt;commit<span class="hljs-number">1</span>&gt;..&lt;commit<span class="hljs-number">2</span>&gt;<br></code></pre></td></tr></table></figure>
 <p>查看要撤销的代码是否正确,再使用 git revert <commit> 可以撤销指定的提交，要撤销一串提交可以用 <commit1>..<commit2> 语法。 注意这是一个前开后闭区间，即不包括 commit1，但包括 commit2。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">git revent &lt;commit&gt;<br><span class="hljs-comment"># 可以指定一个前开后闭的区间被移除</span><br>git revent &lt;commit&gt;...&lt;commit&gt;<br></code></pre></td></tr></table></figure>
 
@@ -414,6 +423,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -445,7 +455,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

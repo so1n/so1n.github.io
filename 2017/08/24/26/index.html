@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>查阅资料后总结的范围从大到小，用户与浏览器交互的过程。<br>用户端以浏览器示例。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>查阅资料后总结的范围从大到小，用户与浏览器交互的过程。<br>用户端以浏览器示例。</p></p>
+        
         <h3 id="OSI7层"><a href="#OSI7层" class="headerlink" title="OSI7层"></a>OSI7层</h3><p>当浏览器需要访问资源时，浏览器与应用层相关协议(http、htpps)进行交互，并将数据传给表示层进行数据转换再传给传输层（https还需要会话层 TLS、SSL 等协议）<br>由于http、htpps基于TCP协议，所以需要经历三次握手过程，也就是：<br>第一个是“连接协定”数据段，用于请求同步（syn）<br>接下来的数据段确认请求（ack），并在主机之间确定连接参数，同时同步接收方排序<br>最后一个数据段也是确认通知目标主机，接受了协定且连接已确立<br>3次握手与4次分手流程图如下：<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/18D3B9C2-D3F5-4F89-82BB-53B717D89BB5.jpg?raw=true"  ><span class="image-caption">enter description here</span><br>由于从这一层开始提供端到端的服务。措意可以实现流量控制、负载均衡，同时数据段也多了端口、控制字和校验和<br>传输层之后是网络层，这里主要是通过路由协议进行路由转发，还有访问控制表限制，网络地址转换等。再向下数据链路层主要是 ARP、RARP 协议完成 IP 和 Mac 地址互解析，再向下到最底层物理层基本就是 IEEE 802.X 等协议进行数据比特流转成高低电平的的一些定义等等。下面的这几层已经偏向于网络与路由交换机方面，故不展开。</p>
 <h3 id="浏览器与服务器"><a href="#浏览器与服务器" class="headerlink" title="浏览器与服务器"></a>浏览器与服务器</h3><p>当输入完url并按下回车时，浏览器与服务器的数据交互就开始了<br>首先浏览器要通过DNS服务器来查询网址对应的Ip地址，查询顺序如下：<br>浏览器缓存→系统缓存→路由器缓存→ISP DNS缓存→从根域名服务器递归搜索<br>浏览器获得ip地址后，就把请求发送给服务器，除了url本身中的资源路径外，在报头中还有写参数<br>  Accept和Accept-Encoding（表明希望收到的数据）、User-Agent（识别浏览器类型的UA）、Connection（用以表明获取后就关闭链接还是保持开启）、Host、Cookie（储存的cookie）<br>服务器根据请求回复相关数据，如果url中没填写www或者这个服务端对应多个url  服务端会发送301让浏览器重定向到正确的url<br>服务端根据url请求的路径和参数，从数据库中获取数据并和对应的前端3宝返回给浏览器<br>浏览器根据服务器回复的数据和前端3宝渲染页面</p>
 <h3 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h3><p>服务端由 反向代理服务器、后端服务器、web应用组成。反向代理服务器如Nginx，在拿到请求后，进行一些验证，比如黑名单拦截之类的，然后 Nginx 直接处理静态资源请求，其他请求 Nginx 转发给后端服务器。在python web中后端服务器一般为WSGI，通过 uwsgi 协议通讯，uWSGI 拿到请求，可以进行一些逻辑， 验证黑名单、判断爬虫等，之后根据 wsgi 标准（<a target="_blank" rel="noopener" href="http://python.jobbole.com/87361/">wsgi说明</a>），把拿到的 environs 参数扔给web应用。web应用以Django为例，Django 根据 wsgi 标准接收请求和 env， 然后开始 start_response ，先跑 Django 相关后台逻辑，Django 拿到请求执行 request middleware 内的相关逻辑，然后路由到相应 view 执行逻辑，出错执行 exception middleware 相关逻辑，接着 response 前执行 response middleware 逻辑，最后通过 wsgi 标准构造 response，再通过 uWSGI 给 Nginx ，Nginx 返回给浏览器。<br>Django执行流程图如下：<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/180016921.png?raw=true"  ><span class="image-caption">enter description here</span></p>
@@ -325,6 +336,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -356,7 +368,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

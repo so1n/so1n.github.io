@@ -63,10 +63,17 @@ Redis命令1.数据类型命令...">
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -118,7 +125,7 @@ Redis命令1.数据类型命令...">
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -127,10 +134,11 @@ Redis命令1.数据类型命令...">
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -208,6 +216,9 @@ Redis命令1.数据类型命令...">
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>Redis常用命令</p>
+        
+          <p><p>Redis常用命令</p></p>
+        
         <h2 id="Redis命令"><a href="#Redis命令" class="headerlink" title="Redis命令"></a>Redis命令</h2><h3 id="1-数据类型命令"><a href="#1-数据类型命令" class="headerlink" title="1.数据类型命令"></a>1.数据类型命令</h3><p>启动</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> sudo service redis<span class="hljs-literal">-server</span> <span class="hljs-built_in">start</span><br><span class="hljs-variable">$</span> redis<span class="hljs-literal">-cli</span><br></code></pre></td></tr></table></figure>
 <p>存入与获取value</p>
@@ -361,6 +372,7 @@ Redis命令1.数据类型命令...">
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -392,7 +404,9 @@ Redis命令1.数据类型命令...">
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

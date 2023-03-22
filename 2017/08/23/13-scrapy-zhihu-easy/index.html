@@ -63,10 +63,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -118,7 +125,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -127,10 +134,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -208,6 +216,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>阅读scrapy后做了一个简单的scrapy爬虫</p>
+        
+          <p><p>阅读scrapy后做了一个简单的scrapy爬虫</p></p>
+        
         <h2 id="Scrapy爬虫（1）-知乎"><a href="#Scrapy爬虫（1）-知乎" class="headerlink" title="Scrapy爬虫（1）-知乎"></a>Scrapy爬虫（1）-知乎</h2><p>第一次用Scrap创建的爬虫，详细记录下<br>完整代码请访问<a target="_blank" rel="noopener" href="https://github.com/so1n/learn-python/tree/master/6-zhihuSpider">这里</a>,不过代码可能有所不同</p>
 <h3 id="1-前记"><a href="#1-前记" class="headerlink" title="-1.前记"></a>-1.前记</h3><p>本来是昨天弄好代码，今天写文章的。然后今天早上在逛台风吧看台风天鸽状况，天鸽近岸爆发加上机构被妮妲狼来了戏耍后都保持谨慎态度，珠海到早上上班时间后才挂红色预警，澳门则到了快登录才挂10号风球，珠三角没有做好防范，还有近岸爆发和赶上天文大潮导致受灾加重，希望那里灾情不重。付上两张图，一张是澳门海水倒灌一张是天鸽高层图，很像鸽子头<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/scrapy%E5%8F%B0%E9%A3%8E1.jpg?raw=true"  ><span class="image-caption">enter description here</span><br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/Scrapy%E5%8F%B0%E9%A3%8E2.jpg?raw=true"  ><span class="image-caption">enter description here</span></p>
 <h3 id="0-思路验证"><a href="#0-思路验证" class="headerlink" title="0.思路验证"></a>0.思路验证</h3><p>在创建这个工程前，我先用段代码来检验基本功能可否运行<br>知乎可以不用登录获取用户信息，对我来说，方便太多了，而且知乎的查看关注页面那里同时显示有个人用户信息所以直接访问：<a target="_blank" rel="noopener" href="https://www.zhihu.com/people/%EF%BC%88token%EF%BC%89/following">https://www.zhihu.com/people/（token）/following</a><br>就可以找到我要的信息了（虽然关注列表只有20个，不过无所谓）<br><img  src="https://github.com/so1n/so1n_blog_photo/blob/master/blog_photo/%E7%9F%A5%E4%B9%8E-%E6%9F%A5%E7%9C%8B%E7%9F%A5%E4%B9%8E%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE.png?raw=true"  ><span class="image-caption">enter description here</span><br>提取信息如图，直接copy这段数据去相应网站分析后，可以得出我要的数据在两个部分，<br>一个是在[‘people’][‘followingByUser’][urltoken][‘ids’]<br>另一个是在[‘entities’][‘users’][urltoken]<br>找到后就可以写代码开始爬下来了。<br>不过知乎的json会有空，比如这个用户没有学校的值时，json就没有相应的节点，如果直接爬就会报错，然后我也没有找到比较简便的处理方法，就写了try…except（如果用了对象，一个方法来复用，最后代码量也差不多，我就放弃了）<br>代码如下：</p>
@@ -221,16 +232,16 @@
 <p>在终端输入</p>
 <figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-variable">$ </span>scrapy startproject zhihuSpider<br></code></pre></td></tr></table></figure>
 <p>之后会在当前目录生成以下结构</p>
-<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs coq">zhihuSpider<br>    |<span class="hljs-type">- scrapy</span>.cfg                        项目部署文件<br>    |<span class="hljs-type">- zhihuSpider</span>                     该项目的python模块，可以在这里加入代码<br>        |<span class="hljs-type">- __init__</span>.py                 <br>        |<span class="hljs-type">- items</span>.py                       主要是将爬取的非结构性的数据源提取结构性数据<br>        |<span class="hljs-type">- middlewares</span>.py          <br>        |<span class="hljs-type">- pipelines</span>.py                  将爬取的数据进行持久化存储<br>        |<span class="hljs-type">-  __pycache__</span>  <br>        |<span class="hljs-type">-  settings</span>.py                  配置文件<br>        |<span class="hljs-type">-  spiders</span>                       放置spider代码的目录<br>            |<span class="hljs-type">-  __init__</span>.py <br>            |<span class="hljs-type">-  __pycache__</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs 1c">zhihuSpider<br>    <span class="hljs-string">|- scrapy.cfg                        项目部署文件</span><br>    <span class="hljs-string">|- zhihuSpider                     该项目的python模块，可以在这里加入代码</span><br>        <span class="hljs-string">|- __init__.py                 </span><br>        <span class="hljs-string">|- items.py                       主要是将爬取的非结构性的数据源提取结构性数据</span><br>        <span class="hljs-string">|- middlewares.py          </span><br>        <span class="hljs-string">|- pipelines.py                  将爬取的数据进行持久化存储</span><br>        <span class="hljs-string">|-  __pycache__  </span><br>        <span class="hljs-string">|-  settings.py                  配置文件</span><br>        <span class="hljs-string">|-  spiders                       放置spider代码的目录</span><br>            <span class="hljs-string">|-  __init__.py </span><br>            <span class="hljs-string">|-  __pycache__</span><br></code></pre></td></tr></table></figure>
 <h3 id="2-创建爬虫模块"><a href="#2-创建爬虫模块" class="headerlink" title="2.创建爬虫模块"></a>2.创建爬虫模块</h3><p>在终端输入</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs vim">$ <span class="hljs-keyword">cd</span> zhihuSpider<br>$ scrapy genspider -t crawl zhihu.<span class="hljs-keyword">com</span> zhihu.<span class="hljs-keyword">com</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> <span class="hljs-built_in">cd</span> zhihuSpider<br><span class="hljs-variable">$</span> scrapy genspider <span class="hljs-literal">-t</span> crawl zhihu.com zhihu.com<br></code></pre></td></tr></table></figure>
 <p>这里是用scpry的bench的genspider<br>语法是scrapy genspider[-t template] &lt;name&gt; &lt;domain&gt;<br>可以用模板来创建spider<br>之后spider文件夹下面会多出一个zhihu_com.py的文件，里面有段代码为：</p>
 <figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs basic"><span class="hljs-symbol">7 </span>    <span class="hljs-keyword">name</span> = <span class="hljs-comment">&#x27;zhihu.com&#x27;</span><br><span class="hljs-symbol">8 </span>    allowed_domains = [<span class="hljs-comment">&#x27;zhihu.com&#x27;]</span><br><span class="hljs-symbol">9 </span>    start_urls = [<span class="hljs-comment">&#x27;http://zhihu.com/&#x27;]</span><br><br></code></pre></td></tr></table></figure>
 <p>其中<br>name是定义spider名字的字符串，它是必须且唯一的<br> allowed_domains是可选的，它包含了spider允许爬取的域名列表。当OffsiteMiddleware组件启用是，域名不在列表中的url不会被跟进<br> start_urls为url列表，当没有使用start_requests()方法配置Requests时，Spider将从该列表中开始进行爬取<br> 重新回到开头看到<br> <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">class</span> <span class="hljs-symbol">ZhihuComSpider</span>(<span class="hljs-symbol">CrawlSpider</span>):<br></code></pre></td></tr></table></figure><br> Spider有3大类，最基本的是Spieder，他的属性有name, allowed_domains, start_urls,custom_settings,crawler,start_requests().除了Spieder外还有CrawlSpider和XMLFeedSpider。<br> CraelCpider除了从Spider继承过来的属性外，还提供了一个新的属性rules，rules是一个包含一个或多个Rule对象的集合，每个Rule对爬取网站的动作定义了特定的规则。如果多个Rule匹配了相同的链接，则根据它们在rules属性中被定义的顺序，第一个会被使用。<br> Rule类的原型为：<br> <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">scrapy.contrib,spiders.<span class="hljs-constructor">Rule(<span class="hljs-params">link_extractor</span>,<span class="hljs-params">callback</span>=None,<span class="hljs-params">cb_kwargs</span>=None,<span class="hljs-params">follow</span>=None,<span class="hljs-params">process_links</span>=None, <span class="hljs-params">process_request</span>=None)</span><br></code></pre></td></tr></table></figure><br> 参数说明</p>
 <blockquote>
 <p>link_extractor 是一个LinkExtractor对象，定义了如何从爬取到的页面提取链接。<br>callback回调函数接受一个response作为一个参数，应避免使用parse作为回调函数<br>cb_kwargs包含传递给回调函数的参数的字典<br>follow是一个布尔值，指定了根据规则从respose提取的链接是否需要跟进</p>
 </blockquote>
-<p> 然而，知乎跳转到关注人的链接不是完整的，而是类似/perople/xxx/following的，crawlSpider没办法识别，所以不能使用rules（或者是我食用crawlSpider方法不对？我都弄了半天了）<br> 了解了这样多，结果我就直接套上去，不使用rules，因为我的链接不是从网页里面提取的，要自己创造的<br> 直接把url注释掉，因为CrawlSpider属于Spider类，所以调用parse解析就好了<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ZhihuComSpider</span>(<span class="hljs-params">CrawlSpider</span>):</span><br>   name = <span class="hljs-string">&#x27;zhihu.com&#x27;</span><br>   allowed_domains = [<span class="hljs-string">&#x27;zhihu.com&#x27;</span>]<br>   start_urls = [<span class="hljs-string">&#x27;https://www.zhihu.com/people/sgai/following&#x27;</span>]<br><br><br>   <span class="hljs-comment">#rules = (</span><br>   <span class="hljs-comment">#    Rule(LinkExtractor(allow=r&#x27;/people/(\w+)/following$&#x27;, process_value=&#x27;my_process_value&#x27;, unique=True, deny_domains=deny), callback=&#x27;parse_item&#x27;, follow=True),</span><br>   <span class="hljs-comment">#)</span><br><br><br>   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">self, response</span>):</span><br></code></pre></td></tr></table></figure><br> 然后到setting.py下面更改3个数值<br> <figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs vbnet"> 请求头<br> USER_AGENT = <span class="hljs-comment">&#x27;Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36&#x27;</span><br>关闭robot<br>ROBOTSTXT_OBEY = <span class="hljs-literal">False</span><br>关闭cookies追踪<br>COOKIES_ENABLED = <span class="hljs-literal">False</span><br></code></pre></td></tr></table></figure></p>
+<p> 然而，知乎跳转到关注人的链接不是完整的，而是类似/perople/xxx/following的，crawlSpider没办法识别，所以不能使用rules（或者是我食用crawlSpider方法不对？我都弄了半天了）<br> 了解了这样多，结果我就直接套上去，不使用rules，因为我的链接不是从网页里面提取的，要自己创造的<br> 直接把url注释掉，因为CrawlSpider属于Spider类，所以调用parse解析就好了<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ZhihuComSpider</span>(<span class="hljs-params">CrawlSpider</span>):</span><br>   name = <span class="hljs-string">&#x27;zhihu.com&#x27;</span><br>   allowed_domains = [<span class="hljs-string">&#x27;zhihu.com&#x27;</span>]<br>   start_urls = [<span class="hljs-string">&#x27;https://www.zhihu.com/people/sgai/following&#x27;</span>]<br><br><br>   <span class="hljs-comment">#rules = (</span><br>   <span class="hljs-comment">#    Rule(LinkExtractor(allow=r&#x27;/people/(\w+)/following$&#x27;, process_value=&#x27;my_process_value&#x27;, unique=True, deny_domains=deny), callback=&#x27;parse_item&#x27;, follow=True),</span><br>   <span class="hljs-comment">#)</span><br><br><br>   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">self, response</span>):</span><br></code></pre></td></tr></table></figure><br> 然后到setting.py下面更改3个数值<br> <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs yaml"> <span class="hljs-string">请求头</span><br> <span class="hljs-string">USER_AGENT</span> <span class="hljs-string">=</span> <span class="hljs-string">&#x27;Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36&#x27;</span><br><span class="hljs-string">关闭robot</span><br><span class="hljs-string">ROBOTSTXT_OBEY</span> <span class="hljs-string">=</span> <span class="hljs-literal">False</span><br><span class="hljs-string">关闭cookies追踪</span><br><span class="hljs-string">COOKIES_ENABLED</span> <span class="hljs-string">=</span> <span class="hljs-literal">False</span><br></code></pre></td></tr></table></figure></p>
 <h3 id="3-解析网页"><a href="#3-解析网页" class="headerlink" title="3.解析网页"></a>3.解析网页</h3><p>解析网页直接照搬我之前测试是否可以运行的代码，并进行了相对应的修改</p>
 <ul>
 <li>建立一个url存放列表，进行url去重</li>
@@ -380,6 +391,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -411,7 +423,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

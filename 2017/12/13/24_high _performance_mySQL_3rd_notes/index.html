@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>之前对数据库的使用都是写入，取出。最近想弄个数据库却涉及到太多东西去百度也百度不到自己想要的，然后在别人推荐下就看了《高性能Mysql》（第三版的书出版时5.6还没出来），所以这个文章是《高性能Mysql》读书笔记。由于太多了，所以我看多少就记多少。。。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>之前对数据库的使用都是写入，取出。最近想弄个数据库却涉及到太多东西去百度也百度不到自己想要的，然后在别人推荐下就看了《高性能Mysql》（第三版的书出版时5.6还没出来），所以这个文章是《高性能Mysql》读书笔记。由于太多了，所以我看多少就记多少。。。</p></p>
+        
         <h2 id="伪前记-mysql的命令"><a href="#伪前记-mysql的命令" class="headerlink" title="伪前记(mysql的命令)"></a>伪前记(mysql的命令)</h2><p><em>看书前温习了下命令，就顺便记下来了</em></p>
 <h3 id="mysql术语"><a href="#mysql术语" class="headerlink" title="mysql术语"></a>mysql术语</h3><ul>
 <li>关系型数据库<ul>
@@ -526,7 +537,7 @@
 <p>  其中存储顺序是按照</p>
   <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> enum_test(e) <span class="hljs-keyword">VALUES</span>(<span class="hljs-string">&#x27;fish&#x27;</span>),(<span class="hljs-string">&#x27;dog&#x27;</span>),(<span class="hljs-string">&#x27;apple&#x27;</span>);<br></code></pre></td></tr></table></figure>
 <p>  进行排序的，而数字是按照</p>
-  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">e ENUM(<span class="hljs-string">&#x27;fish&#x27;</span>,<span class="hljs-string">&#x27;apple&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>)<span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span><br></code></pre></td></tr></table></figure>
+  <figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">e <span class="hljs-keyword">ENUM</span>(<span class="hljs-string">&#x27;fish&#x27;</span>,<span class="hljs-string">&#x27;apple&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>)<span class="hljs-literal">NOT</span> <span class="hljs-literal">NULL</span><br></code></pre></td></tr></table></figure>
 <p>  绑定的<br>  可以输入</p>
   <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">mysql<span class="hljs-operator">&gt;</span><span class="hljs-keyword">SELECT</span> e <span class="hljs-operator">+</span> <span class="hljs-number">0</span> <span class="hljs-keyword">FROM</span> enum_test;<br></code></pre></td></tr></table></figure>
 <p>  查看对应的数字，而</p>
@@ -850,6 +861,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -881,7 +893,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

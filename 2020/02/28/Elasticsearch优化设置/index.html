@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近一直在接触ElasticSearch,非常好用,不过需要记的东西太多了,就把优化项记录下来</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近一直在接触ElasticSearch,非常好用,不过需要记的东西太多了,就把优化项记录下来</p></p>
+        
         <h2 id="1-ElasticSearch相关配置"><a href="#1-ElasticSearch相关配置" class="headerlink" title="1.ElasticSearch相关配置"></a>1.ElasticSearch相关配置</h2><ul>
 <li><p>path.data: /var/lib/elasticsearch<br>别用来存放索引数据<br>path.data支持配置多个目录，每个目录都会用来存放数据，但是单个分片会存放在同一个目录内</p>
   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">path:<br>  data:<br>    - /dir/elasticsearch_1<br>    - /dir/elasticsearch_2<br>    - /dir/elasticsearch_3<br></code></pre></td></tr></table></figure></li>
@@ -430,6 +441,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -461,7 +473,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

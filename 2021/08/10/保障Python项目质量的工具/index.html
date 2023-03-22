@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,9 +213,10 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         
+        
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在编写项目时，都会对代码质量有一定的追求， 比如代码艺术， 设计模式， 重构设计等等。 但是一个良好Python项目除了程序员本身的代码质量能力之外， 还有系统设计和代码质量工具等等。不过由于每个系统的设计都会有一些不同， 系统设计需要程序员一定的经验， 需要跟着项目去一起成长。 而代码质量工具是可以都抽离出来，应用到每个项目中， 本文则是我这些代码质量工具的简要使用总结。</p>
 <h2 id="0-提交代码规范"><a href="#0-提交代码规范" class="headerlink" title="0.提交代码规范"></a>0.提交代码规范</h2><p>每个团队或个人， 都必须要有一套自己的分支管理和提交代码规范， 对于分支管理， 一般会选用<code>git flow</code>, 如果不太会使用， 前期可以使用<a target="_blank" rel="noopener" href="https://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html">git flow 备忘清单</a>, 并且对于<code>master</code>, <code>develop</code>等分支设置一些权权限。<br>另外提交的信息也要有对应的规范， 比如本次提交属于哪种类型， 本次提交的功能是什么等等, 但是这个提交规范往往都没有一个标准， 只要团队和个人用的顺心， 能通过这些规范来减少开发矛盾， 复盘代码等等即可。 我常使用的是：</p>
-<figure class="highlight mojolicious"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mojolicious"><span class="xml">git commit -m&quot;<span class="hljs-tag">&lt;<span class="hljs-name">issue_id</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">file</span> <span class="hljs-attr">change</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">operating</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">info</span>&gt;</span>&quot;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">git commit -m&quot;<span class="hljs-tag">&lt;<span class="hljs-name">issue_id</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">file</span> <span class="hljs-attr">change</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">operating</span>&gt;</span>:<span class="hljs-tag">&lt;<span class="hljs-name">info</span>&gt;</span>&quot;<br></code></pre></td></tr></table></figure>
 <p>其中每个字段代表的含义如下：</p>
 <ul>
 <li>issue_id: 代表一个issue的id, 在准备写功能或者修复一个bug时，都应该先提一个issue, 这个issue要详细的写明要修改什么，达到什么目的，然后再针对这个issue提交代码</li>
@@ -266,7 +275,7 @@
 </ul>
 <p><code>Flake8</code>除了支持上面3种功能外， 还支持通过插件的方式引入其他功能， 比如使用<code>flake8-docstrings</code>强制要求编写函数<code>docstring</code>等。</p>
 <p>在项目中可以通过<code>poetry add flake8 --dev</code>引入flake8到dev依赖， 然后通过在根目录增加<code>.flake8</code>文件：</p>
-<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs nix">[flake8]<br><span class="hljs-comment"># 适当提高最大行长度</span><br><span class="hljs-attr">max-line-length</span> = <span class="hljs-number">120</span><br><span class="hljs-comment"># 设置最大复杂度</span><br><span class="hljs-attr">max-complexity</span> = <span class="hljs-number">24</span><br><span class="hljs-comment"># 忽略这些错误类型</span><br><span class="hljs-attr">ignore</span> = F401, W503, E203<br><span class="hljs-comment"># 忽略以下文件</span><br><span class="hljs-attr">exclude</span> =<br>    .git,<br>    .venv,<br>    __pycache__,<br>    scripts,<br>    logs,<br>    upload,<br>    build,<br>    dist,<br>    docs,<br>    migrations,<br></code></pre></td></tr></table></figure>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">[flake8]<br># 适当提高最大行长度<br>max-line-length = <span class="hljs-number">120</span><br># 设置最大复杂度<br>max-complexity = <span class="hljs-number">24</span><br># 忽略这些错误类型<br>ignore = F401, W503, E203<br># 忽略以下文件<br>exclude =<br>    .git,<br>    .venv,<br><span class="hljs-built_in">    __pycache__,</span><br><span class="hljs-built_in">    scripts,</span><br><span class="hljs-built_in">    logs,</span><br><span class="hljs-built_in">    upload,</span><br><span class="hljs-built_in">    build,</span><br><span class="hljs-built_in">    dist,</span><br><span class="hljs-built_in">    docs,</span><br><span class="hljs-built_in">    migrations,</span><br></code></pre></td></tr></table></figure>
 <p>指定<code>Flke8</code>该如何执行, 最后调用命令<code>poetry run flake8. </code>即可。</p>
 <h3 id="2-2-mypy"><a href="#2-2-mypy" class="headerlink" title="2.2.mypy"></a>2.2.mypy</h3><p>毫无疑问， Python的语法让人能简洁的写出代码， 但是他的动态语言特性会使大型项目变得不牢固， 而<code>mypy</code>的出现恰好能解决这一问题。<br><code>mypy</code>是一个静态类型检查工具，它可以帮助我们像静态语言一样在运行代码之前就捕获到某些错误， 但是我们在写Python代码时， 要像静态语言一样， 会参数写上他的类型， 这就是<a target="_blank" rel="noopener" href="https://docs.python.org/3/library/typing.html">Type Hints</a>, 通过<code>mypy</code>和<code>Type Hints</code>的结合， 虽然会增加我们的代码量，  但它可以引入如下好处：</p>
 <ul>
@@ -450,6 +459,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -481,7 +491,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

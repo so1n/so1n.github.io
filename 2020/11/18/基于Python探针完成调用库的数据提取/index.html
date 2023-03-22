@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -206,6 +214,10 @@
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近在完善公司的监控系统, 发现在项目运行时经常会出现一些运行时的问题， 这些问题往往不是一个子服务引发的问题， 而可能是某个环节出现了问题， 这时候就需要引入APM系统。在收集APM数据时发现在<code>Python</code>生态中针对web框架都有完善的APM中间件用于接口统计与监控, 但是第三方调用库相关的APM实现都比较少(几乎没有)， 同时这些库大多数也都没提供一些钩子实现。这就需要自己去封装一些库， 为这些库实现一套调用过程的数据提供逻辑。</p>
 <p>本文是以<code>Python</code>的<code>aiomysql</code>库为例，阐述如何基于<code>Python</code>的探针完成调用库的调用过程统计与监控的封装。 </p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近在完善公司的监控系统, 发现在项目运行时经常会出现一些运行时的问题， 这些问题往往不是一个子服务引发的问题， 而可能是某个环节出现了问题， 这时候就需要引入APM系统。在收集APM数据时发现在<code>Python</code>生态中针对web框架都有完善的APM中间件用于接口统计与监控, 但是第三方调用库相关的APM实现都比较少(几乎没有)， 同时这些库大多数也都没提供一些钩子实现。这就需要自己去封装一些库， 为这些库实现一套调用过程的数据提供逻辑。</p>
+<p>本文是以<code>Python</code>的<code>aiomysql</code>库为例，阐述如何基于<code>Python</code>的探针完成调用库的调用过程统计与监控的封装。 </p></p>
+        
         <blockquote>
 <p>注: 监控的形式的agent有很多种，如<code>Prometheus</code>，<code>Zabbix</code>, <code>Graphite</code>和<code>Opentracing</code>他们的数据源有很大的不同，但是他们都是基于元数据封装成自己的源数据，然后发送到对应的服务，所以本文只介绍如何提取元数据，剩下的如何发送需要自己按照特定的监控系统去实现。</p>
 </blockquote>
@@ -228,7 +240,7 @@
 
 <p>这个例子看来很不错, 但是需要在调用的入口处显式调用该逻辑, 通常一个项目可能有几个入口, 每个入口都显示调用该逻辑会非常麻烦， 而且必须先调用我们的hook逻辑后才能import， 这样就得订好引入规范， 不然就可能出现部分地方hook不成功, 如果能把引入hook这个逻辑安排在解析器启动后马上执行， 就可以完美地解决这个问题了.<br>查阅了一翻资料后发现,<code>python</code>解释器初始化的时候会自动<code>import PYTHONPATH</code>下存在的<code>sitecustomize</code>和<code>usercustomize</code>模块, 我们只需要创建该模块, 并在模块里面写入我们的<br>替换函数即可。</p>
 <p>具体结构如下，也可以参考<a target="_blank" rel="noopener" href="https://github.com/so1n/example/blob/master/example_python/example_python/python_hook/hook_by_sys/">github存储</a></p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs vim">.<br>├── __init__.<span class="hljs-keyword">py</span><br>├── hook_aiomysql.<span class="hljs-keyword">py</span><br>├── sitecustomize.<span class="hljs-keyword">py</span><br>└── test_auto_hook.<span class="hljs-keyword">py</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs css">.<br>├── __<span class="hljs-selector-tag">init__</span><span class="hljs-selector-class">.py</span><br>├── <span class="hljs-selector-tag">hook_aiomysql</span><span class="hljs-selector-class">.py</span><br>├── <span class="hljs-selector-tag">sitecustomize</span><span class="hljs-selector-class">.py</span><br>└── <span class="hljs-selector-tag">test_auto_hook</span><span class="hljs-selector-class">.py</span><br></code></pre></td></tr></table></figure>
 <p><code>hook_aiomysql.py</code>是我们制作探针的代码为例子， 而<code>sitecustomize.py</code>存放的代码如下, 非常简单， 就是引入我们的探针代码, 并插入到<code>sys.meta_path</code>：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">from</span> hook_aiomysql <span class="hljs-keyword">import</span> MetaPathFinder<br><br>sys.meta_path.insert(<span class="hljs-number">0</span>, MetaPathFinder())<br></code></pre></td></tr></table></figure>
 <p><code>test_auto_hook.py</code>则是测试代码：</p>
@@ -365,6 +377,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -396,7 +409,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

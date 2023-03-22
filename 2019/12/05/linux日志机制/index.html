@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近系统上出现部分日志丢失的情况,为了解决这个问题,开始了解Linux的日志结构和机制。以下是我的学习总结, 主要涉及到了如何发送日志， 怎么处理日志以及怎么管理日志。<br>注:由于这些应用都是需要用配置去改良或者指导他们如何去做,所以除了简述Linux的结构和功能外,更多的是如何去配置他们。但其中最重要的是了解整个日志记录的机制,以及通过配置去了解这套机制会如何去限制日志的记录以及优化传输,这样我们才能去灵活使用他们。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近系统上出现部分日志丢失的情况,为了解决这个问题,开始了解Linux的日志结构和机制。以下是我的学习总结, 主要涉及到了如何发送日志， 怎么处理日志以及怎么管理日志。<br>注:由于这些应用都是需要用配置去改良或者指导他们如何去做,所以除了简述Linux的结构和功能外,更多的是如何去配置他们。但其中最重要的是了解整个日志记录的机制,以及通过配置去了解这套机制会如何去限制日志的记录以及优化传输,这样我们才能去灵活使用他们。</p></p>
+        
         <h2 id="1-Linux中日志的发送流程"><a href="#1-Linux中日志的发送流程" class="headerlink" title="1.Linux中日志的发送流程"></a>1.Linux中日志的发送流程</h2><p>一般来说， 我们所写的Web应用的日志都是直接打开一个文件， 然后把日志信息写到这个文件中。 这样非常方便, 但是缺少了一个统一的定义和管理, 所以Linux中就使用了一套稳定的日志管理系统–<code>rsyslog</code>。 它可以接收应用程序通过socket发送过来的日志数据， 然后按照规则非常方便的过滤和分发日志, 同时它也支持稳定的把所有日志从某台机器发送到另外一台机器， 不漏一条消息。</p>
 <p>那么这整套机制是怎么运行的呢， 先看看一个本机应用程序发送日志， 本机rsyslog接收日志的流程图：</p>
 <blockquote>
@@ -651,6 +662,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -682,7 +694,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

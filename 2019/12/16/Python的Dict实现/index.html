@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在<code>Python</code>中, Dict是一系列由键和值配对组成的元素的集合, 它是一个可变容器模型，可以存储任意类型对象. Dict的存取速度非常的快, 而这全靠他的哈希算法的功劳, 在<code>Python</code>3.6之前Dict是无序的, 在<code>Python</code>3.6中绝大部分是有序的, 在<code>Python</code>3.7以及之后则是绝对有序的, 而且占用内存空间更少, 对于万物基于Dict的<code>Python</code>,这算一个大优化, 也让我好奇<code>Python</code>是如何实现哈希有序的.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在<code>Python</code>中, Dict是一系列由键和值配对组成的元素的集合, 它是一个可变容器模型，可以存储任意类型对象. Dict的存取速度非常的快, 而这全靠他的哈希算法的功劳, 在<code>Python</code>3.6之前Dict是无序的, 在<code>Python</code>3.6中绝大部分是有序的, 在<code>Python</code>3.7以及之后则是绝对有序的, 而且占用内存空间更少, 对于万物基于Dict的<code>Python</code>,这算一个大优化, 也让我好奇<code>Python</code>是如何实现哈希有序的.</p></p>
+        
         <h2 id="1-Dict的实现"><a href="#1-Dict的实现" class="headerlink" title="1.Dict的实现"></a>1.Dict的实现</h2><p>Dict在查找key时非常的快， 这得益于它的使用空间换时间思路和哈希实现。的在读取和写入Key时， 都会对Key进行哈希计算(所以要求Key都是不可变类型，如果是可变类型，就无法计算出他的哈希值了), 然后根据计算的值, 与当前的数组空间长度进行取模计算, 得到的值就是当前Key在数组的下标, 最后通过下标就可以以O(1)的时间复杂度读取值. 这种实现非常棒, 也是分布式的常见做法, 但也有问题, 如果数组满了怎么办或者是不同的Key, 但是哈希结果是一样的怎么办?</p>
 <p>针对第一个问题的解决办法是在合适的时候进行扩容, 在<code>Python</code>中, 当Dict中放置的数量占容量的2/3时, Dict就会开始扩容, 扩容后的总容量是扩容之前的一倍, 这是为了减少频繁扩容， 导致key的迁移次数变多;</p>
 <p>而针对第二个问题则有两个解法:</p>
@@ -359,6 +370,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -390,7 +402,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

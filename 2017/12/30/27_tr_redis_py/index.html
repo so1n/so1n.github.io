@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>之前自己渣渣翻译的<a target="_blank" rel="noopener" href="https://pypi.python.org/pypi/redis">redi-py</a>文档,redis-py可以使用python操作redis数据库</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>之前自己渣渣翻译的<a target="_blank" rel="noopener" href="https://pypi.python.org/pypi/redis">redi-py</a>文档,redis-py可以使用python操作redis数据库</p></p>
+        
         <h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><h3 id="入门"><a href="#入门" class="headerlink" title="入门"></a>入门</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> redis<br><span class="hljs-meta">&gt;&gt;&gt; </span>r = redis.StrictRedis(host=<span class="hljs-string">&#x27;localhost&#x27;</span>, port=<span class="hljs-number">6379</span>, db=<span class="hljs-number">0</span>)<br><span class="hljs-meta">&gt;&gt;&gt; </span>r.<span class="hljs-built_in">set</span>(<span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-string">&#x27;bar&#x27;</span>)<br><span class="hljs-literal">True</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>r.get(<span class="hljs-string">&#x27;foo&#x27;</span>)<br><span class="hljs-string">&#x27;bar&#x27;</span><br></code></pre></td></tr></table></figure>
 <h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><p>Redis官方的命令文档<a target="_blank" rel="noopener" href="https://redis.io/commands">英文</a>,<a target="_blank" rel="noopener" href="http://www.redis.cn/documentation.html">中文</a>做了详细的讲解每个命令的的工作。redis-py公开了两个实现这些命令的类。StrictRedis类尝试遵守官方命令语法。不过有一些例外：</p>
 <ul>
@@ -397,6 +408,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -428,7 +440,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

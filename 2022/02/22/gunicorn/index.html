@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -204,6 +212,7 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
+        
         
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Gunicorn</code>是一个基于<code>Python</code>实现的动态Web服务器，它通过Pre-Worker模型来实现并发，本身带有多种工作模式，基本上可以与所有基于<code>Python</code>的Web框架集成，并为他们带来一个多功能又稳定的服务器托管核心。</p>
 <p>从学习<code>Python</code> Web的第一天就开始接触了<code>Gunicorn</code>,那时候还不知道他具体的作用是什么， 只知道在项目中使用他运行之后可以变得十分的稳定，高性能，从未研究它是如何实现的。随着使用时间的增长，越来越想知道它的运行原理是什么，特别是它性能为何会高，跟类Unix有什么特殊结合，<code>Pre-Worker</code>模型是如何通信的，如何设计一个比较好的<code>Pre-Worker</code>模型服务器？<br>于是，本文就是阅读源码之后的产物。</p>
@@ -441,6 +450,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -472,7 +482,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

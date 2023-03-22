@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在验证用户邮箱时，需要发送一个链接给用户的邮箱，让用户点击以确保用户输入的邮箱是他本人所有。<br>但是email是由提供商进行发送的，我们需要先把请求发给提供商再由提供商发送，如果不使用异步发送，在用户点击按钮后，必须等到后台收到提供商的返回结果，我们才能把数据返回给用户。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在验证用户邮箱时，需要发送一个链接给用户的邮箱，让用户点击以确保用户输入的邮箱是他本人所有。<br>但是email是由提供商进行发送的，我们需要先把请求发给提供商再由提供商发送，如果不使用异步发送，在用户点击按钮后，必须等到后台收到提供商的返回结果，我们才能把数据返回给用户。</p></p>
+        
         <h2 id="1-Celery介绍"><a href="#1-Celery介绍" class="headerlink" title="1.Celery介绍"></a>1.Celery介绍</h2><p>由于使用同步发送带来了许多麻烦，所以可以考虑用任务队列进行异步发送，在python中的Celery库发挥的就是这个作用，而且Celery接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库。<br><a target="_blank" rel="noopener" href="http://python.jobbole.com/87238/">更多介绍以及入门</a></p>
 <h2 id="2-与django结合异步发送邮件的服务"><a href="#2-与django结合异步发送邮件的服务" class="headerlink" title="2.与django结合异步发送邮件的服务"></a>2.与django结合异步发送邮件的服务</h2><p>假设之前已经完成了email发送逻辑（同步方式）</p>
 <h3 id="2-1setting-py设置"><a href="#2-1setting-py设置" class="headerlink" title="2.1setting.py设置"></a>2.1setting.py设置</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs Python">EMAIL_HOST = <span class="hljs-string">&#x27;smtp.163.com&#x27;</span>                <span class="hljs-comment"># 服务提供商</span><br>EMAIL_PORT = <span class="hljs-number">25</span>                            <span class="hljs-comment"># 端口</span><br>EMAIL_HOST_USER = <span class="hljs-string">&quot;***&quot;</span>                    <span class="hljs-comment"># 用户名</span><br>EMAIL_HOST_PASSWORD = <span class="hljs-string">&quot;***&quot;</span>                <span class="hljs-comment"># 密码</span><br>EMAIL_USE_TLS = <span class="hljs-literal">False</span>                      <span class="hljs-comment"># False就好了</span><br>EMAIL_FROM = <span class="hljs-string">&quot;***&quot;</span>                         <span class="hljs-comment"># 来源名字</span><br><br><br><span class="hljs-comment">###配置Broker</span><br>BROKER_URL = <span class="hljs-string">&#x27;redis://127.0.0.1:6379/0&#x27;</span>    <br>BROKER_TRANSPORT = <span class="hljs-string">&#x27;redis&#x27;</span><br></code></pre></td></tr></table></figure>
@@ -221,7 +232,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python">send_register_email.delay(email, <span class="hljs-string">&quot;update_email&quot;</span>, num=<span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
 
 <h3 id="2-5运行celery服务"><a href="#2-5运行celery服务" class="headerlink" title="2.5运行celery服务"></a>2.5运行celery服务</h3><p>Broker设置为redis所以必须先启动</p>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">service redis <span class="hljs-keyword">start</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">service redis <span class="hljs-literal">start</span><br></code></pre></td></tr></table></figure>
 <p>检查是否启动并监听端口</p>
 <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">ps</span> aux|<span class="hljs-keyword">grep</span> redis<br></code></pre></td></tr></table></figure>
 <p>在celery所在目录输入命令启动celery</p>
@@ -345,6 +356,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -376,7 +388,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

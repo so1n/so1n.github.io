@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -204,6 +212,7 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
+        
         
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="https://so1n.me/2022/04/07/Python-gRPC%E5%AE%9E%E8%B7%B5(3)--%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0gRPC%E6%9C%8D%E5%8A%A1/">Python-gRPC实践(3)–使用Python实现gRPC服务</a><br>讲述了如何编写和使用gRPC服务，而本文主要讲述一些业务之外的gRPC用法。</p>
 <h2 id="1-优雅的重启服务"><a href="#1-优雅的重启服务" class="headerlink" title="1.优雅的重启服务"></a>1.优雅的重启服务</h2><p>线上运行的服务永远都不会一尘不变的，特别是对于微服务，服务的更新频率越来越快，需要重启的次数也就变多了，而每次重启都会导致服务正在处理的请求被强行关闭，所以我们需要优雅的重启服务，确保在滚动更新服务的时候不会影响到客户端，好在gRPC自带了一个类似的功能，代码例子如下:</p>
@@ -371,6 +380,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -402,7 +412,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

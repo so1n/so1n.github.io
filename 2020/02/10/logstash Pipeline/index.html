@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="1-Logstash-Pipeline"><a href="#1-Logstash-Pipeline" class="headerlink" title="1.Logstash Pipeline"></a>1.Logstash Pipeline</h2><p>pipeline在logstash6.0后加入,有了pipeline这个机制后,我们可以只通过配置pipeline来控制logstash的input, filter, output</p>
+        
+          <p><h2 id="1-Logstash-Pipeline"><a href="#1-Logstash-Pipeline" class="headerlink" title="1.Logstash Pipeline"></a>1.Logstash Pipeline</h2><p>pipeline在logstash6.0后加入,有了pipeline这个机制后,我们可以只通过配置pipeline来控制logstash的input, filter, output</p></p>
+        
         <h3 id="1-1-logstash所在位置"><a href="#1-1-logstash所在位置" class="headerlink" title="1.1.logstash所在位置"></a>1.1.logstash所在位置</h3><p>目前很多都是使用beats收集各个项目的数据,并经过类似kafka等缓冲层,再由logstash接受处理数据再发到elastic(如下)<br>beats -&gt; [缓冲] -&gt;logstash -&gt; elasticsearch</p>
 <h3 id="1-2为何需要Pipeling"><a href="#1-2为何需要Pipeling" class="headerlink" title="1.2为何需要Pipeling"></a>1.2为何需要Pipeling</h3><ul>
 <li>条件地狱<br>在没有出现pipeline的时候,只能在input,filter,output配置多个if,else非常麻烦.<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">input &#123;<br>  beats &#123; port =&gt; 2333  tag =&gt; apache   &#125;<br>  beats &#123; port =&gt; 2233  tag =&gt; so1n   &#125;<br>&#125;<br>filter &#123;<br>   <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;apache&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    dissect &#123; ... &#125;<br>   &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;so1n&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    grok &#123; ... &#125;<br>   &#125;  <br>&#125;<br><span class="hljs-comment"># elasticsearch需要分别定义index等导致需要拆分</span><br>output &#123;<br>   <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;apache&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    elasticsearch &#123; ... &#125;<br>   &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;so1n&quot;</span> <span class="hljs-keyword">in</span> [tags] &#123;  <br>    elasticsearch &#123; ... &#125;<br>   &#125;  <br>&#125;<br></code></pre></td></tr></table></figure></li>
@@ -357,6 +368,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -388,7 +400,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

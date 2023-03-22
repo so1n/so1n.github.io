@@ -60,10 +60,17 @@
       isHome: true,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -190,6 +198,30 @@
 <div class="col-lg-4 col-md-6 col-sm-12 post-item">
   <div class="post-wrap">
     
+    <a href="/2021/04/23/%E4%BD%BF%E7%94%A8Redis%E5%BD%93%E5%81%9A%E9%98%9F%E5%88%97/" class="post-image">
+      <img src="/images/theme/post-image.jpg" draggable="false">
+    </a>
+    <div class="post-content">
+      <div class="post-content-wrap">
+        <h3 class="post-title"><a href="/2021/04/23/%E4%BD%BF%E7%94%A8Redis%E5%BD%93%E5%81%9A%E9%98%9F%E5%88%97/" title="使用Redis做消息队列" >使用Redis做消息队列</a></h3>
+        <div class="post-excerpt">
+          <p class="substr-3">前记Redis拥有很多数据结构, 是一个非常灵活的内存数据库, 基本上很多后端业务都会用到Redis, 在网络社区中, 经常听到可以使用Redis来当做XXX的问题, 在第一次接触消息队列时, ...</p>
+        </div>
+      </div>
+      <div class="post-info">
+        <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 23, 2021</span>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+    
+
+<div class="col-lg-4 col-md-6 col-sm-12 post-item">
+  <div class="post-wrap">
+    
     <a href="/2021/02/10/2021plan/" class="post-image">
       <img src="/images/theme/post-image.jpg" draggable="false">
     </a>
@@ -204,7 +236,6 @@
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 10, 2021</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>2072</span>
       </div>
     </div>
   </div>
@@ -229,7 +260,6 @@
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 12, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>6008</span>
       </div>
     </div>
   </div>
@@ -255,7 +285,6 @@
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 10, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>7797</span>
       </div>
     </div>
   </div>
@@ -281,7 +310,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>December 10, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>2269</span>
       </div>
     </div>
   </div>
@@ -306,7 +334,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>November 18, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>11823</span>
       </div>
     </div>
   </div>
@@ -331,7 +358,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>September 07, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>2609</span>
       </div>
     </div>
   </div>
@@ -356,7 +382,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>September 05, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>5001</span>
       </div>
     </div>
   </div>
@@ -383,7 +408,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>September 01, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>6876</span>
       </div>
     </div>
   </div>
@@ -408,7 +432,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 17, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>3274</span>
       </div>
     </div>
   </div>
@@ -433,7 +456,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 03, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>5379</span>
       </div>
     </div>
   </div>
@@ -458,32 +480,6 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
       <div class="post-info">
         <span class="post-info-item"><i class="iconfont iconcalendar"></i>June 03, 2020</span>
         
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>5676</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-  
-    
-
-<div class="col-lg-4 col-md-6 col-sm-12 post-item">
-  <div class="post-wrap">
-    
-    <a href="/2020/05/28/%E5%86%85%E5%AD%98%E7%BB%9F%E8%AE%A1/" class="post-image">
-      <img src="/images/theme/post-image.jpg" draggable="false">
-    </a>
-    <div class="post-content">
-      <div class="post-content-wrap">
-        <h3 class="post-title"><a href="/2020/05/28/%E5%86%85%E5%AD%98%E7%BB%9F%E8%AE%A1/" title="由内存溢出的思考:如何监控内存?" >由内存溢出的思考:如何监控内存?</a></h3>
-        <div class="post-excerpt">
-          <p class="substr-3">前记最近在做监控系统,发现Linux的内存监控比较困难,主要是指标太多,不知道那些指标才是真正需要的,比如一开始我们就监控free命令输出的free,然而由于页缓存的原因,有些数据是不对的.恰好...</p>
-        </div>
-      </div>
-      <div class="post-info">
-        <span class="post-info-item"><i class="iconfont iconcalendar"></i>May 28, 2020</span>
-        
-        <span class="post-info-item"><i class="iconfont iconfont-size"></i>9112</span>
       </div>
     </div>
   </div>
@@ -528,6 +524,7 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -559,7 +556,9 @@ Celery的示例或者常用使用方式中, Celery的Woker以及任务调用经�
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

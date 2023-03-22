@@ -62,10 +62,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -117,7 +124,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -126,10 +133,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -207,6 +215,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>这里是补充数据结构里面缺失的对应算法，略产促</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>这里是补充数据结构里面缺失的对应算法，略产促</p></p>
+        
         <h2 id="字符串匹配"><a href="#字符串匹配" class="headerlink" title="字符串匹配"></a>字符串匹配</h2><p>字符串匹配一般是有一大串字符串target_str, 给给一个待匹配的字符串pattern_str, 找出pattern_str是否在target_str之中, 一般来说target_str会很大而pattern_str会很小.<br>最简单的就是暴力算法, 然后有Sunday算法和KMP算法, 暴力算法是一个字符一个字符的比较多, 思路简单, 但是计算资源会重复, 而后面两种算法只是基于前面的查找计算资源, 判断是否可以多跳几个字符, 减少计算资源的使用.</p>
 <h3 id="朴素的模式匹配算法"><a href="#朴素的模式匹配算法" class="headerlink" title="朴素的模式匹配算法"></a>朴素的模式匹配算法</h3><p>假设字母列表长度为m, 想要寻找的长度为n，则从头开始找，到第m-n+1位，寻找是否有相同的字母.<br>一般都是把n的长度当做滑动窗口的大小, 然后一位一位的增加, 直到窗口内容跟n一致</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">str_match</span>(<span class="hljs-params">target_str: <span class="hljs-built_in">str</span>, pattern_str: <span class="hljs-built_in">str</span></span>) -&gt; bool:</span>  <br>    m: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">len</span>(target_str)<br>    n: <span class="hljs-built_in">int</span> = <span class="hljs-built_in">len</span>(pattern_str)  <br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(m-n+<span class="hljs-number">1</span>):<span class="hljs-comment">#起始指针i  </span><br>        <span class="hljs-keyword">if</span> target_str[i:i+n] == pattern_str:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span>  <br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span>  <br><br>str_match(<span class="hljs-string">&quot;BBC ABCDAB ABCDABCDABDE&quot;</span>, <span class="hljs-string">&quot;ABCDABD&quot;</span>)<br></code></pre></td></tr></table></figure>
@@ -357,6 +368,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -388,7 +400,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

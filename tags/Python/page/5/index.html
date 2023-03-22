@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -190,6 +198,14 @@
         
         
           
+            <h3 class="archive-year">2019 年</h3>
+          
+          <div class="archive-item">
+            <a class="archive-date" href="/2019/03/07/%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0tail/">03/07</a>
+            <a class="archive-title" href="/2019/03/07/%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0tail/">使用python实现tail</a>
+          </div>
+        
+          
             <h3 class="archive-year">2017 年</h3>
           
           <div class="archive-item">
@@ -245,12 +261,6 @@
             <a class="archive-title" href="/2017/08/01/6/">Python数据结构以及排序</a>
           </div>
         
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2017/07/31/5_wxpy_2/">07/31</a>
-            <a class="archive-title" href="/2017/07/31/5_wxpy_2/">[Python玩微信（2）:wxpy的进阶]</a>
-          </div>
-        
       </div>
     </div>
   </section>
@@ -284,6 +294,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -315,7 +326,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

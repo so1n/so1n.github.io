@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -206,6 +214,10 @@
         <!-- 展示文章摘录 -->
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在完善一个<code>Protobuf</code>中的<code>Message</code>转为<code>pydantic.BaseModel</code>对象的库–<a target="_blank" rel="noopener" href="https://github.com/so1n/protobuf_to_pydantic">protobuf_to_pydantic</a>，想为它增加一个从原生<code>Protobuf</code>文件直接生成对应<code>pydantic.BaseModel</code>对象源代码的功能，在通过了解后发现可以通过<code>Protobuf</code>插件的形式来实现</p>
 <p>但是搜索了大量的资源后才发现大多数的<code>Protobuf</code>插件都是由<code>Go</code>编写的，并且没有(或者很少)关于<code>Python</code>插件的编写教程以及在<a target="_blank" rel="noopener" href="https://googleapis.dev/python/protobuf/latest/">Python Protobuf官方文档</a>中找不到任何关于<code>Plugin</code>的介绍，所以踩了很多坑，而本文也就成了我编写<code>Protobuf</code>插件的踩坑总结</p>
+        
+          <p><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在完善一个<code>Protobuf</code>中的<code>Message</code>转为<code>pydantic.BaseModel</code>对象的库–<a target="_blank" rel="noopener" href="https://github.com/so1n/protobuf_to_pydantic">protobuf_to_pydantic</a>，想为它增加一个从原生<code>Protobuf</code>文件直接生成对应<code>pydantic.BaseModel</code>对象源代码的功能，在通过了解后发现可以通过<code>Protobuf</code>插件的形式来实现</p>
+<p>但是搜索了大量的资源后才发现大多数的<code>Protobuf</code>插件都是由<code>Go</code>编写的，并且没有(或者很少)关于<code>Python</code>插件的编写教程以及在<a target="_blank" rel="noopener" href="https://googleapis.dev/python/protobuf/latest/">Python Protobuf官方文档</a>中找不到任何关于<code>Plugin</code>的介绍，所以踩了很多坑，而本文也就成了我编写<code>Protobuf</code>插件的踩坑总结</p></p>
+        
         <p>如果不知道如何编写<code>Protobuf</code>文件以及如何生成对应的<code>Python</code>代码，可以先阅读<a href="https://so1n.me/2022/04/07/Python-gRPC%E5%AE%9E%E8%B7%B5(3)--%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0gRPC%E6%9C%8D%E5%8A%A1/">Python-gRPC实践(3)–使用Python实现gRPC服务</a></p>
 <h2 id="1-什么是Protobuf插件"><a href="#1-什么是Protobuf插件" class="headerlink" title="1.什么是Protobuf插件"></a>1.什么是Protobuf插件</h2><p>在官方的介绍中，<code>Protobuf</code>插件是一个标准的程序，它会从标准输入读取协议缓冲区并写入到<code>CodeGeneratorRequest</code>对象中，然后将<code>CodeGeneratorResponse</code>序列化后通过协议缓冲区写进标准输出，其中这些消息类型是在<a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.compiler.plugin.pb">plugin.proto</a>中定义的。</p>
 <p>同时，在使用的过程中可以通过<code>CodeGeneratorRequest</code>获取到<code>Protobuf</code>文件所描述的对象(在<code>Protobuf</code>中称为<code>FileDescriptorProto</code>)，通过这个<code>FileDescriptorProto</code>对象可以得到文件中的所有信息，比如<a target="_blank" rel="noopener" href="https://github.com/nipunn1313/mypy-protobuf">mypy-protobuf</a>就是通过<code>CodeGeneratorRequest</code>对象来生成对应的<code>pyi</code>文件内容，最后再通过<code>CodeGeneratorResponse</code>对象把内容写入到对应的文件中。</p>
@@ -368,6 +380,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -399,7 +412,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

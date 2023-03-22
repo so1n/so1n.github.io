@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -207,6 +215,11 @@
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>所有提供服务的框架都需要跑性能测试， 经过性能测试来发现了解服务的qps有多少， 是否有人为的因素导致性能不足以及是否有需要优化的代码。</p>
 <p>一般来说，服务框架的性能测试都需要跟同类的框架一起做比较， 我在编写<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>之前， 用的是<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 所以在设计<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>时参考了<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 最后进行性能测试的时候也是跟<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>进行比较。</p>
 <p>由于我引入了单连接复用的功能， 所以在预想中我编写的框架性能应该是比<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>性能好， 可是最后的测试结果却是不如意的， 所以就开始了优化之旅。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>所有提供服务的框架都需要跑性能测试， 经过性能测试来发现了解服务的qps有多少， 是否有人为的因素导致性能不足以及是否有需要优化的代码。</p>
+<p>一般来说，服务框架的性能测试都需要跟同类的框架一起做比较， 我在编写<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>之前， 用的是<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 所以在设计<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>时参考了<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 最后进行性能测试的时候也是跟<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>进行比较。</p>
+<p>由于我引入了单连接复用的功能， 所以在预想中我编写的框架性能应该是比<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>性能好， 可是最后的测试结果却是不如意的， 所以就开始了优化之旅。</p></p>
+        
         <h2 id="1-性能对比"><a href="#1-性能对比" class="headerlink" title="1.性能对比"></a>1.性能对比</h2><p>在<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>简介中列出作者对几个相关框架压测的qps数据对比, 如下:</p>
 <table>
 <thead>
@@ -385,6 +398,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -416,7 +430,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

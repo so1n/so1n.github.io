@@ -63,10 +63,17 @@ scrapy...">
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -118,7 +125,7 @@ scrapy...">
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -127,10 +134,11 @@ scrapy...">
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -208,12 +216,15 @@ scrapy...">
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>Scrapy学习笔记，每个都带有示例</p>
+        
+          <p><p>Scrapy学习笔记，每个都带有示例</p></p>
+        
         <h1 id="scrapy学习笔记-有示例版）"><a href="#scrapy学习笔记-有示例版）" class="headerlink" title="scrapy学习笔记(有示例版）"></a>scrapy学习笔记(有示例版）</h1><h2 id="1-使用scrapy"><a href="#1-使用scrapy" class="headerlink" title="1.使用scrapy"></a>1.使用scrapy</h2><blockquote>
 <p>ps:linux环境</p>
 </blockquote>
 <p>安装：sudo install Scrapy</p>
 <h3 id="1-1创建工程"><a href="#1-1创建工程" class="headerlink" title="1.1创建工程"></a>1.1创建工程</h3><p>$ scrapy startproject Spider<br>就创建属于自己的项目<br>同时生成一个Spider目录：</p>
-<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs coq">Spider<br>    |<span class="hljs-type">- scrapy</span>.cfg                        项目部署文件<br>    |<span class="hljs-type">- Spider</span>                     该项目的python模块，可以在这里加入代码<br>        |<span class="hljs-type">- __init__</span>.py                 <br>        |<span class="hljs-type">- items</span>.py                       主要是将爬取的非结构性的数据源提取结构性数据<br>        |<span class="hljs-type">- middlewares</span>.py          <br>        |<span class="hljs-type">- pipelines</span>.py                  将爬取的数据进行持久化存储<br>        |<span class="hljs-type">-  __pycache__</span>  <br>        |<span class="hljs-type">-  settings</span>.py                  配置文件<br>        |<span class="hljs-type">-  spiders</span>                       放置spider代码的目录<br>            |<span class="hljs-type">-  __init__</span>.py <br>            |<span class="hljs-type">-  __pycache__</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs 1c">Spider<br>    <span class="hljs-string">|- scrapy.cfg                        项目部署文件</span><br>    <span class="hljs-string">|- Spider                     该项目的python模块，可以在这里加入代码</span><br>        <span class="hljs-string">|- __init__.py                 </span><br>        <span class="hljs-string">|- items.py                       主要是将爬取的非结构性的数据源提取结构性数据</span><br>        <span class="hljs-string">|- middlewares.py          </span><br>        <span class="hljs-string">|- pipelines.py                  将爬取的数据进行持久化存储</span><br>        <span class="hljs-string">|-  __pycache__  </span><br>        <span class="hljs-string">|-  settings.py                  配置文件</span><br>        <span class="hljs-string">|-  spiders                       放置spider代码的目录</span><br>            <span class="hljs-string">|-  __init__.py </span><br>            <span class="hljs-string">|-  __pycache__</span><br></code></pre></td></tr></table></figure>
 
 <h3 id="1-2创建爬虫模块"><a href="#1-2创建爬虫模块" class="headerlink" title="1.2创建爬虫模块"></a>1.2创建爬虫模块</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> scrapy<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Spider</span>(<span class="hljs-params">scrapy.Spider</span>):</span>                       <span class="hljs-comment">#创建的Spider是继承scrapy.Spider类</span><br>    name = <span class="hljs-string">&quot;Spider&quot;</span>                                      <span class="hljs-comment">#爬虫的名称（必须是项目里面唯一的）</span><br>    allowed_domain = [<span class="hljs-string">&quot;xxx.com&quot;</span>]                <span class="hljs-comment">#允许的域名（就是这个爬虫爬取链接的范围）</span><br>    start_urls = [<span class="hljs-string">&quot;http://xxx.com/xxx/xxx&quot;</span>]     <span class="hljs-comment">#开始爬取的链接</span><br>    <br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span>(<span class="hljs-params">self, response</span>):</span>                     <br>        <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
 <p>在spiders文件夹创建出这份代码，除了以上解释外，里面的parse()是一个Spider方法，被调用时，每个初始url响应后返回的Response对象，将会作为唯一的参数传递给该方法。该方法负责解析返回的数据，提取数据以及生成需要进一步处理的url的Responst对象</p>
@@ -610,6 +621,7 @@ scrapy...">
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -641,7 +653,9 @@ scrapy...">
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

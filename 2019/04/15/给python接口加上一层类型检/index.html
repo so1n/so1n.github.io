@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>给接口加上类型检查的想法源于我实习时写接口的灵感, 那时候就是一个crud boy,一直在写接口,但每次都要在接口写一些参数校验或参数类型转换, 觉得很繁琐,总觉得这个是可以自己封装一个,减少大量代码. 在实现的过程中发现自己慢慢的接受了代码即文档的实现, 并且慢慢迭代, 使之越来越完善, 最终蜕变成一个开源项目<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a></p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>给接口加上类型检查的想法源于我实习时写接口的灵感, 那时候就是一个crud boy,一直在写接口,但每次都要在接口写一些参数校验或参数类型转换, 觉得很繁琐,总觉得这个是可以自己封装一个,减少大量代码. 在实现的过程中发现自己慢慢的接受了代码即文档的实现, 并且慢慢迭代, 使之越来越完善, 最终蜕变成一个开源项目<a target="_blank" rel="noopener" href="https://github.com/so1n/pait">pait</a></p></p>
+        
         <hr>
 <p><strong>注</strong>:<br>第一版是18年实习的时候,基 于一个叫sanic的web框架以及Python3.5写的.</p>
 <p>19/03 更新: 为了代码统一,这里的示例是把sanic的接口代码迁移到starlette, Python3.7了.</p>
@@ -425,6 +436,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -456,7 +468,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>这是我在学习MongoＤＢ时的学习笔记，并且结合Ｐｙｔｈｏｎ调用mongodb数据库</p>
+        
+          <p><p>这是我在学习MongoＤＢ时的学习笔记，并且结合Ｐｙｔｈｏｎ调用mongodb数据库</p></p>
+        
         <h2 id="MongoDB-基础"><a href="#MongoDB-基础" class="headerlink" title="MongoDB 基础"></a>MongoDB 基础</h2><h3 id="1-SQL概念和MongoDB概念对比"><a href="#1-SQL概念和MongoDB概念对比" class="headerlink" title="1.SQL概念和MongoDB概念对比"></a>1.SQL概念和MongoDB概念对比</h3><table>
 <thead>
 <tr>
@@ -245,9 +256,9 @@
 </tr>
 </tbody></table>
 <h3 id="2-创建-删除数据库"><a href="#2-创建-删除数据库" class="headerlink" title="2.创建/删除数据库"></a>2.创建/删除数据库</h3><p>创建数据库的语法：</p>
-<figure class="highlight irpf90"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs irpf90"><span class="hljs-keyword">use</span> DATABASE_NAME<br></code></pre></td></tr></table></figure>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs actionscript"><span class="hljs-keyword">use</span> DATABASE_NAME<br></code></pre></td></tr></table></figure>
 <p>如果数据库不在则创建数据库，否则切换到指定数据库<br>查看所有数据库：</p>
-<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-keyword">show </span>dbs<br></code></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dart"><span class="hljs-keyword">show</span> dbs<br></code></pre></td></tr></table></figure>
 <p>删除数据库(删除当前数据库)：</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-tag">db</span><span class="hljs-selector-class">.dropDatabase</span>()<br></code></pre></td></tr></table></figure>
 <p>创建数据库再删除示例<br><img src="http://ww2.sinaimg.cn/large/006HJ39wgy1fhsnpolv96j30f406n404.jpg"></p>
@@ -433,6 +444,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -464,7 +476,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

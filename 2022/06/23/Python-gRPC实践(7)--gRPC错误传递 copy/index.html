@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -204,6 +212,7 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
+        
         
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前在文章<a href="https://so1n.me/2022/04/07/Python-gRPC%E5%AE%9E%E8%B7%B5(3)--%E4%BD%BF%E7%94%A8Python%E5%AE%9E%E7%8E%B0gRPC%E6%9C%8D%E5%8A%A1/">《Python-gRPC实践(3)–使用Python实现gRPC服务》</a>介绍的实现<code>gRPC</code>服务中使用了一套自定义的协议来传递错误，但这并不是一个优雅的解决方案，因为这种方案的兼容性很差，好在官方定义了一种解决方案，通过这种方案可以使不同的服务都能传递错误。</p>
 <h2 id="1-自定义的错误传递"><a href="#1-自定义的错误传递" class="headerlink" title="1.自定义的错误传递"></a>1.自定义的错误传递</h2><p>在编写普通的HTTP/1.1接口时，我们都会定制一套业务相关的错误来与HTTP标注的错误区分开，比如通常都会返回这样一个结构体：</p>
@@ -366,6 +375,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -397,7 +407,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

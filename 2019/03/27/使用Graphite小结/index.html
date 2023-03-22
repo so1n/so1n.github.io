@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -206,6 +214,10 @@
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>初次认识Graphite时,Graphite已经发展了十年了,那时在负责kamailio相关工作内容,为了监控和查看kamailio数据,查找到的文章<a target="_blank" rel="noopener" href="https://acalustra.com/kamailio-statsd-better-statistics-in-your-voip-platform.html">Kamailio statsd, better statistics in your voip platform.</a>,虽然不太认同作者把statsd客户端的嵌入kamailio的理念,但发现Graphite这东西还是很不错的(虽然后面接触了Prometheus emmmm…….不过Graphite可以保存长期的历史数据,并根据时间自动做聚合旧数据, 这个优点Prometheus是无法代替的).</p>
 <p>Graphite是一个包含了用于接收和整合数据的<code>carbon</code>,存储数据的时序数据库<code>Whisper</code>还有一个提供API的server.<br>它的理念十分简单,存的数据只有timestamp-value,该数据存在key的文件里面,用户可以用过以<code>*.*.*</code>的方式来设置数据维度或者标签.而写数据就更简单了只要发送TCP/UDP文本<code>&#123;key&#125; &#123;value&#125; &#123;timestamp&#125;</code>到carbon即可.同时他还提供按数据落盘时长来聚合数据的归档功能,觉得这个功能是非常棒的,因为数据的有分冷热的, 我们也不会专门去查看一年前的具体数据,只会去查看他的大概数据.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>初次认识Graphite时,Graphite已经发展了十年了,那时在负责kamailio相关工作内容,为了监控和查看kamailio数据,查找到的文章<a target="_blank" rel="noopener" href="https://acalustra.com/kamailio-statsd-better-statistics-in-your-voip-platform.html">Kamailio statsd, better statistics in your voip platform.</a>,虽然不太认同作者把statsd客户端的嵌入kamailio的理念,但发现Graphite这东西还是很不错的(虽然后面接触了Prometheus emmmm…….不过Graphite可以保存长期的历史数据,并根据时间自动做聚合旧数据, 这个优点Prometheus是无法代替的).</p>
+<p>Graphite是一个包含了用于接收和整合数据的<code>carbon</code>,存储数据的时序数据库<code>Whisper</code>还有一个提供API的server.<br>它的理念十分简单,存的数据只有timestamp-value,该数据存在key的文件里面,用户可以用过以<code>*.*.*</code>的方式来设置数据维度或者标签.而写数据就更简单了只要发送TCP/UDP文本<code>&#123;key&#125; &#123;value&#125; &#123;timestamp&#125;</code>到carbon即可.同时他还提供按数据落盘时长来聚合数据的归档功能,觉得这个功能是非常棒的,因为数据的有分冷热的, 我们也不会专门去查看一年前的具体数据,只会去查看他的大概数据.</p></p>
+        
         <h2 id="1-Graphite的好处"><a href="#1-Graphite的好处" class="headerlink" title="1.Graphite的好处"></a>1.Graphite的好处</h2><ul>
 <li>类似于RRD的时序数据库<code>Whisper</code>,支持Metrics的精度递减,如一天内10s一条,七天内合并为1m一条,一年内1h一条(<strong>这点最棒!</strong>)</li>
 <li>带有丰富的查询函数,  sum/min/max/avg/alias等等</li>
@@ -325,7 +337,7 @@
 <h5 id="2-1-4查看whisper数据"><a href="#2-1-4查看whisper数据" class="headerlink" title="2.1.4查看whisper数据"></a>2.1.4查看whisper数据</h5><p>路径:/opt/graphite/storage/whisper<br>查看命令(对于后辍为.wsp的可用, 使用方法为命令+路径):</p>
 <ul>
 <li>whisper-info.py (whisper-info脚本获取为这些指标项创建的 Whisper 文件的元数据信息。)</li>
-<li>whisper-dump.py(whisper-dump是一个更完整的脚本，可以输出所有存储保留周期内的原始数据以及 Whisper 文件的元数据信息。)<br>使用方法<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs vim"># <span class="hljs-keyword">grep</span>是为了去除无效数据<br>whisper-dump.<span class="hljs-keyword">py</span> invite.wsp | <span class="hljs-keyword">grep</span> -v <span class="hljs-string">&#x27;: 0,&#x27;</span><br></code></pre></td></tr></table></figure>
+<li>whisper-dump.py(whisper-dump是一个更完整的脚本，可以输出所有存储保留周期内的原始数据以及 Whisper 文件的元数据信息。)<br>使用方法<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gradle"># <span class="hljs-keyword">grep</span>是为了去除无效数据<br>whisper-<span class="hljs-keyword">dump</span>.py invite.wsp | <span class="hljs-keyword">grep</span> -v <span class="hljs-string">&#x27;: 0,&#x27;</span><br></code></pre></td></tr></table></figure>
 <h5 id="2-1-5graphite-api"><a href="#2-1-5graphite-api" class="headerlink" title="2.1.5graphite-api"></a>2.1.5graphite-api</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install graphite-api --install-option=<span class="hljs-string">&quot;--prefix=/opt/graphite&quot;</span><br></code></pre></td></tr></table></figure>
 或者<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 注:目前不支持python3, 请用上面的pip再加指定位置的方法,或者先安装cairocffi (0.9.0)</span><br>mkdir ./path/...<br><span class="hljs-built_in">cd</span> ./path/...<br>git <span class="hljs-built_in">clone</span> https://github.com/brutasse/graphite-api<br><span class="hljs-built_in">cd</span> graphite-api<br>python setup.py install<br></code></pre></td></tr></table></figure>
 按需确定自己是否需要<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt-get install libpango1.0-0<br> sudo apt-get install libcairo2<br> sudo apt-get install libpq-dev<br><span class="hljs-comment"># python2</span><br>sudo apt-get install python-dev  \<br>     build-essential libssl-dev libffi-dev \<br>     libxml2-dev libxslt1-dev zlib1g-dev \<br>     python-pip<br><span class="hljs-comment"># python3</span><br>sudo apt-get install python3 python-dev python3-dev \<br>     build-essential libssl-dev libffi-dev \<br>     libxml2-dev libxslt1-dev zlib1g-dev \<br>     python-pip<br></code></pre></td></tr></table></figure>
@@ -346,7 +358,7 @@
 <h5 id="2-2-2-更改配置"><a href="#2-2-2-更改配置" class="headerlink" title="2.2.2 更改配置"></a>2.2.2 更改配置</h5><p>在Graphite为StatsD更改匹配模式</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">vi /opt/graphite/conf/storage-schemas.conf<br><span class="hljs-comment"># 在文件增加以下匹配模式</span><br><span class="hljs-comment"># StatsD将带有stats前缀的数据发送到Graphite</span><br>[statsd]<br>pattern = ^stats.*<br>retentions = 10s:1d,1m:7d,10m:1y<br></code></pre></td></tr></table></figure>
 
-<h5 id="2-2-3-重启"><a href="#2-2-3-重启" class="headerlink" title="2.2.3 重启"></a>2.2.3 重启</h5><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-regexp">/opt/g</span>raphite<span class="hljs-regexp">/bin/</span>carbon-cache.py stop<br><span class="hljs-regexp">/opt/g</span>raphite<span class="hljs-regexp">/bin/</span>carbon-cache.py start<br></code></pre></td></tr></table></figure>
+<h5 id="2-2-3-重启"><a href="#2-2-3-重启" class="headerlink" title="2.2.3 重启"></a>2.2.3 重启</h5><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-regexp">/opt/g</span>raphite<span class="hljs-regexp">/bin/</span>carbon-cache.py stop<br><span class="hljs-regexp">/opt/g</span>raphite<span class="hljs-regexp">/bin/</span>carbon-cache.py start<br></code></pre></td></tr></table></figure>
 <h5 id="2-3grafana"><a href="#2-3grafana" class="headerlink" title="2.3grafana"></a>2.3grafana</h5><blockquote>
 <p>详见:<a target="_blank" rel="noopener" href="https://grafana.com/docs/installation/debian/">https://grafana.com/docs/installation/debian/</a></p>
 </blockquote>
@@ -471,6 +483,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -502,7 +515,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

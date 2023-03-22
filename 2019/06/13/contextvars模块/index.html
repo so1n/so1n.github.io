@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -207,6 +215,11 @@
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在Python3.7后官方库出现了<code>contextvars</code>模块, 它的主要功能就是可以为多线程以及asyncio生态添加上下文功能,即使程序在多个协程并发运行的情况下,也能调用到程序的上下文变量, 从而使我们的逻辑解耦.</p>
 <p>上下文,可以理解为我们说话的语境, 在聊天的过程中, 有些话脱离了特定的语境,他的意思就变了,程序的运行也是如此.在线程中也是有他的上下文,只不过称为堆栈,如在python中就是保存在thread.local变量中,而协程也有他自己的上下文,但是没有暴露出来,不过有了<code>contextvars</code>模块后我们可以通过<code>contextvars</code>模块去保存与读取.</p>
 <p>使用<code>contextvars</code>的好处不仅可以防止’一个变量传遍天’的事情发生外,还能很好的结合TypeHint,可以让自己的代码可以被mypy以及IDE检查,让自己的代码更加适应工程化.<br>不过用了<code>contextvars</code>后会多了一些隐性的调用, 需要解决好这些隐性的成本. </p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在Python3.7后官方库出现了<code>contextvars</code>模块, 它的主要功能就是可以为多线程以及asyncio生态添加上下文功能,即使程序在多个协程并发运行的情况下,也能调用到程序的上下文变量, 从而使我们的逻辑解耦.</p>
+<p>上下文,可以理解为我们说话的语境, 在聊天的过程中, 有些话脱离了特定的语境,他的意思就变了,程序的运行也是如此.在线程中也是有他的上下文,只不过称为堆栈,如在python中就是保存在thread.local变量中,而协程也有他自己的上下文,但是没有暴露出来,不过有了<code>contextvars</code>模块后我们可以通过<code>contextvars</code>模块去保存与读取.</p>
+<p>使用<code>contextvars</code>的好处不仅可以防止’一个变量传遍天’的事情发生外,还能很好的结合TypeHint,可以让自己的代码可以被mypy以及IDE检查,让自己的代码更加适应工程化.<br>不过用了<code>contextvars</code>后会多了一些隐性的调用, 需要解决好这些隐性的成本. </p></p>
+        
         <h2 id="更新说明"><a href="#更新说明" class="headerlink" title="更新说明"></a>更新说明</h2><ul>
 <li>切换web框架<code>sanic</code>为<code>starlette</code></li>
 <li>增加一个自己编写且可用于<code>starlette</code>,<code>fastapi</code>的context说明</li>
@@ -418,6 +431,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -449,7 +463,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -204,6 +212,7 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
+        
         
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>目前TCP服务的工作模型有三种，但是开源的服务器基本上都是使用<code>Pre-Worker</code>模型，比如<code>Nginx</code>和<code>Gunicorn</code>。在阅读<code>Gunicorn</code>源码后我对<code>Gunicorn</code>为啥要采用这个模型感兴趣，所以查阅了一番资料并了解常见TCP服务工作模型的优缺点。</p>
 <h2 id="1-TCP服务的请求处理模式"><a href="#1-TCP服务的请求处理模式" class="headerlink" title="1.TCP服务的请求处理模式"></a>1.TCP服务的请求处理模式</h2><p>大多数的TCP服务部署都是从单进程开始的，当请求数量逐渐变多后，单进程工作模型的服务就开始扛不住了， 这时就会想通过添加更多的进程来帮忙处理请求，于是就会诞生出另外两种基于多进程的工作模型， 这三种工作模型的特点如下（其中监听可以认为是调用<code>socket.listen</code>，处理可以认为调用<code>socket.accept</code>）：</p>
@@ -403,6 +412,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -434,7 +444,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

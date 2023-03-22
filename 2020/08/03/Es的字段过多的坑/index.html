@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>前几天,突然发现线上Es有大量的错误日志,核心日志是Limit of total fields [1000] in index.经过查明发现是同事存api server日志时他是数据带有有很多field,导致报错,解决这个问题很简单,又却很复杂,最好的解决方案是分开存储,让Es只做好Es的职责,但是对于架构又复杂了.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>前几天,突然发现线上Es有大量的错误日志,核心日志是Limit of total fields [1000] in index.经过查明发现是同事存api server日志时他是数据带有有很多field,导致报错,解决这个问题很简单,又却很复杂,最好的解决方案是分开存储,让Es只做好Es的职责,但是对于架构又复杂了.</p></p>
+        
         <h2 id="1-发生问题"><a href="#1-发生问题" class="headerlink" title="1.发生问题"></a>1.发生问题</h2><p>前几天在准备增加Logstash的机器部署时发现旧Logstash机器上面有一些错误日志,核心的信息是<code>Limit of total fields [1000] in index</code>.很容易理解,就是本次发送的数据字段数量大于1000了.</p>
 <blockquote>
 <p>题外话,之所以会有这样大的数据量是因为同事那边发送的日志数据里有一个动态的json对象,而对于es来说{‘a’: {‘b’: 1, ‘c’: 2}}会认为有a.b,和a.c两个字段.在发现问题后,把含有该动态json对象的字段解析为文本就好了(不过没事还是不要存那么多数据).</p>
@@ -352,6 +363,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -383,7 +395,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

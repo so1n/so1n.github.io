@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Uvicorn</code>是一个基于<code>uvloop</code>和<code>httptools</code>的ASGI服务器, 性能比较强劲， 通过它可以与使用ASGI规范的<code>Python</code>应用程序进行交互。ASGI与WSGI很像， 只不过ASGI原生支持HTTP2.0和WebSocket， 同时更多的是支持<code>Python</code>的<code>Asyncio</code>生态的WEB应用程序。通过了解<code>Uvicron</code>，能知道一个稳定的Web服务器的工作方式以及能更好的去了解其他基于ASGI的WEB应用程序</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Uvicorn</code>是一个基于<code>uvloop</code>和<code>httptools</code>的ASGI服务器, 性能比较强劲， 通过它可以与使用ASGI规范的<code>Python</code>应用程序进行交互。ASGI与WSGI很像， 只不过ASGI原生支持HTTP2.0和WebSocket， 同时更多的是支持<code>Python</code>的<code>Asyncio</code>生态的WEB应用程序。通过了解<code>Uvicron</code>，能知道一个稳定的Web服务器的工作方式以及能更好的去了解其他基于ASGI的WEB应用程序</p></p>
+        
         <p><code>Uvicron</code>通过一个通用的协定接口与ASGI应用程序交互， 应用程序只要实现如下代码， 即可通过<code>Uvicorn</code>发送和接收信息：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">app</span>(<span class="hljs-params">scope, receive, send</span>):</span><br>    <span class="hljs-comment"># 一个最简单的ASGI应用程序</span><br>    <span class="hljs-keyword">assert</span> scope[<span class="hljs-string">&#x27;type&#x27;</span>] == <span class="hljs-string">&#x27;http&#x27;</span><br>    <span class="hljs-keyword">await</span> send(&#123;<br>        <span class="hljs-string">&#x27;type&#x27;</span>: <span class="hljs-string">&#x27;http.response.start&#x27;</span>,<br>        <span class="hljs-string">&#x27;status&#x27;</span>: <span class="hljs-number">200</span>,<br>        <span class="hljs-string">&#x27;headers&#x27;</span>: [<br>            [<span class="hljs-string">b&#x27;content-type&#x27;</span>, <span class="hljs-string">b&#x27;text/plain&#x27;</span>],<br>        ]<br>    &#125;)<br>    <span class="hljs-keyword">await</span> send(&#123;<br>        <span class="hljs-string">&#x27;type&#x27;</span>: <span class="hljs-string">&#x27;http.response.body&#x27;</span>,<br>        <span class="hljs-string">&#x27;body&#x27;</span>: <span class="hljs-string">b&#x27;Hello, world!&#x27;</span>,<br>    &#125;)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-comment"># uvicorn服务</span><br>    <span class="hljs-keyword">import</span> uvicorn<br>    uvicorn.run(app, host=<span class="hljs-string">&quot;127.0.0.1&quot;</span>, port=<span class="hljs-number">5000</span>, log_level=<span class="hljs-string">&quot;info&quot;</span>)<br></code></pre></td></tr></table></figure>
 <p>其中应用程序的<code>scope</code>代表有关传入连接信息的字典， <code>receive</code>是一个从服务器接收传入信息的通道, <code>send</code>是一个将消息发送到服务器的通道, 不过这不是本文的重点， 更多<code>scope</code>信息可以访问<a target="_blank" rel="noopener" href="http://www.uvicorn.org/#the-asgi-interface">ASGI interface</a>了解, 接下来将从例子的<code>uvicorn.run</code>开始, 通过源码分析<code>uvicorn</code>工作原理。</p>
@@ -371,6 +382,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -402,7 +414,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

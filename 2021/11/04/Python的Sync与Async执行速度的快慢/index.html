@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>Python新的版本中支持了<code>async/await</code>语法， 很多文章都在说这种语法的实现代码会变得很快， 但是这种快是有场景限制的。这篇文章将尝试简单的解释为何<code>Async</code>的代码在某些场景比<code>Sync</code>的代码快。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>Python新的版本中支持了<code>async/await</code>语法， 很多文章都在说这种语法的实现代码会变得很快， 但是这种快是有场景限制的。这篇文章将尝试简单的解释为何<code>Async</code>的代码在某些场景比<code>Sync</code>的代码快。</p></p>
+        
         <h2 id="1-一个简单的例子"><a href="#1-一个简单的例子" class="headerlink" title="1.一个简单的例子"></a>1.一个简单的例子</h2><p>首先先从一个例子了解两种调用方法的差别, 为了能清晰的看出他们的运行时长差别， 都让他们重复运行10000次， 具体代码如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> time<br><br><br>n_call = <span class="hljs-number">10000</span><br><br><br><span class="hljs-comment"># sync的调用时长</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>(<span class="hljs-params">n: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>    <span class="hljs-keyword">return</span> n ** n<br><br>s_time = time.time()<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n_call):<br>    demo(i)<br>print(time.time() - s_time)<br><br><span class="hljs-comment"># async的调用时长</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sub_demo</span>(<span class="hljs-params">n: <span class="hljs-built_in">int</span></span>) -&gt; int:</span><br>    <span class="hljs-keyword">return</span> n ** n<br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">async_main</span>() -&gt; <span class="hljs-keyword">None</span>:</span> <br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n_call):<br>        <span class="hljs-keyword">await</span> sub_demo(i)<br><br>loop = asyncio.get_event_loop()<br>s_time = time.time()<br>loop.run_until_complete(async_main())<br>print(time.time() - s_time)<br><br><span class="hljs-comment"># 输出</span><br><span class="hljs-comment"># 5.310615682601929</span><br><span class="hljs-comment"># 5.614157438278198</span><br></code></pre></td></tr></table></figure>
 <p>可以看得出来， <code>sync</code>的语法大家都是很熟悉， 而<code>async</code>的语法比较不一样， 函数需要使用<code>async def</code>开头， 同时调用<code>async def</code>函数需要使用<code>await</code>语法， 运行的时候需要先获取线程的事件循环， 然后在通过事件循环来运行<code>async_main</code>函数来达到一样的效果， 但是从运行结果的输出可以看得出,  <code>sync</code>的语法在这个场景中比<code>async</code>的语法速度快了一些些（由于Python的GIL原因， 这里无法使用多核的性能， 只能以单核来跑）。</p>
@@ -343,6 +354,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -374,7 +386,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

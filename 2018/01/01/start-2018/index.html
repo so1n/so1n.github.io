@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>平时浏览网页时，看到喜欢的网站都会发送到<a target="_blank" rel="noopener" href="https://www.pushbullet.com/">pushbullet</a>，但没去整理，找起来十分麻烦。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>平时浏览网页时，看到喜欢的网站都会发送到<a target="_blank" rel="noopener" href="https://www.pushbullet.com/">pushbullet</a>，但没去整理，找起来十分麻烦。</p></p>
+        
         <h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/shu580231/article/details/76240611">git flow常用命令</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.laisky.com/p/gitflow/">使用 Git &amp; Gitflow 管理代码开发、发布流程</a></p>
 <h2 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h2><p><a target="_blank" rel="noopener" href="https://juejin.im/post/5ae3ee096fb9a07aa7676883">Python内建函数</a></p>
@@ -376,6 +387,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -407,7 +419,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

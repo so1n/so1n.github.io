@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -206,6 +214,10 @@
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>现在,已经不是那个坚信动态语言+好用的工具就能写工程项目的时代,新出的语言都是走静态语言的路线,动态语言也都开始引入类型增强,解决自己的不足,而Python的也有自己的类型增强方案–TypeHints.</p>
 <p>一开始用着Python写起代码非常爽,但是在大项目且多人合作时,会发现重构代码非常艰难或者不敢去修改历史代码.在引入TypeHints后,通过IDE的增强或者mypy等检查,能使我们重构代码方便,且让代码健壮.(也许有朝一日还能做到静态编译,提升性能- -…)</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>现在,已经不是那个坚信动态语言+好用的工具就能写工程项目的时代,新出的语言都是走静态语言的路线,动态语言也都开始引入类型增强,解决自己的不足,而Python的也有自己的类型增强方案–TypeHints.</p>
+<p>一开始用着Python写起代码非常爽,但是在大项目且多人合作时,会发现重构代码非常艰难或者不敢去修改历史代码.在引入TypeHints后,通过IDE的增强或者mypy等检查,能使我们重构代码方便,且让代码健壮.(也许有朝一日还能做到静态编译,提升性能- -…)</p></p>
+        
         <h2 id="1-PEP的历史进程"><a href="#1-PEP的历史进程" class="headerlink" title="1.PEP的历史进程"></a>1.PEP的历史进程</h2><p>Python作为一个非常灵活的动态语言,也不是一下子就拥有TypeHints的,而是通过PEP 3107, PEP 483, PEP  484,PEP 526,PEP 544,PEP 586,PEP 589, PEP 591,慢慢的使TypeHint变得完整</p>
 <h3 id="1-1-PEP-3107-TypeHints的主要依赖"><a href="#1-1-PEP-3107-TypeHints的主要依赖" class="headerlink" title="1.1.PEP 3107 TypeHints的主要依赖"></a>1.1.PEP 3107 TypeHints的主要依赖</h3><p><a target="_blank" rel="noopener" href="https://www.python.org/dev/peps/pep-3107/">PEP 3107</a>,在06年就已经提出来了,是目前TypeHints的主要依赖,然,而此方案一开始跟TypeHints并没有什么关系,官方对于这个提案处于放养阶段,只是让函数拥有了注解功能:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python">In [<span class="hljs-number">1</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test</span>(<span class="hljs-params">bar: <span class="hljs-built_in">str</span>, foo: <span class="hljs-built_in">int</span></span>) -&gt; int:</span> <br>   ...:     <span class="hljs-keyword">return</span> <span class="hljs-number">1</span><br>   <br>In [<span class="hljs-number">2</span>]: test.__annotations__                                             <br>Out[<span class="hljs-number">2</span>]: &#123;<span class="hljs-string">&#x27;bar&#x27;</span>: <span class="hljs-built_in">str</span>, <span class="hljs-string">&#x27;foo&#x27;</span>: <span class="hljs-built_in">int</span>, <span class="hljs-string">&#x27;return&#x27;</span>: <span class="hljs-built_in">int</span>&#125;<br></code></pre></td></tr></table></figure>
@@ -368,6 +380,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -399,7 +412,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

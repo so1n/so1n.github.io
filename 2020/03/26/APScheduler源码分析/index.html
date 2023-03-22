@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -206,6 +214,10 @@
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近由于账单提交和脚本过多不好控制的原因,一直在寻找解决方案,发现APScheduler比较轻量级以及适合我的账单提交,和脚本运行控制(如果脚本运行需要依赖的话就可以上AirFlow).为了弄清楚原理,以及更好的使用APScheduler,所以阅读了APScheduler代码.其实是APScheduler代码量比较少的分析起来才容易(逃)</p>
 <p>不过apscheduler有一个致命的缺点, 除,由于apscheduler的实现比较简单, 在初始化时, 能达到分布式work的效果外,  在运行时增加任务时, 并不会同步到每个work.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近由于账单提交和脚本过多不好控制的原因,一直在寻找解决方案,发现APScheduler比较轻量级以及适合我的账单提交,和脚本运行控制(如果脚本运行需要依赖的话就可以上AirFlow).为了弄清楚原理,以及更好的使用APScheduler,所以阅读了APScheduler代码.其实是APScheduler代码量比较少的分析起来才容易(逃)</p>
+<p>不过apscheduler有一个致命的缺点, 除,由于apscheduler的实现比较简单, 在初始化时, 能达到分布式work的效果外,  在运行时增加任务时, 并不会同步到每个work.</p></p>
+        
         <p><strong>注:</strong> 为了节省篇幅,下面分析代码时大多数是只贴github的源码链接,并加以说明,源码是<a target="_blank" rel="noopener" href="https://github.com/agronholm/apscheduler/tree/3.x/apscheduler">APscheduler第三版</a></p>
 <h2 id="1-主体逻辑"><a href="#1-主体逻辑" class="headerlink" title="1.主体逻辑"></a>1.主体逻辑</h2><h3 id="1-1代码结构"><a href="#1-1代码结构" class="headerlink" title="1.1代码结构"></a>1.1代码结构</h3><p>首先看看APScheduler的代码结构,除了job,event,util这几个简单的封装外,APScheduler中的组件都各自一个文件夹</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">├── executors      执行器,用于执行任务<br>├── jobstores      储存器,用于存放任务<br>├── schedulers     调度器,用于调度任务实例,由执行器,存储器,触发器三个组件构成<br>├── triggers       触发器,用于设定触发任务的条件<br>├── __init__.py<br>├── events.py      事件,调度器触发时的事件封装<br>├── job.py         job,对添加的任务进行封装,方便调度器调用<br>└── util.py        工具包,apscheduler一些常用函数封装<br></code></pre></td></tr></table></figure>
@@ -444,6 +456,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -475,7 +488,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

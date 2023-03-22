@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -206,6 +214,10 @@
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>【暂时废弃】<br>更新时间：2017-12-13 14:46:00</p>
 <p>WEB有很多东西，有些框架/库的功能也是交叉着，所以有点混乱。今天闲的无聊，百度后觉得别人说的还是不明白，就把之前保存的文档全看了一遍。了解一下，应该有很多认知错误的，以后深入了解后再改正。<br>所以这里就是类似与 <a href="http://so1n.me/2017/10/19/15/#more">前端小功能收集</a>,<a href="http://so1n.me/2017/08/23/14-redis/">Redis命令</a>一样，内容简单，纯粹记录下我刚接触时的感想，顺便把以前的东西也写进来了。回头可以看一看，回顾下，还有就是以后找资料容易点。。。。。。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>【暂时废弃】<br>更新时间：2017-12-13 14:46:00</p>
+<p>WEB有很多东西，有些框架/库的功能也是交叉着，所以有点混乱。今天闲的无聊，百度后觉得别人说的还是不明白，就把之前保存的文档全看了一遍。了解一下，应该有很多认知错误的，以后深入了解后再改正。<br>所以这里就是类似与 <a href="http://so1n.me/2017/10/19/15/#more">前端小功能收集</a>,<a href="http://so1n.me/2017/08/23/14-redis/">Redis命令</a>一样，内容简单，纯粹记录下我刚接触时的感想，顺便把以前的东西也写进来了。回头可以看一看，回顾下，还有就是以后找资料容易点。。。。。。</p></p>
+        
         <p>主要是在今天看了vue,Angular(js框架)，RESTful，tornado，wsgi文档后，才能把他们正式区分开的。<br>文字不好，使用度不频繁，所以写的不太好，以后更熟悉时再改，相比之前不知道为什么需要使用vue，也不知道服务器、容器和应用的关系好多了。。。。。。。</p>
 <h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p>之前我在找前端的资料时，就看到很多人在说前端更新很快，一不学习就要落后了，尤其是一个知乎的回复</p>
 <blockquote>
@@ -262,7 +274,7 @@
 <p>举个具体API的例子：请求：<br>GET /posts HTTP/1.1<br>Accept: application/atom+xml</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs xml">响应：<br>HTTP/1.1 200 OK<br>Content-Type: application/atom+xml<br><br><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">feed</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2005/Atom&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Posts<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;self&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/posts?pn=2&quot;</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;next&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Post XXX<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.org/post-xxx&quot;</span> /&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">updated</span>&gt;</span>2003-12-13T18:30:02Z<span class="hljs-tag">&lt;/<span class="hljs-name">updated</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">content</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;xhtml&quot;</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;</span><br>                <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is the post content.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">content</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">entry</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">feed</span>&gt;</span><br></code></pre></td></tr></table></figure>
 <p>注意上面atom格式中的多个<link>元素，它们分别定义了当前状态下合法的状态转移。例如，这是一个指向自己的链接，其中rel属性指定了状态转移的关系为自身。<link href="http://example.org/posts" rel="self" /><br>这是下一页的链接，<link href="http://example.org/posts?pn=2" rel="next" /><br>如果当前不是第一页的话，就会有类似如下的链接来表示上一页，<link href="http://example.org/posts?pn=2" rel="prev" /><br>而这个是某一篇文章的链接，<link href="http://example.org/post-xxx" /><br>总结一下，就是：服务器生成包含状态转移的表征数据，用来响应客户端对于一个资源的请求；客户端借助这份表征数据，记录了当前的应用状态以及对应可转移状态的方式。当然，为了要实现这一系列的功能，一个不可或缺的东西就是超文本（hypertext）或者说超媒体类型（hypermedia type）。这绝对不是一个简简单单的媒体类型（例如，JSON属性列表）可以做到的。（参考：REST APIs must be hypertext-driven）因此，像下面这种API，1、获取文章</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs gradle">请求：<br>GET <span class="hljs-regexp">/blog/</span>post<span class="hljs-regexp">/&#123;postId&#125; HTTP/</span><span class="hljs-number">1.1</span><br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">200</span> OK<br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br><span class="hljs-number">2</span>、发布文章<br><br>请求：<br>POST <span class="hljs-regexp">/blog/</span>post HTTP/<span class="hljs-number">1.1</span><br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">201</span> CREATED<br></code></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs awk">请求：<br>GET <span class="hljs-regexp">/blog/</span>post<span class="hljs-regexp">/&#123;postId&#125; HTTP/</span><span class="hljs-number">1.1</span><br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">200</span> OK<br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br><span class="hljs-number">2</span>、发布文章<br><br>请求：<br>POST <span class="hljs-regexp">/blog/</span>post HTTP/<span class="hljs-number">1.1</span><br>&#123;<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;foobar&quot;</span>,<br>    <span class="hljs-string">&quot;comments&quot;</span>: [<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]<br>&#125;<br><br>响应：<br>HTTP/<span class="hljs-number">1.1</span> <span class="hljs-number">201</span> CREATED<br></code></pre></td></tr></table></figure>
 <p>绝对不是RESTful！绝对不是RESTful！绝对不是RESTful！</p>
 <p>以上引用：<br>作者：季文昊<br>链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/28557115/answer/48120528">https://www.zhihu.com/question/28557115/answer/48120528</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
 <h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>web上的server都叫web server，但是大家分工也有不同的，有服务器，容器，应用<br>服务器主要是处理请求，决定分发到那个应用(静态文件也在此处理)，容器则是负责初始化环境(设置环境变量，如异步通信，websocket也在此处)，应用则是提供应用功能。</p>
@@ -398,6 +410,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -429,7 +442,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

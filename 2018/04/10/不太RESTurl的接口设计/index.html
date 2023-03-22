@@ -61,10 +61,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -116,7 +123,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -125,10 +132,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -209,6 +217,12 @@
 <p>在还没开始实习的时候,除了在弄一些练习项目或者刷面试题时,经常碰到RESTurl,知道这是一个非常重要的前后端交互的接口设计模式,也是很少人/公司能把RESTurl完全的应用到自己的业务逻辑里面.</p>
 <p>实习时,一开始就用RESTurl方式去写API,写了一段时间的API后发现,其实没必要完全去追求RESTurl,虽然RESTurl的设计是很好的,但是从理论到落地总是会有一些偏差.</p>
 <p>要永远记得,一切要以实际业务为准.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>又是一篇水文- -. </p>
+<p>在还没开始实习的时候,除了在弄一些练习项目或者刷面试题时,经常碰到RESTurl,知道这是一个非常重要的前后端交互的接口设计模式,也是很少人/公司能把RESTurl完全的应用到自己的业务逻辑里面.</p>
+<p>实习时,一开始就用RESTurl方式去写API,写了一段时间的API后发现,其实没必要完全去追求RESTurl,虽然RESTurl的设计是很好的,但是从理论到落地总是会有一些偏差.</p>
+<p>要永远记得,一切要以实际业务为准.</p></p>
+        
         <p>** 注:文章已经更新,目前已经使用starlette代替sanic作为web框架**</p>
 <h2 id="1-HTTP-Method方法缺少云服务商的支持"><a href="#1-HTTP-Method方法缺少云服务商的支持" class="headerlink" title="1.HTTP Method方法缺少云服务商的支持"></a>1.HTTP Method方法缺少云服务商的支持</h2><p>在RESTurl中,最明显的就是对于同一个url,把url当做资源,再用http method方法去进行操作,比如用get去获取数据,post添加数据,put更新数据,delete删除数据,从设计上面来看这个设计的没问题的,但是在现实中却会带来一些bug.之前在API运用RESTurl的设计后运行了一段时间,结果在某一天套上了阿里云的CDN后发现接口不可用了,经过一段时间的排查后发现是阿里云的CDN只支持GET/POST方法…<br>在这次事故之后,所有API的HTTP Method改为GET/POST, get一般用于获取数据且数据一定能被CDN缓存的,其他都使用POST方法.在做了此次更改后,无论接了什么CDN,都再也没有出现云服务商无法支持的问题了.</p>
 <h2 id="2-接口设计与抛错设计的"><a href="#2-接口设计与抛错设计的" class="headerlink" title="2.接口设计与抛错设计的"></a>2.接口设计与抛错设计的</h2><p>经常能发现很多人在一些编程论坛上吵着,全RESTurl,或者只要接口没问题,那就返回HTTP STATUS CODE 200,并自己在json里面写上业务的code,交由客户端判断.在经历过几次项目的设计后,我还是偏爱于后者的.先看看设计</p>
@@ -363,6 +377,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -394,7 +409,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

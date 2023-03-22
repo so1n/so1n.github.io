@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>tail是一个常用的Linux命令, 它可以打印文件的后面n行数据, 也能实时输出文件的追加数据.<br>tail的实现很简单,但是要实现一个完善的tail却需要考虑很多细节,如果要注重性能,则需要引入一些其他的机制.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>tail是一个常用的Linux命令, 它可以打印文件的后面n行数据, 也能实时输出文件的追加数据.<br>tail的实现很简单,但是要实现一个完善的tail却需要考虑很多细节,如果要注重性能,则需要引入一些其他的机制.</p></p>
+        
         <p>一开始只是为了单纯的实现Linux的<code>tail</code>的基本功能,后面随着需要对日志文件的高性能读取则需要的Linux的<code>inotify</code>机制去完善.<br>相关源码见:<a target="_blank" rel="noopener" href="https://github.com/so1n/example/tree/master/example_python/example_python/tail">https://github.com/so1n/example/tree/master/example_python/example_python/tail</a></p>
 <h2 id="1-第一版–从文件尾部读取实时数据"><a href="#1-第一版–从文件尾部读取实时数据" class="headerlink" title="1.第一版–从文件尾部读取实时数据"></a>1.第一版–从文件尾部读取实时数据</h2><p>主要思路是: 打开文件, 把指针移动到文件最后, 然后有数据则输出数据, 无数据则休眠一段时间.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> sys<br><br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Callable, NoReturn<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Tail</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">            self,</span></span><br><span class="hljs-function"><span class="hljs-params">            file_name: <span class="hljs-built_in">str</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">            output: Callable[[<span class="hljs-built_in">str</span>], NoReturn] = sys.stdout.write,</span></span><br><span class="hljs-function"><span class="hljs-params">            interval: <span class="hljs-built_in">int</span> = <span class="hljs-number">1</span></span></span><br><span class="hljs-function"><span class="hljs-params">    </span>):</span><br>        self.file_name: <span class="hljs-built_in">str</span> = file_name<br>        self.output: Callable[[<span class="hljs-built_in">str</span>], NoReturn] = output<br>        self.interval: <span class="hljs-built_in">int</span> = interval<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(self.file_name) <span class="hljs-keyword">as</span> f:<br>            f.seek(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>)  <span class="hljs-comment"># 从文件结尾处开始seek</span><br>            <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>                line: <span class="hljs-built_in">str</span> = f.readline()<br>                <span class="hljs-keyword">if</span> line:<br>                    self.output(line)  <span class="hljs-comment"># 使用print都会每次都打印新的一行</span><br>                <span class="hljs-keyword">else</span>:<br>                    time.sleep(self.interval)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    filename: <span class="hljs-built_in">str</span> = sys.argv[<span class="hljs-number">0</span>]<br>    Tail(filename)()<br></code></pre></td></tr></table></figure>
@@ -343,6 +354,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -374,7 +386,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

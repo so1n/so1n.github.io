@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在上一文<a href="https://so1n.me/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/">Python-gRPC实践（1）–gRPC简介</a>简单的介绍了<code>gRPC</code>采用了<code>HTTP2</code>作为它的传输协议，以及<code>gRPC</code>是如何通过<code>HTTP2</code>传输数据的，而本文则着重介绍<code>gRPC</code>所采用的序列化协议–<code>Protocol Buffer</code>。</p>
+        
+          <p><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在上一文<a href="https://so1n.me/2022/01/05/Python-gRPC%E5%AE%9E%E8%B7%B5(1)--%E7%AE%80%E4%BB%8B/">Python-gRPC实践（1）–gRPC简介</a>简单的介绍了<code>gRPC</code>采用了<code>HTTP2</code>作为它的传输协议，以及<code>gRPC</code>是如何通过<code>HTTP2</code>传输数据的，而本文则着重介绍<code>gRPC</code>所采用的序列化协议–<code>Protocol Buffer</code>。</p></p>
+        
         <h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1.介绍"></a>1.介绍</h2><h3 id="1-1-什么是Protocol-Buffer"><a href="#1-1-什么是Protocol-Buffer" class="headerlink" title="1.1.什么是Protocol Buffer"></a>1.1.什么是Protocol Buffer</h3><p>Protobuf(Google Protocol Buffers)是Google开发的跨语言，跨平台，可扩展，用于序列化结构化数据的数据传输协议，目前已经被广泛用于服务端和客户端间的数据传输，要在项目中把<code>gRPC</code>用得好就必须先清晰理解Protocol Buffer的使用以及语法。</p>
 <blockquote>
 <p>NOTE: Protobuf就像Json一样可以独立使用,不局限于<code>gRPC</code>这个场景之中，我们可以基于Protobuf实现自己的数据序列化/反序列化。</p>
@@ -410,6 +421,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -441,7 +453,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -204,6 +212,7 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
+        
         
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Asyncio</code>在经过一段时间的发展以及获取<code>Curio</code>等第三方库的经验来提供更多的功能，目前高级功能也基本完善，但是相对于其他语言，<code>Python</code>的<code>Asyncio</code>高级功能还是不够的，但好在<code>Asyncio</code>的低级API也比较完善，开发者可以通过参考<code>Asyncio</code>高级API的例子来自己实现一些功能，同时也可以通过这些功能更加了解<code>Asyncio</code>的原理和避免踩到高级API的坑。</p>
 <h2 id="0-基础"><a href="#0-基础" class="headerlink" title="0.基础"></a>0.基础</h2><p>在<a href="https://so1n.me/2022/06/08/python_asyncio_schedule/">《Python Asyncio调度原理》</a>中介绍了<code>Asyncio</code>的两种调度基本单位，<code>Handler</code>和<code>TimeHandler</code>，他们只能被<code>loop.call_xx</code>函数调用，开发者从表面上不知道他们的存在，他们和<code>loop.call_xx</code>属于事件循环的基础功能，但是这些操作都属于单一操作，需要开发者自己编写代码把他们的操作给串联起来。<br>而在<a href="https://so1n.me/2022/04/11/python's_waitable_objects_in_asyncio/">《Python的可等待对象在Asyncio的作用》</a>中介绍了协程链的发起者<code>asyncio.Task</code>能通过<code>loop.call_soon</code>跟事件循环进行交互，并串联整个协程链中可等待对象以及安排可等待对象的运行。<br>不过对于<code>loop.call_at</code>和<code>loop.call_later</code>仍需要开发者通过<code>asyncio.Future</code>来把<code>Timehandler</code>的执行结果与<code>asyncio.Task</code>给串联起来，比如休眠一秒的代码实现：</p>
@@ -368,6 +377,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -399,7 +409,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

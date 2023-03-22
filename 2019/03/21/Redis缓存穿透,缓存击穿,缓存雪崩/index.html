@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -210,6 +218,14 @@
 <li>击穿  缓存和数据库都没有数据的时候</li>
 <li>穿透  同一个key,缓存没数据,数据库有数据的时候</li>
 <li>雪崩  很多个key在同一时刻,缓存没数据,数据库有数据的时候
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近使用Redis越来越多了,使用Redis可以提升接口性能,同时也可以基于Redis实现分布式锁以及使用Redis限流等等.不过在使用Redis与Mysql结合时会遇到一些常见的单机缓存相关问题(基本是标配了)缓存穿透、击穿、雪崩.</p>
+<p>缓存穿透,击穿,雪崩很像,如果不是为了面试准备,我也可能随时就忘了(逃)</p>
+<ul>
+<li>击穿  缓存和数据库都没有数据的时候</li>
+<li>穿透  同一个key,缓存没数据,数据库有数据的时候</li>
+<li>雪崩  很多个key在同一时刻,缓存没数据,数据库有数据的时候</p>
+        
         这类问题十分常见,所以我又是多水了一文啦,不过要确保在引入解决方案时,能尽可能的适应自己的业务,而不是为了引进解决方案而引进解决方案.</li>
 </ul>
 <p><strong>注:示例代码做了更新,使用的redis为aioredis,使用的mysql为aiomysql,同时已经把代码更新到Python3.6+可用</strong></p>
@@ -361,6 +377,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -392,7 +409,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

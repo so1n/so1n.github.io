@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -207,6 +215,11 @@
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在接手了公司的SIP项目后的不久，发现服务器时不时就遇到了kamailio进程(用于处理sip协议)占用了过多的文件描述符,直接超过限制的情况，造成kamailio进程无法接收新的请求,影响线上用户使用。</p>
 <p>这个问题有个两个难点,一个是只有发生问题才能进行排查,而发生问题时需要快速重启进程,不然影响用户使用;另一个问题由于发生时间充满随机性，而且时隔半个月到一个月才发生一次，所以整个解决流程用了快3个月，其中共发生了4次。</p>
 <p>不过从发现问题到解决问题倒是收获了很多,只是到了后来才发现造成该问题的根本原因是客户端由于觉得接口加密逻辑有bug就跟API接口的商量一起下线加密逻辑,而我又不知道,加密逻辑下线后导致sip服务器的ip被暴露出来,引发SIP服务器被攻击…</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在接手了公司的SIP项目后的不久，发现服务器时不时就遇到了kamailio进程(用于处理sip协议)占用了过多的文件描述符,直接超过限制的情况，造成kamailio进程无法接收新的请求,影响线上用户使用。</p>
+<p>这个问题有个两个难点,一个是只有发生问题才能进行排查,而发生问题时需要快速重启进程,不然影响用户使用;另一个问题由于发生时间充满随机性，而且时隔半个月到一个月才发生一次，所以整个解决流程用了快3个月，其中共发生了4次。</p>
+<p>不过从发现问题到解决问题倒是收获了很多,只是到了后来才发现造成该问题的根本原因是客户端由于觉得接口加密逻辑有bug就跟API接口的商量一起下线加密逻辑,而我又不知道,加密逻辑下线后导致sip服务器的ip被暴露出来,引发SIP服务器被攻击…</p></p>
+        
         <h2 id="1-SIP连接的特性"><a href="#1-SIP连接的特性" class="headerlink" title="1.SIP连接的特性"></a>1.SIP连接的特性</h2><p>SIP服务器不像http服务器一样一个请求一个链接,而是用户在使用时就是一条长链接,并且一直存活着.一开始客户端的设计时只有客户端打开期间才有长链接，之后客户端改为后台常驻长链接也能存活，变成了用户只要不强制杀死客户端，服务器就会为之保留一个长链接。服务器的长链接数量发生了6倍的提升.</p>
 <h2 id="2-更改文件描述符限制"><a href="#2-更改文件描述符限制" class="headerlink" title="2.更改文件描述符限制"></a>2.更改文件描述符限制</h2><p>由于链接量的提升,导致了服务器更容易触发文件描述符过多的问题,由于刚接触对kamailio以及Linux不熟悉，在整理了一些资料后,就去咨询大佬，询问是不是由于服务器被攻击导致的，大佬说可能性不大，主要是用户链接数量增长了，而Linux限制的文件描述符造成了该问题的发生，在查阅资料后发现Linux的文件描述符限制在1024，修改即可。</p>
 <h3 id="2-1更改默认文件描述符限制值"><a href="#2-1更改默认文件描述符限制值" class="headerlink" title="2.1更改默认文件描述符限制值"></a>2.1更改默认文件描述符限制值</h3><p>更改文件描述符这个比较简单，通常可以通过ulimit -n查看默认限制值，以下是修改命令</p>
@@ -385,6 +398,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -416,7 +430,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

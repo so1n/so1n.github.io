@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>分页设计是一个常见的需求, 对于后端来说, 分页设计通常是跟数据库强绑定的需求. 一个后端API经常会返回成千上百条记录, 如果一下子返回所有结果对服务器, 客户端来说都是一个不小的挑战, 而用户也不会一次请求完所有数据, 对于多余的数据就是单纯的浪费内存和性能. 于是就有了分页的功能, 通过分页功能可以减少对服务器的负担, 加快响应速度. 分页设计很常见, 但是数据都存在数据库里面, 而很少有数据库会提供一个完备的分页功能, 数据库只能尽量的提供分页功能, 所以直接依赖数据库的分页功能容易带来性能问题. 在实现分页功能的时候, 需要尽量避免性能低效, 使用别的方法尽量的实现分页功能. 目前分页方案很多, 但没有一个万金油选项, 只能根据业务以及技术服务定义自己的分页功能.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>分页设计是一个常见的需求, 对于后端来说, 分页设计通常是跟数据库强绑定的需求. 一个后端API经常会返回成千上百条记录, 如果一下子返回所有结果对服务器, 客户端来说都是一个不小的挑战, 而用户也不会一次请求完所有数据, 对于多余的数据就是单纯的浪费内存和性能. 于是就有了分页的功能, 通过分页功能可以减少对服务器的负担, 加快响应速度. 分页设计很常见, 但是数据都存在数据库里面, 而很少有数据库会提供一个完备的分页功能, 数据库只能尽量的提供分页功能, 所以直接依赖数据库的分页功能容易带来性能问题. 在实现分页功能的时候, 需要尽量避免性能低效, 使用别的方法尽量的实现分页功能. 目前分页方案很多, 但没有一个万金油选项, 只能根据业务以及技术服务定义自己的分页功能.</p></p>
+        
         <hr>
 <h2 id="1-一个简单的API例子"><a href="#1-一个简单的API例子" class="headerlink" title="1.一个简单的API例子"></a>1.一个简单的API例子</h2><p>首先先看看一个简单的API例子, 大多数第一版的分页功能都是这样实现的. 这个例子的Url让客户端知道能请求第几页,每页有多少条数据, 总的数量有多少:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">GET /api/book?page=10&amp;size=10<br></code></pre></td></tr></table></figure>
@@ -401,6 +412,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -432,7 +444,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

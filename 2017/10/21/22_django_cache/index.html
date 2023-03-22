@@ -63,10 +63,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -118,7 +125,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -127,10 +134,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -208,6 +216,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>简单的缓存设计与在django使用缓存</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>简单的缓存设计与在django使用缓存</p></p>
+        
         <h2 id="1-浏览器的缓存"><a href="#1-浏览器的缓存" class="headerlink" title="1.浏览器的缓存"></a>1.浏览器的缓存</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chenqf/p/6386163.html">关于浏览器与服务器缓存机制</a></p>
 <h3 id="1-1浏览器缓存机制"><a href="#1-1浏览器缓存机制" class="headerlink" title="1.1浏览器缓存机制"></a>1.1浏览器缓存机制</h3><h4 id="1-1-1-http报文的Cache-Control头域"><a href="#1-1-1-http报文的Cache-Control头域" class="headerlink" title="1.1.1 http报文的Cache-Control头域"></a>1.1.1 http报文的Cache-Control头域</h4><p>　　Cache-Control指定请求和响应遵循的缓存机制。在请求消息或响应消息中设置Cache-Control并不会修改另一个消息处理过程中的缓存处理过程。请求时的缓存指令包括no-cache、no-store、max-age、max-stale、min-fresh、only-if-cached，响应消息中的指令包括public、private、no-cache、no-store、no-transform、must-revalidate、proxy-revalidate、max-age。各个消息中的指令含义如下：<br>　　Public指示响应可被任何缓存区缓存。<br>　　Private指示对于单个用户的整个或部分响应消息，不能被共享缓存处理。这允许服务器仅仅描述当用户的部分响应消息，此响应消息对于其他用户的请求无效。<br>　　no-cache指示请求或响应消息不能缓存<br>　　no-store用于防止重要的信息被无意的发布。在请求消息中发送将使得请求和响应消息都不使用缓存。<br>　　max-age指示客户机可以接收生存期不大于指定时间（以秒为单位）的响应。<br>　　min-fresh指示客户机可以接收响应时间小于当前时间加上指定时间的响应。<br>　　max-stale指示客户机可以接收超出超时期间的响应消息。如果指定max-stale消息的值，那么客户机可以接收超出超时期指定值之内的响应消息。<br>综述：<br>Cache-Control指定请求和响应遵循的缓存机制。在请求消息或响应消息中设置Cache-Control并不会修改另一个消息处理过程中的缓存处理过程。请求时的缓存指令包括no-cache、no-store、max-age、max-stale、min-fresh、only-if-cached，响应消息中的指令包括public、private、no-cache、no-store、no-transform、must-revalidate、proxy-revalidate、max-age。网页的缓存通过HTTP消息头中的“Cache-control”来控制，常见的取值有private、no-cache、max-age、must-revalidate等，默认为private。</p>
 <h4 id="1-1-1-http报文的Last-Modified-If-Modified-Since"><a href="#1-1-1-http报文的Last-Modified-If-Modified-Since" class="headerlink" title="1.1.1  http报文的Last-Modified/If-Modified-Since"></a>1.1.1  http报文的Last-Modified/If-Modified-Since</h4><h5 id="Last-Modified-If-Modified-Since要配合Cache-Control使用。"><a href="#Last-Modified-If-Modified-Since要配合Cache-Control使用。" class="headerlink" title="Last-Modified/If-Modified-Since要配合Cache-Control使用。"></a>Last-Modified/If-Modified-Since要配合Cache-Control使用。</h5><p>   Last-Modified：标示这个响应资源的最后修改时间。web服务器在响应请求时，告诉浏览器资源的最后修改时间。<br>   If-Modified-Since：当资源过期时（使用Cache-Control标识的max-age），发现资源具有Last-Modified声明，则再次向web服务器请求时带上头 If-Modified-Since，表示请求时间。web服务器收到请求后发现有头If-Modified-Since 则与被请求资源的最后修改时间进行比对。若最后修改时间较新，说明资源又被改动过，则响应整片资源内容（写在响应消息包体内），HTTP 200；若最后修改时间较旧，说明资源无新修改，则响应HTTP 304 (无需包体，节省浏览)，告知浏览器继续使用所保存的cache。</p>
@@ -215,7 +226,7 @@
 <h5 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h5><p>作用： 防止页面被缓存， 在HTTP/1.1版本中，它和Cache-Control:no-cache作用一模一样<br>Pargma只有一个用法， 例如： Pragma: no-cache</p>
 <h2 id="2-Django的缓存"><a href="#2-Django的缓存" class="headerlink" title="2.Django的缓存"></a>2.Django的缓存</h2><h3 id="2-1Django缓存原理："><a href="#2-1Django缓存原理：" class="headerlink" title="2.1Django缓存原理："></a>2.1Django缓存原理：</h3><p>Django根据设置的缓存方式，浏览器第一次请求时，cache会缓存单个变量或整个网页等内容到硬盘或者内存中，同时设置response头部，当浏览器再次发起请求时，附带f-Modified-Since请求时间到Django，Django 发现f-Modified-Since会先去参数之后，会与缓存中的过期时间相比较，如果缓存时间比较新，则会重新请求数据，并缓存起来然后返回response给客户端，如果缓存没有过期，则直接从缓存中提取数据，返回给response给客户端。</p>
 <h3 id="2-2通用设置"><a href="#2-2通用设置" class="headerlink" title="2.2通用设置"></a>2.2通用设置</h3><h4 id="2-2-1设置中间件"><a href="#2-2-1设置中间件" class="headerlink" title="2.2.1设置中间件"></a>2.2.1设置中间件</h4><p>django接受请求时，中间件的访问顺序是从上到下<br>返回响应时，中间件的访问顺序是从下到上，所以中间件的位置要放对</p>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs hsp"><span class="hljs-string">&#x27;django.middleware.cache.UpdateCacheMiddleware&#x27;</span>,  <span class="hljs-meta">#必须设置在第一个位置 </span><br>...其他中间件...<br><span class="hljs-string">&#x27;django.middleware.cache.FetchFromCacheMiddleware&#x27;</span>,<span class="hljs-meta">#必须设置在最后一个位置</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs 1c">&#x27;django.middleware.cache.UpdateCacheMiddleware&#x27;,  <span class="hljs-meta">#必须设置在第一个位置 </span><br>...其他中间件...<br>&#x27;django.middleware.cache.FetchFromCacheMiddleware&#x27;,<span class="hljs-meta">#必须设置在最后一个位置</span><br></code></pre></td></tr></table></figure>
 <p>缓存中间件缓存每个没有GET或者POST参数的页面。 或者，如果CACHE_MIDDLEWARE_ANONYMOUS_ONLY设置为True，只有匿名请求（即不是由登录的用户）将被缓存。 如果想取消用户相关页面（user-specific pages）的缓存，例如Djangos 的管理界面，这是一种既简单又有效的方法。 CACHE_MIDDLEWARE_ANONYMOUS_ONLY，你应该确保你已经启动AuthenticationMiddleware。</p>
 <p>此外，缓存中间件为每个HttpResponse自动设置了几个头部信息：</p>
 <p>当一个新(没缓存的)版本的页面被请求时设置Last-Modified头部为当前日期/时间。</p>
@@ -466,6 +477,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -497,7 +509,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -204,6 +212,7 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
+        
         
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前在<a href="https://so1n.me/categories/Python-gRPC%E5%AE%9E%E8%B7%B5/">Python-gRPC实践</a>系列文章中都是在多线程模式中介绍如何使用<code>gRPC</code>，但是在<code>Python</code>生态中更偏好通过协程的方式来运行服务，而<code>Python</code>的协程运行方式却有多种，虽然他们的原理类似，但是使用上却有区别，本文主要是对在<code>gevent</code>和<code>asyncio</code>中对<code>gRPC</code>的使用进行对比。</p>
 <h2 id="1-简单的例子"><a href="#1-简单的例子" class="headerlink" title="1.简单的例子"></a>1.简单的例子</h2><p>本章以官方中的<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/examples/protos/helloworld.proto">helloworld</a> <code>Protobuf</code>文件为例子，介绍在不同协程中如何运行服务，该<code>Protobuf</code>文件内容如下:</p>
@@ -390,6 +399,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -421,7 +431,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

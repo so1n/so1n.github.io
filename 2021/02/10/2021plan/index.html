@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -206,6 +214,10 @@
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>rm 2020plan.md<br>vi 2021plan.md</p>
 <p>害, 今年很快, 一下子就过去了, 有很多的意外, 也有很多不甘, 但还是得向前看</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>rm 2020plan.md<br>vi 2021plan.md</p>
+<p>害, 今年很快, 一下子就过去了, 有很多的意外, 也有很多不甘, 但还是得向前看</p></p>
+        
         <h2 id="amp"><a href="#amp" class="headerlink" title="%$*&amp;^"></a>%$*&amp;^</h2><p>20这一年, 是技术突飞猛进的一年, 也是第一次换了工作, 第一次拥有猫猫,第一次知道有现金流有多重要, 很想在大城市有个家, 也很想念家里人.</p>
 <h2 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h2><p>1.这一年在老东家做了很多新的东西, 可惜的是有些东西没有做完就走了. 想走的原因很简单, 就是成长空间只能靠自己去想象摸索, 没有人可以带我, 还有就是钱太少了, 还拿着一份像毕业时一样的工资, 都比不过同学的工资了.</p>
 <p>2.换了工作后, 有了个比较完善的团队体验, 但是项目就是屎山级别的代码, 通过半年的逐渐升级, 改造, 重构,终于开始像一个像样的项目了. 然而这个项目的天花板已经摆在那里了,  后面可成长的空间也不大, 还有一个只会<code>Java</code>和<code>Mysql</code>的<code>Leader</code>,  有些东西没办法交流, 他也很难理解我们为什么这样做, 认为就必须用<code>Java</code>去重构这个项目, <code>Java</code>才是最好的…而我虽然是喜欢<code>Python</code>但我是坚信每个语言都有自己的独特之处, 没有一门语言适用于所有场景.</p>
@@ -354,6 +366,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -385,7 +398,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

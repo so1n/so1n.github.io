@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -196,7 +204,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>August 17, 2017</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5993</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>5992</span>
     </div>
   </div>
 </section>
@@ -205,9 +213,12 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <p>python文档入门的笔记，也就是创建一个投票应用那个，后面的文档就只看，没记了</p>
+        
+          <p><p>python文档入门的笔记，也就是创建一个投票应用那个，后面的文档就只看，没记了</p></p>
+        
         <h1 id="Django学习笔记"><a href="#Django学习笔记" class="headerlink" title="Django学习笔记"></a>Django学习笔记</h1><h2 id="1-前期准备"><a href="#1-前期准备" class="headerlink" title="1. 前期准备"></a>1. 前期准备</h2><ul>
 <li>使用虚拟环境Virtualenv<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> pip install Virtualenv    <span class="hljs-comment">#安装Virtualenv</span></span><br><span class="hljs-meta">#</span><span class="bash">在要运行Django的目录创建 虚拟环境</span><br><span class="hljs-meta">   $</span><span class="bash"> virtualenv  djangoproject_env      <span class="hljs-comment">#运行后在当前目录生成djangoproject_env</span></span><br><span class="hljs-meta">   $</span><span class="bash"> <span class="hljs-built_in">source</span> djangoproject_env/bin/activate   <span class="hljs-comment">#启动虚拟环境</span></span><br><span class="hljs-meta">$</span><span class="bash"> django-admin startproject testproject    <span class="hljs-comment">#创建Django工程</span></span><br><span class="hljs-meta">$</span><span class="bash"> python manage.py runserver  <span class="hljs-comment">#进行测试</span></span><br><span class="hljs-meta">$</span><span class="bash"> python manage.py startapp testapp <span class="hljs-comment">#创建Django应用</span></span><br></code></pre></td></tr></table></figure>
-Django 默认的语言是英语，所以显示给我们的欢迎页面是英文的。我们在 Django 的配置文件里稍作修改，让它支持中文。用任何一个文本编辑器打开 settings.py 文件，找到如下的两行代码：<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs vala">blogproject/blogproject/settings.py<br><br><span class="hljs-meta">## 其它配置代码...</span><br><br>LANGUAGE_CODE = <span class="hljs-string">&#x27;en-us&#x27;</span><br>TIME_ZONE = <span class="hljs-string">&#x27;UTC&#x27;</span><br><br><span class="hljs-meta">## 其它配置代码...</span><br></code></pre></td></tr></table></figure>
+Django 默认的语言是英语，所以显示给我们的欢迎页面是英文的。我们在 Django 的配置文件里稍作修改，让它支持中文。用任何一个文本编辑器打开 settings.py 文件，找到如下的两行代码：<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs awk">blogproject<span class="hljs-regexp">/blogproject/</span>settings.py<br><br><span class="hljs-comment">## 其它配置代码...</span><br><br>LANGUAGE_CODE = <span class="hljs-string">&#x27;en-us&#x27;</span><br>TIME_ZONE = <span class="hljs-string">&#x27;UTC&#x27;</span><br><br><span class="hljs-comment">## 其它配置代码...</span><br></code></pre></td></tr></table></figure>
 把 LANGUAGE_CODE 的值改为 zh-hans，TIME_ZONE 的值改为 Asia/Shanghai：<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs vala">blogproject/blogproject/settings.py<br><br><span class="hljs-meta">## 其它配置代码...</span><br><br><span class="hljs-meta"># 把英文改为中文</span><br>LANGUAGE_CODE = <span class="hljs-string">&#x27;zh-hans&#x27;</span><br><br><span class="hljs-meta"># 把国际时区改为中国时区</span><br>TIME_ZONE = <span class="hljs-string">&#x27;Asia/Shanghai&#x27;</span><br><br><span class="hljs-meta">## 其它配置代码...</span><br></code></pre></td></tr></table></figure>
 寻找一个学习文章，英文有点渣，我就找中文的，英文看不懂的就切中文看<br><a target="_blank" rel="noopener" href="http://python.usyiyi.cn/translate/django_182/index.html">中文文档</a>  <a target="_blank" rel="noopener" href="https://docs.djangoproject.com/en/1.11/">原版英本文档</a></li>
 </ul>
@@ -237,7 +248,7 @@ Django 默认的语言是英语，所以显示给我们的欢迎页面是英文�
 </ul>
 <h3 id="2-编写你的第一个Django应用，第2部分"><a href="#2-编写你的第一个Django应用，第2部分" class="headerlink" title="2.编写你的第一个Django应用，第2部分"></a>2.编写你的第一个Django应用，第2部分</h3><p>创建一个管理员用户¶</p>
 <blockquote>
-<p>首先，我们需要创建一个能够登录管理站点的用户。 运行如下命令：<br>$ python manage.py createsuperuser<br>键入你想要使用的用户名，然后按下回车键：<br>Username: admin<br>然后提示你输入想要使用的邮件地址：<br>Email address: <a href="mailto:&#x61;&#x64;&#109;&#x69;&#x6e;&#64;&#x65;&#x78;&#x61;&#x6d;&#x70;&#108;&#101;&#x2e;&#x63;&#111;&#109;">&#x61;&#x64;&#109;&#x69;&#x6e;&#64;&#x65;&#x78;&#x61;&#x6d;&#x70;&#108;&#101;&#x2e;&#x63;&#111;&#109;</a><br>你需要输入两次密码，第二次输入是确认密码<br>Password:<br>Password (again):<br>Superuser created successfully.</p>
+<p>首先，我们需要创建一个能够登录管理站点的用户。 运行如下命令：<br>$ python manage.py createsuperuser<br>键入你想要使用的用户名，然后按下回车键：<br>Username: admin<br>然后提示你输入想要使用的邮件地址：<br>Email address: <a href="mailto:&#97;&#x64;&#109;&#x69;&#110;&#64;&#101;&#x78;&#x61;&#109;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#x6d;">&#97;&#x64;&#109;&#x69;&#110;&#64;&#101;&#x78;&#x61;&#109;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#x6d;</a><br>你需要输入两次密码，第二次输入是确认密码<br>Password:<br>Password (again):<br>Superuser created successfully.</p>
 </blockquote>
 <p>其中，django会自动检测密码，密码跟邮箱或者用户名太像也不会通过。。。</p>
 <p>在polls/admin.py中，代码示例如下</p>
@@ -270,7 +281,7 @@ Django 默认的语言是英语，所以显示给我们的欢迎页面是英文�
         &#39;latest_question_list&#39;: latest_question_list,
     &#125;)
     return HttpResponse(template.render(context))
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><br>在这个栗子中，中文版的原文已经做了如下阐述：<br>&gt; 以上的代码载入polls<span class="hljs-regexp">/index.html模板，并传给它一个context。Context是一个字典，将模板变量的名字映射到Python 对象。将你的浏览器指向“/</span>polls/”来加载这个页面，你应该看到一个列表，包含来自教程<span class="hljs-number">1</span>中<span class="hljs-string">&quot;What&#x27;s up&quot;</span> Question。其链接指向Question的detail页面。<br>然而还是遇到了这个错误提示：<br></code></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>在这个栗子中，中文版的原文已经做了如下阐述：<br>&gt; 以上的代码载入polls<span class="hljs-regexp">/index.html模板，并传给它一个context。Context是一个字典，将模板变量的名字映射到Python 对象。将你的浏览器指向“/</span>polls/”来加载这个页面，你应该看到一个列表，包含来自教程<span class="hljs-number">1</span>中<span class="hljs-string">&quot;What&#x27;s up&quot;</span> Question。其链接指向Question的detail页面。<br>然而还是遇到了这个错误提示：<br></code></pre></td></tr></table></figure>
 TypeError: context must be a dict rather than RequestContext.
 <figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs awk">    https:<span class="hljs-regexp">//</span>stackoverflow.com<span class="hljs-regexp">/questions/</span><span class="hljs-number">43787700</span>/django-<span class="hljs-number">1</span>-<span class="hljs-number">11</span>-typeerror-context-must-be-a-dict-rather-than-context<br>也说了是Django1.<span class="hljs-number">8</span>+后更改的问题<br>但是<span class="hljs-number">1.11</span>版教程是这样的：<br></code></pre></td></tr></table></figure>
 from django.http import HttpResponse
@@ -412,6 +423,7 @@ def index(request):
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -443,7 +455,9 @@ def index(request):
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

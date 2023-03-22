@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>生产的机器会产生很多的日志, 如果不对日志进行管理, 日志会不断消耗硬盘空间, 直到把硬盘挤爆, 同时所有日志挤在同一个文件, 也很难去翻前几天的日志数据, 这时候就需要一个日志管理工具–<code>logrotate</code>.<br>Linux机器中自带<code>logrotate</code>用于日志轮转, 他的实现是最简单的, 也是最好用的, 基本适用所有情况, 一般情况下, 机器上面有logrotate时, 就不要使用其他的日志轮转, 如Python日志模块的转换, Java日志模块的转换, supervisor的日志轮转模块, 他们在多线程/多进程的时候基本有坑.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>生产的机器会产生很多的日志, 如果不对日志进行管理, 日志会不断消耗硬盘空间, 直到把硬盘挤爆, 同时所有日志挤在同一个文件, 也很难去翻前几天的日志数据, 这时候就需要一个日志管理工具–<code>logrotate</code>.<br>Linux机器中自带<code>logrotate</code>用于日志轮转, 他的实现是最简单的, 也是最好用的, 基本适用所有情况, 一般情况下, 机器上面有logrotate时, 就不要使用其他的日志轮转, 如Python日志模块的转换, Java日志模块的转换, supervisor的日志轮转模块, 他们在多线程/多进程的时候基本有坑.</p></p>
+        
         <h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h2><p><code>logrotate</code>是一个linux系统日志的管理工具。可以对单个日志文件或者某个目录下的文件按时间或者文件大小进行切割，压缩等操作, 并能按照指定设置的保留n个日志；还可以在切割之后运行自定义命令。</p>
 <p>logrotate 并不是一个守护进程, 正常情况下不会启动, 而是按照一定的周期启动的, 这个周期是基于<code>crontab</code>运行的，所以这个时间点是由 crontab 控制的，具体可以查询 crontab 的配置文件<code>/etc/crontab</code>. 系统会按照计划的频率运行 logrotate，通常是每天, 也就是通过<code>/etc/cron.daily/logrotate</code>配置文件来配置logrotate的运行.</p>
 <p><code>logrotate</code>默认的配置文件<code>/etc/logrotate.conf</code>里有一句<code>include /etc/logrotate.d</code>, 所以<code>logrotate</code>在启动后会读取<code>/etc/logrotate.d</code>里的所有配置, 如果我们有新的需求, 就在该目录下面创建需求对应的文件夹, 并在里面写<code>logrotate</code>脚本, 或者在<code>/etc/logrotate.d</code>里面直接写配置文件.</p>
@@ -351,6 +362,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -382,7 +394,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

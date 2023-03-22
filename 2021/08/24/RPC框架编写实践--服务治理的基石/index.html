@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>由于服务的调用是通过网络间来调用了， 服务并不在同一个进程内， 程序可能崩溃、节点可能宕机、网络可能中断，这些意外情况其实全部都在意料之中, 微服务的一个思想就是， 所有假设会出错的东西一定会出现， 而且没办法完全避免， 只能通过一些功能去增加容错性， 稳定性和可用性， 这类功能被统称为服务治理， 大部分功能都会利用过去一段时间产生的数据来决策接下来的请求该怎么做， 而这些数据就是服务治理的基石。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>由于服务的调用是通过网络间来调用了， 服务并不在同一个进程内， 程序可能崩溃、节点可能宕机、网络可能中断，这些意外情况其实全部都在意料之中, 微服务的一个思想就是， 所有假设会出错的东西一定会出现， 而且没办法完全避免， 只能通过一些功能去增加容错性， 稳定性和可用性， 这类功能被统称为服务治理， 大部分功能都会利用过去一段时间产生的数据来决策接下来的请求该怎么做， 而这些数据就是服务治理的基石。</p></p>
+        
         <blockquote>
 <p><a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写框架<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>的想法和总结。</p>
 </blockquote>
@@ -368,6 +379,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -399,7 +411,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

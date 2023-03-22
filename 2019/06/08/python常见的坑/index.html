@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>本文主体思想和内容来自于<a target="_blank" rel="noopener" href="https://www.toptal.com/python/top-10-mistakes-that-python-programmers-make">Buggy Python Code: The 10 Most Common Mistakes That Python Developers Make</a>。由于结合内容写出自己平时遇到一些坑，所以与原文有些不同之处，出入较大。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>本文主体思想和内容来自于<a target="_blank" rel="noopener" href="https://www.toptal.com/python/top-10-mistakes-that-python-programmers-make">Buggy Python Code: The 10 Most Common Mistakes That Python Developers Make</a>。由于结合内容写出自己平时遇到一些坑，所以与原文有些不同之处，出入较大。</p></p>
+        
         <h2 id="1-滥用可变对象作为函数参数的默认值"><a href="#1-滥用可变对象作为函数参数的默认值" class="headerlink" title="1. 滥用可变对象作为函数参数的默认值"></a>1. 滥用可变对象作为函数参数的默认值</h2><p>Python允许您给函数的参数提供默认值，但是在使用可变对象作为默认参数时，它可能会导致一些混淆。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs Python">In [<span class="hljs-number">1</span>]: <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">foo</span>(<span class="hljs-params">bar=[]</span>):</span> <br>   ...:     bar.append(<span class="hljs-string">&quot;baz&quot;</span>) <br>   ...:     <span class="hljs-keyword">return</span> bar <br>   ...:                                                                                                            <br><br>In [<span class="hljs-number">2</span>]: foo()                                                                                                      <br>Out[<span class="hljs-number">2</span>]: [<span class="hljs-string">&#x27;baz&#x27;</span>]<br><br>In [<span class="hljs-number">3</span>]: foo()                                                                                                      <br>Out[<span class="hljs-number">3</span>]: [<span class="hljs-string">&#x27;baz&#x27;</span>, <span class="hljs-string">&#x27;baz&#x27;</span>]<br><br>In [<span class="hljs-number">4</span>]: foo()                                                                                                      <br>Out[<span class="hljs-number">4</span>]: [<span class="hljs-string">&#x27;baz&#x27;</span>, <span class="hljs-string">&#x27;baz&#x27;</span>, <span class="hljs-string">&#x27;baz&#x27;</span>]<br></code></pre></td></tr></table></figure>
 <p>写下这个代码时，是想让代码在参数时已经初始化为一个list，之后可以对该参数进行操作，最后返回该参数，但是Python每次调用时都会给现有的foo()的bar默认值添加”bar”.<br>造成这样的原因是，Python在执行的时候，会把关键字参数存在于函数的<code>__defaults__</code>里面,在foo函数中,虽然调用的foo行为不一样,但函数里的bar对象的一样的,也就是把bar=[]这个对象存放于<code>__defaults__</code>里,由于bar是一个可变对象,每次调用都会用到与上一次相同的bar对象,进行处理后返回同一个bar,可以通过调用以下方法查看foo函数的关键字参数。</p>
@@ -358,6 +369,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -389,7 +401,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

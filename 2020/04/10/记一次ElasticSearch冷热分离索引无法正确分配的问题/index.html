@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>一开始ElasticSearch是同事自己搭的一个单节点, 我在接手后开始使用mapping,集群等功能, 但很多旧<code>index</code>在单节点时被应用了很多奇怪的配置, 导致添加新的功能非常麻烦, 比如在启用冷热分离功能的时候, 旧的<code>index</code>无法正确分配.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>一开始ElasticSearch是同事自己搭的一个单节点, 我在接手后开始使用mapping,集群等功能, 但很多旧<code>index</code>在单节点时被应用了很多奇怪的配置, 导致添加新的功能非常麻烦, 比如在启用冷热分离功能的时候, 旧的<code>index</code>无法正确分配.</p></p>
+        
         <h2 id="1-问题"><a href="#1-问题" class="headerlink" title="1.问题"></a>1.问题</h2><p>当给ElasticSearch配置了ILM后,ElasticSearch会根据配置自动执行,按照配置把索引进行在集群之中迁移,但是运行一段时间后发现,之前用logstash传过来的且没有使用mapping的旧索引都无法正常执行ILM,而其他数据却能正常处理.<br>由于发现这个问题时,对于Es不是十分了解,只能copy错误去搜索,搜索后发现几乎没有一个答案是满意的,最多说的是升级ElasticSearch版本解决,所以就又水了一文.</p>
 <h2 id="2-查看索引ilm运行情况"><a href="#2-查看索引ilm运行情况" class="headerlink" title="2.查看索引ilm运行情况"></a>2.查看索引ilm运行情况</h2><p>由于是由ilm自己自动运行的, 我们可以通过查看ilm的运行情况查看问题发生在哪</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">GET so1n_index/_ilm/explain<br></code></pre></td></tr></table></figure>
@@ -346,6 +357,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -377,7 +389,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -208,6 +216,12 @@
 <blockquote>
 <p>NOTE: 使用了几年的<code>starlette</code>以来， 简单了翻过了几次源码， 觉得<code>starlette</code>堪称工艺品， 设计很完美， 各种逻辑实现起来很简单(也可能是我一开始就使用了sanic框架)， 从使用至今， 除了初始化中间件， 在中间件读取body以及官方示例文档比较少这些缺点外， 感觉不出有其他的槽点。</p>
 </blockquote>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>上一篇分析了<code>uvicorn</code>， 但是<code>uvicorn</code>只是一个ASGI容器， 真正处理请求的是ASGI应用程序，而<code>starlette</code>是最出名也是最标准的ASGI应用程序， 通过了解<code>starlette</code>, 可以了解到每个组件都是ASGI APP的设计理念， 了解ASGI APP的兼容性， 能更完整的理解ASGI生态。</p>
+<blockquote>
+<p>NOTE: 使用了几年的<code>starlette</code>以来， 简单了翻过了几次源码， 觉得<code>starlette</code>堪称工艺品， 设计很完美， 各种逻辑实现起来很简单(也可能是我一开始就使用了sanic框架)， 从使用至今， 除了初始化中间件， 在中间件读取body以及官方示例文档比较少这些缺点外， 感觉不出有其他的槽点。</p>
+</blockquote></p>
+        
         <blockquote>
 <p>NOTE: 本文偏代码+注释比较多</p>
 </blockquote>
@@ -413,6 +427,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -444,7 +459,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

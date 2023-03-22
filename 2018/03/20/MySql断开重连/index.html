@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -205,6 +213,9 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>今天上班发现在在跑的业务接口无法访问了,查看的日志后发现MySQL断开连接,只有重启web程序后才能恢复正常.MySQL断开重连这个问题第一次遇到时还是有点懵逼的,主要与库选型有关才造成发现了这个问题,还有就是对MySQL的了解不熟悉,才会造成MySQL断开重连的问题需要经过一顿搜索后才能查明原因并解决.</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>今天上班发现在在跑的业务接口无法访问了,查看的日志后发现MySQL断开连接,只有重启web程序后才能恢复正常.MySQL断开重连这个问题第一次遇到时还是有点懵逼的,主要与库选型有关才造成发现了这个问题,还有就是对MySQL的了解不熟悉,才会造成MySQL断开重连的问题需要经过一顿搜索后才能查明原因并解决.</p></p>
+        
         <h2 id="1-发生原因"><a href="#1-发生原因" class="headerlink" title="1.发生原因"></a>1.发生原因</h2><p>其实发生这个问题比较苛刻,因为MySQL断开重连是MySQL会去探测与自己相关的连接,当超过了设定的timeout时间后,MySQL服务器会断开这个链接,使用<code>show variables like &#39;%timeout%&#39;;</code>命令查询可以看到MySQL默认的超时时间是28800秒也就是8小时.而目前在写的业务并没有正式上线,所以基本除了自己人就没有用户在使用,所以睡了一觉后就会发现接口挂了.</p>
 <p>自己在实习之前是只用Django写demo,Django自带的ORM除了让程序员可以用面向对象的思想去写SQL语句外,自己还做了一些封装如数据库链接池,还有就是针对与服务器链接断开时,会使用mysql的ping命令,检测并重新创建链接.</p>
 <h2 id="2-修复问题"><a href="#2-修复问题" class="headerlink" title="2.修复问题"></a>2.修复问题</h2><p>在这个问题还没出现之前,MySQL相关部分代码是这样的:</p>
@@ -329,6 +340,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -360,7 +372,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 

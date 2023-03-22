@@ -60,10 +60,17 @@
       isHome: false,
       fancybox: true,
       pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
       lazyload: {
         enable: true,
         only_post: 'true',
-        loading: '/images/theme/puff.svg'
+        loading: {
+          gif: '',
+          lottie: ''
+        }
       },
       donate: {
         enable: true,
@@ -115,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: 'search.xml'
+        path: '/search.xml'
       }
     }
   </script>
@@ -124,10 +131,11 @@
 
   
 
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
 
 <body class="lock-screen">
-  <div class="loading"></div>
+  <div class="loading" id="loading"></div>
   
     
 
@@ -211,6 +219,15 @@
 <li>趋势有序, 这个id在业务中通常会充当索引字段, 所以要趋势上有序.</li>
 <li>数量不可猜测(非必要), 一般的业务场景中, 会要求生成的id不会被他人猜测到今天生成的量有多少.</li>
 <li>高性能, 生成id的速度一定要快.
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在业务中, 我们经常需要有一个唯一id, 来区分每个数据, 如每个订单都有一个自己的id, 如果是一个单体应用, 实现起来会非常容易, 但很多时候是有多个应用同时索要id, 这时候就要确保任一次生成的id都不重复,  这就催生了分布式id的概念, 分布式id一般有几个特性:</p>
+<ul>
+<li>全局唯一, 不会再生成与这一样的id</li>
+<li>高可用， 所有的业务系统都需要依赖这个方法生成id，所以不能出现问题.</li>
+<li>趋势有序, 这个id在业务中通常会充当索引字段, 所以要趋势上有序.</li>
+<li>数量不可猜测(非必要), 一般的业务场景中, 会要求生成的id不会被他人猜测到今天生成的量有多少.</li>
+<li>高性能, 生成id的速度一定要快.</p>
+        
         </li>
 </ul>
 <h2 id="1-UUID方案"><a href="#1-UUID方案" class="headerlink" title="1.UUID方案"></a>1.UUID方案</h2><p>UUID方案是最方便引用的方案, 由于没有网络依赖, 全靠本地生成, 所以他的性能是最高的. 但同时他的劣势也非常的明显:</p>
@@ -364,6 +381,7 @@
   </div>
   
   
+  
   <div class="fab fab-up">
     <i class="iconfont iconcaret-up"></i>
   </div>
@@ -395,7 +413,9 @@
   
 </body>
 
-<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 
 
