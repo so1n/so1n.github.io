@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python Asyncio 库之从ChatGPT Bug了解Cancel机制 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记最近几天，在使用ChatGPT时会发现无法使用历史...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: {
+          gif: '',
+          lottie: ''
+        }
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: '/search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
+
+<body class="lock-screen">
+  <div class="loading" id="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python Asyncio 库之从ChatGPT Bug了解Cancel机制</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550442517731649661119526images.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python Asyncio 库之从ChatGPT Bug了解Cancel机制</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>March 25, 2023</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>4067</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近几天，在使用ChatGPT时会发现无法使用历史记录功能。而在3月24号时，OpenAI公布了这次原因，之所以关闭历史记录功能是由于某个Bug导致，导致部分用户能获得到其他用户的信息，而这一切是因为<code>Asyncio Cancel</code>机制的问题。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近几天，在使用ChatGPT时会发现无法使用历史记录功能。而在3月24号时，OpenAI公布了这次原因，之所以关闭历史记录功能是由于某个Bug导致，导致部分用户能获得到其他用户的信息，而这一切是因为<code>Asyncio Cancel</code>机制的问题。</p></p>
+        
+        <blockquote>
+<p>注：协程的取消机制是大部分语言都要考虑的问题，他们的原因是相似的</p>
+</blockquote>
+<h2 id="1-ChatGPT遇到的问题"><a href="#1-ChatGPT遇到的问题" class="headerlink" title="1.ChatGPT遇到的问题"></a>1.ChatGPT遇到的问题</h2><p>本次ChatGPT问题导致了部分用户能获取到另一个用户的数据，这是一个非常严重的问题。<br>根据OpenAI的问题披露可以知道，ChatGPT使用<code>Redis</code>缓存用户的信息，而后台服务是基于<code>Asyncio</code>运行的，所以使用的是<code>redis-py</code>中的<code>AsyncRedis</code>与他们的<code>Redis</code>集群进行交互的。</p>
+<blockquote>
+<p>AsyncRedis代表着是<code>redis-py</code>中的<code>redis.asyncio.client</code>中的<code>Redis</code>类，下同</p>
+</blockquote>
+<p>在大部分情况下(包括测试)，这种使用方式是没问题的，但是在他们对服务进行修改后导致<code>Redis</code>请求的取消数量激增，而取消是通过<code>asyncio</code>的<code>Cancel</code>实现的，正常情况下，在遇到<code>Cancel</code>后可以捕获取消异常再进行重试或者直接抛出异常，ChatGPT在业务层也是这样实现的，所以ChatGPT的代码并没有问题，真正有问题的是ChatGPT使用到的<code>redis-py</code>库中的<code>AsyncRedis</code>。</p>
+<p><code>AsyncRedis</code>在ChatGPT服务器和<code>Redis</code>集群之间维护一个共享连接池，这些连接池存放着很多个TCP连接，TCP连接拥有请求队列和响应队列，在通过TCP发送数据时，实际上是把数据投递到请求队列中，再由操作系统把数据发送到目标服务器，而在接收到服务器数据后，会把数据存放到响应队列中，等待程序获取。<br>ChatGPT服务每次与<code>Redis</code>交互时，都会从<code>Redis</code>连接池获取一个连接，并将请求推入到连接中的请求队列中，然后再从连接的响应队列获取数据再返回。<br>当交互A成功把请求推入到连接后，当前的协程由于意外被取消了，那么这时候ChatGPT服务只收到一个取消异常，而<code>AsyncRedis</code>会回收当前连接，并给交互B使用，而此时连接的响应队列恰好收到了<code>Redis</code>服务返回的数据，那么交互B就会从响应队列得到了交互A的响应数据了，更糟糕的是由于大部分的请求都是一个发送对应一个接收到，这就意味着后续交互获得的响应都是上一个交互请求的数据了。</p>
+<blockquote>
+<p>ChatGPT问题细节并不本文重点，有兴趣的可以 访问<a target="_blank" rel="noopener" href="https://openai.com/blog/march-20-chatgpt-outage">OpenAI披露问题细节</a>。同时应该知道，保护用户数据是后端开发者的主要职责之一，我们不止要校验请求的参数，还需要对返回的隐私数据进行校验，而不是单纯的依赖在使用的工具和服务。</p>
+</blockquote>
+<h2 id="2-重现问题"><a href="#2-重现问题" class="headerlink" title="2.重现问题"></a>2.重现问题</h2><p>为了确保能100%重现这个问题，首先需要在本机安装<code>Redis</code>服务(如果不是使用本机的<code>Redis</code>服务，那么不一定能100%重现)，然后运行如下代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 示例代码来源于：https://github.com/redis/redis-py/issues/2624</span><br><span class="hljs-comment"># 对应的redis-py版本为4.5.2（新推出的修复版本4.5.3仍然有该问题,4.5.3只修复了PIPE）</span><br><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> redis.asyncio <span class="hljs-keyword">import</span> Redis<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>():</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> Redis(single_connection_client=<span class="hljs-literal">True</span>) <span class="hljs-keyword">as</span> r:<br><br>        <span class="hljs-keyword">await</span> r.<span class="hljs-built_in">set</span>(<span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-string">&#x27;foo&#x27;</span>)<br>        <span class="hljs-keyword">await</span> r.<span class="hljs-built_in">set</span>(<span class="hljs-string">&#x27;bar&#x27;</span>, <span class="hljs-string">&#x27;bar&#x27;</span>)<br><br>        t = asyncio.create_task(r.get(<span class="hljs-string">&#x27;foo&#x27;</span>))<br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0</span>)  <span class="hljs-comment"># 模拟IO</span><br>        t.cancel()<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-keyword">await</span> t<br>            print(<span class="hljs-string">&#x27;try again, we did not cancel the task in time&#x27;</span>)<br>        <span class="hljs-keyword">except</span> asyncio.CancelledError <span class="hljs-keyword">as</span> e:<br>            print(<span class="hljs-string">&#x27;managed to cancel the task, connection is left open with unread response&#x27;</span>)<br><br>        print(<span class="hljs-string">&#x27;bar:&#x27;</span>, <span class="hljs-keyword">await</span> r.get(<span class="hljs-string">&#x27;bar&#x27;</span>))<br>        print(<span class="hljs-string">&#x27;ping:&#x27;</span>, <span class="hljs-keyword">await</span> r.ping())<br>        print(<span class="hljs-string">&#x27;foo:&#x27;</span>, <span class="hljs-keyword">await</span> r.get(<span class="hljs-string">&#x27;foo&#x27;</span>))<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>可以得到输出如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs Python">managed to cancel the task, connection <span class="hljs-keyword">is</span> left <span class="hljs-built_in">open</span> <span class="hljs-keyword">with</span> unread response<br>bar: <span class="hljs-string">b&#x27;foo&#x27;</span><br>ping: <span class="hljs-literal">False</span><br>foo: <span class="hljs-string">b&#x27;PONG&#x27;</span><br></code></pre></td></tr></table></figure>
+<p>可以发现，第一个交互是从<code>Redis</code>获取键值为<code>foo</code>的值，但是在被显式的执行取消操作后，后续的交互获取的值都是上一次交互想要的值,这是非常糟糕的，为了找到问题的原因，需要深入到<code>AsyncRedis</code>的源码中查找。</p>
+<p>在用户发起命令<code>set</code>和<code>get</code>后，涉及到与连接交互的只有<code>execute_command</code>方法l，对应的代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># redis.asyncio.client</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Redis</span>:</span><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">execute_command</span>(<span class="hljs-params">self, *args, **options</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;Execute a command and return a parsed response&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">await</span> self.initialize()<br>        pool = self.connection_pool<br>        command_name = args[<span class="hljs-number">0</span>]<br>        conn = self.connection <span class="hljs-keyword">or</span> <span class="hljs-keyword">await</span> pool.get_connection(command_name, **options)<br><br>        <span class="hljs-keyword">if</span> self.single_connection_client:<br>            <span class="hljs-keyword">await</span> self._single_conn_lock.acquire()<br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> conn.retry.call_with_retry(<br>                <span class="hljs-keyword">lambda</span>: self._send_command_parse_response(<br>                    conn, command_name, *args, **options<br>                ),<br>                <span class="hljs-keyword">lambda</span> error: self._disconnect_raise(conn, error),<br>            )<br>        <span class="hljs-keyword">finally</span>:<br>            <span class="hljs-keyword">if</span> self.single_connection_client:<br>                self._single_conn_lock.release()<br>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> self.connection:<br>                <span class="hljs-keyword">await</span> pool.release(conn)<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_send_command_parse_response</span>(<span class="hljs-params">self, conn, command_name, *args, **options</span>):</span><br>        <span class="hljs-keyword">await</span> conn.send_command(*args)<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> self.parse_response(conn, command_name, **options)<br></code></pre></td></tr></table></figure>
+<p>其中<code>execute_command</code>对应的就是从连接池获取连接以及回收连接，然后通过<code>_send_command_parse_response</code>方法把请求数据发送到连接中，然后等待从连接获取数据并返回，可以发现这是两个IO操作。</p>
+<p>由于通过复现问题的代码输出可以发现在显式调用取消后，下一个交互得到的输出永远为上一个交互得到的结果，这也就意味着<code>send_command</code>这个方法是执行成功的，取消操作真正命中的是<code>self.parse_response</code>方法。</p>
+<blockquote>
+<p>如果重新问题代码中的<code>asyncio.sleep(0)</code>被移除，则不会有问题发生，这是因为取消操作命中的是<code>send_command</code>方法</p>
+</blockquote>
+<p>在取消操作执行成功的时候，会沿着该协程的堆栈抛出异常，然而<code>execute_commanad</code>中的名为<code>call_with_retry</code>的重试方法只针对连接异常和超时异常进行重试，所以取消异常会继续往上抛，这时<code>execute_command</code>方法就会回收连接，并把异常向上抛到调用<code>AsyncRedis</code>的业务层中供用户使用。</p>
+<p>`</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2023/03/25/python_asyncio_lib_cancel/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;03&#x2F;25&#x2F;python_asyncio_lib_cancel&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;03&#x2F;25&#x2F;python_asyncio_lib_cancel&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asyncio/" rel="tag">Asyncio</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2023/02/27/python_asyncio_lib_network/">Python Asyncio 库之网络编程详解<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-ChatGPT%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">1.ChatGPT遇到的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%87%8D%E7%8E%B0%E9%97%AE%E9%A2%98"><span class="toc-text">2.重现问题</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-ChatGPT%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">1.ChatGPT遇到的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%87%8D%E7%8E%B0%E9%97%AE%E9%A2%98"><span class="toc-text">2.重现问题</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+  
+  <div class="footer-copyright">
+      <a href="/atom.xml">
+  </div>
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
