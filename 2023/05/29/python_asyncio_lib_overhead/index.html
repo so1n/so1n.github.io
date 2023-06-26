@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Python Asyncio 协程对象开销成本 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记最近看到一篇文章《# How Much Memor...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: {
+          gif: '',
+          lottie: ''
+        }
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: '/search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
+
+<body class="lock-screen">
+  <div class="loading" id="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Python Asyncio 协程对象开销成本</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550442517731649661119526images.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python Asyncio 协程对象开销成本</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>May 29, 2023</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>7674</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近看到一篇文章<a target="_blank" rel="noopener" href="https://pkolaczk.github.io/memory-consumption-of-async/">《# <a target="_blank" rel="noopener" href="https://pkolaczk.github.io/memory-consumption-of-async/">How Much Memory Do You Need to Run 1 Million Concurrent Tasks?</a>》</a>,它介绍了不同语言在运行100万并发时的内存占用，文章列举了多种语言在不同并发环境下的内存占用，让我比较意外的是，在文章最后的结果看到了<code>Go</code>在100万并发时内存的占用比<code>Python</code>还高。<br>于是我很好奇一个<code>Python Asyncio</code>协程内存占用有多少，以及他的其他创建开销数据，处理性能等。</p>
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>最近看到一篇文章<a target="_blank" rel="noopener" href="https://pkolaczk.github.io/memory-consumption-of-async/">《# <a target="_blank" rel="noopener" href="https://pkolaczk.github.io/memory-consumption-of-async/">How Much Memory Do You Need to Run 1 Million Concurrent Tasks?</a>》</a>,它介绍了不同语言在运行100万并发时的内存占用，文章列举了多种语言在不同并发环境下的内存占用，让我比较意外的是，在文章最后的结果看到了<code>Go</code>在100万并发时内存的占用比<code>Python</code>还高。<br>于是我很好奇一个<code>Python Asyncio</code>协程内存占用有多少，以及他的其他创建开销数据，处理性能等。</p></p>
+        
+        <h2 id="1-创建协程的开销"><a href="#1-创建协程的开销" class="headerlink" title="1.创建协程的开销"></a>1.创建协程的开销</h2><blockquote>
+<p>注：测试数据因电脑性能、<code>Python</code>版本区别有不同的差异，本次采用的<code>Python</code>环境为<code>Python3.8</code>。</p>
+</blockquote>
+<p>在<code>Python Asyncio</code>中，一个<code>asyncio.Task</code>就代表是一个协程，而<code>asyncio.ceate_task</code>是便捷的创建<code>asyncio.Task</code>的方法，所以只需要计算通过<code>asyncio.create_task</code>创建n个<code>asyncio.Task</code>需要耗费多少秒，就可以知道<code>Python Asyncio</code>创建协程的开销了。</p>
+<p>首先测的是裸创建协程的数据，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> time <span class="hljs-keyword">import</span> process_time <span class="hljs-keyword">as</span> time<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">time_tasks</span>(<span class="hljs-params">count: <span class="hljs-built_in">int</span> =<span class="hljs-number">100</span></span>) -&gt; float:</span><br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">nop_task</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">pass</span><br><br>    start = time()<br>    <span class="hljs-comment"># 创建一批asyncio.Task</span><br>    tasks = [asyncio.create_task(nop_task()) <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(count)]<br>    <span class="hljs-comment"># 计算创建时间</span><br>    elapsed = time() - start<br>    <span class="hljs-comment"># 消费创建的asyncio.Task</span><br>    <span class="hljs-keyword">await</span> asyncio.gather(*tasks)<br>    <span class="hljs-keyword">return</span> elapsed<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">for</span> count <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">100_000</span>, <span class="hljs-number">1000_000</span> + <span class="hljs-number">1</span>, <span class="hljs-number">100_000</span>):<br>        create_time = <span class="hljs-keyword">await</span> time_tasks(count)<br>        create_per_second = <span class="hljs-number">1</span> / (create_time / count)<br>        print(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;count:,&#125;</span> tasks \t <span class="hljs-subst">&#123;create_per_second:<span class="hljs-number">0</span>,<span class="hljs-number">.0</span>f&#125;</span> tasks per/s&quot;</span>)<br><br>asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>在我的电脑运行代码后得出的数据如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">100,000 tasks 	 163,661 tasks per/s<br>200,000 tasks 	 163,275 tasks per/s<br>300,000 tasks 	 163,771 tasks per/s<br>400,000 tasks 	 155,471 tasks per/s<br>500,000 tasks 	 169,313 tasks per/s<br>600,000 tasks 	 161,779 tasks per/s<br>700,000 tasks 	 128,751 tasks per/s<br>800,000 tasks 	 173,240 tasks per/s<br>900,000 tasks 	 182,140 tasks per/s<br>1,000,000 tasks 	 182,871 tasks per/s<br></code></pre></td></tr></table></figure>
+<p>可以看到裸创建协程的性能还是ok的，这是由于<code>Python Asyncio</code>的协程是跑在一个线程上的用户级别协程，不需要跟操作系统交互，所以裸创建的协程性能会比较高。</p>
+<p>不过这是在<code>Python Asyncio</code>环境比较干净的情况下跑出来的数据，如果移除掉<code>time_tasks</code>函数中的<code>await asyncio.gather(*tasks)</code>，就会每一轮测试后<code>Python Asyncio</code>中还存在一些未跑完的<code>asyncio.Task</code>，这些<code>asyncio.Task</code>会的运行会影响到测试的准确度，导致下一轮测试会比较慢了，具体数据如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">100,000 tasks 	 183,077 tasks per/s<br>200,000 tasks 	 132,444 tasks per/s<br>300,000 tasks 	 130,042 tasks per/s<br>400,000 tasks 	 139,849 tasks per/s<br>500,000 tasks 	 196,590 tasks per/s<br>600,000 tasks 	 139,296 tasks per/s<br>700,000 tasks 	 169,764 tasks per/s<br>800,000 tasks 	 151,947 tasks per/s<br>900,000 tasks 	 154,378 tasks per/s<br>1,000,000 tasks 	 147,910 tasks per/s<br></code></pre></td></tr></table></figure>
+
+<p>除了裸创建协程的开销这个指标外，还有一个比较重要的指标就是<code>Python Asyncio</code>能同时处理多少个协程。不过要做这个测试会比较困难，但是把指标改为一秒能处理多少个协程后进行测试就比较简单了，改动方法非常简单，只需要移动下<code>await asyncio.gather(*tasks)</code>的位置即可，代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> time <span class="hljs-keyword">import</span> process_time <span class="hljs-keyword">as</span> time<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">time_tasks</span>(<span class="hljs-params">count: <span class="hljs-built_in">int</span> =<span class="hljs-number">100</span></span>) -&gt; float:</span><br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">nop_task</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">pass</span><br><br>    start = time()<br>    tasks = [asyncio.create_task(nop_task()) <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(count)]<br>    <span class="hljs-keyword">await</span> asyncio.gather(*tasks)   <span class="hljs-comment"># &lt;--移动在elapsed之前</span><br>    elapsed = time() - start<br>    <span class="hljs-keyword">return</span> elapsed<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">for</span> count <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">100_000</span>, <span class="hljs-number">1000_000</span> + <span class="hljs-number">1</span>, <span class="hljs-number">100_000</span>):<br>        create_time = <span class="hljs-keyword">await</span> time_tasks(count)<br>        create_per_second = <span class="hljs-number">1</span> / (create_time / count)<br>        print(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;count:,&#125;</span> tasks \t <span class="hljs-subst">&#123;create_per_second:<span class="hljs-number">0</span>,<span class="hljs-number">.0</span>f&#125;</span> tasks per/s&quot;</span>)<br><br>asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>通过测试后发现，在我的电脑上<code>Python Asyncio</code>每秒能处理接近10w个协程，算还ok(在m1 pro跑的数据是我电脑的3倍)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">100,000 tasks 	 101,301 tasks per/s<br>200,000 tasks 	 85,196 tasks per/s<br>300,000 tasks 	 75,686 tasks per/s<br>400,000 tasks 	 90,694 tasks per/s<br>500,000 tasks 	 91,721 tasks per/s<br>600,000 tasks 	 90,821 tasks per/s<br>700,000 tasks 	 87,428 tasks per/s<br>800,000 tasks 	 84,583 tasks per/s<br>900,000 tasks 	 88,311 tasks per/s<br>1,000,000 tasks 	 102,782 tasks per/s<br></code></pre></td></tr></table></figure>
+
+<p>不过<code>Asyncio</code>的性能只能算中规中矩，为了在生产环境下拥有更强的性能，大部分服务都会使用<code>uvloop</code>，所以也附上了在我电脑上跑<code>uvloop</code>的数据：</p>
+<ul>
+<li>1.裸跑创建<code>asyncio.Task</code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">100,000 tasks 	 236,275 tasks per/s<br>200,000 tasks 	 175,045 tasks per/s<br>300,000 tasks 	 195,661 tasks per/s<br>400,000 tasks 	 190,515 tasks per/s<br>500,000 tasks 	 207,637 tasks per/s<br>600,000 tasks 	 203,315 tasks per/s<br>700,000 tasks 	 189,886 tasks per/s<br>800,000 tasks 	 161,822 tasks per/s<br>900,000 tasks 	 241,289 tasks per/s<br>1,000,000 tasks 	 216,428 tasks per/s<br></code></pre></td></tr></table></figure></li>
+<li>2.裸跑创建<code>asyncio.Task</code>(每次开始时仍有未完成的<code>asyncio.Task</code>)<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">100,000 tasks 	 236,375 tasks per/s<br>200,000 tasks 	 157,874 tasks per/s<br>300,000 tasks 	 195,601 tasks per/s<br>400,000 tasks 	 163,596 tasks per/s<br>500,000 tasks 	 246,414 tasks per/s<br>600,000 tasks 	 161,369 tasks per/s<br>700,000 tasks 	 219,827 tasks per/s<br>800,000 tasks 	 200,722 tasks per/s<br>900,000 tasks 	 195,852 tasks per/s<br>1,000,000 tasks 	 161,363 tasks per/s	<br></code></pre></td></tr></table></figure></li>
+<li>3.每秒处理<code>asyncio.Task</code>能力:  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">100,000 tasks 	 138,045 tasks per/s<br>200,000 tasks 	 115,583 tasks per/s<br>300,000 tasks 	 122,949 tasks per/s<br>400,000 tasks 	 134,310 tasks per/s<br>500,000 tasks 	 125,624 tasks per/s<br>600,000 tasks 	 120,950 tasks per/s<br>700,000 tasks 	 123,622 tasks per/s<br>800,000 tasks 	 125,671 tasks per/s<br>900,000 tasks 	 116,234 tasks per/s<br>1,000,000 tasks 	 130,501 tasks per/s<br></code></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>通过上述结果可以看出，在使用<code>uvloop</code>后，三种测试方式的结果都优于<code>Python Asyncio</code>。</p>
+<h2 id="2-内存占用"><a href="#2-内存占用" class="headerlink" title="2.内存占用"></a>2.内存占用</h2><p>一般情况下，为了测试程序的真正内存占用，会选择直接运行程序，然后在终端上通过命令查看程序的内存占用。不过好在<code>Python Asyncio</code>是在线程上运行的用户级别程序，<code>Python Asyncio</code>不会像线程一样每启动一个线程都需要一向系统申请单独的内存和上下文，这意味着可以通过<code>tracemalloc</code>快速的捕获到内存，<code>tramalloc</code>是<code>Python</code>的标准库中的模块，他能获取到内存的使用情况快照，使用方法非常简单，如下代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    tracemalloc.start()<br>    demo_dict = &#123;&#125;<br>    snapshot = tracemalloc.take_snapshot()<br>    total_bytes = <span class="hljs-built_in">sum</span>(stat.size <span class="hljs-keyword">for</span> stat <span class="hljs-keyword">in</span> snapshot.statistics(<span class="hljs-string">&#x27;lineno&#x27;</span>))<br>    print(total_bytes / <span class="hljs-number">1024.0</span>)<br></code></pre></td></tr></table></figure>
+<p>这段代码需要捕获<code>demo_dict</code>占用了多少内存，于是会在<code>demo_dict</code>之前添加<code>tracemalloc.start()</code>,在<code>demo_dict</code>后面添加<code>tramallo.take_snapshot()</code>，然后就可以根据<code>shapshot.statistics</code>来统计<code>demo_dict</code>的内存占用了，具体使用方法可以查看<a target="_blank" rel="noopener" href="https://docs.python.org/3/library/tracemalloc.html"><code>tracemalloc</code>文档</a>。</p>
+<p>内存占用的统计工具已经找到了，现在就需要编写一个简单的协程函数，由于要防止出现部分协程还没有运行，其他协程已经执行完毕的情况，这个协程函数需要加上一点点料，如下，该函数会遍历10次，且每次都休眠时间为0.1秒：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sub_demo</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br></code></pre></td></tr></table></figure>
+<p>接着就需要通过<code>asyncio.create_task</code>来创建运行<code>sub_demo</code>的<code>asyncio.Task</code>，并且使用<code>tracemalloc.start</code>来统计他们的内存使用:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">demo</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    tracemalloc.start()<br>    tasks = [asyncio.create_task(sub_demo()) <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num)]<br>    snapshot = tracemalloc.take_snapshot()<br></code></pre></td></tr></table></figure>
+<p>但是如果直接这样测试，会发现测试结果中平均每个协程的内存占用大约只有1kb左右，这是因为直接创建的<code>asyncio.Task</code>只是被初始化，还未被调度，所以占用的资源是比较少的，测出来的数据也是不准的。<br>为了解决这个问题，就需要在程序中添加<code>await asyncio.sleep(0)</code>这个最简单的让步方法，使创建的<code>asyncio.Task</code>可以被初始化，最终成品代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> tracemalloc<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sub_demo</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">benchmark</span>(<span class="hljs-params">num: <span class="hljs-built_in">int</span></span>) -&gt; float:</span><br>    tracemalloc.start()<br>    tasks = [asyncio.create_task(sub_demo()) <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num)]<br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0</span>)<br>    snapshot = tracemalloc.take_snapshot()<br>    <span class="hljs-keyword">await</span> asyncio.wait(tasks)  <span class="hljs-comment"># 等待执行完成，防止影响到后面的其他测试</span><br>    total_bytes = <span class="hljs-built_in">sum</span>(stat.size <span class="hljs-keyword">for</span> stat <span class="hljs-keyword">in</span> snapshot.statistics(<span class="hljs-string">&#x27;lineno&#x27;</span>))<br>    <span class="hljs-keyword">return</span> total_bytes / <span class="hljs-number">1024.0</span><br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> [<span class="hljs-number">2000</span>, <span class="hljs-number">5000</span>, <span class="hljs-number">10000</span>, <span class="hljs-number">50000</span>, <span class="hljs-number">100000</span>]:<br>        total_kb = <span class="hljs-keyword">await</span> benchmark(n)<br>        print(<span class="hljs-string">f&#x27;&gt; coroutines=<span class="hljs-subst">&#123;n:<span class="hljs-number">5</span>&#125;</span> used <span class="hljs-subst">&#123;total_kb:<span class="hljs-number">.3</span>f&#125;</span> K/b  per:<span class="hljs-subst">&#123;total_kb / n&#125;</span> K/b&#x27;</span>)<br><br><br>asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>运行代码后，可以看到随着生成<code>asyncio.Task</code>对象越多，平均每个<code>asyncio.Task</code>的内存占用越趋向于2K/b，这时可以简单的认为<code>Python Asyncio</code>创建的每个协程的内存占用约为2Kb</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">coroutines= 2000 used 4172.743 K/b  per:2.08637158203125 K/b<br>coroutines= 5000 used 10627.268 K/b  per:2.125453515625 K/b<br>coroutines=10000 used 20718.018 K/b  per:2.0718017578125 K/b<br>coroutines=50000 used 102878.197 K/b  per:2.0575639453125 K/b<br>coroutines=100000 used 205737.854 K/b  per:2.05737853515625 K/b<br></code></pre></td></tr></table></figure>
+<h2 id="3-附录–解惑"><a href="#3-附录–解惑" class="headerlink" title="3.附录–解惑"></a>3.附录–解惑</h2><p>在<a target="_blank" rel="noopener" href="https://go.dev/doc/go1.4#runtime">Go 1.4</a>发版说明中已经说了一个<code>Goroutine</code>的内存占用只有2Kb，与上面测试总结<code>Python Asyncio</code>的内存占用是接近的，而在<a target="_blank" rel="noopener" href="https://pkolaczk.github.io/memory-consumption-of-async/">《# <a target="_blank" rel="noopener" href="https://pkolaczk.github.io/memory-consumption-of-async/">How Much Memory Do You Need to Run 1 Million Concurrent Tasks?</a>》</a>文中介绍了100万并发时，<code>Go</code>的内存占用比<code>Python Asyncio</code>还高。<br>这是因为<code>Goroutine</code>并不是真协程的调用，他与其他语言的协程调度的设计还是有区别的，大部分语言（<code>Python</code>, <code>Js</code>, <code>Dart</code>等）的协程都是交给一个线程去调度，而<code>Go</code>的协程–<code>Goroutine</code>是交给很多线程去调用的，所以大部分语言在100万并发与1万并发使用的线程数量是一样的，而<code>Go</code>在100万并发时除了有约100万个<code>Goroutinue</code>占用了内存空间外，还需要创建很多线程去调度<code>Goroutine</code>，它们会占用内存资源，最终导致在100万并发下<code>Go</code>占用的内存大于<code>Python Asyncio</code>。</p>
+<blockquote>
+<p>可以通过<a target="_blank" rel="noopener" href="https://tpaschalis.me/goroutines-size/">goroutines-size</a>了解<code>Goroutinue</code>的内存占用</p>
+</blockquote>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2023/05/29/python_asyncio_lib_overhead/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;05&#x2F;29&#x2F;python_asyncio_lib_overhead&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;05&#x2F;29&#x2F;python_asyncio_lib_overhead&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asyncio/" rel="tag">Asyncio</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2023/03/25/python_asyncio_lib_cancel/">Python Asyncio 库之从ChatGPT Bug了解Cancel机制<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E5%8D%8F%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80"><span class="toc-text">1.创建协程的开销</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8"><span class="toc-text">2.内存占用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%99%84%E5%BD%95%E2%80%93%E8%A7%A3%E6%83%91"><span class="toc-text">3.附录–解惑</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E5%8D%8F%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80"><span class="toc-text">1.创建协程的开销</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8"><span class="toc-text">2.内存占用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%99%84%E5%BD%95%E2%80%93%E8%A7%A3%E6%83%91"><span class="toc-text">3.附录–解惑</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+  
+  <div class="footer-copyright">
+      <a href="/atom.xml">
+  </div>
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
