@@ -17,7 +17,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Web框架的快速路由</title>
+    <title>Web框架的快速路由实现</title>
     <url>/2023/06/27/web_framwork-fast_route/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>多功能的路由匹配是<code>Python</code>Web框架的一个特色，从<code>Django</code>，<code>Flask</code>框架开始，他们的路由匹配功能就非常丰富，它们基本上都允许Host匹配，重定向匹配以及其他正则匹配等使得用户可以添加他们大部分想要的路由规则，但也增加了路由匹配模块的复杂性和增加了路由匹配的时间消耗。</p>
 <h2 id="1-Web框架高性能的秘密"><a href="#1-Web框架高性能的秘密" class="headerlink" title="1.Web框架高性能的秘密"></a>1.Web框架高性能的秘密</h2><p>目前<code>Python Asyncio</code>的Web框架百花齐放，每个框架都有自己的特色，但是它们的基础功能基本上都是相同的，但是由于它们在部分功能模块的实现有些不同，导致他们的性能表现各不相同，下图是<a href="http://klen.github.io/py-frameworks-bench/">py-frameworks-bench</a>提供的压测结果:</p>
