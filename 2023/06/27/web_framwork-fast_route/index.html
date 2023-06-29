@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Web框架的快速路由 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记多功能的路由匹配是PythonWeb框架的一个特色...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: {
+          gif: '',
+          lottie: ''
+        }
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: '/search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
+
+<body class="lock-screen">
+  <div class="loading" id="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">Web框架的快速路由</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550442517731649661119526images.png" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Web框架的快速路由</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>June 27, 2023</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>12428</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>多功能的路由匹配是<code>Python</code>Web框架的一个特色，从<code>Django</code>，<code>Flask</code>框架开始，他们的路由匹配功能就非常丰富，它们基本上都允许Host匹配，重定向匹配以及其他正则匹配等使得用户可以添加他们大部分想要的路由规则，但也增加了路由匹配模块的复杂性和增加了路由匹配的时间消耗。</p>
+<h2 id="1-Web框架高性能的秘密"><a href="#1-Web框架高性能的秘密" class="headerlink" title="1.Web框架高性能的秘密"></a>1.Web框架高性能的秘密</h2><p>目前<code>Python Asyncio</code>的Web框架百花齐放，每个框架都有自己的特色，但是它们的基础功能基本上都是相同的，但是由于它们在部分功能模块的实现有些不同，导致他们的性能表现各不相同，下图是<a target="_blank" rel="noopener" href="http://klen.github.io/py-frameworks-bench/">py-frameworks-bench</a>提供的压测结果:</p>
+<p><img  src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16879623297911687962328974.png"  ><span class="image-caption">16879623297911687962328974.png</span></p>
+<p>通过压测结果可以把框架分类成三部分，第一部分是<code>Django</code>, <code>Quart</code>, <code>tornado</code>, <code>Aiohttp</code>这类比较老的框架，它们的压测结果都比较差，第二部分是<code>Starlette</code>和<code>Emmett</code>，它们的压测结果处于中等水平，而<code>Blacsheep</code>，<code>Sanic</code>这类框架的压测结果都是很高的。</p>
+<p>在粗略的查看了他们的源码和设计说明后可以总结出他们性能差异的原因：</p>
+<ul>
+<li>1.对于老式框架<code>tornado</code>,<code>aiohttp</code>，他们并不支持ASGI，导致无法使用<code>uvicorn</code>等ASGI服务器，从而要自己去实现HTTP协议解析，而他们的HTTP协议解析是纯<code>Python</code>实现的，解析性能不如C实现的HTTP解析器强。</li>
+<li>2.对于新式框架，他们的部分组件使用了<code>Cython</code>去编写，从而使这些组件获得了<code>C</code>一样的性能。</li>
+<li>3.新式框架不再使用传统的路由匹配，而是改用路由树或者通过AST路由。</li>
+</ul>
+<p>如果再把上面的描述进一步提炼，就可以发现，目前的Web框架性能差异主要是在协议解析，路由匹配两个大模块上，其中协议解析是与使用的协议绑定的，所以针对HTTP的WEB框架再怎么改动都很难有提升，而路由匹配关心的是如何根据一个URL找到对应的路由，可定制性大。</p>
+<h2 id="2-复杂的路由匹配"><a href="#2-复杂的路由匹配" class="headerlink" title="2.复杂的路由匹配"></a>2.复杂的路由匹配</h2><p>一般来说只要创建一个字典，然后把Url和路由绑定就可以完成一个速度极快又非常简单的路由匹配功能了，如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python">route_dict = &#123;<br>    <span class="hljs-string">&quot;/&quot;</span>: index_route,<br>    <span class="hljs-string">&quot;/api/user&quot;</span>: user_route,<br>    <span class="hljs-string">&quot;/api/manager&quot;</span>: manager_route,<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这种方式实现的路由匹配速度是非常快的（算法复杂度O(1)），但是在遇到不同的用户通过<code>/api/user/123</code>和<code>/api/user/345</code>等多个Url需要匹配同一个路由时，这个设计就有问题了，毕竟一个系统的用户数会很多，把它们对应的URL装进字典里并不是一件很实际的事，所以就需要通过另一种方案来实现路由匹配，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python">route_list = [<br>    (<span class="hljs-string">&quot;/&quot;</span>, index_route),<br>    (<span class="hljs-string">&quot;/api/user/&lt;user_id&gt;&quot;</span>, user_route),<br>    (<span class="hljs-string">&quot;/api/manager&quot;</span>, manager_route),<br>]<br></code></pre></td></tr></table></figure>
+<p>这种方案是把路由表从哈希字典改成一个数组，同时URL不再被规定为字符串，它也可以是正则表达式，然后在进行路由匹配时，就会遍历每个定义URL，如果发现访问的URL与定义的URL相等或者符合定义的URL正则表达式，那么就意味着匹配成功，这样一来只需要在路由表编写<code>/api/user/&lt;user_id&gt;</code>的映射关系就可以满足<code>/api/user/123</code>，<code>/api/user/345</code>等URL，路由表映射编写的便利性提升到了质的飞跃。</p>
+<p>除了包含正则表达式的URL外，还有一些比较特殊的匹配需求，如域名匹配，简单的域名匹配路由表如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs Python">route_list = [<br>    (<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>, index_route),<br>    (<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;/api/user/&lt;user_id&gt;&quot;</span>, user_route),<br>    (<span class="hljs-string">&quot;example.com&quot;</span>, <span class="hljs-string">&quot;/api/manager&quot;</span>, manager_route_1),<br>    (<span class="hljs-string">&quot;www.example.com&quot;</span>, <span class="hljs-string">&quot;/api/manager&quot;</span>, manager_route_2),<br>]<br></code></pre></td></tr></table></figure>
+
+<p>在这种方案的路由表多了一个元素–域名，通过增加域名这个元素使其在路由匹配时会先检验当前的域名是否匹配，如果域名匹配成功了才会再去匹配第二项的路由URL，当域名和URL都完全匹配时才会去访问对应的路由。<br>比如<code>http://example.com/api/manager</code>会匹配到<code>manager_route_1</code>路由，而<code>http://www.example.com/api/manager</code>会匹配到<code>manager_route_2</code>路由。</p>
+<blockquote>
+<p>这里只做简单演示，实际上在使用时不会通过添加多一个元素来满足多一种条件的方式，具体可以通过<code>werkzeug</code>的<code>routing</code>源码了解。</p>
+</blockquote>
+<p>到现在位置，可以发现循环遍历匹配路由的实现非常简单，同时拓展起来也非常方便，这也就是<code>Django</code>，<code>Flask</code>，<code>Starlette</code>等流行的框架会采用遍历的方法来实现路由匹配的原因，但是随着而来的是路由匹配的算法复杂度从O(1)变为O(n)，这也意味着后面添加的路由被匹配的效率是很低的。</p>
+<p>为了解决路由数组循环匹配的性能以及哈希匹配的拓展性都比较差的情况，很多人都在研究其他的路由匹配方法，比较出名的有路由前缀树和AST路由两种方案，在<a target="_blank" rel="noopener" href="https://github.com/richardolsson/falcon-routing-survey">Falcon Routing Surver</a>中就测出了几种不同路由实现的性能，如下(其中省去几行不是关键的输出)：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash">----------------------------------------<br>BENCHMARKING ROUTER: tree_router<br>...<br>RESULT: 3.99470496178s (200000 iterations)<br>...<br>----------------------------------------<br>BENCHMARKING ROUTER: regex_router<br>...<br>RESULT: 8.51333618164s (200000 iterations)<br>...<br>----------------------------------------<br>BENCHMARKING ROUTER: compiled_router<br>...<br>RESULT: 0.957674980164s (200000 iterations)<br>...<br></code></pre></td></tr></table></figure>
+<p>通过输出结果可以发现AST路由的速度是最快的，是路由数组的8倍，而路由前缀树方案的速度是路由数组的4倍。<br>不过，在AST路由和路由前缀树方案都带来了性能的提升同时，它们支持的路由匹配功能却少了一些。</p>
+<h2 id="3-路由前缀树"><a href="#3-路由前缀树" class="headerlink" title="3.路由前缀树"></a>3.路由前缀树</h2><p>在制订URL的时候往往都是以/来划分层级的，比如下面的URL：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">/api/user/create<br>/api/user/delete<br>/api/user/&lt;user_id&gt;/info<br><br>/api/blog/list<br>/api/blog/content<br>/api/blog/comment<br><br>/internal/metric<br>/internal/info<br>/internal/health<br></code></pre></td></tr></table></figure>
+<p>通过观察可以发现他们拥有共同的前缀，按照前缀的不同可以分为业务组–<code>/api/xxx</code>和内部接口组–<code>/internal/xxx</code>，而业务组可以细分用户组–<code>xxx/user/xxx</code>，博客组–<code>xxx/blog/xxx</code>。<br>现在就换个角度观察它们，先按<code>/</code>把URL切分成多个字符串，如<code>/api/user/create</code>可以被切分为<code>api</code>，<code>user</code>，<code>create</code>三个字符串，然后把他们按顺序排列并去掉重复的前缀，结果如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">api user create<br>         delete<br>         &lt;user_id&gt; info<br><br>    blog list<br>         content<br>         comment<br><br>internal metric<br>         info<br>         health<br></code></pre></td></tr></table></figure>
+<p>然后再根据这个结果创建路由树，首先是创建<code>/</code>节点，然后按顺序把他们与上层节点连上，这样就形成一颗路由树了，如图:<br><img  src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16880456728751688045672080.png"  ><span class="image-caption">16880456728751688045672080.png</span></p>
+<p>通过图可以发现路由树的构造与经典的数据结构<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-cn/Trie">前缀树</a>类似，只不过前缀树是以每个字母为节点，而路由树是以<code>/</code>为根节点，并通过<code>/</code>切分URL形成多个子path，这些子path都为子节点。</p>
+<p>了解前缀树的话会知道前缀树的一个优点是内存占用和查找性能都介于数组和哈希字典的中间，也就是不浪费空间占用，查找的复杂度也不是O(n)，比如在查找<code>/api/user/create</code>时，会先命中<code>/api</code>节点，然后再命中<code>/user</code>节点，最后再命中<code>create</code>节点，这个过程虽然会进行三次哈希查找，但是他的时间复杂度只能算是O(k) (k为树的层级)，远优于遍历队列查找的O(n)。</p>
+<h3 id="3-1-路由前缀树的实现"><a href="#3-1-路由前缀树的实现" class="headerlink" title="3.1.路由前缀树的实现"></a>3.1.路由前缀树的实现</h3><p>了解了路由前缀树的原理后就可以着手实现路由前缀树了，路由前缀树的实现有很多种，这里演示的路由前缀树实现了最简单的路由匹配功能，同时它还支持与拥有正则的URL(只支持一个变量)绑定。</p>
+<p>路由前缀树整个实现有三部分，首先是定义一个模拟路由，通过拓展它可以挂载路由函数，但这里这是一个简单的实现，所以只需要传入一个属性–<code>url</code>，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Route</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, url: <span class="hljs-built_in">str</span></span>):</span><br>        self.url: <span class="hljs-built_in">str</span> = url<br><br>        <span class="hljs-comment"># 用于后面匹配URL的正则表达式</span><br>        self.url_re = url<br>    <br>    <span class="hljs-comment"># 用于格式化打印</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__repr__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;&lt;Route url=<span class="hljs-subst">&#123;self.url&#125;</span>&gt;&quot;</span><br></code></pre></td></tr></table></figure>
+<p>然后在构造路由前缀树之前，需要构造路由前缀树的节点，该节点会以字典来存储子节点与自己的关系，同时为了支持类似<code>/api/user/&lt;user_id&gt;/info</code>带有正则的URL，节点需要存储对应的路由列表，同时存储当前正则表达式的变量名，代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RouteNode</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self,</span></span><br><span class="hljs-function"><span class="hljs-params">        route_list: Optional[List[Route]] = <span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">        node: Optional[Dict[<span class="hljs-built_in">str</span>, <span class="hljs-string">&quot;RouteNode&quot;</span>]] = <span class="hljs-literal">None</span>,</span></span><br><span class="hljs-function"><span class="hljs-params">    </span>):</span><br>        <span class="hljs-comment"># 当URL包含正则时，可能会绑定多个路由</span><br>        self.route_list: List[Route] = route_list <span class="hljs-keyword">if</span> route_list <span class="hljs-keyword">else</span> []<br>        <span class="hljs-comment"># 子节点与当前节点的映射关系</span><br>        self.node: Dict[<span class="hljs-built_in">str</span>, <span class="hljs-string">&quot;RouteNode&quot;</span>] = node <span class="hljs-keyword">if</span> node <span class="hljs-keyword">else</span> <span class="hljs-built_in">dict</span>()<br>        <span class="hljs-comment"># 如果当前的节点不是普通的字符串，而是正则表达式，那么就存储它的正则表达式的key名</span><br>        self.var_name: Optional[<span class="hljs-built_in">str</span>] = <span class="hljs-literal">None</span><br></code></pre></td></tr></table></figure>
+<p>接着就可以实现路由前缀树了，一个简单的路由前缀树会有一个根节点，然后还拥有构造路由前缀树和通过路由前缀树查询的功能，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RouteTrie</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-comment"># 构造树的根节点</span><br>        self.root_node: <span class="hljs-string">&quot;RouteNode&quot;</span> = RouteNode()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">insert</span>(<span class="hljs-params">self, route: Route</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-string">&quot;&quot;&quot;向路由树插入节点的功能&quot;&quot;&quot;</span><br>        cur_node: <span class="hljs-string">&quot;RouteNode&quot;</span> = self.root_node<br>        <span class="hljs-keyword">for</span> node_url <span class="hljs-keyword">in</span> route.url.strip().split(<span class="hljs-string">&quot;/&quot;</span>):<br>            <span class="hljs-comment"># 按/拆分URL</span><br>            <span class="hljs-keyword">if</span> node_url <span class="hljs-keyword">and</span> <span class="hljs-string">&quot;&lt;&quot;</span> == node_url[<span class="hljs-number">0</span>] <span class="hljs-keyword">and</span> <span class="hljs-string">&quot;&gt;&quot;</span> == node_url[-<span class="hljs-number">1</span>]:<br>                <span class="hljs-comment"># 如果属于正则的URL就存储变量名，并替换url，方便后面通过正则匹配</span><br>                cur_node.var_name = node_url[<span class="hljs-number">1</span>:-<span class="hljs-number">1</span>]<br>                route.url_re = route.url_re.replace(node_url, <span class="hljs-string">&quot;(\w+)&quot;</span>)<br>                <span class="hljs-keyword">break</span><br>            <span class="hljs-keyword">elif</span> node_url <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> cur_node.node:<br>                <span class="hljs-comment"># 如果是普通的URL则构建子节点并与自己建立映射关系</span><br>                cur_node.node[node_url] = RouteNode()<br>            cur_node = cur_node.node[node_url]<br>        <span class="hljs-comment"># 为当前节点绑定路由</span><br>        cur_node.route_list.append(route)<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_search_node</span>(<span class="hljs-params">self, url_path: <span class="hljs-built_in">str</span></span>) -&gt; Tuple[RouteNode, Dict]:</span><br>        <span class="hljs-string">&quot;&quot;&quot;通过路由树查找节点&quot;&quot;&quot;</span><br>        cur_node = self.root_node<br>        var_dict = &#123;&#125;<br>        <span class="hljs-keyword">for</span> url_node <span class="hljs-keyword">in</span> url_path.strip().split(<span class="hljs-string">&quot;/&quot;</span>):<br>            <span class="hljs-comment"># 按/拆分URL</span><br>            <span class="hljs-keyword">if</span> url_node <span class="hljs-keyword">in</span> cur_node.node:<br>                <span class="hljs-comment"># 对于普通路由则通过映射关系找到下一个节点</span><br>                cur_node = cur_node.node[url_node]<br>            <span class="hljs-keyword">elif</span> cur_node.var_name:<br>                <span class="hljs-comment"># 对于正则路由则附上变量的值</span><br>                var_dict[cur_node.var_name] = url_node<br>                <span class="hljs-keyword">break</span><br>        <span class="hljs-keyword">return</span> cur_node, var_dict<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">search</span>(<span class="hljs-params">self, url_path: <span class="hljs-built_in">str</span></span>) -&gt; Tuple[Optional[Route], Dict]:</span><br>        <span class="hljs-comment"># 根据URL查出对应的节点</span><br>        cur_node, var_dict = self._search_node(url_path)<br>        <span class="hljs-keyword">if</span> var_dict <span class="hljs-keyword">and</span> cur_node.route_list:<br>            <span class="hljs-comment"># 如果是带有正则的URL，需要遍历匹配每个路由</span><br>            <span class="hljs-keyword">for</span> route <span class="hljs-keyword">in</span> cur_node.route_list:<br>                <span class="hljs-keyword">if</span> re.match(route.url_re, url_path):<br>                    <span class="hljs-keyword">return</span> route, var_dict<br>        <span class="hljs-keyword">elif</span> cur_node.route_list:<br>            <span class="hljs-comment"># 如果是普通的URL，直接返回节点的第一个路由</span><br>            <span class="hljs-keyword">return</span> cur_node.route_list[<span class="hljs-number">0</span>], var_dict<br>        <span class="hljs-comment"># 如果当前节点并没有绑定路由，那么寻找失败</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>, var_dict<br></code></pre></td></tr></table></figure>
+<p>这样一来，简单的路由前缀树就实现完成了，运行如下代码验证路由树是否正常实现，通过输出后可以发现路由前缀树能够正常的匹配到路由，同时也支持带有正则URL的变量生成：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs Python">route_trie = RouteTrie()<br>route_trie.insert(Route(<span class="hljs-string">&quot;/api/user/create&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/api/user/delete&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/api/user/&lt;user_id&gt;/info&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/api/blog/list&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/api/blog/content&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/api/blog/comment&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/internal/metric&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/internal/info&quot;</span>))<br>route_trie.insert(Route(<span class="hljs-string">&quot;/internal/health&quot;</span>))<br><br>print(route_trie.search(<span class="hljs-string">&quot;/api/user/create&quot;</span>))<br><span class="hljs-comment"># &gt;&gt;&gt; (&lt;Route url=/api/user/create&gt;, &#123;&#125;)</span><br>print(route_trie.search(<span class="hljs-string">&quot;/api/user/123&quot;</span>))<br><span class="hljs-comment"># &gt;&gt;&gt; (None, &#123;&#x27;user_id&#x27;: &#x27;123&#x27;&#125;)</span><br>print(route_trie.search(<span class="hljs-string">&quot;/api/user/123/info&quot;</span>))<br><span class="hljs-comment"># &gt;&gt;&gt; (&lt;Route url=/api/user/&lt;user_id&gt;/info&gt;, &#123;&#x27;user_id&#x27;: &#x27;123&#x27;&#125;)</span><br>print(route_trie.search(<span class="hljs-string">&quot;/internal/health&quot;</span>))<br><span class="hljs-comment"># &gt;&gt;&gt; (&lt;Route url=/internal/health&gt;, &#123;&#125;)</span><br></code></pre></td></tr></table></figure>
+
+<p>路由树的查找速度会比路由数组的快，但是在实现支持包含正则的URL功能时，会发现路由–<code>Route</code>，路由树节点–<code>RouteNode</code>，路由树–<code>RouteTrie</code>这三点都需要进行改造，导致路由前缀树的开发成本比路由数组高。</p>
+<blockquote>
+<p>如果对路由树有兴趣，可以参考一些比较好的实现:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/nitely/kua">https://github.com/nitely/kua</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vltr/xrtr">https://github.com/vltr/xrtr</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/shiyanhui/Router">https://github.com/shiyanhui/Router</a></li>
+</ul>
+</blockquote>
+<h2 id="4-AST路由"><a href="#4-AST路由" class="headerlink" title="4.AST路由"></a>4.AST路由</h2><p>AST路由是一种粗暴的解决方案，它在添加路由的时候也是构造一颗路由树，并在构造完路由树后遍历路由树并通过<code>Python</code>的动态能力有规则的生成含有大量<code>IF</code>语句的路由匹配代码，虽然生成的路由匹配代码比较丑，但是由于只含有<code>IF</code>逻辑，AST路由的匹配性能出奇的高。</p>
+<blockquote>
+<p>性能高的原因主要有两点:</p>
+<ul>
+<li>1.由于有规则的生成匹配逻辑，CPU在遇到IF时进行分支预测的准确性会大大提高，匹配的速度也得到提高，详见<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/369942218">当 CPU 遇上 if 语句</a></li>
+<li>2.<code>Python</code>的<code>For</code>语句性能比较差(相对于其他语言)，而AST路由是唯一没有<code>For</code>语句的路由匹配方案。</li>
+</ul>
+</blockquote>
+<p>AST路由的实现比较复杂，所以直接采用<a target="_blank" rel="noopener" href="https://github.com/richardolsson/falcon-routing-survey">falcon-routing-survey</a>的实现，如果有兴趣可以直接查看它的源码。<br><a target="_blank" rel="noopener" href="https://github.com/richardolsson/falcon-routing-survey">falcon-routing-survey</a>封装的AST路由–<code>CompiledTreeRoute</code>的使用很简单，如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> routers.compiled <span class="hljs-keyword">import</span> CompiledTreeRouter<br><br><span class="hljs-comment"># 生成AST路由树</span><br>ctr = CompiledTreeRouter()<br><br><br><span class="hljs-comment"># 向路由树添加路由</span><br><span class="hljs-keyword">for</span> url <span class="hljs-keyword">in</span> [<br>    <span class="hljs-string">&quot;/api/user/create&quot;</span>,<br>    <span class="hljs-string">&quot;/api/user/delete&quot;</span>,<br>    <span class="hljs-string">&quot;/api/user/&#123;user_id&#125;/info&quot;</span>,  <span class="hljs-comment"># &lt; -- ctr支持的URL是&#123;user_id&#125;而不是&lt;user_id&gt;</span><br>    <span class="hljs-string">&quot;/api/blog/list&quot;</span>,<br>    <span class="hljs-string">&quot;/api/blog/content&quot;</span>,<br>    <span class="hljs-string">&quot;/api/blog/comment&quot;</span>,<br>    <span class="hljs-string">&quot;/internal/metric&quot;</span>,<br>    <span class="hljs-string">&quot;/internal/info&quot;</span>,<br>    <span class="hljs-string">&quot;/internal/health&quot;</span><br>]:<br>    ctr.add_route(url, <span class="hljs-keyword">lambda</span> : print(url))<br><br><span class="hljs-comment"># 匹配路由</span><br><span class="hljs-comment"># 第一次寻找路由时会通过路由树生成匹配逻辑代码，这里略</span><br>print(ctr.find_responder(<span class="hljs-string">&quot;/api/user/create&quot;</span>))<br><span class="hljs-comment"># (&lt;function &lt;lambda&gt; at 0x7f70299cf1e0&gt;, &#123;&#125;)</span><br>print(ctr.find_responder(<span class="hljs-string">&quot;/api/user/123&quot;</span>))<br><span class="hljs-comment"># (None, &#123;&#x27;user_id&#x27;: &#x27;123&#x27;&#125;)</span><br>print(ctr.find_responder(<span class="hljs-string">&quot;/api/user/123/info&quot;</span>))<br><span class="hljs-comment"># (&lt;function &lt;lambda&gt; at 0x7f702980af28&gt;, &#123;&#x27;user_id&#x27;: &#x27;123&#x27;&#125;)</span><br>print(ctr.find_responder(<span class="hljs-string">&quot;/internal/health&quot;</span>))<br><span class="hljs-comment"># (&lt;function &lt;lambda&gt; at 0x7f702980e488&gt;, &#123;&#125;)</span><br>print(ctr.find_responder(<span class="hljs-string">&quot;/internal/health&quot;</span>)[<span class="hljs-number">0</span>]())<br><span class="hljs-comment"># &quot;/internal/health&quot;</span><br></code></pre></td></tr></table></figure>
+<p>代码中通过<code>add_route</code>向路由树绑定了URL和路由，然后使用<code>find_responder</code>通过URL寻找路由，可以看到它除了支持普通URL的路由匹配外，也支持含有正则的URL路由匹配，而负责路由匹配的逻辑代码则是在第一次调用<code>find_responder</code>时生成的，这次运行时生成的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">find</span>(<span class="hljs-params">path, responders, expressions, params</span>):</span><br>  path_len = <span class="hljs-built_in">len</span>(path)<br>  <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">0</span>] == <span class="hljs-string">&quot;api&quot;</span>:<br>    <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;user&quot;</span>:<br>      <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">2</span>] == <span class="hljs-string">&quot;create&quot;</span>:<br>        <span class="hljs-keyword">return</span> responders[<span class="hljs-number">0</span>]<br>      <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">2</span>] == <span class="hljs-string">&quot;delete&quot;</span>:<br>        <span class="hljs-keyword">return</span> responders[<span class="hljs-number">1</span>]<br>      <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">2</span>:<br>        params[<span class="hljs-string">&quot;user_id&quot;</span>] = path[<span class="hljs-number">2</span>]<br>        <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">3</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">3</span>] == <span class="hljs-string">&quot;info&quot;</span>:<br>          <span class="hljs-keyword">return</span> responders[<span class="hljs-number">2</span>]<br>    <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;blog&quot;</span>:<br>      <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">2</span>] == <span class="hljs-string">&quot;list&quot;</span>:<br>        <span class="hljs-keyword">return</span> responders[<span class="hljs-number">3</span>]<br>      <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">2</span>] == <span class="hljs-string">&quot;content&quot;</span>:<br>        <span class="hljs-keyword">return</span> responders[<span class="hljs-number">4</span>]<br>      <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">2</span>] == <span class="hljs-string">&quot;comment&quot;</span>:<br>        <span class="hljs-keyword">return</span> responders[<span class="hljs-number">5</span>]<br>  <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">0</span>] == <span class="hljs-string">&quot;internal&quot;</span>:<br>    <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;metric&quot;</span>:<br>      <span class="hljs-keyword">return</span> responders[<span class="hljs-number">6</span>]<br>    <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;info&quot;</span>:<br>      <span class="hljs-keyword">return</span> responders[<span class="hljs-number">7</span>]<br>    <span class="hljs-keyword">if</span> path_len &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> path[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;health&quot;</span>:<br>      <span class="hljs-keyword">return</span> responders[<span class="hljs-number">8</span>]<br></code></pre></td></tr></table></figure>
+<p>可以看到生成的代码虽然很长，但逻辑也很简单，都是匹配<code>path</code>的长度以及<code>path</code>的某一项的值等于什么，<br>同时通过生成代码的缩进可以发现，代码中的<code>IF</code>逻辑可以分为几部分，每部分恰好与按照URL区分的组类似，比如<code>api</code>和<code>internal</code>都是处于第一层，而<code>user</code>,<code>blog</code>处于<code>api</code>的下一层。</p>
+<p>虽然AST路由的性能很快，但是每次新增功能也需要大量的改动，同时他是通过各种逻辑判断后才生成的代码，所以代码的易读性并不会很好，在改动逻辑前可能需要把生成的代码打印出来才能理顺，不过路由匹配本来就是一个稳定的功能，对于追求极致性能的框架都会采用AST路由来提升自己的性能，比如<code>Sanic</code>和<code>Falcon</code>，如果对AST路由感兴趣，可以通过如下URL:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/sanic-org/sanic-routing/blob/main/sanic_routing/tree.py">https://github.com/sanic-org/sanic-routing/blob/main/sanic_routing/tree.py</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/falconry/falcon/blob/master/falcon/routing/compiled.py">https://github.com/falconry/falcon/blob/master/falcon/routing/compiled.py</a></li>
+</ul>
+<p>分别访问<code>Sanic</code>和<code>Falcon</code>的路由源码查看他们的实现。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5.总结"></a>5.总结</h2><p>路由组匹配，路由前缀树，AST路由它们三者的性能与简单性成反比，<br>在查阅资料后发现采纳不同的路由匹配方式与Web框架诞生的时代有一定的相关性。<br>目前采用路由组匹配的Web框架都是在Web1.0时代诞生的，而且都在路由组匹配上实现了很多小众的功能;<br>采用路由前缀树的Web框架则大部分都是近10年内诞生的Web框架，他们的作者根据URL的特性实现了路由前缀树来提升路由匹配的功能，同时由于路由前缀树在各大语言的Web框架都有实现，大家互相借鉴推动了路由前缀树的功能迭代（如很多框架在使用路由前缀树时会新增路由组功能），这使路由前缀树成为了路由匹配中的六边形战士。<br>而采用AST路由的都是在<code>Python</code>等动态语言中，诞生的比较晚且勇于尝试新事物和追求高性能的框架。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>其他参考链接</p>
+<ul>
+<li><code>Sanic</code>从路由组匹配改为AST路由的讨论 <a target="_blank" rel="noopener" href="https://community.sanicframework.org/t/a-fast-new-router/649/10">https://community.sanicframework.org/t/a-fast-new-router/649/10</a></li>
+<li><code>Quart</code>作者关于<code>Werkzeug</code>重新实现的路由描述 <a target="_blank" rel="noopener" href="https://pgjones.dev/blog/faster-routing-2022/">https://pgjones.dev/blog/faster-routing-2022/</a></li>
+</ul>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2023/06/27/web_framwork-fast_route/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;06&#x2F;27&#x2F;web_framwork-fast_route&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;06&#x2F;27&#x2F;web_framwork-fast_route&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+</ul>
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E6%A1%86%E6%9E%B6/" rel="tag">Web框架</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B7%AF%E7%94%B1/" rel="tag">路由</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2023/05/29/python_asyncio_lib_overhead/">Python Asyncio 协程对象开销成本<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Web%E6%A1%86%E6%9E%B6%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%A7%98%E5%AF%86"><span class="toc-text">1.Web框架高性能的秘密</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%8D%E6%9D%82%E7%9A%84%E8%B7%AF%E7%94%B1%E5%8C%B9%E9%85%8D"><span class="toc-text">2.复杂的路由匹配</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B7%AF%E7%94%B1%E5%89%8D%E7%BC%80%E6%A0%91"><span class="toc-text">3.路由前缀树</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E8%B7%AF%E7%94%B1%E5%89%8D%E7%BC%80%E6%A0%91%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.1.路由前缀树的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-AST%E8%B7%AF%E7%94%B1"><span class="toc-text">4.AST路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Web%E6%A1%86%E6%9E%B6%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%A7%98%E5%AF%86"><span class="toc-text">1.Web框架高性能的秘密</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%8D%E6%9D%82%E7%9A%84%E8%B7%AF%E7%94%B1%E5%8C%B9%E9%85%8D"><span class="toc-text">2.复杂的路由匹配</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B7%AF%E7%94%B1%E5%89%8D%E7%BC%80%E6%A0%91"><span class="toc-text">3.路由前缀树</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E8%B7%AF%E7%94%B1%E5%89%8D%E7%BC%80%E6%A0%91%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.1.路由前缀树的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-AST%E8%B7%AF%E7%94%B1"><span class="toc-text">4.AST路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-text">5.总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+  
+  <div class="footer-copyright">
+      <a href="/atom.xml">
+  </div>
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

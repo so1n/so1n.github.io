@@ -204,7 +204,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 27, 2023</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>916</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>1659</span>
     </div>
   </div>
 </section>
@@ -212,14 +212,18 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Python Asyncio</code>提供了一套完整的高性能网络编程接口，它除了提供了一些<code>Socket</code>的异步调用外，还在<code>Socket</code>上层封装了一层<code>Protocol</code>&amp;<code>Transport</code>调用，在<code>Protocol</code>&amp;<code>Transport</code>上层封装了<code>Stream</code>调用来减少开发者的网络编程负担，开发者可以根据自己的需求来选择其中一套来使用。</p>
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Python Asyncio</code>提供了一套完整的高性能网络编程接口，它的最底层是一套兼容<code>Asycnio</code>的<code>Socket</code>的异步调用，然后在<code>Socket</code>上层封装了一层<code>Protocol</code>&amp;<code>Transport</code>调用，并在<code>Protocol</code>&amp;<code>Transport</code>上层封装了<code>Stream</code>调用来减少开发者的网络编程负担，开发者可以根据自己的需求来选择其中一套来使用。</p>
         
-          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Python Asyncio</code>提供了一套完整的高性能网络编程接口，它除了提供了一些<code>Socket</code>的异步调用外，还在<code>Socket</code>上层封装了一层<code>Protocol</code>&amp;<code>Transport</code>调用，在<code>Protocol</code>&amp;<code>Transport</code>上层封装了<code>Stream</code>调用来减少开发者的网络编程负担，开发者可以根据自己的需求来选择其中一套来使用。</p></p>
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Python Asyncio</code>提供了一套完整的高性能网络编程接口，它的最底层是一套兼容<code>Asycnio</code>的<code>Socket</code>的异步调用，然后在<code>Socket</code>上层封装了一层<code>Protocol</code>&amp;<code>Transport</code>调用，并在<code>Protocol</code>&amp;<code>Transport</code>上层封装了<code>Stream</code>调用来减少开发者的网络编程负担，开发者可以根据自己的需求来选择其中一套来使用。</p></p>
         
         <h2 id="1-简单介绍"><a href="#1-简单介绍" class="headerlink" title="1.简单介绍"></a>1.简单介绍</h2><p><code>Python Asyncio</code>提供的<code>Socket</code>、<code>Protocol</code>&amp;<code>Transport</code>、<code>Stream</code>三套网络编程封装各有各的优缺点，它们的关系就跟套娃一样，<code>Stream</code> 套在<code>Protocol</code>&amp;<code>Transport</code> ，<code>Protocol</code>&amp;<code>Transport</code>套在<code>Socket</code>上面。套在最上面的<code>Stram</code>的易用性是最高的</p>
 <h2 id="待定内容"><a href="#待定内容" class="headerlink" title="待定内容"></a>待定内容</h2><p>stream类似于同步的用法，protocol类似于回调的用法<br>socket 相关用法: <code>sock_connect</code>, <code>sock_accept</code>, <code>sock_recv</code>, and <code>sock_sendall</code><br>stream相关用法：<br>    - 读取流的方法： reader.read,readline,readuntil,readexactly<br>    - 检查是否到达EOF reader.ateof<br>    - 控制写入的流程：writer.drain<br>易用性stream -&gt; protocol &amp; transport-&gt; socket<br>性能protocol&amp; transport-&gt;stram -&gt; socket</p>
 <p>stream提供了一些针对TCP的封装<br>stream比protocol慢的相关issue：<a target="_blank" rel="noopener" href="https://github.com/python/asyncio/issues/412%E3%80%82%E4%BD%86%E6%98%AFPython3.11%E5%8F%AF%E8%83%BD%E6%9C%89%E6%94%B9%E8%BF%9B">https://github.com/python/asyncio/issues/412。但是Python3.11可能有改进</a></p>
 <p>protocol&amp;transport 之所以比socket性能高的原因是eventlopp更知道eventloop?来自于<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=WSq0S7UvI8E&amp;ab_channel=PyConCanada%E7%9A%8412%EF%BC%9A30">https://www.youtube.com/watch?v=WSq0S7UvI8E&amp;ab_channel=PyConCanada的12：30</a></p>
+<p>loop.sock_*:loop cannot buffer data for you.<br>No flow control.<br>Streams:easy to use,but too generic.<br>Protocols Transports:say hello to callbacks.</p>
+<p>· Use loop.sock_* for easy porting synchronous<br>code to asyncio. Better consider using Streams<br>. Use Streams for implementing protocols with<br>asynclawait<br>· Use Protocols and Transports for performance</p>
+<p>loop pushes data to Protocols.<br>Protocols send data back using Transports.<br>Protocols can implement specialized read and write<br>buffers.<br>Protocols can do flow-control.<br>Full control over how IO is performed.</p>
+<p>Stream比Protocol&amp;Transports更慢的原因是Stream是在Protocol&amp;Transports上层封装的，为了能让使用者能更方便的通过Stream来进行网络编程，以及覆盖尽量多的情况，Stream中使用了大量的Tasks和Futures，这些会带来一定的开销。而Protocol&amp;Transport只接受事件循环的回调/数据接收，所以开销很少。</p>
       </section>
       <section class="extra">
         
