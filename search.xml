@@ -17,52 +17,8 @@
       </tags>
   </entry>
   <entry>
-    <title>Redis Scan命令踩坑笔记</title>
-    <url>/2023/06/28/how_to_safe_user_redis_scan/</url>
-    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>大部分人在接触Redis时就都会了解到Redis是以单线程的形式处理用户命令，导致O(N)的命令有极大的几率会阻塞Redis，所以在使用Redis时需要放弃一些O(n)命令的使用，比如不要去使用<code>KEYS</code>命令而应该使用<code>SCAN</code>命令，然而<code>SCAN</code>命令也有一些坑。</p>
-<h2 id="1-踩到的坑"><a href="#1-踩到的坑" class="headerlink" title="1.踩到的坑"></a>1.踩到的坑</h2><p>为了减少<code>MySQL</code>的压力，在部分变动比较少的表会通过<code>Redis</code>套上缓存，如下代码：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-meta">@cache(<span class="hljs-params">key_name=<span class="hljs-string">&quot;demo_system:user&quot;</span>, expire=<span class="hljs-number">10</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_user</span>(<span class="hljs-params">user_id: <span class="hljs-built_in">str</span></span>) -&gt; UserDict:</span><br>    <span class="hljs-keyword">with</span> conn.cursor() <span class="hljs-keyword">as</span> cursor:<br>        cursor.execute(<span class="hljs-string">&quot;SELECT * FROM user WHERE user_id=%s&quot;</span>, (user_id, ))<br>        <span class="hljs-keyword">return</span> cursor.fetchone() <span class="hljs-keyword">or</span> ()<br></code></pre></td></tr></table></figure>
-<p>这段代码中会有一个<code>cache</code>装饰器，它每次被调用时会把<code>key_name</code>与传入的参数绑定为一个Key，比如某次调用的参数<code>user_id</code>为10086时，生成的Key为<code>demo_system:user:10086</code>。<br>它在执行时会先去Redis检查一下该Key是否存在，如果存在就直接返回数据，如果不存在就进入<code>get_user</code>函数通过<code>MySQL</code>获取<code>user_id</code>为10086的数据，不过在返回数据10086的数据之前会先缓存到对应的Key中。</p>
-<p>可见这个实现非常简单，也没有什么坑，但是当遇到需要按照模糊匹配批量删除缓存的需求时，问题也就跟着过来了，因为Redis本身并没有按照模糊匹配再批量删除的方法，只能先通过Redis的<code>KEYS</code>或者<code>SCAN</code>的模糊匹配查找一批Key，然后再通过<code>DEL</code>命令批量删除。<br>为了防止<code>Redis</code>阻塞，大都会选用<code>SCAN</code>来进行模糊匹配并通过<code>DEL</code>命令删除，使用起来也简单，代码如下:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete_cache_start_with</span>(<span class="hljs-params">cache_name: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;根据前缀删除批量缓存&quot;&quot;&quot;</span><br>    cache_name += <span class="hljs-string">&quot;*&quot;</span><br>    cache_name_list = [item <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> redis.scan_iter(cache_name)]<br>    <span class="hljs-keyword">if</span> cache_name_list:<br>        redis.delete(*cache_name_list)<br><br>delete_cache_start_with(<span class="hljs-string">&quot;demo_system:user&quot;</span>)<br></code></pre></td></tr></table></figure>
-<p>通过这段代码就可以批量删除与<code>demo_system:user</code>相关的Key了，在测试环境验证基本也不会出现问题，但是当上到生产环境时就会发现拥有批量删除逻辑的接口在某些情况下它的响应时长会变得很长，比如我在排查某个业务时看到的Jaeger数据如下图:<br><img    class="lazyload" data-original="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1688110959832%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20230629142027.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">1688110959832截图_选择区域_20230629142027.png</span></p>
-<p>图中展示的是本次调用执行了多次<code>SCAN</code>命令，同时通过捕获的命令也可以知道<code>SCAN</code>的索引是一直在变的，而且不会重复，这意味着<code>SCAN</code>的执行逻辑是正常的，但是需要执行很多次才能获得最终的结果，所以导致接口的响应时长非常的长。</p>
-<h2 id="2-解决方案"><a href="#2-解决方案" class="headerlink" title="2.解决方案"></a>2.解决方案</h2><p>当前的问题是当Redis的Key数量过多时，<code>SCAN</code>的扫描次数也变多了，导致服务需要向Redis发起多次IO交互，而每一次IO交互都需要一定的时间开销，最终导致接口响应时长变长， 所以解决这个问题的核心就变为在每次执行批量删除时尽量的减少<code>SCAN</code>命令次数(最终结果集不变的情况下)。</p>
-<p>由于扫描次数是由<code>SCAN</code>命令中的<code>COUNT</code>大小和要扫描的Key总量这两个条件决定的，所以分别衍生出两套解决方案。</p>
-<h3 id="2-1-修改COUNT参数"><a href="#2-1-修改COUNT参数" class="headerlink" title="2.1.修改COUNT参数"></a>2.1.修改COUNT参数</h3><p>如果代码中有大量依赖于<code>SCAN</code>命令且比较难更改的情况或者是代码中是使用了类似于<code>django.core.cache</code>的<code>cache.delete_pattern</code>封装函数，那么直接修改代码会非常麻烦，这时可以选择通过改大COUNT参数来减少<code>SCAN</code>命令的次数。</p>
-<p>不过COUNT参数也不能太大，根据<a href="https://docs.keydb.dev/blog/2020/08/10/blog-post">KeyDB</a>中的描述在一个包含500万Key的Redis执行<code>SCAN</code>时，不同的COUNT参数与通过<code>SCAN</code>扫描所有Key的消耗时间的关系如下图:</p>
-<p><img   class="lazyload" data-original="https://docs.keydb.dev/assets/images/scan_time_vs_count-8153069e42f3d752df0fcb16ca74d9b5.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ></p>
-<p>通过图可以看到，当COUNT大于1000时，通过<code>SCAN</code>扫码所有Key的消耗时间变化已经不是很大，但是我们也需要考虑COUNT过大时可能会对Redis的负载性能有影响，所以我们需要针对自己使用的Redis服务进行压测后，选择最适合当前Redis服务的<code>COUNT</code>(一般建议在100-1000之间)。</p>
-<h3 id="2-2-创建一个存放缓存Key的Bucket"><a href="#2-2-创建一个存放缓存Key的Bucket" class="headerlink" title="2.2.创建一个存放缓存Key的Bucket"></a>2.2.创建一个存放缓存Key的Bucket</h3><p>由于缓存的Key的数量远远小于业务Key的数量，如果能做到只扫描缓存的Key而不是所有Key，那么<code>SCAN</code>命令执行的次数就会少了很多很多。<br>而这个解决方案就是通过创建一个单独的Bucket来存放缓存的Key，然后在模糊匹配时只扫描Bucket中的Key，最后在执行删除时除了删除业务Key外还需要同时删除Bucket中的Key。至于这个实现这个Bucket的方案有很多种，比如进程中的内存里或者一个公有文件中，但是Bucket的最佳实现还得是Redis的<code>SET</code>。</p>
-<p>这个方案的实现最好是基于Redis客户端库再封装一层统一的调用，比如上面示例的<code>cache</code>装饰器，这个装饰器的核心逻辑如下:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 省去装饰的逻辑</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_cache</span>(<span class="hljs-params">func: Callable, key: <span class="hljs-built_in">str</span></span>) -&gt; Any:</span><br>    result: Any = redis.get(key)<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> result:<br>        result = func()<br>        redis.<span class="hljs-built_in">set</span>(key, result)<br>    <span class="hljs-keyword">return</span> result<br></code></pre></td></tr></table></figure>
-<p>它会先判断key是否存在Redis中，如果存在就直接返回，不存在则调用函数获取结果，再把结果存入Redis后并返回。</p>
-<p>在进行改造时，只需要先指定Bucket的Key名，然后在调用<code>redis.set</code>时把缓存的key存入到Bucket中，如下:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">bucket_key: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;demo_system:bucket&quot;</span><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_cache</span>(<span class="hljs-params">func: Callable, key: <span class="hljs-built_in">str</span></span>) -&gt; Any:</span><br>    result: Any = redis.get(key)<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> result:<br>        result = func()<br>        redis.sadd(bucket_key, key)  <span class="hljs-comment"># &lt;-- 新增语句，为了保持双写成功，建议使用pipe，否则一定要放在set之前</span><br>        redis.<span class="hljs-built_in">set</span>(key, result)<br>    <span class="hljs-keyword">return</span> result<br></code></pre></td></tr></table></figure>
-<p>然后删除的逻辑也需要修改，首先是把扫描Key从扫描Redis全局改为扫描Bucket，然后在删除Key时顺便把Key也从Bucket中移除，代码如下:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete_cache_start_with</span>(<span class="hljs-params">cache_name: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;根据前缀删除批量缓存&quot;&quot;&quot;</span><br>    cache_name += <span class="hljs-string">&quot;*&quot;</span><br>    cache_name_list = [item <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> redis.sscan_iter(bucket_key, match=cache_name)]  <span class="hljs-comment"># &lt;--修改点</span><br>    <span class="hljs-keyword">if</span> cache_name_list:<br>        redis.delete(*cache_name_list)<br>        redis.srem(bucket_key, *cache_name_list)  <span class="hljs-comment"># &lt;--同样建议使用pipe，如果没有则必须放在delete后</span><br><br>delete_cache_start_with(<span class="hljs-string">&quot;demo_system:user&quot;</span>)<br></code></pre></td></tr></table></figure>
-<p>这样一来就改造完成了，经过在线上跑了一段时间后，所有接口的响应时间并不会受删除Key的逻辑影响。</p>
-<h2 id="3-其他注意点"><a href="#3-其他注意点" class="headerlink" title="3.其他注意点"></a>3.其他注意点</h2><p>在翻阅Redis关于<code>SCAN</code>命令的文档后发现有如下这一段描述:</p>
-<blockquote>
-<p>Scan guarantees<br>The SCAN command, and the other commands in the SCAN family, are able to provide to the user a set of guarantees associated to full iterations.</p>
-<ul>
-<li>A full iteration always retrieves all the elements that were present in the collection from the start to the end of a full iteration. This means that if a given element is inside the collection when an iteration is started, and is still there when an iteration terminates, then at some point SCAN returned it to the user.</li>
-<li>A full iteration never returns any element that was NOT present in the collection from the start to the end of a full iteration. So if an element was removed before the start of an iteration, and is never added back to the collection for all the time an iteration lasts, SCAN ensures that this element will never be returned.<br>H</li>
-<li>A given element may be returned multiple times. It is up to the application to handle the case of duplicated elements, for example only using the returned elements in order to perform operations that are safe when re-applied multiple times.</li>
-</ul>
-</blockquote>
-<p>通过描述可以发现<code>SCAN</code>命令会保证扫描出在遍历开始之前就已经存在Redis的值，但是如果有一个值是在遍历开始之后才加入的，那么<code>SCAN</code>无法保证一定能被扫描出来，不过对于当前的删除缓存Key场景并没有什么影响。此外<code>SCAN</code>多次扫描的结果可能有重复的，需要我们在程序中把扫码的结果重新整理并去重。</p>
-]]></content>
-      <categories>
-        <category>Redis</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>分布式锁(1)--分布式锁的介绍与实现</title>
-    <url>/2023/06/28/distributed_lock_lntroduction_and_lmplementation/</url>
+    <url>/2023/07/23/distributed_lock_lntroduction_and_lmplementation/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>随着业务的增长，后端技术架构会慢慢的从单体服务转向多服务或者微服务的分布式架构，此时语言级别的锁无法管理所有资源的竞争，只能采用分布式锁。而分布式锁的主体思想虽然与语言级别的锁类似，但还需要考虑到一些网络因素，使其变得复杂。</p>
 <span id="more"></span>
 
@@ -137,6 +93,50 @@
       <tags>
         <tag>Redis</tag>
         <tag>分布式锁</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis Scan命令踩坑笔记</title>
+    <url>/2023/06/28/how_to_safe_user_redis_scan/</url>
+    <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>大部分人在接触Redis时就都会了解到Redis是以单线程的形式处理用户命令，导致O(N)的命令有极大的几率会阻塞Redis，所以在使用Redis时需要放弃一些O(n)命令的使用，比如不要去使用<code>KEYS</code>命令而应该使用<code>SCAN</code>命令，然而<code>SCAN</code>命令也有一些坑。</p>
+<h2 id="1-踩到的坑"><a href="#1-踩到的坑" class="headerlink" title="1.踩到的坑"></a>1.踩到的坑</h2><p>为了减少<code>MySQL</code>的压力，在部分变动比较少的表会通过<code>Redis</code>套上缓存，如下代码：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-meta">@cache(<span class="hljs-params">key_name=<span class="hljs-string">&quot;demo_system:user&quot;</span>, expire=<span class="hljs-number">10</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_user</span>(<span class="hljs-params">user_id: <span class="hljs-built_in">str</span></span>) -&gt; UserDict:</span><br>    <span class="hljs-keyword">with</span> conn.cursor() <span class="hljs-keyword">as</span> cursor:<br>        cursor.execute(<span class="hljs-string">&quot;SELECT * FROM user WHERE user_id=%s&quot;</span>, (user_id, ))<br>        <span class="hljs-keyword">return</span> cursor.fetchone() <span class="hljs-keyword">or</span> ()<br></code></pre></td></tr></table></figure>
+<p>这段代码中会有一个<code>cache</code>装饰器，它每次被调用时会把<code>key_name</code>与传入的参数绑定为一个Key，比如某次调用的参数<code>user_id</code>为10086时，生成的Key为<code>demo_system:user:10086</code>。<br>它在执行时会先去Redis检查一下该Key是否存在，如果存在就直接返回数据，如果不存在就进入<code>get_user</code>函数通过<code>MySQL</code>获取<code>user_id</code>为10086的数据，不过在返回数据10086的数据之前会先缓存到对应的Key中。</p>
+<p>可见这个实现非常简单，也没有什么坑，但是当遇到需要按照模糊匹配批量删除缓存的需求时，问题也就跟着过来了，因为Redis本身并没有按照模糊匹配再批量删除的方法，只能先通过Redis的<code>KEYS</code>或者<code>SCAN</code>的模糊匹配查找一批Key，然后再通过<code>DEL</code>命令批量删除。<br>为了防止<code>Redis</code>阻塞，大都会选用<code>SCAN</code>来进行模糊匹配并通过<code>DEL</code>命令删除，使用起来也简单，代码如下:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete_cache_start_with</span>(<span class="hljs-params">cache_name: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;根据前缀删除批量缓存&quot;&quot;&quot;</span><br>    cache_name += <span class="hljs-string">&quot;*&quot;</span><br>    cache_name_list = [item <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> redis.scan_iter(cache_name)]<br>    <span class="hljs-keyword">if</span> cache_name_list:<br>        redis.delete(*cache_name_list)<br><br>delete_cache_start_with(<span class="hljs-string">&quot;demo_system:user&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>通过这段代码就可以批量删除与<code>demo_system:user</code>相关的Key了，在测试环境验证基本也不会出现问题，但是当上到生产环境时就会发现拥有批量删除逻辑的接口在某些情况下它的响应时长会变得很长，比如我在排查某个业务时看到的Jaeger数据如下图:<br><img    class="lazyload" data-original="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1688110959832%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20230629142027.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="   ><span class="image-caption">1688110959832截图_选择区域_20230629142027.png</span></p>
+<p>图中展示的是本次调用执行了多次<code>SCAN</code>命令，同时通过捕获的命令也可以知道<code>SCAN</code>的索引是一直在变的，而且不会重复，这意味着<code>SCAN</code>的执行逻辑是正常的，但是需要执行很多次才能获得最终的结果，所以导致接口的响应时长非常的长。</p>
+<h2 id="2-解决方案"><a href="#2-解决方案" class="headerlink" title="2.解决方案"></a>2.解决方案</h2><p>当前的问题是当Redis的Key数量过多时，<code>SCAN</code>的扫描次数也变多了，导致服务需要向Redis发起多次IO交互，而每一次IO交互都需要一定的时间开销，最终导致接口响应时长变长， 所以解决这个问题的核心就变为在每次执行批量删除时尽量的减少<code>SCAN</code>命令次数(最终结果集不变的情况下)。</p>
+<p>由于扫描次数是由<code>SCAN</code>命令中的<code>COUNT</code>大小和要扫描的Key总量这两个条件决定的，所以分别衍生出两套解决方案。</p>
+<h3 id="2-1-修改COUNT参数"><a href="#2-1-修改COUNT参数" class="headerlink" title="2.1.修改COUNT参数"></a>2.1.修改COUNT参数</h3><p>如果代码中有大量依赖于<code>SCAN</code>命令且比较难更改的情况或者是代码中是使用了类似于<code>django.core.cache</code>的<code>cache.delete_pattern</code>封装函数，那么直接修改代码会非常麻烦，这时可以选择通过改大COUNT参数来减少<code>SCAN</code>命令的次数。</p>
+<p>不过COUNT参数也不能太大，根据<a href="https://docs.keydb.dev/blog/2020/08/10/blog-post">KeyDB</a>中的描述在一个包含500万Key的Redis执行<code>SCAN</code>时，不同的COUNT参数与通过<code>SCAN</code>扫描所有Key的消耗时间的关系如下图:</p>
+<p><img   class="lazyload" data-original="https://docs.keydb.dev/assets/images/scan_time_vs_count-8153069e42f3d752df0fcb16ca74d9b5.png" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" ></p>
+<p>通过图可以看到，当COUNT大于1000时，通过<code>SCAN</code>扫码所有Key的消耗时间变化已经不是很大，但是我们也需要考虑COUNT过大时可能会对Redis的负载性能有影响，所以我们需要针对自己使用的Redis服务进行压测后，选择最适合当前Redis服务的<code>COUNT</code>(一般建议在100-1000之间)。</p>
+<h3 id="2-2-创建一个存放缓存Key的Bucket"><a href="#2-2-创建一个存放缓存Key的Bucket" class="headerlink" title="2.2.创建一个存放缓存Key的Bucket"></a>2.2.创建一个存放缓存Key的Bucket</h3><p>由于缓存的Key的数量远远小于业务Key的数量，如果能做到只扫描缓存的Key而不是所有Key，那么<code>SCAN</code>命令执行的次数就会少了很多很多。<br>而这个解决方案就是通过创建一个单独的Bucket来存放缓存的Key，然后在模糊匹配时只扫描Bucket中的Key，最后在执行删除时除了删除业务Key外还需要同时删除Bucket中的Key。至于这个实现这个Bucket的方案有很多种，比如进程中的内存里或者一个公有文件中，但是Bucket的最佳实现还得是Redis的<code>SET</code>。</p>
+<p>这个方案的实现最好是基于Redis客户端库再封装一层统一的调用，比如上面示例的<code>cache</code>装饰器，这个装饰器的核心逻辑如下:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 省去装饰的逻辑</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_cache</span>(<span class="hljs-params">func: Callable, key: <span class="hljs-built_in">str</span></span>) -&gt; Any:</span><br>    result: Any = redis.get(key)<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> result:<br>        result = func()<br>        redis.<span class="hljs-built_in">set</span>(key, result)<br>    <span class="hljs-keyword">return</span> result<br></code></pre></td></tr></table></figure>
+<p>它会先判断key是否存在Redis中，如果存在就直接返回，不存在则调用函数获取结果，再把结果存入Redis后并返回。</p>
+<p>在进行改造时，只需要先指定Bucket的Key名，然后在调用<code>redis.set</code>时把缓存的key存入到Bucket中，如下:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python">bucket_key: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;demo_system:bucket&quot;</span><br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_cache</span>(<span class="hljs-params">func: Callable, key: <span class="hljs-built_in">str</span></span>) -&gt; Any:</span><br>    result: Any = redis.get(key)<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> result:<br>        result = func()<br>        redis.sadd(bucket_key, key)  <span class="hljs-comment"># &lt;-- 新增语句，为了保持双写成功，建议使用pipe，否则一定要放在set之前</span><br>        redis.<span class="hljs-built_in">set</span>(key, result)<br>    <span class="hljs-keyword">return</span> result<br></code></pre></td></tr></table></figure>
+<p>然后删除的逻辑也需要修改，首先是把扫描Key从扫描Redis全局改为扫描Bucket，然后在删除Key时顺便把Key也从Bucket中移除，代码如下:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">delete_cache_start_with</span>(<span class="hljs-params">cache_name: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    <span class="hljs-string">&quot;&quot;&quot;根据前缀删除批量缓存&quot;&quot;&quot;</span><br>    cache_name += <span class="hljs-string">&quot;*&quot;</span><br>    cache_name_list = [item <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> redis.sscan_iter(bucket_key, match=cache_name)]  <span class="hljs-comment"># &lt;--修改点</span><br>    <span class="hljs-keyword">if</span> cache_name_list:<br>        redis.delete(*cache_name_list)<br>        redis.srem(bucket_key, *cache_name_list)  <span class="hljs-comment"># &lt;--同样建议使用pipe，如果没有则必须放在delete后</span><br><br>delete_cache_start_with(<span class="hljs-string">&quot;demo_system:user&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>这样一来就改造完成了，经过在线上跑了一段时间后，所有接口的响应时间并不会受删除Key的逻辑影响。</p>
+<h2 id="3-其他注意点"><a href="#3-其他注意点" class="headerlink" title="3.其他注意点"></a>3.其他注意点</h2><p>在翻阅Redis关于<code>SCAN</code>命令的文档后发现有如下这一段描述:</p>
+<blockquote>
+<p>Scan guarantees<br>The SCAN command, and the other commands in the SCAN family, are able to provide to the user a set of guarantees associated to full iterations.</p>
+<ul>
+<li>A full iteration always retrieves all the elements that were present in the collection from the start to the end of a full iteration. This means that if a given element is inside the collection when an iteration is started, and is still there when an iteration terminates, then at some point SCAN returned it to the user.</li>
+<li>A full iteration never returns any element that was NOT present in the collection from the start to the end of a full iteration. So if an element was removed before the start of an iteration, and is never added back to the collection for all the time an iteration lasts, SCAN ensures that this element will never be returned.<br>H</li>
+<li>A given element may be returned multiple times. It is up to the application to handle the case of duplicated elements, for example only using the returned elements in order to perform operations that are safe when re-applied multiple times.</li>
+</ul>
+</blockquote>
+<p>通过描述可以发现<code>SCAN</code>命令会保证扫描出在遍历开始之前就已经存在Redis的值，但是如果有一个值是在遍历开始之后才加入的，那么<code>SCAN</code>无法保证一定能被扫描出来，不过对于当前的删除缓存Key场景并没有什么影响。此外<code>SCAN</code>多次扫描的结果可能有重复的，需要我们在程序中把扫码的结果重新整理并去重。</p>
+]]></content>
+      <categories>
+        <category>Redis</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
       </tags>
   </entry>
   <entry>
