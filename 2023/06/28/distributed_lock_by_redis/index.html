@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="google" content="notranslate" />
   
-  <meta name="description" content="前记PyRedis库提追求的是高性能，简单的分布式锁，...">
+  <meta name="description" content="前记py-redis库提追求的是高性能，简单的分布式锁...">
   <meta name="author" content="So1n">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
   <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
@@ -204,7 +204,7 @@
       <span class="post-info-item"><i class="iconfont iconcalendar"></i>June 28, 2023</span>
       
       本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-      <span class="post-info-item"><i class="iconfont iconfont-size"></i>1553</span>
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>1665</span>
     </div>
   </div>
 </section>
@@ -212,11 +212,11 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>PyRedis</code>库提追求的是高性能，简单的分布式锁，这就导致了在某些场合下无法被使用，在本章中将重写<code>PyRedis</code>库的<code>Lock</code>实现，并根据<a target="_blank" rel="noopener" href="https://github.com/redisson/redisson">Redission</a>的原理实现各种不同功能的锁。</p>
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>py-redis</code>库提追求的是高性能，简单的分布式锁，这就导致了在某些场合下无法被使用，在本章中将重写<code>py-redis</code>库的<code>Lock</code>实现，并参考<a target="_blank" rel="noopener" href="https://github.com/redisson/redisson">Redission</a>的原理实现各种不同功能的锁。</p>
         
-          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>PyRedis</code>库提追求的是高性能，简单的分布式锁，这就导致了在某些场合下无法被使用，在本章中将重写<code>PyRedis</code>库的<code>Lock</code>实现，并根据<a target="_blank" rel="noopener" href="https://github.com/redisson/redisson">Redission</a>的原理实现各种不同功能的锁。</p></p>
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>py-redis</code>库提追求的是高性能，简单的分布式锁，这就导致了在某些场合下无法被使用，在本章中将重写<code>py-redis</code>库的<code>Lock</code>实现，并参考<a target="_blank" rel="noopener" href="https://github.com/redisson/redisson">Redission</a>的原理实现各种不同功能的锁。</p></p>
         
-        <h2 id="1-PyRedis锁的不足"><a href="#1-PyRedis锁的不足" class="headerlink" title="1.PyRedis锁的不足"></a>1.<code>PyRedis</code>锁的不足</h2><p><code>PyRedis</code>只提供了一个简单的分布式锁实现，他的实现非常简单，性能也是最高的，但是他的特性也比较少，只解决了如下问题:</p>
+        <h2 id="1-py-redis锁的不足"><a href="#1-py-redis锁的不足" class="headerlink" title="1.py-redis锁的不足"></a>1.<code>py-redis</code>锁的不足</h2><p><code>py-redis</code>只提供了一个简单的分布式锁实现，他的实现非常简单，性能也是最高的，但是他的特性也比较少，只解决了如下问题:</p>
 <ul>
 <li>1.通过token防止释放了别人持有的锁。</li>
 <li>2.通过过期时间防止获取锁的程序崩溃后导致锁死锁。</li>
@@ -226,16 +226,17 @@
 <li>1.通过循环的机制来重复轮询是否可以获取锁，这可能会增加IO次数(sleep参数设置不好的情况)，同时锁与锁的关系只有客户端逻辑在判断，无法在锁过期时由Redis通知到客户端。</li>
 <li>2.只有锁续约逻辑，但没有WatchDog逻辑。</li>
 </ul>
-<p>最重要的一点是当前是使用<code>Redis</code>的字符串结构来实现分布式锁，这个数据结构是非常简单的，这意味着很难进行功能拓展，需要把存放锁的结构从<code>Redis</code>从字符串变更为Hash结构。</p>
-<h2 id="2-可重入锁"><a href="#2-可重入锁" class="headerlink" title="2.可重入锁"></a>2.可重入锁</h2><p>了解完<code>PyRedis</code>库实现的分布式锁后可以知道他的实现非常简单，特性比较少，正因如此，他的性能也是最高的，不过它可能不适用一些特殊的场景，接下来将根据各个场景逐一为当前实现的锁添加功能，首先是可重入问题，如下例子：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> redis.asyncio <span class="hljs-keyword">import</span> Redis<br><span class="hljs-keyword">from</span> watch_dog <span class="hljs-keyword">import</span> WithWatchDogLock<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>():</span><br>    _redis = Redis()<br>    _lock = _redis.lock(<span class="hljs-string">&quot;demo&quot;</span>, lock_class=WithWatchDogLock, timeout=<span class="hljs-number">3</span>)<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> _lock:<br>        print(<span class="hljs-string">&quot;get lock 1&quot;</span>)<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> _lock:<br>            print(<span class="hljs-string">&quot;get lock 2&quot;</span>)<br><br><br>asyncio.run(main())<br></code></pre></td></tr></table></figure>
-<p>如果执行这段代码，会发现在输出<code>get lock 1</code>后，整个程序就卡住了，这是因为当前的锁不支持可重入功能，导致在同一个协程中无法多次获取锁。</p>
-<p>如果有了解线程的可重入锁，就会知道可重入锁实际上是多维护了一个计数器，每次获取锁时计数器+1，而每次释放锁时计数器-1且当计数器为0时就直接释放锁。<br>但是当前的分布式锁使用的是<code>Redis</code>的字符串结构，很难嵌入一个计数器结构，只能把存放分布式锁的数据结构从字符串替换为Hash结构。<br>如果把<code>Redis</code>比喻为一个大的字典，那么目前锁存放的结构如下：</p>
+<p>最重要的一点是当前是使用<code>Redis</code>的字符串结构来实现分布式锁，这个数据结构是非常简单的，这意味着很难进行功能拓展。为了解决这个问题，需要先把存放锁的数据结构从<code>Redis</code>从字符串变更为Hash结构。</p>
+<h2 id="2-可重入锁"><a href="#2-可重入锁" class="headerlink" title="2.可重入锁"></a>2.可重入锁</h2><p>在上一文中了解了<code>py-redis</code>库实现的分布式锁后可以知道它的实现非常简单，特性比较少，正因如此，他的性能也是最高的，不过它可能不适用一些特殊的场景，接下来将根据各个场景逐一为当前实现的锁添加功能，首先是可重入问题，如下例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> redis.asyncio <span class="hljs-keyword">import</span> Redis<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>():</span><br>    _redis = Redis()<br>    _lock = _redis.lock(<span class="hljs-string">&quot;demo&quot;</span>, timeout=<span class="hljs-number">3</span>)<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> _lock:<br>        print(<span class="hljs-string">&quot;get lock 1&quot;</span>)<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> _lock:<br>            print(<span class="hljs-string">&quot;get lock 2&quot;</span>)<br><br><br>asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>如果执行这段代码，会发现在输出<code>get lock 1</code>后，整个程序就卡住了，等到3秒后才会输出<code>get lock 2</code>，然后再抛出锁异常。<br>这是因为当前的锁不支持可重入功能，导致在同一个协程中无法多次获取锁。</p>
+<p>如果有了解线程的可重入锁，就会知道可重入锁实际上是在锁的基础上添加了一个计数器，它会统计不同线程中对同一个锁的获取锁次数，在每次获取锁时计数器+1，而每次释放锁时计数器-1且当计数器为0时就直接释放锁。</p>
+<p>但是当前的分布式锁使用的是<code>Redis</code>的字符串结构，很难嵌入一个计数器结构，只能把存放分布式锁的数据结构从字符串替换为Hash结构。<br>如果把<code>Redis</code>比喻为一个大的字典，那么目前锁存放的结构如下：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;lock name&quot;</span>: <span class="hljs-string">&quot;token&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
-<p>而在使用了Hash结构后，锁存放的结构变为如下格式:</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;lock name&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;token&quot;</span>: <span class="hljs-number">1</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>其中1代表的是加锁次数。</p>
-<p>接着就可以修改<code>Lock</code>类中的脚本，主要的修改点有：</p>
+<p>其中每个Key代表一个锁，<code>token</code>是获取锁协程的标记，而在使用了Hash结构后，锁存放的结构变为如下格式:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;lock name&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;token:id&quot;</span>: <span class="hljs-number">1</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这样一来<code>token</code>就不是最底层的结构了，整个锁的数据结构它从两层结构变为三层结构，同时<code>token</code>变为<code>token</code>+<code>协程id</code>的组合，而它们的值<code>1</code>则是计数器。</p>
+<p>了解了基本原理后，就可以开始着手修改<code>Lock</code>类，主要的修改点有：</p>
 <ul>
 <li>1.获取锁从调用<code>set</code>命令变为一个即获取锁又维护计数器的lua脚本。</li>
 <li>2.释放锁从直接删除<code>key</code>变为一个先处理计数器然后再判断是否释放锁的lua脚本。</li>
@@ -244,7 +245,7 @@
 <p>Note: 暂不考虑之前没提到的方法，包括但不限于<code>reacquire</code>，<code>owned</code>和<code>locked</code>。<br>修改完的代码如下:</p>
 </blockquote>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Python"><br></code></pre></td></tr></table></figure>
-<p>再使用了支持可重入的锁后，可以发现之前的脚本能够正常运行了。</p>
+<p>在使用了支持可重入的锁后，可以发现之前的脚本能够正常运行了。</p>
 <h2 id="3-公平锁"><a href="#3-公平锁" class="headerlink" title="3.公平锁"></a>3.公平锁</h2><h2 id="4-读写锁"><a href="#4-读写锁" class="headerlink" title="4.读写锁"></a>4.读写锁</h2><h2 id="5-红锁"><a href="#5-红锁" class="headerlink" title="5.红锁"></a>5.红锁</h2>
       </section>
       <section class="extra">
@@ -313,14 +314,14 @@
           
   <aside class="toc-wrap">
     <h3 class="toc-title">文章目录：</h3>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-PyRedis%E9%94%81%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="toc-text">1.PyRedis锁的不足</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81"><span class="toc-text">2.可重入锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%AC%E5%B9%B3%E9%94%81"><span class="toc-text">3.公平锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AF%BB%E5%86%99%E9%94%81"><span class="toc-text">4.读写锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BA%A2%E9%94%81"><span class="toc-text">5.红锁</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-py-redis%E9%94%81%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="toc-text">1.py-redis锁的不足</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81"><span class="toc-text">2.可重入锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%AC%E5%B9%B3%E9%94%81"><span class="toc-text">3.公平锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AF%BB%E5%86%99%E9%94%81"><span class="toc-text">4.读写锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BA%A2%E9%94%81"><span class="toc-text">5.红锁</span></a></li></ol>
   </aside>
 
         
           
   <aside class="toc-wrap">
     <h3 class="toc-title">文章目录：</h3>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-PyRedis%E9%94%81%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="toc-text">1.PyRedis锁的不足</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81"><span class="toc-text">2.可重入锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%AC%E5%B9%B3%E9%94%81"><span class="toc-text">3.公平锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AF%BB%E5%86%99%E9%94%81"><span class="toc-text">4.读写锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BA%A2%E9%94%81"><span class="toc-text">5.红锁</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-py-redis%E9%94%81%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="toc-text">1.py-redis锁的不足</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81"><span class="toc-text">2.可重入锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%AC%E5%B9%B3%E9%94%81"><span class="toc-text">3.公平锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AF%BB%E5%86%99%E9%94%81"><span class="toc-text">4.读写锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BA%A2%E9%94%81"><span class="toc-text">5.红锁</span></a></li></ol>
   </aside>
 
         
