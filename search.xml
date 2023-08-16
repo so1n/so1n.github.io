@@ -17,7 +17,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Python Asyncio实践--高并发下如何防止发缓存击穿</title>
+    <title>Python Asyncio实践--高并发下如何防止缓存击穿</title>
     <url>/2023/08/14/python_asyncio_concunrrency_result_share/</url>
     <content><![CDATA[<h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>本文描述的是如何基于<code>Asyncio.Future</code>的特性编写一个语言级别的防缓存击穿的工具–<code>Share</code>，并介绍它的使用和高并发下的处理方法。</p>
 <span id="more"></span>
