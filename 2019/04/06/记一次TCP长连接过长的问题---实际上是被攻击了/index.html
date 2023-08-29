@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,9 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在接手了公司的SIP项目后的不久，发现服务器时不时就遇到了kamailio进程(用于处理sip协议)占用了过多的文件描述符,直接超过限制的情况，造成kamailio进程无法接收新的请求,影响线上用户使用。</p>
-<p>这个问题有个两个难点,一个是只有发生问题才能进行排查,而发生问题时需要快速重启进程,不然影响用户使用;另一个问题由于发生时间充满随机性，而且时隔半个月到一个月才发生一次，所以整个解决流程用了快3个月，其中共发生了4次。</p>
-<p>不过从发现问题到解决问题倒是收获了很多,只是到了后来才发现造成该问题的根本原因是客户端由于觉得接口加密逻辑有bug就跟API接口的商量一起下线加密逻辑,而我又不知道,加密逻辑下线后导致sip服务器的ip被暴露出来,引发SIP服务器被攻击…</p>
         
           <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在接手了公司的SIP项目后的不久，发现服务器时不时就遇到了kamailio进程(用于处理sip协议)占用了过多的文件描述符,直接超过限制的情况，造成kamailio进程无法接收新的请求,影响线上用户使用。</p>
 <p>这个问题有个两个难点,一个是只有发生问题才能进行排查,而发生问题时需要快速重启进程,不然影响用户使用;另一个问题由于发生时间充满随机性，而且时隔半个月到一个月才发生一次，所以整个解决流程用了快3个月，其中共发生了4次。</p>
@@ -290,7 +288,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2019/04/06/%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;06&#x2F;%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;04&#x2F;06&#x2F;%E8%AE%B0%E4%B8%80%E6%AC%A1TCP%E9%95%BF%E8%BF%9E%E6%8E%A5%E8%BF%87%E9%95%BF%E7%9A%84%E9%97%AE%E9%A2%98---%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E8%A2%AB%E6%94%BB%E5%87%BB%E4%BA%86&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -481,7 +482,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

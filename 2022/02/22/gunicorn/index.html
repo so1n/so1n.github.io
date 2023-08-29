@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,7 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        
         
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p><code>Gunicorn</code>是一个基于<code>Python</code>实现的动态Web服务器，它通过Pre-Worker模型来实现并发，本身带有多种工作模式，基本上可以与所有基于<code>Python</code>的Web框架集成，并为他们带来一个多功能又稳定的服务器托管核心。</p>
 <p>从学习<code>Python</code> Web的第一天就开始接触了<code>Gunicorn</code>,那时候还不知道他具体的作用是什么， 只知道在项目中使用他运行之后可以变得十分的稳定，高性能，从未研究它是如何实现的。随着使用时间的增长，越来越想知道它的运行原理是什么，特别是它性能为何会高，跟类Unix有什么特殊结合，<code>Pre-Worker</code>模型是如何通信的，如何设计一个比较好的<code>Pre-Worker</code>模型服务器？<br>于是，本文就是阅读源码之后的产物。</p>
@@ -342,7 +342,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2022/02/22/gunicorn/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;02&#x2F;22&#x2F;gunicorn&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;02&#x2F;22&#x2F;gunicorn&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -533,7 +536,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

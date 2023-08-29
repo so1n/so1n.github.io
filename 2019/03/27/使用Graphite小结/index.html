@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,8 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>初次认识Graphite时,Graphite已经发展了十年了,那时在负责kamailio相关工作内容,为了监控和查看kamailio数据,查找到的文章<a target="_blank" rel="noopener" href="https://acalustra.com/kamailio-statsd-better-statistics-in-your-voip-platform.html">Kamailio statsd, better statistics in your voip platform.</a>,虽然不太认同作者把statsd客户端的嵌入kamailio的理念,但发现Graphite这东西还是很不错的(虽然后面接触了Prometheus emmmm…….不过Graphite可以保存长期的历史数据,并根据时间自动做聚合旧数据, 这个优点Prometheus是无法代替的).</p>
-<p>Graphite是一个包含了用于接收和整合数据的<code>carbon</code>,存储数据的时序数据库<code>Whisper</code>还有一个提供API的server.<br>它的理念十分简单,存的数据只有timestamp-value,该数据存在key的文件里面,用户可以用过以<code>*.*.*</code>的方式来设置数据维度或者标签.而写数据就更简单了只要发送TCP/UDP文本<code>&#123;key&#125; &#123;value&#125; &#123;timestamp&#125;</code>到carbon即可.同时他还提供按数据落盘时长来聚合数据的归档功能,觉得这个功能是非常棒的,因为数据的有分冷热的, 我们也不会专门去查看一年前的具体数据,只会去查看他的大概数据.</p>
         
           <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>初次认识Graphite时,Graphite已经发展了十年了,那时在负责kamailio相关工作内容,为了监控和查看kamailio数据,查找到的文章<a target="_blank" rel="noopener" href="https://acalustra.com/kamailio-statsd-better-statistics-in-your-voip-platform.html">Kamailio statsd, better statistics in your voip platform.</a>,虽然不太认同作者把statsd客户端的嵌入kamailio的理念,但发现Graphite这东西还是很不错的(虽然后面接触了Prometheus emmmm…….不过Graphite可以保存长期的历史数据,并根据时间自动做聚合旧数据, 这个优点Prometheus是无法代替的).</p>
 <p>Graphite是一个包含了用于接收和整合数据的<code>carbon</code>,存储数据的时序数据库<code>Whisper</code>还有一个提供API的server.<br>它的理念十分简单,存的数据只有timestamp-value,该数据存在key的文件里面,用户可以用过以<code>*.*.*</code>的方式来设置数据维度或者标签.而写数据就更简单了只要发送TCP/UDP文本<code>&#123;key&#125; &#123;value&#125; &#123;timestamp&#125;</code>到carbon即可.同时他还提供按数据落盘时长来聚合数据的归档功能,觉得这个功能是非常棒的,因为数据的有分冷热的, 我们也不会专门去查看一年前的具体数据,只会去查看他的大概数据.</p></p>
@@ -375,7 +374,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2019/03/27/%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;03&#x2F;27&#x2F;%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;03&#x2F;27&#x2F;%E4%BD%BF%E7%94%A8Graphite%E5%B0%8F%E7%BB%93&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -566,7 +568,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

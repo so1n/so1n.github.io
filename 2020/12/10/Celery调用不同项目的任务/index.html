@@ -123,7 +123,7 @@ Celery的示例或者常用使用...">
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -164,6 +164,7 @@ Celery的示例或者常用使用...">
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -213,8 +214,6 @@ Celery的示例或者常用使用...">
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>PS: 水文笔记…</p>
-<p><code>Celery</code>的示例或者常用使用方式中, <code>Celery</code>的Woker以及任务调用经常都是在同一个项目里面.<br>但是随着项目的拓展,很多时候<code>Celery</code>任务调用端与Woker的代码并不是在同一个项目里(但是共享同一个Mq, Redis等配置和中间件),而且<code>Celery</code>是基于<code>RabbitMQ</code>进行任务信息传输的,非常适合不同的项目调用解耦.<br>而<code>Celery</code>有一个非常好的概念–Signature,我们只要在远程端封装一个伪任务的Signature,就可以通过调用该Signature去让另一个项目的Celery执行对应的任务.</p>
         
           <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>PS: 水文笔记…</p>
 <p><code>Celery</code>的示例或者常用使用方式中, <code>Celery</code>的Woker以及任务调用经常都是在同一个项目里面.<br>但是随着项目的拓展,很多时候<code>Celery</code>任务调用端与Woker的代码并不是在同一个项目里(但是共享同一个Mq, Redis等配置和中间件),而且<code>Celery</code>是基于<code>RabbitMQ</code>进行任务信息传输的,非常适合不同的项目调用解耦.<br>而<code>Celery</code>有一个非常好的概念–Signature,我们只要在远程端封装一个伪任务的Signature,就可以通过调用该Signature去让另一个项目的Celery执行对应的任务.</p></p>
@@ -241,7 +240,10 @@ Celery的示例或者常用使用...">
     <li><strong>本文链接：</strong><a href="http://so1n.me/2020/12/10/Celery%E8%B0%83%E7%94%A8%E4%B8%8D%E5%90%8C%E9%A1%B9%E7%9B%AE%E7%9A%84%E4%BB%BB%E5%8A%A1/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;12&#x2F;10&#x2F;Celery%E8%B0%83%E7%94%A8%E4%B8%8D%E5%90%8C%E9%A1%B9%E7%9B%AE%E7%9A%84%E4%BB%BB%E5%8A%A1&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;12&#x2F;10&#x2F;Celery%E8%B0%83%E7%94%A8%E4%B8%8D%E5%90%8C%E9%A1%B9%E7%9B%AE%E7%9A%84%E4%BB%BB%E5%8A%A1&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -432,7 +434,6 @@ Celery的示例或者常用使用...">
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

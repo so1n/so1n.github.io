@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,7 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在2019上半年时， 项目需要用到<code>RPC</code>来为不同服务间建立连接, 便开始调研<code>RPC</code>相关的内容， 由于项目本身是基于<code>Asyncio</code>生态的， 所以就开始找基于<code>asyncio</code>生态的<code>RPC</code>框架， 那时候<code>Python</code>上关于<code>Asyncio</code>的<code>RPC</code>框架比较少, 只有一个<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 它能满足<code>RPC</code>的基本功能, 但缺少了其他的<code>RPC</code>框架带有的服务治理功能(称为服务管理会不会更好点???), 所以在那时候开始， 我就想开始造一个<code>Python Asyncio</code>生态的<code>RPC</code>框架–<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>, 这个项目除了满足在任一语言的<code>RPC</code>的功能外(虽然其他语言的没编写…), 还要满足快;核心功能简单;可以单独为python提供高阶功能; 在没其他服务依赖的情况下就能单独使用, 同时又可以通过插件的形式进行功能拓展。<br>而<a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写这个框架时的想法和总结。</p>
         
           <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在2019上半年时， 项目需要用到<code>RPC</code>来为不同服务间建立连接, 便开始调研<code>RPC</code>相关的内容， 由于项目本身是基于<code>Asyncio</code>生态的， 所以就开始找基于<code>asyncio</code>生态的<code>RPC</code>框架， 那时候<code>Python</code>上关于<code>Asyncio</code>的<code>RPC</code>框架比较少, 只有一个<a target="_blank" rel="noopener" href="https://github.com/choleraehyq/aiorpc">aiorpc</a>, 它能满足<code>RPC</code>的基本功能, 但缺少了其他的<code>RPC</code>框架带有的服务治理功能(称为服务管理会不会更好点???), 所以在那时候开始， 我就想开始造一个<code>Python Asyncio</code>生态的<code>RPC</code>框架–<a target="_blank" rel="noopener" href="https://github.com/so1n/rap">rap</a>, 这个项目除了满足在任一语言的<code>RPC</code>的功能外(虽然其他语言的没编写…), 还要满足快;核心功能简单;可以单独为python提供高阶功能; 在没其他服务依赖的情况下就能单独使用, 同时又可以通过插件的形式进行功能拓展。<br>而<a href="https://so1n.me/categories/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5/">RPC框架编写实践</a>系列文章是我编写这个框架时的想法和总结。</p></p>
         
@@ -295,7 +295,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2021/08/19/RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;08&#x2F;19&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2021&#x2F;08&#x2F;19&#x2F;RPC%E6%A1%86%E6%9E%B6%E7%BC%96%E5%86%99%E5%AE%9E%E8%B7%B5--%E6%9C%80%E5%B0%8FRPC%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BE%9D%E8%B5%96&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -486,7 +489,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

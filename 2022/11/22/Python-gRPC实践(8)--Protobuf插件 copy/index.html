@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,8 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在完善一个<code>Protobuf</code>中的<code>Message</code>转为<code>pydantic.BaseModel</code>对象的库–<a target="_blank" rel="noopener" href="https://github.com/so1n/protobuf_to_pydantic">protobuf_to_pydantic</a>，想为它增加一个从原生<code>Protobuf</code>文件直接生成对应<code>pydantic.BaseModel</code>对象源代码的功能，在通过了解后发现可以通过<code>Protobuf</code>插件的形式来实现</p>
-<p>但是搜索了大量的资源后才发现大多数的<code>Protobuf</code>插件都是由<code>Go</code>编写的，并且没有(或者很少)关于<code>Python</code>插件的编写教程以及在<a target="_blank" rel="noopener" href="https://googleapis.dev/python/protobuf/latest/">Python Protobuf官方文档</a>中找不到任何关于<code>Plugin</code>的介绍，所以踩了很多坑，而本文也就成了我编写<code>Protobuf</code>插件的踩坑总结</p>
         
           <p><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在完善一个<code>Protobuf</code>中的<code>Message</code>转为<code>pydantic.BaseModel</code>对象的库–<a target="_blank" rel="noopener" href="https://github.com/so1n/protobuf_to_pydantic">protobuf_to_pydantic</a>，想为它增加一个从原生<code>Protobuf</code>文件直接生成对应<code>pydantic.BaseModel</code>对象源代码的功能，在通过了解后发现可以通过<code>Protobuf</code>插件的形式来实现</p>
 <p>但是搜索了大量的资源后才发现大多数的<code>Protobuf</code>插件都是由<code>Go</code>编写的，并且没有(或者很少)关于<code>Python</code>插件的编写教程以及在<a target="_blank" rel="noopener" href="https://googleapis.dev/python/protobuf/latest/">Python Protobuf官方文档</a>中找不到任何关于<code>Plugin</code>的介绍，所以踩了很多坑，而本文也就成了我编写<code>Protobuf</code>插件的踩坑总结</p></p>
@@ -272,7 +271,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2022/11/22/Python-gRPC%E5%AE%9E%E8%B7%B5(8)--Protobuf%E6%8F%92%E4%BB%B6%20copy/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;22&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(8)--Protobuf%E6%8F%92%E4%BB%B6%20copy&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;22&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(8)--Protobuf%E6%8F%92%E4%BB%B6%20copy&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -463,7 +465,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

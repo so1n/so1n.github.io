@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,7 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        
         
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前在<a href="https://so1n.me/categories/Python-gRPC%E5%AE%9E%E8%B7%B5/">Python-gRPC实践</a>系列文章中都是在多线程模式中介绍如何使用<code>gRPC</code>，但是在<code>Python</code>生态中更偏好通过协程的方式来运行服务，而<code>Python</code>的协程运行方式却有多种，虽然他们的原理类似，但是使用上却有区别，本文主要是对在<code>gevent</code>和<code>asyncio</code>中对<code>gRPC</code>的使用进行对比。</p>
 <h2 id="1-简单的例子"><a href="#1-简单的例子" class="headerlink" title="1.简单的例子"></a>1.简单的例子</h2><p>本章以官方中的<a target="_blank" rel="noopener" href="https://github.com/grpc/grpc/blob/master/examples/protos/helloworld.proto">helloworld</a> <code>Protobuf</code>文件为例子，介绍在不同协程中如何运行服务，该<code>Protobuf</code>文件内容如下:</p>
@@ -291,7 +291,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2022/11/25/Python-gRPC%E5%AE%9E%E8%B7%B5(9)--gRPC%E5%9C%A8gevent%E4%B8%8Easyncio%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AF%B9%E6%AF%94/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;25&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(9)--gRPC%E5%9C%A8gevent%E4%B8%8Easyncio%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AF%B9%E6%AF%94&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2022&#x2F;11&#x2F;25&#x2F;Python-gRPC%E5%AE%9E%E8%B7%B5(9)--gRPC%E5%9C%A8gevent%E4%B8%8Easyncio%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AF%B9%E6%AF%94&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -482,7 +485,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,13 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在业务中, 我们经常需要有一个唯一id, 来区分每个数据, 如每个订单都有一个自己的id, 如果是一个单体应用, 实现起来会非常容易, 但很多时候是有多个应用同时索要id, 这时候就要确保任一次生成的id都不重复,  这就催生了分布式id的概念, 分布式id一般有几个特性:</p>
-<ul>
-<li>全局唯一, 不会再生成与这一样的id</li>
-<li>高可用， 所有的业务系统都需要依赖这个方法生成id，所以不能出现问题.</li>
-<li>趋势有序, 这个id在业务中通常会充当索引字段, 所以要趋势上有序.</li>
-<li>数量不可猜测(非必要), 一般的业务场景中, 会要求生成的id不会被他人猜测到今天生成的量有多少.</li>
-<li>高性能, 生成id的速度一定要快.
         
           <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在业务中, 我们经常需要有一个唯一id, 来区分每个数据, 如每个订单都有一个自己的id, 如果是一个单体应用, 实现起来会非常容易, 但很多时候是有多个应用同时索要id, 这时候就要确保任一次生成的id都不重复,  这就催生了分布式id的概念, 分布式id一般有几个特性:</p>
 <ul>
@@ -273,7 +267,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2020/09/07/%E5%88%86%E5%B8%83%E5%BC%8Fid/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;09&#x2F;07&#x2F;%E5%88%86%E5%B8%83%E5%BC%8Fid&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2020&#x2F;09&#x2F;07&#x2F;%E5%88%86%E5%B8%83%E5%BC%8Fid&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -464,7 +461,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

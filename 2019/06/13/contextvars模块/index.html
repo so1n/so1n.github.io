@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -212,9 +213,6 @@
     <section class="main">
       <section class="content">
         <!-- 展示文章摘录 -->
-        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在Python3.7后官方库出现了<code>contextvars</code>模块, 它的主要功能就是可以为多线程以及asyncio生态添加上下文功能,即使程序在多个协程并发运行的情况下,也能调用到程序的上下文变量, 从而使我们的逻辑解耦.</p>
-<p>上下文,可以理解为我们说话的语境, 在聊天的过程中, 有些话脱离了特定的语境,他的意思就变了,程序的运行也是如此.在线程中也是有他的上下文,只不过称为堆栈,如在python中就是保存在thread.local变量中,而协程也有他自己的上下文,但是没有暴露出来,不过有了<code>contextvars</code>模块后我们可以通过<code>contextvars</code>模块去保存与读取.</p>
-<p>使用<code>contextvars</code>的好处不仅可以防止’一个变量传遍天’的事情发生外,还能很好的结合TypeHint,可以让自己的代码可以被mypy以及IDE检查,让自己的代码更加适应工程化.<br>不过用了<code>contextvars</code>后会多了一些隐性的调用, 需要解决好这些隐性的成本. </p>
         
           <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在Python3.7后官方库出现了<code>contextvars</code>模块, 它的主要功能就是可以为多线程以及asyncio生态添加上下文功能,即使程序在多个协程并发运行的情况下,也能调用到程序的上下文变量, 从而使我们的逻辑解耦.</p>
 <p>上下文,可以理解为我们说话的语境, 在聊天的过程中, 有些话脱离了特定的语境,他的意思就变了,程序的运行也是如此.在线程中也是有他的上下文,只不过称为堆栈,如在python中就是保存在thread.local变量中,而协程也有他自己的上下文,但是没有暴露出来,不过有了<code>contextvars</code>模块后我们可以通过<code>contextvars</code>模块去保存与读取.</p>
@@ -323,7 +321,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2019/06/13/contextvars%E6%A8%A1%E5%9D%97/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;06&#x2F;13&#x2F;contextvars%E6%A8%A1%E5%9D%97&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2019&#x2F;06&#x2F;13&#x2F;contextvars%E6%A8%A1%E5%9D%97&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -514,7 +515,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 

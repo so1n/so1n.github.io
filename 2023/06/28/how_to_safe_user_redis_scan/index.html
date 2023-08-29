@@ -122,7 +122,7 @@
       },
       search: {
         enable: true,
-        path: '/search.xml'
+        path: 'search.xml'
       }
     }
   </script>
@@ -163,6 +163,7 @@
       <div id="qrcode-navbar"></div>
     
   </nav>
+
 
   
   
@@ -213,7 +214,6 @@
       <section class="content">
         <!-- 展示文章摘录 -->
         
-        
         <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>大部分人在接触Redis时就都会了解到Redis是以单线程的形式处理用户命令，导致O(N)的命令有极大的几率会阻塞Redis，所以在使用Redis时需要放弃一些O(n)命令的使用，比如不要去使用<code>KEYS</code>命令而应该使用<code>SCAN</code>命令，然而<code>SCAN</code>命令也有一些坑。</p>
 <h2 id="1-踩到的坑"><a href="#1-踩到的坑" class="headerlink" title="1.踩到的坑"></a>1.踩到的坑</h2><p>为了减少<code>MySQL</code>的压力，在部分变动比较少的表会通过<code>Redis</code>套上缓存，如下代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-meta">@cache(<span class="hljs-params">key_name=<span class="hljs-string">&quot;demo_system:user&quot;</span>, expire=<span class="hljs-number">10</span></span>)</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_user</span>(<span class="hljs-params">user_id: <span class="hljs-built_in">str</span></span>) -&gt; UserDict:</span><br>    <span class="hljs-keyword">with</span> conn.cursor() <span class="hljs-keyword">as</span> cursor:<br>        cursor.execute(<span class="hljs-string">&quot;SELECT * FROM user WHERE user_id=%s&quot;</span>, (user_id, ))<br>        <span class="hljs-keyword">return</span> cursor.fetchone() <span class="hljs-keyword">or</span> ()<br></code></pre></td></tr></table></figure>
@@ -257,7 +257,10 @@
     <li><strong>本文链接：</strong><a href="http://so1n.me/2023/06/28/how_to_safe_user_redis_scan/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;06&#x2F;28&#x2F;how_to_safe_user_redis_scan&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;06&#x2F;28&#x2F;how_to_safe_user_redis_scan&#x2F;index.html</a></li>
     <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
   
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
 </ul>
+
         
         
           <section class="donate">
@@ -448,7 +451,6 @@
       s.parentNode.insertBefore(bp, s);
     })();
   </script>
-
 
 
 
