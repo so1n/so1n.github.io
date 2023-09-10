@@ -1,0 +1,464 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>分布式锁(3)--基于Etcd的分布式锁实现 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记基于Redis实现的分布式锁的性能强，功能多，但是...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: {
+          gif: '',
+          lottie: ''
+        }
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
+
+<body class="lock-screen">
+  <div class="loading" id="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">分布式锁(3)--基于Etcd的分布式锁实现</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1690116367110distributed%20lock.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">分布式锁(3)--基于Etcd的分布式锁实现</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>September 10, 2023</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>6826</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+        <h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>基于<code>Redis</code>实现的分布式锁的性能强，功能多，但是由于<code>Redis</code>本身的特性决定了基于<code>Redis</code>实现的分布式锁可能会不唯一，所以无法应用在要求分布式锁必须绝对唯一的场景。<br>为此，只能基于其他服务来实现分布式锁，不过它们实现的总体思路是一致的，只是调用方式有一些区别，本文将介绍如何基于<code>Etcd</code>实现具有完备性的分布式锁。</p>
+<h2 id="1-为何基于Etcd实现分布式锁"><a href="#1-为何基于Etcd实现分布式锁" class="headerlink" title="1.为何基于Etcd实现分布式锁"></a>1.为何基于Etcd实现分布式锁</h2><p>目前常见的分布式锁实现除了<code>Redis</code>外还有<code>Etcd</code>和<code>Zookeeper</code>，由于<code>Redis</code>的一致性只满足了AP，所以基于<code>Redis</code>实现的分布式锁无法保证绝对唯一，而<code>Etcd</code>和<code>Zookeeper</code>的一致性都满足了CP，都是通过类似的一致性算法确保了数据的一致性，这样基于<code>Etcd</code>和<code>Zookeeper</code>实现的分布式锁能保证绝对唯一。<br>其中<code>Etcd</code>和<code>Zookeeper</code>的功能类似，但有一些方面中<code>Etcd</code>甚至超越了<code>ZooKeeper</code>，如<code>Etcd</code>采用的<code>Raft</code>协议就要比<code>ZooKeeper</code>采用的<code>Zab</code>协议简单、易理解，同时它的性能也比<code>Zookeeper</code>高，所以通常会选择<code>Etcd</code>作为分布式锁的实现。</p>
+<p>官方提供的<code>Etcd</code>与其他同类型的组件对比如下图：<br><img  src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1694360947468Etcd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E4%B9%8BEtcd%E4%B8%8E%E5%85%B6%E4%BB%96%E7%BB%84%E4%BB%B6%E7%9A%84%E5%AF%B9%E6%AF%94.png"  ><span class="image-caption">Etcd分布式锁之Etcd与其他组件的对比.png</span></p>
+<p>通过图可以看到<code>Etcd</code>略胜于其他组件，此外它提供的<code>Watch</code>，<code>Lease</code>，<code>Revision</code>以及<code>Prefix</code>机制使基于<code>Etcd</code>实现分布式锁会非常的方便，同时它是通过HTTP/gRPC提供对应的API，所以它的客户端实现也比较方便，当然如果当前系统依赖的是<code>Zookepeer</code>，那么肯定还是选择<code>Zookerpeer</code>，除非有性能要求。</p>
+<blockquote>
+<p>在<code>Python</code>中<code>Etcd</code>的客户端并没有官方的维护，目前维护的比较好的是<a target="_blank" rel="noopener" href="https://github.com/martyanov/aetcd">aetcd</a>，接下来将使用<a target="_blank" rel="noopener" href="https://github.com/martyanov/aetcd">aetcd</a>实现一个简单的分布式锁。</p>
+</blockquote>
+<h2 id="2-分布式锁的实现"><a href="#2-分布式锁的实现" class="headerlink" title="2.分布式锁的实现"></a>2.分布式锁的实现</h2><p>前面说到，<code>Etcd</code>的<code>Watch</code>，<code>Lease</code>，<code>Revision</code>以及<code>Prefix</code>机制赋予<code>Etcd</code>分布式锁的能力，要实现分布式锁则需要了解它们的作用，它们的作用如下:</p>
+<ul>
+<li>Lease机制：它类似于<code>Redis</code>中的过期，<code>Etcd</code>可以通过<code>Lease</code>为<code>Key-Value</code>设置租约时间（也就是过期时间），当租约到期时<code>Key-Value</code>会被删除。</li>
+<li>Revision机制：<code>Etcd</code>会为每个<code>Key-Value</code>赋予一个版本，同时更新<code>Key-Value</code>的时候，它的版本也会发生变化。比如插入<code>Key1</code>时，它的版本为0，而在后续插入<code>Key2</code>时它的版本为1，通过这样的机制，就可以知道写操作的顺序。</li>
+<li>Prefix机制：<code>Etcd</code>通过<code>Prefix</code>机制提供了对前缀相同的Key执行同一操作的能力，例如一个名为<code>/lock</code>的锁，当有两个客户端进行写操作时，实际上写入的<code>Key</code>分别为<code>key1=&quot;/lock/UUID1&quot;</code>和<code>key2=/lock/UUID2&quot;&quot;</code>，其中UUID就是<code>token</code>的含义，用于确保每个锁的唯一性。<br>不过与<code>Redis</code>中实现的分布式锁不一样的是在<code>Etcd</code>中这两个锁都会写入成功，但是返回的<code>Revision</code>是不一样的，需要应用程序通过<code>/lock/</code>前缀去查询数据，然后会获得到<code>key1</code>和<code>key2</code>的结果和<code>Revision</code>，接着再根据<code>Revision</code>的结果进行判断哪个<code>Key</code>才是获取到锁。</li>
+<li>Watch机制：<code>Etcd</code>的<code>Watch</code>机制可以批量的监听一批<code>Key</code>，当被监听的<code>Key</code>发生变化时，客户端会收到通知。在实现分布式锁的时候，如果抢锁失败，可通过<code>Prefix</code>机制返回的<code>Key</code>列表获得<code>Revision</code>比自己小且相差最小的<code>Key</code>（称为<code>Pre-Key</code>），对<code>Pre-Key</code>进行监听，因为只有它释放锁，自己才能获得锁，如果监听到<code>Pre-Key</code>的删除事件，则说明<code>Pre-Key</code>已经释放，自己已经持有锁。</li>
+</ul>
+<p>了解完这些机制，可以发现通过这些机制可以非常快的基于<code>Etcd</code>实现一个简单的分布式锁，如下图：<br><img  src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1694361172468Etcd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%AD%A5%E9%AA%A4.png"  ><span class="image-caption">Etcd分布式锁的实现步骤.png</span><br>图中红色方块代表<code>Etcd</code>服务端，蓝色方块代表<code>Etcd</code>客户端，白色方块代表当前<code>Etcd</code>服务端存的数据，图中总共分为4个步骤，用虚线隔开。<br>首先是步骤1，<code>client1</code>和<code>client2</code>会通过<code>put</code>命令把<code>/demo/&#123;uuid&#125;</code>推送到<code>Etcd</code>中。</p>
+<p>然后是步骤2，这里通过<code>Prefix</code>获取<code>/demo</code>开头的键值对的信息。</p>
+<p>接着就是步骤3，这个步骤会判断步骤2返回的键值对信息中<code>Revision</code>版本最小的是不是自己，如果是那就意味着自己获取到锁了，如果不是则会通过<code>Watch</code>机制监听<code>Revision</code>比自己小1的键值对的删除事件。</p>
+<p>最后是步骤4，当获取到锁的<code>client1</code>执行完任务后删除了<code>/demo/uuid1</code>，这时<code>Etcd</code>会通知到<code>client2</code>客户端，它已经获取锁了，可以执行任务。</p>
+<p>通过这些机制，可以发现基于<code>Etcd</code>实现的分布式锁会非常的方便，同时由于<code>Revision</code>的作用，实现的分布式锁默认带有了公平锁的功能，接下来开始手撸<code>Etcd</code>分布式锁的实现，首先是获取锁的逻辑：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Lock</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, name: <span class="hljs-built_in">str</span>, client: aetcd.Client, ttl: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        self._prefix = name.encode()<br>        self._name = self._prefix + <span class="hljs-string">b&#x27;/&#x27;</span> + uuid1().<span class="hljs-built_in">hex</span>.encode()<br>        self._client = client<br>        self._ttl = ttl<br>        self.lease = <span class="hljs-literal">None</span><br>        self._watch_dog: Optional[asyncio.Task]= <span class="hljs-literal">None</span><br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">acquire</span>(<span class="hljs-params">self</span>) -&gt; bool:</span><br>        <span class="hljs-comment"># 1.创建续约</span><br>        self.lease = <span class="hljs-keyword">await</span> self._client.lease(self._ttl)<br>        <span class="hljs-comment"># 2.写入数据</span><br>        create_result = <span class="hljs-keyword">await</span> self._client.put(self._name, <span class="hljs-string">b&quot;&quot;</span>, lease=self.lease)<br>        self_revision = create_result.header.revision<br>        <span class="hljs-comment"># 3.查询数据</span><br>        range_result = <span class="hljs-keyword">await</span> self._client.get_prefix(self._prefix, sort_target=<span class="hljs-string">&quot;create&quot;</span>)<br>        create_revision = range_result.kvs[<span class="hljs-number">0</span>].create_revision<br>        <span class="hljs-keyword">if</span> create_revision == self_revision:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br>        <span class="hljs-comment"># 4.查询需要监听的key</span><br>        watch_key = <span class="hljs-string">b&quot;&quot;</span><br>        <span class="hljs-keyword">for</span> index, item <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(range_result.kvs):<br>            <span class="hljs-keyword">if</span> item.create_revision == self_revision:<br>                watch_key = range_result.kvs[index - <span class="hljs-number">1</span>].key<br><br>        <span class="hljs-comment"># 5.监听Key</span><br>        watch = <span class="hljs-keyword">await</span> self._client.watch(<br>            watch_key,<br>            kind=aetcd.rtypes.EventKind.DELETE,<br>        )<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">for</span> event <span class="hljs-keyword">in</span> watch:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br></code></pre></td></tr></table></figure>
+<p>示例代码中会先进行初始化，其中传递进来的<code>name</code>参数会取名为<code>prefix</code>，而锁内的<code>name</code>为<code>prefix</code>和<code>token</code>的拼接，这样会方便通过<code>Prefix</code>机制去查找相同锁的内容，也可以让<code>Watch</code>机制单独的去监听对应锁的状态，以及防止发生别的锁释放到自己的锁的情况。</p>
+<p>在初始化之后就是获取锁的实现了，获取锁的第一步是创建续约的相关方法，<code>Etcd</code>的续约机制与<code>Redis</code>的过期时间不同的是，<code>Etcd</code>是需要先创建一个租约，然后再用租约去绑定对应的<code>Key</code>，如果这个租约过期了，那么租约对应的<code>Key</code>都会同时过期，所有要先创建一个租约，然后在<code>put</code>方法中与<code>Key</code>绑定。<br>接着是与图中的步骤一样，会先推送数据到<code>Etcd</code>中，然后根据<code>get_prefix</code>获取所有锁的数据，需要注意的是这里需要定义<code>sort_target</code>为<code>create</code>，这样返回的结果集会按照<code>Key</code>创建的版本号排序。使后续能快速的判断自己获取锁是否成功，也容易推断出上一个Key的值是什么。<br>最后就是通过<code>watch</code>方法，监听上一个Key的删除事件，如果收到删除事件那么意味获取到锁。</p>
+<p>可以看到由于<code>Etcd</code>的<code>Revision</code>和<code>Watch</code>机制以及它的一致性，基于<code>Etcd</code>实现的获取锁不需要通过<code>While</code>循环去循环获取锁，也不需要考虑到网络原因导致客户端和服务端的数据不同步的因素，因此实现的代码                          非常的简单。同时这个简单还不止提现在获取锁的方法中，释放锁和<code>WatchDog</code>的实现也非常简单，如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Lock</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    ...<br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__aenter__</span>(<span class="hljs-params">self</span>) -&gt; &quot;Lock&quot;:</span><br>        self._watch_dog = asyncio.create_task(self.watch_dog())<br>        <span class="hljs-keyword">await</span> self.acquire()<br>        <span class="hljs-keyword">return</span> self<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__aexit__</span>(<span class="hljs-params">self, exc_type, exc_val, exc_tb</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">if</span> self._watch_dog <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> self._watch_dog.done():<br>            self._watch_dog.cancel()<br>        <span class="hljs-keyword">await</span> self.release()<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">watch_dog</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>            <span class="hljs-keyword">if</span> self.lease <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>                <span class="hljs-keyword">try</span>:<br>                    <span class="hljs-keyword">await</span> self.refresh()<br>                <span class="hljs-keyword">except</span> ValueError:<br>                    <span class="hljs-keyword">pass</span><br>            <span class="hljs-keyword">await</span> asyncio.sleep(self._ttl / <span class="hljs-number">3</span>)<br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">refresh</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-string">&quot;&quot;&quot;Refresh the time to live on this lock.&quot;&quot;&quot;</span><br>        <span class="hljs-keyword">if</span> self.lease <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> self.lease.refresh()<br><br>        <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&#x27;no lease associated with this lock: <span class="hljs-subst">&#123;self._name!r&#125;</span>&#x27;</span>)<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">release</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        <span class="hljs-keyword">await</span> self._client.delete(self._name)<br></code></pre></td></tr></table></figure>
+<p>通过代码可以看到，释放锁的操作非常简单只需要调用<code>delete</code>方法即可，而<code>WatchDog</code>与之前<code>Redis</code>分布式锁的机制类似，只是核心的锁续约交给了<code>Lease</code>机制去实现，<code>Lease</code>机制的<code>refresh</code>方法会重置当前续约的时间为一开始定义的ttl。</p>
+<p>接下来运行测试代码，这个代码会按顺序执行相同的任务，它们的锁超时时间为1秒，但是执行的时间为2秒，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">my_print</span>(<span class="hljs-params">msg: <span class="hljs-built_in">str</span></span>):</span><br>    print(<span class="hljs-string">f&quot;Timestamp:<span class="hljs-subst">&#123;time.time()&#125;</span> Task:<span class="hljs-subst">&#123;<span class="hljs-built_in">id</span>(asyncio.current_task())&#125;</span>, <span class="hljs-subst">&#123;msg&#125;</span>&quot;</span>)<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sub</span>(<span class="hljs-params">client: aetcd.Client, cnt: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>    my_print(<span class="hljs-string">f&quot;cnt:<span class="hljs-subst">&#123;cnt&#125;</span> wait&quot;</span>)<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> Lock(<span class="hljs-string">&quot;demo&quot;</span>, client, <span class="hljs-number">1</span>):<br>        my_print(<span class="hljs-string">f&quot;cnt:<span class="hljs-subst">&#123;cnt&#125;</span> run&quot;</span>)<br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">2</span>)<br>    my_print(<span class="hljs-string">f&quot;cnt:<span class="hljs-subst">&#123;cnt&#125;</span> done&quot;</span>)<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>() -&gt; <span class="hljs-keyword">None</span>:</span><br>    client = aetcd.Client()<br>    <span class="hljs-keyword">await</span> client.delete_prefix(<span class="hljs-string">b&quot;demo&quot;</span>)<br>    tasks = []<br>    tasks.append(asyncio.create_task(sub(client, <span class="hljs-number">1</span>)))<br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br>    tasks.append(asyncio.create_task(sub(client, <span class="hljs-number">2</span>)))<br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.1</span>)<br>    tasks.append(asyncio.create_task(sub(client, <span class="hljs-number">3</span>)))<br>    <span class="hljs-keyword">await</span> asyncio.gather(*tasks)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    asyncio.run(main())<br></code></pre></td></tr></table></figure>
+<p>在运行测试代码后可以看到如下输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">Timestamp:1694361604.7456405 Task:140007816152864, cnt:1 <span class="hljs-built_in">wait</span><br>Timestamp:1694361604.7522662 Task:140007816152864, cnt:1 run<br>Timestamp:1694361604.846592 Task:140007816153184, cnt:2 <span class="hljs-built_in">wait</span><br>Timestamp:1694361604.947299 Task:140007816154624, cnt:3 <span class="hljs-built_in">wait</span><br>Timestamp:1694361606.7529566 Task:140007816152864, cnt:1 <span class="hljs-keyword">done</span><br>Timestamp:1694361606.7571979 Task:140007816153184, cnt:2 run<br>Timestamp:1694361608.7577982 Task:140007816153184, cnt:2 <span class="hljs-keyword">done</span><br>Timestamp:1694361608.7609887 Task:140007816154624, cnt:3 run<br>Timestamp:1694361610.7621803 Task:140007816154624, cnt:3 <span class="hljs-keyword">done</span><br></code></pre></td></tr></table></figure>
+<p>通过输出可以发现，每个任务的执行时间都在2秒左右，而且任务2和任务3虽然在同一时间内等待执行，但是任务1执行完毕后，只有任务2会执行，任务3需要等待任务2执行完毕后才能执行。
+             </p>
+
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2023/09/10/distributed_lock_by_etcd/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;09&#x2F;10&#x2F;distributed_lock_by_etcd&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2023&#x2F;09&#x2F;10&#x2F;distributed_lock_by_etcd&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
+</ul>
+
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Etcd/" rel="tag">Etcd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag">分布式</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2023/09/09/distributed_lock_by_redis/">分布式锁(2)--基于Redis实现的不同功能的分布式锁<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BA%E4%BD%95%E5%9F%BA%E4%BA%8EEtcd%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="toc-text">1.为何基于Etcd实现分布式锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.分布式锁的实现</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BA%E4%BD%95%E5%9F%BA%E4%BA%8EEtcd%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="toc-text">1.为何基于Etcd实现分布式锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.分布式锁的实现</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+  
+  <div class="footer-copyright">
+      <a href="/atom.xml">
+  </div>
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
