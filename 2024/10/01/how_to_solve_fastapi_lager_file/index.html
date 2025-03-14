@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hans" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>如何解决FastAPI的大文件传输问题 - So1n blog</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="前记在使用FastAPI/Starlette进行大文件...">
+  <meta name="author" content="So1n">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon.ico" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/favicon.ico" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon.ico">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/atom-one-dark-reasonable.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      loading: {
+        gif: '',
+        lottie: ''
+      },
+      lazyload: {
+        enable: true,
+        only_post: 'true',
+        loading: {
+          gif: '',
+          lottie: ''
+        }
+      },
+      donate: {
+        enable: true,
+        alipay: 'https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg',
+        wechat: ''
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: true
+      },
+      carrier: {
+        enable: false
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: 'I`m   So1n',
+          typing: true,
+          api: '',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: true,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="So1n blog" type="application/atom+xml">
+</head>
+
+<body class="lock-screen">
+  <div class="loading" id="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+        <i class="iconfont iconsearch j-navbar-search"></i>
+      
+    </div>
+    <div class="center">如何解决FastAPI的大文件传输问题</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/project/ " class="underline "> 项目</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1731229270952file-transfer-app-for-pc-1.jpg" draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">如何解决FastAPI的大文件传输问题</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>October 01, 2024</span>
+      
+      本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>13015</span>
+    </div>
+  </div>
+</section>
+
+    <section class="main">
+      <section class="content">
+        <!-- 展示文章摘录 -->
+        
+          <p><h2 id="前记"><a href="#前记" class="headerlink" title="前记"></a>前记</h2><p>在使用FastAPI/Starlette进行大文件处理路由开发时，有可能会发现路由的响应时间会比其他框架开发的路由还要慢，而这跟<code>Starlette</code>的设计有关。</p></p>
+        
+        <h2 id="1-上传文件"><a href="#1-上传文件" class="headerlink" title="1.上传文件"></a>1.上传文件</h2><p>在FastAPI的官方文档介绍了上传文件的方法时，只介绍了UploadFile对象的使用，而在Starlette官方文档中除了介绍UploadFile对象的使用外，还介绍了处理文件流的Stream方法。由于FastAPI的各种网络处理都是基于Starlette的，所以FastAPI可以同时使用这两种方法来接收客户端上传的文件，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> FastAPI, UploadFile, Request<br><br>app = FastAPI()<br><br><br><span class="hljs-meta">@app.post(<span class="hljs-params"><span class="hljs-string">&quot;/uploadfile/&quot;</span></span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_upload_file</span>(<span class="hljs-params">file: UploadFile</span>) -&gt; dict:</span><br>    print(<span class="hljs-built_in">len</span>(<span class="hljs-keyword">await</span> file.read()))<br>    <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&quot;filename&quot;</span>: file.filename&#125;<br><br><br><span class="hljs-meta">@app.post(<span class="hljs-params"><span class="hljs-string">&quot;/streamfile/&quot;</span></span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_file</span>(<span class="hljs-params">request: Request</span>):</span><br>    chunks: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">bytes</span>] = []<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">for</span> chunk <span class="hljs-keyword">in</span> request.stream():<br>        chunks.append(chunk)<br>    print(<span class="hljs-built_in">len</span>(chunks))<br>    <span class="hljs-keyword">return</span> request.headers.get(<span class="hljs-string">&quot;filename&quot;</span>)<br><br><br><span class="hljs-keyword">import</span> uvicorn<br>uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+<p>这两种方法在FastAPI中最主要的差别是FastAPI的OpenAPI能够支持UploadFile对象，而Stream则不支持。此外还有一个不容易被发现的差别–他们在处理大文件的性能有明显的差异，比如下面这个例子，首先是在当前路径下创建两个文件，他们的大小分别为1MB和10MB:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">dd <span class="hljs-keyword">if</span>=/dev/zero of=file_1mb bs=1024B count=1024<br>dd <span class="hljs-keyword">if</span>=/dev/zero of=file_10mb bs=1024B count=10240<br></code></pre></td></tr></table></figure>
+<p>通过<code>ls</code>命令可以看到他们一个文件大小为1M，另一个为10M:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">ls -alh<br><br>-rw-rw-r--  1 so1n so1n    10M 10月 1日 17:38 file_10mb<br>-rw-rw-r--  1 so1n so1n   1.0M 10月 1日 17:37 file_1mb<br></code></pre></td></tr></table></figure>
+<p>在文件创建完毕后，先在终端启动FastAPI服务，并向<code>streamfile</code>和<code>uploadfile</code>接口各发送两个请求，一个请求的文件大小为1mb，另外一个请求的文件大小为10mb，如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 10MB</span><br>➜ curl -X <span class="hljs-string">&#x27;POST&#x27;</span> \<br>  <span class="hljs-string">&#x27;http://127.0.0.1:8000/streamfile/&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;accept: application/json&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;Content-Type: multipart/form-data&#x27;</span> \<br>  -F <span class="hljs-string">&#x27;file=@file_10mb&#x27;</span><br>➜ curl -X <span class="hljs-string">&#x27;POST&#x27;</span> \    <br>  <span class="hljs-string">&#x27;http://127.0.0.1:8000/uploadfile/&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;accept: application/json&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;Content-Type: multipart/form-data&#x27;</span> \<br>  -F <span class="hljs-string">&#x27;file=@file_10mb&#x27;</span><br><br><span class="hljs-comment"># 1MB</span><br>➜ curl -X <span class="hljs-string">&#x27;POST&#x27;</span> \<br>  <span class="hljs-string">&#x27;http://127.0.0.1:8000/streamfile/&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;accept: application/json&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;Content-Type: multipart/form-data&#x27;</span> \<br>  -F <span class="hljs-string">&#x27;file=@file_1mb&#x27;</span><br>➜ curl -X <span class="hljs-string">&#x27;POST&#x27;</span> \    <br>  <span class="hljs-string">&#x27;http://127.0.0.1:8000/uploadfile/&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;accept: application/json&#x27;</span> \      <br>  -H <span class="hljs-string">&#x27;Content-Type: multipart/form-data&#x27;</span> \<br>  -F <span class="hljs-string">&#x27;file=@file_1mb&#x27;</span> <br></code></pre></td></tr></table></figure>
+<p>接着再切回到运行FastAPI服务的终端，通过日志可以发现对于1MB文件的请求，他们的响应时长是差不多的，而对于10MB文件的请求，<code>Stream</code>的响应时长却只有<code>UploadFile</code>的一半：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 10MB</span><br>Duration Time 0.02158188819885254 sec<br>INFO:     127.0.0.1:49688 - <span class="hljs-string">&quot;POST /streamfile/ HTTP/1.1&quot;</span> 200 OK<br>Duration Time 0.05427813529968262 sec<br>INFO:     127.0.0.1:49702 - <span class="hljs-string">&quot;POST /uploadfile/ HTTP/1.1&quot;</span> 200 OK<br><span class="hljs-comment"># 1MB</span><br>Duration Time 0.003081798553466797 sec<br>INFO:     127.0.0.1:51168 - <span class="hljs-string">&quot;POST /streamfile/ HTTP/1.1&quot;</span> 200 OK<br>Duration Time 0.0035855770111083984 sec<br>INFO:     127.0.0.1:51184 - <span class="hljs-string">&quot;POST /uploadfile/ HTTP/1.1&quot;</span> 200 OK<br></code></pre></td></tr></table></figure>
+
+<p>造成这个差别的原因是<code>UploadFile</code>对象中使用到的<code>file</code>为<code>Python</code>的<code>SpooledTemporaryFile</code>，同时设置了<code>max_size</code>为1MB。 在这个配置下，<code>UploadFile</code>会持续的接收文件流并交给<code>SpooledTemporaryFile</code>处理。 当接收的流大小小于1MB时，流的数据是存放在内存中，当接收的流的大小超过了1MB时，才会把位于内存的文件转移到硬盘中，而且后续接收的所有流都会写入到硬盘中。</p>
+<p>这也意味着<code>Starlette</code>在接收文件时，如果文件的大小小于1MB，那么文件就会存在内存之中，如果文件大于1MB，那么文件会写入到硬盘中。所以对于小于1MB的文件，<code>UploadFile</code>不会涉及到IO操作，而对于大于1MB的文件，<code>UploadFile</code>在写入数据以及路由函数调用<code>read</code>方法时都会涉及到IO操作，最终，整个路由的执行时间会变慢了一些，具体原理如图：<br><img  src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1730639563221SpooledTemporaryFile_With_Web.png"  ><span class="image-caption">1730639563221SpooledTemporaryFile_With_Web.png</span></p>
+<p>图中的逻辑名为假脱机策略，通过该策略可以有效的防止用户上传大文件导致挤爆机器内存而无法继续提供服务，但是也因此产生了多次IO调用从而导致了处理上传文件的效率变得低效。<br>当在遇到文件上传的性能有瓶颈时，可以通过以下方法来解决问题。</p>
+<h3 id="1-2-解决方案"><a href="#1-2-解决方案" class="headerlink" title="1.2.解决方案"></a>1.2.解决方案</h3><p>前面说到，使用<code>UploadFile</code>上传大文件时速度比较慢的原因是<code>UploadFile</code>在处理大文件时会涉及到文件的IO处理，如果把这个IO处理的影响给移除掉，那么就没有性能问题了。</p>
+<h4 id="1-2-1-修改max-file-size配置参数"><a href="#1-2-1-修改max-file-size配置参数" class="headerlink" title="1.2.1.修改max_file_size配置参数"></a>1.2.1.修改<code>max_file_size</code>配置参数</h4><p>适用场景：机器内存比较大，上传的文件频率不高但却对性能有明显的需求。</p>
+<p>通过修改<code>max_file_size</code>参数的大小，可以防止<code>SpooledTemporaryFile</code>把文件从内存写入硬盘，从而移除了IO处理的影响，修改方法如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> starlette.formparsers <span class="hljs-keyword">import</span> MultiPartParser<br><br>MultiPartParser.max_file_size = <span class="hljs-number">20</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span><br></code></pre></td></tr></table></figure>
+<p>上述方法把文件大小的判断改为20MB，这个参数大小可以根据自己的业务进行判断，不过需要注意的是，如果这个接口使用很频繁，或者用户上传的文件比较大时，可能会让系统的内存挤满，从而导致程序OOM。</p>
+<h4 id="1-2-2-修改临时目录"><a href="#1-2-2-修改临时目录" class="headerlink" title="1.2.2.修改临时目录"></a>1.2.2.修改临时目录</h4><p>适用场景：只接收客户端上传的文件并进行存储，不会进行其他处理。</p>
+<p>服务端接收文件一般有两个需求，一个是处理文件，另外一个是存放文件。如果当前的需求是为了存放文件，那么可以通过该方法更改保存的临时目录，修改方法如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> tempfile<br><br><span class="hljs-comment"># 修改临时文件目录</span><br>tempfile.tempdir = <span class="hljs-string">&quot;path/to/tempdir/here&quot;</span><br><br><span class="hljs-keyword">from</span> starlette.formparsers <span class="hljs-keyword">import</span> MultiPartParser<br><br><span class="hljs-comment"># 修改该配置，使所有文件都会直接存放到硬盘中</span><br>MultiPartParser.max_file_size = <span class="hljs-number">0</span> <br></code></pre></td></tr></table></figure>
+<p>这样一来就等于把保存文件这一个功能交给了<code>UploadFile</code>对象处理，也是达到了减少额外IO处理的影响。</p>
+<h4 id="1-2-3-重新实现流处理"><a href="#1-2-3-重新实现流处理" class="headerlink" title="1.2.3.重新实现流处理"></a>1.2.3.重新实现流处理</h4><p>适用场景：不考虑<code>FastAPI</code>的OpenAPI功能， 考虑到需要尽量少的使用内存，同时还需要在程序中处理文件流。</p>
+<p>在前面介绍的FastAPI两种接收方法中，除了<code>UploadFile</code>外，还有一种名为<code>Stream</code>的方法，通过<code>Stream</code>实时读取数据并写入文件或者进行实时的流处理也能减少IO的影响。不过该方案需要自己去解析流，直接保存流内容到文件中容易导致文件无法打开，好在<code>multipart</code>已经提供了一个很好的解析器了，只需要稍微修改就可以实现流的解析，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> FastAPI, Request<br><span class="hljs-keyword">from</span> multipart <span class="hljs-keyword">import</span> PushMultipartParser, MultipartSegment, parse_options_header<br><br>app = FastAPI()<br><br><br><span class="hljs-meta">@app.post(<span class="hljs-params"><span class="hljs-string">&quot;/streamfile/&quot;</span></span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_file</span>(<span class="hljs-params">request: Request</span>):</span><br>    content_type = request.headers.get(<span class="hljs-string">&quot;content-type&quot;</span>)<br>    real_content_type, boundary_dict = parse_options_header(content_type)<br>    <span class="hljs-keyword">assert</span> real_content_type == <span class="hljs-string">&quot;multipart/form-data&quot;</span><br><br>    filename: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;&quot;</span><br>    file_length: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span><br>    stream_gen = request.stream()<br><br>    <span class="hljs-keyword">with</span> PushMultipartParser(boundary_dict[<span class="hljs-string">&quot;boundary&quot;</span>]) <span class="hljs-keyword">as</span> parser:<br>        <span class="hljs-keyword">while</span> <span class="hljs-keyword">not</span> parser.closed:<br>            chunk = <span class="hljs-keyword">await</span> stream_gen.__anext__()<br>            <span class="hljs-keyword">for</span> result <span class="hljs-keyword">in</span> parser.parse(chunk):<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(result, MultipartSegment):<br>                    print(<span class="hljs-string">f&quot;== Start of segment: <span class="hljs-subst">&#123;result.name&#125;</span>&quot;</span>)<br>                    <span class="hljs-keyword">if</span> result.filename:<br>                        filename = result.filename<br>                        print(<span class="hljs-string">f&quot;== Client-side filename: <span class="hljs-subst">&#123;result.filename&#125;</span>&quot;</span>)<br>                    <span class="hljs-keyword">for</span> header, value <span class="hljs-keyword">in</span> result.headerlist:<br>                        print(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;header&#125;</span>: <span class="hljs-subst">&#123;value&#125;</span>&quot;</span>)<br>                <span class="hljs-keyword">elif</span> result:  <span class="hljs-comment"># Result is a non-empty bytearray</span><br>                    file_length += <span class="hljs-built_in">len</span>(result)<br>                <span class="hljs-keyword">else</span>:  <span class="hljs-comment"># Result is None</span><br>                    print(<span class="hljs-string">f&quot;== End of segment&quot;</span>)<br><br>    <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&quot;filename&quot;</span>: filename, <span class="hljs-string">&quot;length&quot;</span>: file_length&#125;<br><br><br><span class="hljs-keyword">import</span> uvicorn<br>uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Note: </p>
+<ul>
+<li><code>python-multipart</code>有点鸡贼， 没有讲究先来后到的原则，直接使用了<code>multipart</code>的包名，如果你安装了<code>python-multipart</code>且它的版本小于0.0.13，那么上述代码可能无法正常运行。</li>
+<li>通过魔改，也可以定义一个类似于UploadFile的对象，同时又支持在OpenAPI展示。</li>
+</ul>
+</blockquote>
+<h2 id="2-大文件下载"><a href="#2-大文件下载" class="headerlink" title="2.大文件下载"></a>2.大文件下载</h2><blockquote>
+<p>Note: 本章节不考虑通过程序在内存生成数据并以文件形式返回给客户端等文件不存在于硬盘的场景，比如拉取数据库的数据，然后以文件响应的形式返回给客户端。</p>
+</blockquote>
+<p>目前大部分开发者对大文件下载的性能要求并不大，所以<code>Starlette</code>以及<code>Sanic</code>等开发者并没有完善这个功能的想法，然而在进行测试时可以发现他们的性能都比较差。如下测试，由于<code>FastAPI</code>和<code>aiohttp</code>的<code>static</code>路由都是使用了各自的<code>FileResponse</code>，所以我使用了他们的<code>static</code>路由进行测试，首先是把上述的<code>file_1mb</code>和<code>file_10mb</code>文件移动到当前目录的<code>static</code>子目录中，然后创建两个文件，一个文件存放<code>FastAPI</code>的代码，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> FastAPI<br><span class="hljs-keyword">from</span> fastapi.staticfiles <span class="hljs-keyword">import</span> StaticFiles<br><br>app = FastAPI()<br>app.mount(<span class="hljs-string">&quot;/static&quot;</span>, StaticFiles(directory=<span class="hljs-string">&quot;static&quot;</span>), name=<span class="hljs-string">&quot;static&quot;</span>)<br><br><span class="hljs-keyword">import</span> uvicorn<br>uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+<p>另外一个存放<code>aiohttp</code>的代码，如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> aiohttp <span class="hljs-keyword">import</span> web<br><br>routes = web.RouteTableDef()<br>routes.static(<span class="hljs-string">&quot;/static&quot;</span>, <span class="hljs-string">&quot;./static&quot;</span>)<br><br>app = web.Application()<br>app.add_routes(routes)<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span>(<span class="hljs-params">port=<span class="hljs-number">8000</span></span>):</span><br>    loop = asyncio.new_event_loop()<br>    web.run_app(app, port=port, loop=loop)<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    main()<br></code></pre></td></tr></table></figure>
+
+<p>接下来，使用<code>ab</code>命令进行压测：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">&gt; ab -n 1000 -c 100 http://127.0.0.1:8000/static/file_10mb<br></code></pre></td></tr></table></figure>
+<p>具体数据就不贴出来了，只贴QPS的数据，通过如下数据可以发现<code>aiohttp</code>每秒处理的请求数量是<code>FastAPI</code>的5倍：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># FastAPI   Requests per second:    63.43 [#/sec] (mean)</span><br><span class="hljs-comment"># aiohttp   Requests per second:    287.53 [#/sec] (mean)</span><br></code></pre></td></tr></table></figure>
+<p>他们的性能差别为何如此之大呢？原因在于他们的<code>FileResponse</code>实现，首先是<code>Starlette</code>的<code>FileResponse</code>，源码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-comment"># 0.39版本后新增了if-range的处理，代码会更多，这里以0.38版本代码为准</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileResponse</span>(<span class="hljs-params">Response</span>):</span><br>    ...<br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span>(<span class="hljs-params">self, scope: Scope, receive: Receive, send: Send</span>) -&gt; <span class="hljs-keyword">None</span>:</span><br>        ...<br>        <span class="hljs-keyword">await</span> send(<br>            &#123;<br>                <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;http.response.start&quot;</span>,<br>                <span class="hljs-string">&quot;status&quot;</span>: self.status_code,<br>                <span class="hljs-string">&quot;headers&quot;</span>: self.raw_headers,<br>            &#125;<br>        )<br>        <span class="hljs-keyword">if</span> scope[<span class="hljs-string">&quot;method&quot;</span>].upper() == <span class="hljs-string">&quot;HEAD&quot;</span>:<br>            <span class="hljs-keyword">await</span> send(&#123;<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;http.response.body&quot;</span>, <span class="hljs-string">&quot;body&quot;</span>: <span class="hljs-string">b&quot;&quot;</span>, <span class="hljs-string">&quot;more_body&quot;</span>: <span class="hljs-literal">False</span>&#125;)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># &gt;&gt;&gt;主要逻辑</span><br>            <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> <span class="hljs-keyword">await</span> anyio.open_file(self.path, mode=<span class="hljs-string">&quot;rb&quot;</span>) <span class="hljs-keyword">as</span> file:<br>                more_body = <span class="hljs-literal">True</span><br>                <span class="hljs-keyword">while</span> more_body:<br>                    chunk = <span class="hljs-keyword">await</span> file.read(self.chunk_size)<br>                    more_body = <span class="hljs-built_in">len</span>(chunk) == self.chunk_size<br>                    <span class="hljs-keyword">await</span> send(<br>                        &#123;<br>                            <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;http.response.body&quot;</span>,<br>                            <span class="hljs-string">&quot;body&quot;</span>: chunk,<br>                            <span class="hljs-string">&quot;more_body&quot;</span>: more_body,<br>                        &#125;<br>                    )<br>        <span class="hljs-keyword">if</span> self.background <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-keyword">await</span> self.background()<br></code></pre></td></tr></table></figure>
+<p>在这段源码中，大部分都是与ASGI协议设计相关，只要中间的才是正直传输文件的逻辑（从注释点开始），可以看到<code>FileResponse</code>的主要工作原理是通过<code>anyio.open_file</code>打开文件，并读取文件的内容后再以ASGI协议发送到ASGI服务器。</p>
+<p>而<code>AioHTTP</code>有所不同，它的<code>FileResponse</code>主要源码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileResponse</span>(<span class="hljs-params">StreamResponse</span>):</span><br>    ...<br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_sendfile_fallback</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self, writer: AbstractStreamWriter, fobj: IO[Any], offset: <span class="hljs-built_in">int</span>, count: <span class="hljs-built_in">int</span></span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; AbstractStreamWriter:</span><br><br>        chunk_size = self._chunk_size<br>        loop = asyncio.get_event_loop()<br><br>        <span class="hljs-keyword">await</span> loop.run_in_executor(<span class="hljs-literal">None</span>, fobj.seek, offset)<br><br>        chunk = <span class="hljs-keyword">await</span> loop.run_in_executor(<span class="hljs-literal">None</span>, fobj.read, chunk_size)<br>        <span class="hljs-keyword">while</span> chunk:<br>            <span class="hljs-keyword">await</span> writer.write(chunk)<br>            count = count - chunk_size<br>            <span class="hljs-keyword">if</span> count &lt;= <span class="hljs-number">0</span>:<br>                <span class="hljs-keyword">break</span><br>            chunk = <span class="hljs-keyword">await</span> loop.run_in_executor(<span class="hljs-literal">None</span>, fobj.read, <span class="hljs-built_in">min</span>(chunk_size, count))<br><br>        <span class="hljs-keyword">await</span> writer.drain()<br>        <span class="hljs-keyword">return</span> writer<br><br>    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_sendfile</span>(<span class="hljs-params"></span></span><br><span class="hljs-function"><span class="hljs-params">        self, request: <span class="hljs-string">&quot;BaseRequest&quot;</span>, fobj: IO[Any], offset: <span class="hljs-built_in">int</span>, count: <span class="hljs-built_in">int</span></span></span><br><span class="hljs-function"><span class="hljs-params">    </span>) -&gt; AbstractStreamWriter:</span><br>        writer = <span class="hljs-keyword">await</span> <span class="hljs-built_in">super</span>().prepare(request)<br>        <span class="hljs-keyword">assert</span> writer <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span><br><br>        <span class="hljs-keyword">if</span> NOSENDFILE <span class="hljs-keyword">or</span> self.compression:<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> self._sendfile_fallback(writer, fobj, offset, count)<br><br>        loop = request._loop<br>        transport = request.transport<br>        <span class="hljs-keyword">assert</span> transport <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span><br><br>        <span class="hljs-keyword">try</span>:<br>            <span class="hljs-keyword">await</span> loop.sendfile(transport, fobj, offset, count)<br>        <span class="hljs-keyword">except</span> NotImplementedError:<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> self._sendfile_fallback(writer, fobj, offset, count)<br><br>        <span class="hljs-keyword">await</span> <span class="hljs-built_in">super</span>().write_eof()<br>        <span class="hljs-keyword">return</span> writer<br></code></pre></td></tr></table></figure>
+<p>通过源码可以知道，<code>FileResponse</code>的主要工作原理是先通过<code>_sendfile</code>的<code>loop.sendfile</code>方法尝试发送文件，如果发送失败，则使用<code>_sendfile_fallback</code>发送数据。<code>_sendfile_fallback</code>发送数据的逻辑与<code>Starlette</code>的<code>FileResponse</code>类似， 都是先打开文件，然后一批一批的通过网络传输给客户端。</p>
+<p>经过对比可以发现<code>AioHTTP</code>与<code>Starlette</code>最主要的区别是<code>AioHTTP</code>比<code>Starlette</code>多了一个<code>loop.sendfile</code>的方法，这个方法就是<code>AioHTTP</code>大文件下载速度快于<code>FastAPI</code>的秘诀。<br><code>loop.sendfile</code>方法是<code>os.sendfile</code>的异步方法，它是<code>Linux</code>零拷贝的一个API调用，零拷贝与普通的文件读取并下载文件有些区别，如下图：<br><img  src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1731142932157diff-large-file-download.png"  ><span class="image-caption">1731142932157diff-large-file-download.png</span><br>图中左边是普通的服务器下载文件的方式，右边则是利用零拷贝API实现服务器下载文件的方式。<br>首先看左边的实现，其中第2和3步骤都涉及到了用户态与内核态之间的切换，这种切换会增加上下文的开销，同时还需要CPU去拷贝这些数据，严重的占用了CPU的资源。而第1和第4步在以前跟第2和第3步是一样的，只不过后面引进了DMA来释放了CPU的压力。<br>DMA的原理很简单，他可以被认为是一个独立的工作单元，但它收到CPU的命令后会把数据从硬盘传输到内核态或者从内核态传输到网卡中。整个过程CPU只需要发送一个指令，相对于原先的CPU的逐字节搬运，CPU的开销就降低了很多。<br>接着来看右边的零拷贝实现，它与左边的区别是数据再也不需要经历用户态，用户只需要在用户态调用零拷贝的API，数据就能直接在内核态中把文件流转换为网络数据流发向网卡中。这样一来既省去了用户态和内核态之间的交互，也不再需要CPU去拷贝数据，于是CPU的开销就降低了很多，系统的性能也就提了上去。</p>
+<blockquote>
+<p>Note:<br>  通过零拷贝会省去上下文，IO中断和CPU处理等开销，本文不会着重的讲解这些知识，可以通过以下链接了解更多零拷贝相关的知识:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.linuxjournal.com/article/6345">Zero Copy I: User-Mode Perspective</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7083793623594041375">图文并茂|彻底搞懂零拷贝（Zero-Copy）技术</a></li>
+</ul>
+</blockquote>
+<p>那<code>loop.sendfile</code>的性能如此的好，其它框架为何并不感冒呢，主要是有以下几个原因：</p>
+<ul>
+<li>1.Windows系统并不支持零拷贝</li>
+<li>2.uvloop并不支持<code>loop.sendfile</code>方法(<a target="_blank" rel="noopener" href="https://github.com/MagicStack/uvloop/issues/228">uvloop #228</a>)，如果Web框架支持<code>sendfile</code>的调用会违背了自己所声明的统一性，见<a target="_blank" rel="noopener" href="https://github.com/sanic-org/sanic/issues/2527#issuecomment-1219788898">sanic issue #2527</a>。(其实他可以弄成跟<code>AioHTTP</code>一样的设计的 - -)。</li>
+<li>3.ASGI框架实现过于麻烦， 需要在ASGI协议传递较多的参数，影响后期的维护，见<a target="_blank" rel="noopener" href="https://github.com/encode/uvicorn/pull/1210#issuecomment-986651500">uvicorn #1210</a> 以及<a target="_blank" rel="noopener" href="https://github.com/encode/starlette/pull/1288#discussion_r804545851">starlette #1288</a></li>
+<li>4.以RUST实现的ASGI服务器在传递文件描述符时，需要进行跨语言序列化，在不好维护的基础上还会引起性能损耗(btw，这是ASGI设计时没有考虑多语言的问题了，导致一堆C库的大佬抨击，比如uWebSocket)</li>
+</ul>
+<h3 id="2-2-解决方案"><a href="#2-2-解决方案" class="headerlink" title="2.2.解决方案"></a>2.2.解决方案</h3><p>如果真的对大文件下载的性能有要求，那么有如下三个解决思路：</p>
+<ul>
+<li>1.改用AioHTTP处理文件下载。</li>
+<li>2.合并<code>uvicorn</code>和<code>starlette</code>中别人提交的零拷贝处理相关的代码。</li>
+<li>3.如果API服务与Nginx服务在同一台机器上，那么可以通过Nginx的<code>X-Accel-Redirect</code>来委托Nginx提供高性能的文件下载服务。</li>
+</ul>
+<p>第二个方法以后有机会再讨论，这里简单的介绍一下Nginx方案的使用方法。在这个方案中API服务器只需要处理用户的鉴权等下载文件之前的操作，并在最后返回一个带有<code>X-Accel-Redirect</code>的空响应即可，具体逻辑如下：<br><img  src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/1730910928548Nginx-large-file-download.png"  ><span class="image-caption">1730910928548Nginx-large-file-download.png</span></p>
+<p>为了实现这个逻辑，需要先配置一下Nginx，具体的配置如下：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs Nginx"><span class="hljs-comment"># API服务器</span><br><span class="hljs-attribute">upstream</span> api_backend_hosts &#123;<br>    <span class="hljs-attribute">server</span> <span class="hljs-number">127.0.0.1:8000</span>;<br>    <span class="hljs-attribute">keepalive</span> <span class="hljs-number">10</span>;<br>&#125;<br><br><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;<br>    <span class="hljs-attribute">server_name</span> _;<br>    <span class="hljs-attribute">charset</span> utf-<span class="hljs-number">8</span>;<br><br>    <span class="hljs-attribute">location</span> / &#123;<br>        <span class="hljs-comment"># 转发到API服务器 </span><br>        <span class="hljs-attribute">proxy_pass</span> http://api_backend_hosts;<br>        <span class="hljs-attribute">proxy_http_version</span> <span class="hljs-number">1</span>.<span class="hljs-number">1</span>;<br>    &#125;<br>    <br>    <span class="hljs-attribute">location</span> /private_files/ &#123;<br>        <span class="hljs-comment"># 内部路径，禁止直接请求</span><br>        internal;<br>        <span class="hljs-attribute">alias</span> /home/server/private_files/<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>接着再创建一个FastAPI服务，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> Response, FastAPI<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">file_route</span>(<span class="hljs-params">file_name: <span class="hljs-built_in">str</span></span>) -&gt; Response:</span><br>    resp = Response()<br>    resp.headers[<span class="hljs-string">&quot;X-Sendfile&quot;</span>] = <span class="hljs-string">f&quot;/private_files/<span class="hljs-subst">&#123;file_name&#125;</span>&quot;</span><br>    <span class="hljs-keyword">return</span> resp<br><br><br>app = FastAPI()<br>app.add_route(<span class="hljs-string">&quot;/api/file/&#123;file_name&#125;&quot;</span>, file_route, methods=[<span class="hljs-string">&quot;GET&quot;</span>])<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-keyword">import</span> uvicorn<br>    uvicorn.run(app)<br></code></pre></td></tr></table></figure>
+<p>在运行Nginx和API服务后，只需要把文件放置到机器中的<code>/home/server/private_files</code>文件夹中，就可以通过<code>Nginx</code>和API服务完成大文件下载的功能，他们的性能还是杠杠的。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>目前<code>Asyncio</code>生态中有多个文件处理的库，如果你真的很在意不同库对文件处理大小的性能差异，那么你可以关注此<a target="_blank" rel="noopener" href="https://github.com/mosquito/aiofile/issues/88">issue</a>的相关讨论，最终你会发现通过<code>asyncio.thread</code>去调用同步方法的性能是最好的。</p>
+      </section>
+      <section class="extra">
+        
+          <ul class="copyright">
+  
+    <li><strong>本文作者：</strong>So1n</li>
+    <li><strong>本文链接：</strong><a href="http://so1n.me/2024/10/01/how_to_solve_fastapi_lager_file/index.html" title="http:&#x2F;&#x2F;so1n.me&#x2F;2024&#x2F;10&#x2F;01&#x2F;how_to_solve_fastapi_lager_file&#x2F;index.html">http:&#x2F;&#x2F;so1n.me&#x2F;2024&#x2F;10&#x2F;01&#x2F;how_to_solve_fastapi_lager_file&#x2F;index.html</a></li>
+    <li><strong>版权声明：</strong>本博客所有文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" title="BY-NC-SA" target="_blank" rel="noopener">BY-NC-SA</a> 许可协议，转载请注明出处！</li>
+  
+  <img src="https://raw.githubusercontent.com/so1n/so1n_blog_photo/master/blog_photo/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%88.png" alt="text">
+
+</ul>
+
+        
+        
+          <section class="donate">
+  <div id="qrcode-donate">
+    <img src="https://fastly.jsdelivr.net/gh/so1n/so1n_blog_photo@master/blog_photo/16550449287744d2ebf32586d8799ee2e75333d6f5d2.jpg">
+  </div>
+  <div class="icon">
+    <a href="javascript:;" id="alipay"><i class="iconfont iconalipay"></i></a>
+    <a href="javascript:;" id="wechat"><i class="iconfont iconwechat-fill"></i></a>
+  </div>
+</section>
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asyncio/" rel="tag">Asyncio</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FastAPI/" rel="tag">FastAPI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2023/12/28/python_asyncio_lib_how_to_use_it_correctly/">Python Asyncio 之常见的三个坑<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<div id="gitalk" class="gitalk"></div>
+<script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+  window.onload = function () {
+    var gitalk = new Gitalk({
+      clientID: '59f804e526b05c378470',
+      clientSecret: '36679ff697cec424936a0f7c4bcd6d2988dac28e',
+      id: window.location.pathname,
+      repo: 'so1n.github.io',
+      owner: 'so1n',
+      admin: 'so1n'
+    });
+    if ( true ) {
+      $("#comments-btn").on("click", function () {
+        $(this).hide();
+        gitalk.render('gitalk');
+      });
+    } else {
+      gitalk.render('gitalk');
+    }
+  }
+</script>
+
+</section>
+      
+    </section>
+  </div>
+</article>
+</div>
+      <div class="col-xl-3">
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6"><span class="toc-text">1.上传文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">1.2.解决方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%A7%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD"><span class="toc-text">2.大文件下载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">2.2.解决方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a></li></ol>
+  </aside>
+
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%AE%B0"><span class="toc-text">前记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6"><span class="toc-text">1.上传文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">1.2.解决方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A4%A7%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD"><span class="toc-text">2.大文件下载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">2.2.解决方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-text">附录</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="https://github.com/so1n "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://github.com/izhaoo/hexo-theme-zhaoo">zhaoo</a>| <a target="_blank" href="/atom.xml">RSS</a> </p></div>
+  
+  <div class="footer-copyright">
+      <a href="/atom.xml">
+  </div>
+  <div class="footer-copyright">
+    总访问量<span id="busuanzi_value_site_pv"></span>次
+    访客数<span id="busuanzi_value_site_uv"></span>人次
+  </div>
+
+</footer>
+
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+    <div class="search">
+  <div class="search-container">
+    <div class="search-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <div class="search-input-wrapper">
+      <i class="search-input-icon iconfont iconsearch"></i>
+      <input class="search-input" type="search" id="search-input" placeholder="Search..." autofocus autocomplete="off"
+        autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="search-output" id="search-output"></div>
+  </div>
+</div>
+  
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
